@@ -1,0 +1,8 @@
+*.env
+*.vscode
+documents/*
+notebooks/data/*
+scratch/*
+.venv/*
+*__pycache__*
+presentation/*
