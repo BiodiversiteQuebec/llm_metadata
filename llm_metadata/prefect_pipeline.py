@@ -53,9 +53,4 @@ if __name__ == "__main__":
     # 10.5061/dryad.4k275
 
     # Run the flow
-    flow_state = doi_classification_pipeline(dois=["10.5061/dryad.2n5h6"])
-    
-    # Get the results
-    results = flow_state.result()
-    for result in results:
-        print(result.output)
+    results = doi_classification_pipeline(dois=["10.5061/dryad.2n5h6"])

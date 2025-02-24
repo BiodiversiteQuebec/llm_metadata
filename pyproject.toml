@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "llm_metadata"
+version = "0.1.0"
+description = "A Python package to interact with Dryad and zenodo datasets and extract ecological metadata using GPT-4."
+authors = [
+    { name = "Vincent Beauregard", email = "vincent.beauregard@usherbrooke.ca" }
+]
+readme = "README.md"
+dependencies = [
+    "pydantic",
+    "requests",
+    "prefect",
+    "openai"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pandas",
+    "python-dotenv"
+]
+
+[tool.setuptools]
+package-dir = {"" = "llm_metadata"}
+
+[tool.setuptools.packages.find]
+where = ["llm_metadata"]

@@ -1,5 +1,5 @@
 import config
-from src.zenodo import get_record, get_record_by_doi, get_record_by_doi_list
+from llm_metadata.zenodo import get_record, get_record_by_doi, get_record_by_doi_list
 import unittest
 
 SAMPLE_RECORD_ID = '5009453'
