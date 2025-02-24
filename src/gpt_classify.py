@@ -1,83 +1,84 @@
-import openai
+from openai import OpenAI
 import json
 import os
 from pathlib import Path
+from pydantic import BaseModel, Field
+from typing import Optional, List, Dict
 
-MODEL = "gpt-4-0613"
-MAX_TOKENS = 800
+MODEL = "gpt-4o-mini"
+MAX_TOKENS = 2000
 TEMPERATURE = 0
 CATEGORY_LIST = ["population time-series", "trait data", "abundances", "presence/absence", "plots", "specimens", "museum collection", "trajectory"]
-PROMPT = """
-You are EcodataGPT. Your task is to analyze an open data abstract and generate a JSON output with structured information. The output should be created using the following JSON_template and fields descriptions : 
+SYSTEM_MESSAGE = """
+You are EcodataGPT. Your task is to analyze an open data abstract and generate a JSON output with structured information. 
 """
 
-JSON_TEMPLATE = """
-{
-  "categories": {
-    // List each applicable category with a confidence score. Accepted values:
-    // "population time-series", "trait data", "abundances", "presence/absence",
-    // "plots", "specimens", "museum collection", "trajectory"
-    // Example: {"population time-series": 0.9, "abundances": 0.8,}
-  },
-  "taxonomic_groups": [
-    // List all species, taxonomic entities or groups mentioned in the abstract.
-    // Example: "Mammals"
-  ],
-  "additional_keywords": [
-    // List additional keywords relevant to the dataset.
-    // Example: "Biodiversity"
-  ],
-  "additional_data": [
-    // Describe any additional data types used in relation to the ecological dataset.
-    // Example: "Satellite imagery"
-  ],
-  "dataset_year_start": // Provide the start year of the dataset, if mentioned.
-  // Example: 2001
-  "dataset_year_end": // Provide the end year of the dataset, if mentioned.
-  // Example: 2020
-  "regions_of_interest": [
-    // List geographical regions relevant to the dataset.
-    // Example: "Amazon Rainforest"
-  ]
-}"""
+class EcologicalDatasetTemplate(BaseModel):
+    categories: Optional[List[str]] = Field(
+        default=None,
+        description=(
+            "List each applicable category. "
+            "Accepted keys: population time-series, trait data, abundances, "
+            "presence/absence, plots, specimens, museum collection, trajectory."
+        )
+    )
+    taxonomic_groups: Optional[List[str]] = Field(
+        default=None,
+        description="List all species, taxonomic entities or groups mentioned in the abstract."
+    )
+    additional_keywords: Optional[List[str]] = Field(
+        default=None,
+        description="List additional keywords relevant to the dataset."
+    )
+    additional_data: Optional[List[str]] = Field(
+        default=None,
+        description="Describe any additional data types used in relation to the ecological dataset."
+    )
+    dataset_year_start: Optional[int] = Field(
+        default=None,
+        description="Provide the start year of the dataset, if mentioned."
+    )
+    dataset_year_end: Optional[int] = Field(
+        default=None,
+        description="Provide the end year of the dataset, if mentioned."
+    )
+    regions_of_interest: Optional[List[str]] = Field(
+        default=None,
+        description="List geographical regions relevant to the dataset."
+    )
 
-def classify_abstract(abstract, json_template = JSON_TEMPLATE, open_api_key=None, temperature=TEMPERATURE, model=MODEL, max_tokens=MAX_TOKENS):
-    if not open_api_key:
-        open_api_key = os.getenv("OPENAI_API_KEY")
-    openai.api_key = open_api_key
 
-    # Define the system message to instruct the model, including the JSON JSON_template
-    system_message = f"You are EcodataGPT. Your task is to analyze an open data abstract and generate a JSON output with structured information. Use the following JSON JSON_template: \n{json_template}"
+def classify_abstract(abstract,
+                      system_message=SYSTEM_MESSAGE,
+                      temperature=TEMPERATURE,
+                      model=MODEL, max_tokens=MAX_TOKENS,
+                      response_format=EcologicalDatasetTemplate):
 
     # Define the user message with the abstract
     user_message = abstract
 
     # Create chat completion using OpenAI's Chat API
-    response = openai.ChatCompletion.create(
+    client = OpenAI()
+    response = client.beta.chat.completions.parse(
         model=model,
         messages=[
             {"role": "system", "content": system_message},
             {"role": "user", "content": user_message}
         ],
         max_tokens=max_tokens,
-        temperature=temperature
+        temperature=temperature,
+        response_format=response_format
     )
 
     # Process the response
     out = {
         "prompt": system_message,
         "abstract": abstract,
-        "JSON_template": json_template,
         "model": model,
         "temperature": temperature,
-        "response_raw": response.choices[0].message["content"].strip()
+        "response": response.choices[0],
+        "output": response.choices[0].message.parsed
     }
-
-    try:
-        out["response"] = json.loads(out["response_raw"])
-    except json.decoder.JSONDecodeError:
-        print("Error: JSONDecodeError")
-        out["response"] = None
 
     return out
 
@@ -96,6 +97,3 @@ if __name__ == "__main__":
     classification = classify_abstract(abstract_text)
     # Print the classification
     print(classification)
-
-    # Prompt alternative
-    # Using the following ecological dataset abstract, provide a JSON structure detailing: dataset `categories` with confidence scores, `taxonomic_groups`, `additional_keywords`, `environmental_data`, `dataset_year_start`, `dataset_year_end`, and `regions_of_interest`. Categories should describe type of contained data from list : population time-series, trait data, abundances, presence/absence, plots, specimens, museum collection, trajectory.
