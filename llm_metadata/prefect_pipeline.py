@@ -7,14 +7,6 @@ from zenodo import get_record_by_doi, get_record_by_doi_list
 from gpt_classify import classify_abstract
 from fuster_model import DatasetFeatures
 
-class ClassificationResult(BaseModel):
-    prompt: str
-    abstract: str
-    model: str
-    temperature: float
-    response: dict
-    output: dict
-
 @task
 def fetch_abstract(doi: str) -> str:
     record = get_record_by_doi(doi)
@@ -37,14 +29,14 @@ def fetch_abstracts(dois: List[str]) -> List[str]:
     return abstracts
 
 @task
-def classify_abstract_task(abstract: str, response_format:BaseModel = DatasetFeatures) -> ClassificationResult:
+def classify_abstract_task(abstract: str, response_format:BaseModel = DatasetFeatures) -> dict:
     classification = classify_abstract(abstract, response_format=response_format)
     return classification
 
 @flow(task_runner=ThreadPoolTaskRunner(max_workers=10))
-def doi_classification_pipeline(dois: List[str]) -> List[ClassificationResult]:
+def doi_classification_pipeline(dois: List[str]) -> List:
     abstracts = fetch_abstracts(dois)
-    futures = classify_abstract_task.map(abstracts)
+    futures = classify_abstract_task.map(abstracts, )
     return futures.result()
 
 if __name__ == "__main__":
@@ -54,3 +46,4 @@ if __name__ == "__main__":
 
     # Run the flow
     results = doi_classification_pipeline(dois=["10.5061/dryad.2n5h6"])
+    print(results)

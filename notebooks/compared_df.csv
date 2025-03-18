@@ -1,0 +1,7 @@
+title,url,doi,classification,data_type,geospatial_info_dataset,spatial_range_km2,temporal_range,temp_range_i,temp_range_f,taxons,referred_dataset
+Data from: Resampling method for applying density-dependent habitat selection theory to wildlife surveys,https://doi.org/10.5061/dryad.1771t,10.5061/dryad.1771t,manual,['density'],sample coordinates,not given,2008,2008,2008,"raccoons, striped skunks",
+,,10.5061/dryad.1771t,automated,"['traits', 'genetic_analysis']",site,,,,,Aspicilia bicensis,"Parc national du Bic, Quebec, Canada"
+"Data from: Aspicilia bicensis (Megasporaceae), a new sterile, pustulose lichen from eastern Canada",https://doi.org/10.5061/dryad.24rj8,10.5061/dryad.24rj8,manual,['genetic analysis'],not given,not given,,,,Aspicilia bicensis,
+,,10.5061/dryad.24rj8,automated,"['abundance', 'distribution']",site,,,,,"raccoons, striped skunks",
+Data from: Do genetic drift and accumulation of deleterious mutations preclude adaptation? Empirical investigation using RADseq in a northern lacustrine fish,https://doi.org/10.5061/dryad.2b8f1,10.5061/dryad.2b8f1,manual,['EBV genetic analysis'],not given,500000,2003-2013,2003,2013,Salvelinus namaycush,
+,,10.5061/dryad.2b8f1,automated,"['genetic_analysis', 'traits']",site,,,,,Lake Trout (Salvelinus namaycush),"Québec, Canada"
