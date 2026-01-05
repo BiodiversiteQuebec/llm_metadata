@@ -1,74 +1,217 @@
-# Dryad-GPT4 Data Describer
+# llm_metadata
 
-This Python package provides functionalities to interact with the Dryad datasets and leverage the power of GPT-4 for enhanced dataset descriptions. Users can list datasets based on specific criteria, obtain structured information, and generate insightful summaries using GPT-4.
+A Python package for extracting structured ecological metadata from scientific dataset abstracts using Large Language Models (LLMs). This tool supports biodiversity monitoring efforts by identifying and characterizing datasets to fill taxonomic, spatial, and temporal gaps in biodiversity data coverage.
 
 ## Table of Contents
 
-- [Dryad-GPT4 Data Describer](#dryad-gpt4-data-describer)
+- [llm\_metadata](#llm_metadata)
   - [Table of Contents](#table-of-contents)
+  - [Overview](#overview)
   - [Features](#features)
   - [Installation](#installation)
+  - [Setup](#setup)
+    - [Required Environment Variables](#required-environment-variables)
   - [Usage](#usage)
-  - [Contribute](#contribute)
+    - [Dryad Integration](#dryad-integration)
+    - [Zenodo Integration](#zenodo-integration)
+    - [GPT-4 Metadata Extraction](#gpt-4-metadata-extraction)
+    - [Batch Processing with Prefect](#batch-processing-with-prefect)
+  - [Project Context](#project-context)
+  - [Development](#development)
+    - [Package Structure](#package-structure)
   - [License](#license)
+
+## Overview
+
+Biodiversity observation networks require comprehensive and representative data to track progress toward global biodiversity frameworks (e.g., Kunming-Montreal). However, many valuable datasets remain buried in unstructured text within scientific literature and repository abstracts.
+
+This package leverages GPT-4 to programmatically extract structured metadata from dataset abstracts, including:
+- **Species studied** (taxonomic coverage)
+- **Spatial extent** (geographic coverage)
+- **Temporal period** (time range)
+- **Data type** (following Essential Biodiversity Variables framework)
+
+The goal is to identify relevant datasets that can fill data gaps and support more effective biodiversity monitoring.
 
 ## Features
 
-- **List Dryad Datasets**: Retrieve a list of datasets from Dryad based on keywords and placenames.
-- **Structured Dataset Information**: Fetch essential information like title, authors, abstract, and usage notes of a dataset.
-- **GPT-4 Enhanced Descriptions**: Generate comprehensive and insightful descriptions of datasets using GPT-4.
+- **Dryad API Integration**: Search and retrieve datasets from Dryad repository
+- **Zenodo API Integration**: Query records from Zenodo by DOI
+- **GPT-4 Metadata Extraction**: Extract structured ecological metadata from dataset abstracts using OpenAI's GPT-4
+- **Structured Schemas**: Pydantic models for dataset metadata and Essential Biodiversity Variables (EBV) features
+- **Batch Processing**: Prefect pipeline for processing multiple datasets in parallel
+- **Reproducible Extraction**: Deterministic structured output format for consistent metadata extraction
 
 ## Installation
 
 ```bash
-pip install dryad-gpt4-describer
+pip install -e .
 ```
 
-Ensure you have the `requests` library installed:
+For development dependencies:
 
 ```bash
-pip install requests
+pip install -e .[dev]
+```
+
+## Setup
+
+### Required Environment Variables
+
+Create a `.env` file in the project root:
+
+```bash
+# For GPT-4 classification
+OPENAI_API_KEY=your_openai_api_key
+
+# For Zenodo API access (optional, required only for Zenodo features)
+ZENODO_ACCESS_TOKEN=your_zenodo_token
 ```
 
 ## Usage
 
-1. **List datasets by keyword and placename**
+### Dryad Integration
+
+Search for datasets on Dryad by keywords:
 
 ```python
-from dryad_gpt4_describer import list_datasets_by_keyword_and_placename
+from llm_metadata.dryad import search_datasets, get_dataset
 
-results = list_datasets_by_keyword_and_placename("ecology", "Canada")
-print(results)
+# Search for datasets related to Quebec biodiversity
+results = search_datasets("biodiversity Quebec Canada", per_page=10)
+
+# Get a specific dataset by DOI
+doi = "doi:10.5061/dryad.n726pq6"
+dataset = get_dataset(doi)
+print(dataset)
 ```
 
-2. **Fetch structured dataset information**
+### Zenodo Integration
+
+Retrieve Zenodo records by DOI:
 
 ```python
-from dryad_gpt4_describer import get_dataset_info
+from llm_metadata.zenodo import get_record_by_doi, get_record_by_doi_list
 
-dataset_info = get_dataset_info("YOUR_DATASET_ID")
-print(dataset_info)
+# Get a single record
+record = get_record_by_doi("10.5061/dryad.2n5h6")
+abstract = record['metadata']['description']
+
+# Get multiple records
+dois = ["10.5061/dryad.2n5h6", "10.5061/dryad.3nh72"]
+records = get_record_by_doi_list(dois)
 ```
 
-3. **Generate enhanced descriptions using GPT-4**
+### GPT-4 Metadata Extraction
+
+Extract structured metadata from dataset abstracts to identify data gaps:
 
 ```python
-from dryad_gpt4_describer import generate_description_with_gpt4
+from llm_metadata.gpt_classify import classify_abstract
+from llm_metadata.schemas import DatasetAbstractMetadata
 
-description = generate_description_with_gpt4("YOUR_DATASET_ID")
-print(description)
+abstract = """
+We monitored caribou populations in northern Quebec from 1999 to 2015
+using GPS telemetry. The dataset includes movement trajectories and
+habitat use data for 45 individuals across three herds.
+"""
+
+# Extract high-level metadata
+result = classify_abstract(
+    abstract, 
+    response_format=DatasetAbstractMetadata
+)
+
+metadata = result['output']
+print(metadata.taxonomic_groups)        # ['caribou']
+print(metadata.regions_of_interest)     # ['Quebec']
+print(metadata.dataset_year_start)      # 1999
+print(metadata.dataset_year_end)        # 2015
+print(metadata.categories)              # ['trajectory', 'population time-series']
 ```
 
-Replace `YOUR_DATASET_ID` with the ID of the desired dataset.
+For detailed feature extraction following the EBV framework:
 
-## Contribute
+```python
+from llm_metadata.schemas import DatasetFeatureExtraction
 
-Contributions are welcome! Please fork this repository, make your changes, and submit a pull request. For major changes, please open an issue first to discuss the proposed change.
+result = classify_abstract(
+    abstract,
+    response_format=DatasetFeatureExtraction
+)
+
+features = result['output']
+print(features.data_type)          # ['trajectory', 'time_series']
+print(features.taxons)             # 'caribou'
+print(features.temp_range_i)       # 1999
+print(features.temp_range_f)       # 2015
+print(features.geospatial_info_dataset)  # 'sample'
+```
+
+### Batch Processing with Prefect
+
+Process multiple datasets in parallel for large-scale data gap analysis:
+
+```python
+from llm_metadata.prefect_pipeline import doi_classification_pipeline
+
+# Process multiple DOIs from Quebec-related datasets
+dois = [
+    "10.5061/dryad.2n5h6",
+    "10.5061/dryad.3nh72",
+    "10.5061/dryad.4k275"
+]
+
+results = doi_classification_pipeline(dois=dois)
+
+# Analyze results to identify data gaps
+for result in results:
+    print(f"Taxons: {result['output'].taxons}")
+    print(f"Temporal range: {result['output'].temp_range_i} - {result['output'].temp_range_f}")
+    print(f"Data type: {result['output'].data_type}")
+```
+
+## Project Context
+
+This work is part of ongoing research to support biodiversity observation networks like **Biodiversité Québec** in implementing the **Kunming-Montreal Global Biodiversity Framework**. The project aims to:
+
+1. **Identify data gaps**: Detect taxonomic, spatial, and temporal gaps in biodiversity data coverage for Quebec
+2. **Discover hidden datasets**: Find relevant datasets buried in scientific literature and data repositories
+3. **Evaluate LLM precision**: Compare automated extraction against manually annotated reference datasets
+4. **Enable reproducible workflows**: Provide deterministic, repeatable metadata extraction for large-scale analysis
+
+The extracted metadata helps prioritize data collection efforts and supports evidence-based decision-making for conservation policies and territorial planning.
+
+## Development
+
+Install development dependencies:
+
+```bash
+pip install -e .[dev]
+```
+
+Development tools included:
+- pandas: Data analysis
+- python-dotenv: Environment variable management
+- ipykernel: Jupyter notebook support
+
+### Package Structure
+
+```
+llm_metadata/
+├── dryad.py                    # Dryad API integration
+├── zenodo.py                   # Zenodo API integration
+├── gpt_classify.py             # GPT-4 classification engine
+├── prefect_pipeline.py         # Batch processing pipeline
+└── schemas/
+    ├── abstract_metadata.py    # High-level metadata schema
+    └── fuster_features.py      # EBV feature extraction schema
+```
 
 ## License
 
-MIT License. See [LICENSE](LICENSE) for more details.
+MIT License. See LICENSE for details.
 
 ---
 
-Feel free to adapt and extend this README to fit the specifics of the package, including any dependencies, additional functionalities, and other relevant details.
+**Keywords**: biodiversity, metadata extraction, LLM, GPT-4, Essential Biodiversity Variables (EBV), data gaps, Dryad, Zenodo, Kunming-Montreal Framework, Biodiversité Québec
