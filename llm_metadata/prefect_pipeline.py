@@ -5,7 +5,7 @@ from pydantic import BaseModel
 from typing import Optional, List
 from zenodo import get_record_by_doi, get_record_by_doi_list
 from gpt_classify import classify_abstract
-from fuster_model import DatasetFeatures
+from llm_metadata.schemas import DatasetFeatureExtraction
 
 @task
 def fetch_abstract(doi: str) -> str:
@@ -29,7 +29,7 @@ def fetch_abstracts(dois: List[str]) -> List[str]:
     return abstracts
 
 @task
-def classify_abstract_task(abstract: str, response_format:BaseModel = DatasetFeatures) -> dict:
+def classify_abstract_task(abstract: str, response_format:BaseModel = DatasetFeatureExtraction) -> dict:
     classification = classify_abstract(abstract, response_format=response_format)
     return classification
 

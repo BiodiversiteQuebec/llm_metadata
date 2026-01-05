@@ -2,57 +2,23 @@ from openai import OpenAI
 import json
 import os
 from pathlib import Path
-from pydantic import BaseModel, Field
-from typing import Optional, List, Dict
+from typing import Dict
+
+from llm_metadata.schemas import DatasetAbstractMetadata
 
 MODEL = "gpt-4o-mini"
 MAX_TOKENS = 2000
 TEMPERATURE = 0
-CATEGORY_LIST = ["population time-series", "trait data", "abundances", "presence/absence", "plots", "specimens", "museum collection", "trajectory"]
 SYSTEM_MESSAGE = """
-You are EcodataGPT. Your task is to analyze an open data abstract and generate a JSON output with structured information. 
+You are EcodataGPT. Your task is to analyze an open data abstract and generate a JSON output with structured information.
 """
-
-class EcologicalDatasetTemplate(BaseModel):
-    categories: Optional[List[str]] = Field(
-        default=None,
-        description=(
-            "List each applicable category. "
-            "Accepted keys: population time-series, trait data, abundances, "
-            "presence/absence, plots, specimens, museum collection, trajectory."
-        )
-    )
-    taxonomic_groups: Optional[List[str]] = Field(
-        default=None,
-        description="List all species, taxonomic entities or groups mentioned in the abstract."
-    )
-    additional_keywords: Optional[List[str]] = Field(
-        default=None,
-        description="List additional keywords relevant to the dataset."
-    )
-    additional_data: Optional[List[str]] = Field(
-        default=None,
-        description="Describe any additional data types used in relation to the ecological dataset."
-    )
-    dataset_year_start: Optional[int] = Field(
-        default=None,
-        description="Provide the start year of the dataset, if mentioned."
-    )
-    dataset_year_end: Optional[int] = Field(
-        default=None,
-        description="Provide the end year of the dataset, if mentioned."
-    )
-    regions_of_interest: Optional[List[str]] = Field(
-        default=None,
-        description="List geographical regions relevant to the dataset."
-    )
 
 
 def classify_abstract(abstract,
                       system_message=SYSTEM_MESSAGE,
                       temperature=TEMPERATURE,
                       model=MODEL, max_tokens=MAX_TOKENS,
-                      response_format=EcologicalDatasetTemplate):
+                      response_format=DatasetAbstractMetadata):
 
     # Define the user message with the abstract
     user_message = abstract
