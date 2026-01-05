@@ -7,3 +7,6 @@ scratch/*
 *__pycache__*
 presentation/*
 *.egg-info*
+build/*
+dist/*
+.ipynb_checkpoints/

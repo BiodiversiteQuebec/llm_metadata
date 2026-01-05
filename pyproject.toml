@@ -14,17 +14,18 @@ dependencies = [
     "pydantic",
     "requests",
     "prefect",
-    "openai"
+    "openai",
+    "pandera",
 ]
 
 [project.optional-dependencies]
 dev = [
     "pandas",
-    "python-dotenv"
+    "python-dotenv",
+    "ipykernel",
+    "loguru",
 ]
 
-[tool.setuptools]
-package-dir = {"" = "llm_metadata"}
-
 [tool.setuptools.packages.find]
-where = ["llm_metadata"]
+where = ["src"]
+include = ["llm_metadata*"]

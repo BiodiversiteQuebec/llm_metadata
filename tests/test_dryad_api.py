@@ -1,5 +1,5 @@
 import unittest
-from llm_metadata.dryad import search_datasets, get_dataset_info
+from llm_metadata.dryad import search_datasets, get_dataset
 
 class TestClassify(unittest.TestCase):
     def test_list_datasets_by_keywords(self):
