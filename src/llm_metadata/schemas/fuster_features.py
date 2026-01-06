@@ -11,6 +11,7 @@ Reference: Fuster et al. methodology for biodiversity dataset characterization.
 from enum import Enum
 from typing import Any, Optional
 import math
+import pandas as pd
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
@@ -23,6 +24,7 @@ class EBVDataType(str, Enum):
     """
     ABUNDANCE = "abundance"
     PRESENCE_ABSENCE = "presence-absence"
+    PRESENCE_ONLY = "presence-only"
     DENSITY = "density"
     DISTRIBUTION = "distribution"
     TRAITS = "traits"
@@ -30,6 +32,8 @@ class EBVDataType(str, Enum):
     ECOSYSTEM_STRUCTURE = "ecosystem_structure"
     GENETIC_ANALYSIS = "genetic_analysis"
     TIME_SERIES = "time_series"
+    SPECIES_RICHNESS = "species_richness"
+    OTHER = "other"
     UNKNOWN = "unknown"
 
 
@@ -89,9 +93,9 @@ class DatasetFeatureExtraction(BaseModel):
     )
 
     # Geospatial information
-    geospatial_info_dataset: Optional[GeospatialInfoType] = Field(
+    geospatial_info_dataset: Optional[list[GeospatialInfoType]] = Field(
         None,
-        description="Geospatial info in the dataset (sample, site, range, etc.)."
+        description="List of geospatial info categories in the dataset (sample, site, range, etc.)."
     )
 
     # Spatial range with explicit units (km²)
@@ -134,22 +138,25 @@ class DatasetFeatureExtraction(BaseModel):
     @model_validator(mode='before')
     @classmethod
     def convert_nan_to_none(cls, data: Any) -> Any:
-        """Convert NaN, NA, and placeholder values to None across all fields."""
+        """
+        Clean raw data across all fields.
+        - Converts NaN/NA and placeholder strings to None
+        - Normalizes European-style decimals (0,5 -> 0.5)
+        - Handles whitespace
+        """
         if not isinstance(data, dict):
             return data
         
         null_placeholders = {
-            "not given", "Not given", "NOT GIVEN",
-            "NA", "N/A", "n/a", "na",
-            "nan", "NaN", "NAN",
-            "none", "None", "NONE",
+            "not given", "not_given", "no",
+            "na", "n/a", "nan", "none",
             "", " ",
         }
         
         def is_nan(value: Any) -> bool:
             if value is None:
                 return False
-            if isinstance(value, float) and math.isnan(value):
+            if isinstance(value, (float, int)) and pd.isna(value):
                 return True
             return False
         
@@ -157,8 +164,16 @@ class DatasetFeatureExtraction(BaseModel):
         for key, value in data.items():
             if is_nan(value):
                 cleaned[key] = None
-            elif isinstance(value, str) and value.strip() in null_placeholders:
-                cleaned[key] = None
+            elif isinstance(value, str):
+                s = value.strip()
+                # 1. Placeholder check
+                if s.lower() in null_placeholders:
+                    cleaned[key] = None
+                # 2. European decimal check (e.g., '0,5')
+                elif ',' in s and s.replace(',', '').replace('.', '').replace('-', '').isdigit():
+                    cleaned[key] = s.replace(',', '.')
+                else:
+                    cleaned[key] = s
             else:
                 cleaned[key] = value
         return cleaned
@@ -167,24 +182,36 @@ class DatasetFeatureExtraction(BaseModel):
     @classmethod
     def parse_data_type_list(cls, v: Any) -> Optional[list[str]]:
         """
-        Convert comma-separated string to list of EBV data type values.
+        Convert comma-separated strings to list of EBV data type values.
         
-        Handles: 'abundance,density' -> ['abundance', 'density']
-        Also normalizes common variations (e.g., 'genetic analysis' -> 'genetic_analysis')
+        Handles: 
+        - 'abundance,density' -> ['abundance', 'density']
+        - ['abundance', 'density, other'] -> ['abundance', 'density', 'other']
         """
         if v is None:
             return None
         
+        raw_items = []
         if isinstance(v, list):
-            # Already a list, normalize each value
-            return [cls._normalize_ebv_value(item) for item in v if item]
+            raw_items = v
+        elif isinstance(v, str):
+            raw_items = [v]
+        else:
+            return v
+            
+        final_values = []
+        for item in raw_items:
+            if not item or not isinstance(item, str):
+                if item: final_values.append(item)
+                continue
+            
+            # Split comma-separated values and normalize each
+            for part in item.split(','):
+                norm = cls._normalize_ebv_value(part.strip())
+                if norm:
+                    final_values.append(norm)
         
-        if isinstance(v, str):
-            # Split comma-separated values and normalize
-            values = [cls._normalize_ebv_value(item.strip()) for item in v.split(',')]
-            return [val for val in values if val]  # Filter out empty strings
-        
-        return v
+        return final_values if final_values else None
 
     @staticmethod
     def _normalize_ebv_value(value: str) -> str:
@@ -197,47 +224,134 @@ class DatasetFeatureExtraction(BaseModel):
         normalized = normalized.replace('ebv', '').strip()
         # Take only part before parentheses
         normalized = normalized.split('(')[0].strip()
+        
+        # Handle common pluralizations and variations
+        normalized = normalized.replace('analyses', 'analysis')
+        normalized = normalized.replace('records', '') # 'presence records' -> 'presence'
+        
         # Replace spaces and hyphens with underscores for enum matching
         normalized = normalized.replace(' ', '_').replace('-', '_')
-        # Common normalizations
+        normalized = normalized.strip('_')
+        
+        # Mapping for full matches
         replacements = {
-            'analyses': 'analysis',
-            'presence_only': 'presence_absence',
-            'presence': 'presence_absence',
+            'presence': 'presence_only',  # bare 'presence' maps to presence-only
+            'presence_only': 'presence_only',
+            'presence_absence': 'presence_absence',
             'genetic_analysis': 'genetic_analysis',
         }
-        for old, new in replacements.items():
-            if normalized == old:
-                normalized = new
-                break
         
-        # Convert back to enum format (with hyphens where appropriate)
+        if normalized in replacements:
+            normalized = replacements[normalized]
+        
+        # Convert back to enum format (with hyphens where appropriate for known values)
         if normalized == 'presence_absence':
             return 'presence-absence'
+        if normalized == 'presence_only':
+            return 'presence-only'
         
         return normalized
 
     @field_validator('geospatial_info_dataset', mode='before')
     @classmethod
-    def normalize_geospatial_enum(cls, v: Any) -> Optional[str]:
-        """Normalize geospatial info value to match enum format."""
+    def parse_geospatial_list(cls, v: Any) -> Optional[list[str]]:
+        """
+        Convert comma or complex strings to list of GeospatialInfoType values.
+        
+        Handles:
+        - 'site IDs, site coordinates' -> ['site_ids', 'site']
+        - 'site coordinates geographic feature' -> ['site', 'geographic_features']
+        """
         if v is None:
             return None
         
+        raw_items = []
+        if isinstance(v, list):
+            raw_items = v
+        elif isinstance(v, str):
+            # First split by comma
+            raw_items = [v]
+        else:
+            return v
+            
+        final_values = []
+        for item in raw_items:
+            if not item or not isinstance(item, str):
+                if item: final_values.append(item)
+                continue
+            
+            # Sub-split by comma
+            for part in item.split(','):
+                p = part.strip()
+                if not p: continue
+                
+                # Check if it's a composite space-separated string that needs further splitting
+                # e.g. 'site coordinates geographic feature'
+                # Strategy: try to normalize the whole part first
+                norm = cls._normalize_geospatial_value(p)
+                
+                # If normalization didn't map to a known value, try splitting by space
+                # but only if it's not a known multi-word phrase
+                known_phrases = {'site coordinates', 'sample coordinates', 'range coordinates', 
+                                'geographic feature', 'geographic features',
+                                'administrative unit', 'administrative units', 'site ids',
+                                'distribution model'}
+                
+                if norm not in [e.value for e in GeospatialInfoType] and ' ' in p:
+                    # Very simple heuristic: if it contains a known phrase, we might want to split around it
+                    # But simpler: just try to normalize each word if it doesn't match a known phrase
+                    words = p.split()
+                    i = 0
+                    while i < len(words):
+                        # Try 2-word phrase
+                        if i + 1 < len(words):
+                            phrase = f"{words[i]} {words[i+1]}"
+                            if phrase.lower() in known_phrases:
+                                final_values.append(cls._normalize_geospatial_value(phrase))
+                                i += 2
+                                continue
+                        
+                        # Fallback to single word
+                        word_norm = cls._normalize_geospatial_value(words[i])
+                        if word_norm:
+                            final_values.append(word_norm)
+                        i += 1
+                else:
+                    if norm:
+                        final_values.append(norm)
+        
+        # Deduplicate while preserving order
+        seen = set()
+        unique_values = []
+        for val in final_values:
+            if val not in seen:
+                unique_values.append(val)
+                seen.add(val)
+                
+        return unique_values if unique_values else None
+
+    @staticmethod
+    def _normalize_geospatial_value(v: str) -> str:
+        """Normalize geospatial info value to match enum format."""
         if not isinstance(v, str):
             return v
         
-        normalized = v.lower().strip().replace(' ', '_').replace('-', '_')
+        normalized = v.lower().strip().replace('-', '_').replace(' ', '_')
+        normalized = normalized.strip('_')
         
         # Map common variations to valid enum values
         mapping = {
             'sample_coordinates': 'sample',
             'site_coordinates': 'site',
+            'sites_ids': 'site_ids',
+            'site_id': 'site_ids',
+            'ids': 'site_ids',
+            'id': 'site_ids',
             'range_coordinates': 'range',
             'geographic_feature': 'geographic_features',
             'administrative_unit': 'administrative_units',
+            'distribution_model': 'distribution',
             'map': 'maps',
-            'site_id': 'site_ids',
         }
         
         return mapping.get(normalized, normalized)
@@ -245,22 +359,38 @@ class DatasetFeatureExtraction(BaseModel):
     @field_validator('spatial_range_km2', mode='before')
     @classmethod
     def coerce_spatial_range(cls, v: Any) -> Optional[float]:
-        """Coerce spatial range to float, handling string inputs."""
+        """Coerce spatial range to float, handling string inputs and comma-decimal separators."""
         if v is None:
             return None
         
         if isinstance(v, (int, float)):
+            if isinstance(v, float) and math.isnan(v):
+                return None
             return float(v)
         
         if isinstance(v, str):
-            # Try to extract numeric value
-            cleaned = v.strip().replace(',', '').replace(' ', '')
+            # Try to extract numeric value, handle '0,5' -> 0.5
+            cleaned = v.strip().replace(',', '.').replace(' ', '')
             try:
                 return float(cleaned)
             except ValueError:
                 return None
         
         return v
+
+    @field_validator('temporal_range', mode='before')
+    @classmethod
+    def coerce_temporal_range(cls, v: Any) -> Optional[str]:
+        """Coerce temporal range to string, handling numeric inputs from Excel/Pandas."""
+        if v is None:
+            return None
+            
+        if isinstance(v, (int, float)):
+            if isinstance(v, float) and math.isnan(v):
+                return None
+            return str(int(v))
+        
+        return str(v).strip()
 
     @field_validator('temp_range_i', 'temp_range_f', mode='before')
     @classmethod

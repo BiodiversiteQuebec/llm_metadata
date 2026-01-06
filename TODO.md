@@ -10,7 +10,7 @@
 
 ## Benchmarking from abstracts
 
-* [ ] Pydantic model for benchmark dataset and normalization of annotated data
+* [x] Pydantic model for benchmark dataset and normalization of annotated data
 
 * [ ] LLM feature extraction pipeline
 

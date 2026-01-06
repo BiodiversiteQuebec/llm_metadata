@@ -22,8 +22,8 @@ from llm_metadata.schemas.validation import (
     ValidationReport,
     ValidationError,
     ErrorType,
-    AnnotationsDataFrameSchema,
 )
+
 
 __all__ = [
     # Abstract metadata
