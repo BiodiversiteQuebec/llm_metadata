@@ -11,6 +11,7 @@ Reference: Fuster et al. methodology for biodiversity dataset characterization.
 from enum import Enum
 from typing import Any, Optional
 import math
+import re
 import pandas as pd
 
 from pydantic import BaseModel, Field, field_validator, model_validator
@@ -35,6 +36,27 @@ class EBVDataType(str, Enum):
     SPECIES_RICHNESS = "species_richness"
     OTHER = "other"
     UNKNOWN = "unknown"
+
+
+class ValidationStatus(str, Enum):
+    """Dataset validation status."""
+    YES = "yes"
+    NO = "no"
+
+
+class InvalidReason(str, Enum):
+    """
+    Reasons for invalid dataset classification.
+    
+    Includes categories observed in validation data.
+    """
+    LOCATION = "location"
+    NON_RELEVANT = "non-relevant information"
+    NON_FIELD_EXPERIMENT = "non-field experiment"
+    NOT_IN_THE_FIELD = "not in the field"
+    BIODIVERSITY_UNRELATED = "biodiversity-unrelated"
+    MICROBIAL_COMMUNITY = "microbial community"
+    OTHER = "other"
 
 
 class GeospatialInfoType(str, Enum):
@@ -122,15 +144,25 @@ class DatasetFeatureExtraction(BaseModel):
     )
 
     # Taxonomic information
-    taxons: Optional[str] = Field(
+    species: Optional[list[str]] = Field(
         None,
-        description="Taxonomic groups or species (e.g. 'black-legged tick')."
+        description="Extracted text as-is (copy pasted), not interpreted. Taxonomic groups, scientific names, common names, mixtures, or counts (e.g. 'Tamias striatus', 'raccoons', '41 fish mock species', '12 mammal, 199 ground-dwelling beetles')."
     )
 
     # Dataset references
     referred_dataset: Optional[str] = Field(
         None,
         description="Referred dataset source (e.g. 'Ministère des Ressources naturelles...')."
+    )
+
+    # Validation fields
+    valid_yn: Optional[ValidationStatus] = Field(
+        None,
+        description="Validation status (yes/no)."
+    )
+    reason_not_valid: Optional[str] = Field(
+        None,
+        description="Reason for invalid classification. See InvalidReason enum for common values."
     )
 
     # --- Field Validators ---
@@ -177,6 +209,66 @@ class DatasetFeatureExtraction(BaseModel):
             else:
                 cleaned[key] = value
         return cleaned
+
+    @field_validator('reason_not_valid', mode='before')
+    @classmethod
+    def normalize_reason_not_valid(cls, v: Any) -> Optional[str]:
+        """
+        Normalize validation reason values.
+        Maps observed variations to standard categories.
+        """
+        if isinstance(v, str):
+             v = v.strip()
+             v_lower = v.lower()
+             
+             # Map aliases to standard values
+             if v_lower == 'non biological':
+                 return "biodiversity-unrelated"
+             
+             if v_lower == 'experiment':
+                 return "non-field experiment"
+                 
+             if v_lower in ['micorbial community', 'microbial communities']:
+                 return "microbial community"
+
+             if v_lower.startswith('gut microbiota'):
+                 return "microbial community"
+
+             return v
+
+        return v
+
+    @field_validator('species', mode='before')
+    @classmethod
+    def parse_species_list(cls, v: Any) -> Optional[list[str]]:
+        """
+        Convert string input to list of species strings.
+        Splits by comma if input is a string.
+        """
+        if v is None:
+            return None
+        
+        raw_items = []
+        if isinstance(v, list):
+            raw_items = v
+        elif isinstance(v, str):
+            raw_items = [v]
+        else:
+            return [str(v)]
+            
+        final_values = []
+        for item in raw_items:
+            if isinstance(item, str):
+                # Split comma-separated or semicolon-separated values and strip whitespace
+                # Use regex to split by , or ;
+                for part in re.split(r'[;,]', item):
+                    cleaned = part.strip()
+                    if cleaned:
+                        final_values.append(cleaned)
+            elif item:
+                final_values.append(str(item))
+        
+        return final_values if final_values else None
 
     @field_validator('data_type', mode='before')
     @classmethod

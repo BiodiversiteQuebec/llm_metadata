@@ -12,6 +12,13 @@
 
 * [x] Pydantic model for benchmark dataset and normalization of annotated data
 
+* [x] Refine pydantic model based on feature descriptions from Fuster et al.
+
+  * [x] Species field. Make sure that the definition covers values examples in the annotated data
+
+  * [x] valid_yn and reason_not_valid fields. Make sure that the definition covers values in the annotated data as enum, incl "other" reason
+
+
 * [ ] LLM feature extraction pipeline
 
   * [ ] Batch classification for manually annotated data

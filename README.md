@@ -33,6 +33,10 @@ This package leverages GPT-4 to programmatically extract structured metadata fro
 
 The goal is to identify relevant datasets that can fill data gaps and support more effective biodiversity monitoring.
 
+This work follows the methodology outlined in Fuster et al. (2024) and their results:
+
+> Fuster-Calvo A, Valentin S, Tamayo WC, Gravel D. 2025. Evaluating the feasibility of automating dataset retrieval for biodiversity monitoring. PeerJ 13:e18853 https://doi.org/10.7717/peerj.18853
+
 ## Features
 
 - **Dryad API Integration**: Search and retrieve datasets from Dryad repository
