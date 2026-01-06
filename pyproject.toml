@@ -24,6 +24,7 @@ dev = [
     "python-dotenv",
     "ipykernel",
     "loguru",
+    "openpyxl",
 ]
 
 [tool.setuptools.packages.find]

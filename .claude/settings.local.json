@@ -1,7 +1,19 @@
 {
   "permissions": {
     "allow": [
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(gh:*)",
+      "Bash(python:*)",
+      "Bash(pytest:*)",
+      "Bash(jupyter:*)",
+      "Bash(ipython:*)",
+      "Bash(ls:*)",
+      "Bash(dir:*)",
+      "Bash(tree:*)",
+      "Bash(stat:*)",
+      "Bash(find:*)",
+      "Bash(mkdir:*)",
+      "Bash(touch:*)"
     ]
   }
 }
