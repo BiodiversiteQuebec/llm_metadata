@@ -25,11 +25,11 @@
 
   * [ ] Batch classification for manually annotated data
 
-  * [ ] Research : Single shot vs multiple shots and LLMs
+  * [x] Research : Single shot vs multiple shots and LLMs (tested gpt-4o-mini vs gpt-5-mini)
 
 * [ ] Evaluation of LLM feature extraction
 
-  * [ ] Metrics definition & utils
+  * [x] Metrics definition & utils (evaluation.py with precision/recall/F1)
 
   * [ ] Benchmark report generation
 

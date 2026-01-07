@@ -7,7 +7,7 @@ from typing import Dict, Optional
 from llm_metadata.schemas import DatasetAbstractMetadata
 
 MODEL = "gpt-5-mini"
-MAX_OUTPUT_TOKENS = 1024
+MAX_OUTPUT_TOKENS = 4096  # Increased from 1024 to allow complete JSON generation for complex schemas
 TEMPERATURE = None # Pas valid pour les modèles à raisonnement (GPT-5 / o-series), utilisé pour gpt-4o, et gpt-5.1 et gpt-5.2 sans raisonnement
 REASONING = {"effort": "low"} # options: low, medium, high, none (pour gpt-5.1, gpt-5.2)
 SYSTEM_MESSAGE = """
@@ -31,7 +31,7 @@ def classify_abstract(
     temperature: Optional[float] = TEMPERATURE,
     model: str = MODEL,
     max_output_tokens: int = MAX_OUTPUT_TOKENS,
-    text_format=DatasetAbstractMetadata,
+    text_format: type = DatasetAbstractMetadata,
     reasoning: Optional[Dict] = REASONING,
 ):
     client = OpenAI()

@@ -60,3 +60,37 @@ Valid data stored as `data/dataset_092624_validated.xlsx`.
 
 **Report:**
 📊 [View HTML Report](results/fuster_test_extraction_evaluation_20260107_01/index.html)
+
+---
+
+### 2026-01-07: Model Change Experiment
+**Task:** Test alternative model (`gpt-5-mini`) for feature extraction to compare performance. Model is way cheaper, than previous `gpt-4`.
+
+**Work Performed:**
+- **Notebook:** `notebooks/fuster_test_extraction_evaluation.ipynb`
+- **Model Change:** Switched from `gpt-4` to `gpt-5-mini` in `classify_abstract()` call. Include new reasoning parameter (effort: "low") while loosing temperature setting. This is a new setting that can be played with for GPT-5 series models.
+- **Configuration:** Maintained same extraction schema (`DatasetFeatureExtraction`).
+
+**Results:**
+| Metric | Value |
+|--------|-------|
+| Micro-average Precision | 0.296 |
+| Micro-average Recall | 0.538 |
+| Micro-average F1 | 0.382 |
+| Macro-average F1 | 0.491 |
+
+**Comparison to gpt-4o-mini:**
+- Precision decreased: 0.333 → 0.296
+- Recall increased: 0.487 → 0.538
+- Micro F1 decreased: 0.396 → 0.382
+- Macro F1 increased: 0.471 → 0.491
+
+**Analysis:**
+`gpt-5-mini` shows a tradeoff pattern: higher recall but lower precision compared to `gpt-4`. The model extracts more features (better coverage) but with more false positives. The macro F1 improvement suggests more balanced performance across different field types, though overall micro F1 is slightly lower. Big payoff will be done on the individual vocabulary normalization, fuzzy matching, and feature based prompt refinement.
+
+**Next Steps:**
+- Integrate vocabulary normalization and fuzzy matching as planned.
+- Separate extraction and validation steps.
+- Just ignore temporal_range exact matching for now.
+- Implement evidence extraction for key fields to improve precision. ([chat-gpt discussion](https://chatgpt.com/share/695ed6c1-e640-8001-8318-612ebbedd8bd)). I want to understand better why the model made certain extraction decisions (looking at you `data_type` and `geospatial_info_dataset` fields.
+- Feature-based prompt refinement with examples. Especially for `species`.
