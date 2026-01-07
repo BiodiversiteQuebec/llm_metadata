@@ -21,6 +21,8 @@
 
 * [ ] LLM feature extraction pipeline
 
+  * [x] Test run on sample annotated abstracts
+
   * [ ] Batch classification for manually annotated data
 
   * [ ] Research : Single shot vs multiple shots and LLMs

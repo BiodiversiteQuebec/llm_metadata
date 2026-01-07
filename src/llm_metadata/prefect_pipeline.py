@@ -3,8 +3,8 @@ from prefect.task_runners import ThreadPoolTaskRunner
 
 from pydantic import BaseModel
 from typing import Optional, List
-from zenodo import get_record_by_doi, get_record_by_doi_list
-from gpt_classify import classify_abstract
+from llm_metadata.zenodo import get_record_by_doi, get_record_by_doi_list
+from llm_metadata.gpt_classify import classify_abstract
 from llm_metadata.schemas import DatasetFeatureExtraction
 
 @task
