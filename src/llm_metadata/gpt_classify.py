@@ -2,64 +2,84 @@ from openai import OpenAI
 import json
 import os
 from pathlib import Path
-from typing import Dict
+from typing import Dict, Optional
 
 from llm_metadata.schemas import DatasetAbstractMetadata
 
-MODEL = "gpt-4o-mini"
-MAX_TOKENS = 2000
-TEMPERATURE = 0
+MODEL = "gpt-5-mini"
+MAX_OUTPUT_TOKENS = 1024
+TEMPERATURE = None # Pas valid pour les modèles à raisonnement (GPT-5 / o-series), utilisé pour gpt-4o, et gpt-5.1 et gpt-5.2 sans raisonnement
+REASONING = {"effort": "low"} # options: low, medium, high, none (pour gpt-5.1, gpt-5.2)
 SYSTEM_MESSAGE = """
-You are EcodataGPT. Your task is to analyze an open data abstract and generate a JSON output with structured information.
-"""
 
 
-def classify_abstract(abstract,
-                      system_message=SYSTEM_MESSAGE,
-                      temperature=TEMPERATURE,
-                      model=MODEL, max_tokens=MAX_TOKENS,
-                      response_format=DatasetAbstractMetadata):
+You are EcodataGPT, a structured data extraction engine.
 
-    # Define the user message with the abstract
-    user_message = abstract
+Goal: extract fields from the user's abstract into the provided schema.
 
-    # Create chat completion using OpenAI's Chat API
+Rules:
+- Only use information explicitly supported by the text. Do NOT guess or infer.
+- If a field is not clearly stated, set it to null (or an empty list) as allowed by the schema.
+- Prefer conservative outputs over over-extraction.
+- Output must conform exactly to the schema (types, enums, lists).
+""".strip()
+
+
+def classify_abstract(
+    abstract: str,
+    system_message: str = SYSTEM_MESSAGE,
+    temperature: Optional[float] = TEMPERATURE,
+    model: str = MODEL,
+    max_output_tokens: int = MAX_OUTPUT_TOKENS,
+    text_format=DatasetAbstractMetadata,
+    reasoning: Optional[Dict] = REASONING,
+):
     client = OpenAI()
-    response = client.beta.chat.completions.parse(
+
+    response = client.responses.parse(
         model=model,
-        messages=[
+        input=[
             {"role": "system", "content": system_message},
-            {"role": "user", "content": user_message}
+            {"role": "user", "content": abstract},
         ],
-        max_tokens=max_tokens,
+        text_format=text_format,
         temperature=temperature,
-        response_format=response_format
+        max_output_tokens=max_output_tokens,
     )
 
-    # Process the response
     out = {
         "prompt": system_message,
         "abstract": abstract,
         "model": model,
-        "temperature": temperature,
-        "response": response.choices[0],
-        "output": response.choices[0].message.parsed
+        "response": response,  # full response object
+        "output": response.output_parsed,  # parsed Pydantic model
     }
 
-    return out
+    if temperature is not None:
+        out["temperature"] = temperature
 
+    if reasoning is not None:
+        out["reasoning"] = reasoning
+
+    return out
 
 if __name__ == "__main__":
     # Load .env
     from dotenv import load_dotenv
-    dotenv_path = Path(__file__).parent.parent / '.env'
+    dotenv_path = Path('.env')
     load_dotenv(dotenv_path)
+
+    # Print os.getwd for debugging
+    print(f"Current working directory: {os.getcwd()}")
+
+    # print OpenAI API key for debugging
+    print(f"OpenAI API Key: {os.getenv('OPENAI_API_KEY')}")
 
     # Get the abstract from the user
     abstract_text = """
     Future human land use and climate change may disrupt movement behaviors of terrestrial animals, thereby altering the ability of individuals to move across a landscape. Some of the expected changes result from processes whose effects will be difficult to alter, such as global climate change. We present a novel framework in which we use models to (1) identify the ecological changes from these difficult-to-alter processes, as well as (2) the potential conservation measures that are best able to compensate for these changes. We illustrated this framework with the case of an endangered caribou population in Québec, Canada. We coupled a spatially explicit individual-based movement model with a range of landscape scenarios to assess the impacts of varying degrees of climate change, and the ability of conservation actions to compensate for such impacts on caribou movement behaviors. We found that (1) climate change impacts reduced movement potential, and that (2) the complete restoration of secondary roads inside protected areas was able to fully offset this reduction, suggesting that road restoration would be an effective compensatory conservation action. By evaluating conservation actions via landscape use simulated by an individual-based model, we were able to identify compensatory conservation options for an endangered species facing climate change.
     """
-    # Get the classification from GPT-4
+    # Get the classification from GPT
     classification = classify_abstract(abstract_text)
     # Print the classification
     print(classification)
