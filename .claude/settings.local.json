@@ -13,7 +13,10 @@
       "Bash(stat:*)",
       "Bash(find:*)",
       "Bash(mkdir:*)",
-      "Bash(touch:*)"
+      "Bash(touch:*)",
+      "WebSearch",
+      "WebFetch(domain:docs.openalex.org)",
+      "Bash(git add:*)"
     ]
   }
 }

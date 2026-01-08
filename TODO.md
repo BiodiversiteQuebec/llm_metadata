@@ -53,13 +53,25 @@
 
 
 
-Feature extraction from paper full text
+## Feature extraction from paper full text
 
-* [ ] Recherche d'articles à partir d'un api de papiers scientifiques
+* [x] Recherche d'articles à partir d'un api de papiers scientifiques
+  * [x] Article DOI retrieval from Excel cited_articles column (24.4% coverage)
+  * [x] Article DOI retrieval from Dryad/Zenodo APIs (fallback method)
+  * [x] Generated dataset-to-article mapping CSV (75 article DOIs from 299 valid datasets)
+  * [x] Coverage: Dryad 100%, Zenodo 56.7%
+
 * [ ] Full papers folder + repo
-  * [ ] Small db with paper metadata (title, authors, etc) from benchmark
-  * [ ] Téléchargement d'articles en distribution ouverte
-  * [ ] Téléchargement d'articles en distribution restreinte
+  * [x] Small db with paper metadata (dataset_article_mapping.csv with 75 article DOIs)
+  * [ ] **NEXT: Download PDFs using Unpaywall API** (https://api.unpaywall.org/v2/{doi}?email={email})
+    * [ ] Implement Unpaywall API client with rate limiting
+    * [ ] Check open access availability (is_oa flag)
+    * [ ] Download PDFs from best_oa_location
+    * [ ] Store PDFs in data/pdfs/ organized by source
+    * [ ] Generate metadata file with download status and OA license info
+    * [ ] Handle restricted access articles (log for manual retrieval)
+  * [ ] Téléchargement d'articles en distribution ouverte (via Unpaywall)
+  * [ ] Téléchargement d'articles en distribution restreinte (manual/institutional access)
 
 * [ ] Chunking & embeddings
 
