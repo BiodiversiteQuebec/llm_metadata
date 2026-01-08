@@ -5,6 +5,7 @@ This package contains schema definitions for different metadata extraction appro
 - abstract_metadata: High-level metadata extracted from dataset abstracts using LLMs
 - fuster_features: Detailed feature extraction following EBV classification framework
 - validation: Two-layer validation system (pandera + Pydantic) for data wrangling
+- openalex_work: Scientific paper metadata from OpenAlex for Quebec researcher tracking
 """
 
 from llm_metadata.schemas.abstract_metadata import (
@@ -23,6 +24,12 @@ from llm_metadata.schemas.validation import (
     ValidationError,
     ErrorType,
 )
+from llm_metadata.schemas.openalex_work import (
+    OpenAlexWork,
+    OpenAlexAuthor,
+    work_dict_to_model,
+    works_to_dict_list,
+)
 
 
 __all__ = [
@@ -40,4 +47,9 @@ __all__ = [
     "ValidationError",
     "ErrorType",
     "AnnotationsDataFrameSchema",
+    # OpenAlex work metadata
+    "OpenAlexWork",
+    "OpenAlexAuthor",
+    "work_dict_to_model",
+    "works_to_dict_list",
 ]
