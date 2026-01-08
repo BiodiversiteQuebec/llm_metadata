@@ -94,3 +94,38 @@ Valid data stored as `data/dataset_092624_validated.xlsx`.
 - Just ignore temporal_range exact matching for now.
 - Implement evidence extraction for key fields to improve precision. ([chat-gpt discussion](https://chatgpt.com/share/695ed6c1-e640-8001-8318-612ebbedd8bd)). I want to understand better why the model made certain extraction decisions (looking at you `data_type` and `geospatial_info_dataset` fields.
 - Feature-based prompt refinement with examples. Especially for `species`.
+
+---
+
+### 2026-01-07: Vocabulary Normalization & Fuzzy Matching
+**Task:** Implement vocabulary normalization and fuzzy matching to improve evaluation accuracy.
+
+**Work Performed:**
+- **Notebook:** `notebooks/fuster_test_extraction_evaluation.ipynb`
+- **Vocabulary Normalization:** Created mapping dictionaries for `data_type` → `EBVDataType` and `geospatial_info_dataset` → `GeospatialInfoType` enums
+- **Fuzzy Matching:** Implemented `rapidfuzz`-based species matching with threshold=70 to handle taxonomic name variations
+- **Dropped Temporal Fields:** Removed `temporal_range`, `temp_range_i`, `temp_range_f` from evaluation (not relevant for abstract-only extraction)
+
+**Results (with normalization):**
+| Metric | Value | Change |
+|--------|-------|--------|
+| Micro-average Precision | 0.293 | -1% |
+| Micro-average Recall | 0.708 | +32% ⬆️ |
+| Micro-average F1 | 0.415 | +9% ⬆️ |
+| Macro-average F1 | 0.395 | -20% |
+
+**Per-Field Performance:**
+- **Species**: Recall = 1.0 (perfect!), F1 = 0.53 — Fuzzy matching dramatically improved recall
+- **Spatial range**: Precision = 1.0, Recall = 0.25, F1 = 0.40 — Conservative extraction
+- **Data type**: Precision = 0.27, Recall = 0.57, F1 = 0.36 — Over-extraction persists
+- **Geospatial info**: Precision = 0.18, Recall = 0.75, F1 = 0.29 — Consistent over-prediction
+
+**Key Findings:**
+1. Fuzzy matching is highly effective for species field
+2. Over-extraction of `data_type` and `geospatial_info_dataset` is semantic (model interpretation differs from annotators), not vocabulary mismatch
+3. Temporal fields removed since abstract-only extraction doesn't reliably capture dates
+
+**Next Steps:**
+- Evidence extraction for model reasoning transparency
+- Expand test set to all 11 Dryad records
+- Prompt refinement with few-shot examples
