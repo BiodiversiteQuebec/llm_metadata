@@ -244,12 +244,17 @@ def download_pdf_with_ezproxy(
     ezproxy_cookies: Optional[Dict[str, str]] = None,
     output_dir: Optional[Path] = None,
     timeout: int = DEFAULT_TIMEOUT,
-    year: Optional[int] = None
+    year: Optional[int] = None,
+    verify_ssl: bool = False,
+    publisher_pdf_url: Optional[str] = None
 ) -> Optional[Path]:
     """
     Download PDF using UdeS EZproxy authentication.
 
     Requires EZproxy session cookies from browser authentication.
+    Tries two strategies:
+    1. Direct DOI → EZproxy login URL (requires active CAS session)
+    2. Proxied publisher URL (may work with just EZproxy cookies)
 
     Args:
         doi: Article DOI
@@ -257,9 +262,16 @@ def download_pdf_with_ezproxy(
         output_dir: Storage directory (default: data/pdfs/)
         timeout: Request timeout in seconds
         year: Publication year for subdirectory organization
+        verify_ssl: Whether to verify SSL certificates (default: False for EZproxy)
+        publisher_pdf_url: Direct publisher PDF URL (optional, enables proxied URL strategy)
 
     Returns:
         Path to downloaded file or None if failed
+
+    Note:
+        SSL verification is disabled by default because university EZproxy
+        servers often use certificates that Python's requests library cannot
+        verify (enterprise CA chains). This is safe for academic paper downloads.
 
     Example:
         >>> from llm_metadata.ezproxy import extract_cookies_from_browser
@@ -269,8 +281,13 @@ def download_pdf_with_ezproxy(
         ...     ezproxy_cookies=cookies
         ... )
     """
+    # Suppress SSL warnings if verification is disabled
+    if not verify_ssl:
+        import urllib3
+        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
     try:
-        from llm_metadata.ezproxy import create_ezproxy_doi_url
+        from llm_metadata.ezproxy import create_ezproxy_doi_url, create_proxied_publisher_url
     except ImportError:
         logger.error("EZproxy module not available")
         return None
@@ -294,58 +311,99 @@ def download_pdf_with_ezproxy(
         logger.info(f"PDF already exists: {output_path}")
         return output_path
 
-    # Create EZproxy URL
+    # Build URLs to try
+    urls_to_try = []
+
+    # Strategy 1: If we have a publisher PDF URL, try the proxied version first
+    # This often works with just EZproxy cookies (no CAS redirect needed)
+    if publisher_pdf_url:
+        proxied_url = create_proxied_publisher_url(publisher_pdf_url)
+        urls_to_try.append(('proxied_publisher', proxied_url))
+
+    # Strategy 2: EZproxy login URL (requires active CAS session)
     ezproxy_url = create_ezproxy_doi_url(doi)
-    logger.info(f"Trying EZproxy for {doi}")
-    logger.debug(f"EZproxy URL: {ezproxy_url}")
+    urls_to_try.append(('ezproxy_login', ezproxy_url))
 
-    try:
-        # Make request with cookies
-        response = requests.get(
-            ezproxy_url,
-            timeout=timeout,
-            cookies=ezproxy_cookies,
-            headers={
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-            },
-            allow_redirects=True,
-            stream=True
-        )
+    # Create session with cookies
+    session = requests.Session()
 
-        # EZproxy may redirect to the actual PDF
-        # Check final URL for PDF
-        final_url = response.url
-        logger.debug(f"Final URL after redirects: {final_url}")
+    # Pre-populate session with browser cookies
+    if ezproxy_cookies:
+        for name, value in ezproxy_cookies.items():
+            if name.startswith('cas_'):
+                session.cookies.set(name[4:], value, domain='cas.usherbrooke.ca')
+            else:
+                # Set EZproxy cookie for the base domain (works for subdomains too)
+                session.cookies.set(name, value, domain='.ezproxy.usherbrooke.ca')
 
-        # Check if we got HTML (login page) instead of PDF
-        content_type = response.headers.get('Content-Type', '').lower()
+    for strategy_name, url in urls_to_try:
+        logger.info(f"Trying EZproxy {strategy_name} for {doi}")
+        logger.debug(f"URL: {url}")
 
-        if 'text/html' in content_type:
-            logger.warning("Received HTML instead of PDF - authentication may have failed")
-            logger.warning("You may need to re-authenticate in browser")
-            return None
+        try:
+            response = session.get(
+                url,
+                timeout=timeout,
+                headers={
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+                },
+                allow_redirects=True,
+                stream=True,
+                verify=verify_ssl
+            )
 
-        response.raise_for_status()
+            final_url = response.url
+            logger.debug(f"Final URL after redirects: {final_url}")
 
-        # Write PDF
-        with open(output_path, 'wb') as f:
-            for chunk in response.iter_content(chunk_size=8192):
-                if chunk:
-                    f.write(chunk)
+            # Check if we got redirected to login page
+            if 'cas.usherbrooke.ca/login' in final_url:
+                logger.debug(f"  {strategy_name}: Redirected to CAS login")
+                continue  # Try next strategy
 
-        # Verify file
-        file_size = output_path.stat().st_size
-        if file_size < 1000:
-            logger.warning(f"Downloaded file is very small ({file_size} bytes)")
-            output_path.unlink()
-            return None
+            # Check content type
+            content_type = response.headers.get('Content-Type', '').lower()
 
-        logger.info(f"Successfully downloaded via EZproxy: {output_path} ({file_size / 1024:.1f} KB)")
-        return output_path
+            if 'text/html' in content_type:
+                content_sample = response.text[:1000].lower()
+                if 'access denied' in content_sample or 'forbidden' in content_sample:
+                    logger.debug(f"  {strategy_name}: Access denied")
+                    continue
+                elif 'login' in content_sample or 'sign in' in content_sample:
+                    logger.debug(f"  {strategy_name}: Login required")
+                    continue
+                else:
+                    logger.debug(f"  {strategy_name}: Received HTML (landing page?)")
+                    continue
 
-    except Exception as e:
-        logger.error(f"EZproxy download failed: {e}")
-        return None
+            # We got something that's not HTML - check if it's a PDF
+            if response.status_code == 200:
+                # Write PDF
+                with open(output_path, 'wb') as f:
+                    for chunk in response.iter_content(chunk_size=8192):
+                        if chunk:
+                            f.write(chunk)
+
+                # Verify file
+                file_size = output_path.stat().st_size
+                if file_size < 1000:
+                    logger.warning(f"Downloaded file is very small ({file_size} bytes)")
+                    output_path.unlink()
+                    continue
+
+                logger.info(f"Successfully downloaded via EZproxy ({strategy_name}): {output_path} ({file_size / 1024:.1f} KB)")
+                return output_path
+
+        except Exception as e:
+            logger.debug(f"  {strategy_name} error: {e}")
+            continue
+
+    # All strategies failed
+    logger.warning("EZproxy download failed - session may have expired")
+    logger.warning("To re-authenticate:")
+    logger.warning("  1. Visit in Firefox: http://ezproxy.usherbrooke.ca/login?url=https://doi.org/10.1111/ddi.12496")
+    logger.warning("  2. Complete SSO + 2FA login")
+    logger.warning("  3. Close Firefox and retry")
+    return None
 
 
 def download_pdf_with_fallback(
@@ -416,7 +474,7 @@ def download_pdf_with_fallback(
             pdf_url=openalex_pdf_url,
             output_path=output_path,
             timeout=timeout,
-            use_proxy=use_proxy
+            use_proxy=True
         )
         if success:
             return output_path
@@ -442,7 +500,7 @@ def download_pdf_with_fallback(
                         output_path=output_path,
                         timeout=timeout,
                         max_retries=2,  # Fewer retries for fallback attempts
-                        use_proxy=use_proxy
+                        use_proxy=True
                     )
                     if success:
                         return output_path
@@ -459,6 +517,7 @@ def download_pdf_with_fallback(
             doi=doi,
             ezproxy_cookies=ezproxy_cookies,
             output_dir=output_dir,
+            publisher_pdf_url=openalex_pdf_url,  # Pass for proxied URL strategy
             timeout=timeout,
             year=year
         )

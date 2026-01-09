@@ -71,15 +71,17 @@ def create_ezproxy_doi_url(doi: str) -> str:
     return create_ezproxy_url(doi_url)
 
 
-def extract_cookies_from_browser(browser: Optional[str] = None) -> Optional[dict]:
+def extract_cookies_from_browser(browser: Optional[str] = None, include_cas: bool = True) -> Optional[dict]:
     """
-    Extract EZproxy session cookies from browser.
+    Extract EZproxy and CAS session cookies from browser.
 
     Note: Requires browser_cookie3 package and prior authentication in browser.
 
     Args:
         browser: Browser to extract from ('firefox', 'chrome', 'edge', 'safari').
                  If None, uses BROWSER_FOR_COOKIES env var (default: 'firefox')
+        include_cas: Whether to also extract CAS (Central Authentication Service)
+                     cookies from cas.usherbrooke.ca (default: True)
 
     Returns:
         Dictionary of cookies or None if extraction fails
@@ -130,20 +132,36 @@ def extract_cookies_from_browser(browser: Optional[str] = None) -> Optional[dict
         # Get browser function
         get_cookies = browser_functions[browser]
 
-        # Try to get cookies for ezproxy domain
-        print(f"Extracting cookies from {browser.capitalize()}...")
-        cookies_jar = get_cookies(domain_name='ezproxy.usherbrooke.ca')
-
-        # Convert to dict
         cookies_dict = {}
-        for cookie in cookies_jar:
+
+        # Extract EZproxy cookies
+        print(f"Extracting cookies from {browser.capitalize()}...")
+        ezproxy_jar = get_cookies(domain_name='ezproxy.usherbrooke.ca')
+        for cookie in ezproxy_jar:
             cookies_dict[cookie.name] = cookie.value
 
+        ezproxy_count = len(cookies_dict)
+        if ezproxy_count > 0:
+            print(f"  ✓ Found {ezproxy_count} EZproxy cookie(s)")
+
+        # Extract CAS cookies (for SSO authentication)
+        if include_cas:
+            try:
+                cas_jar = get_cookies(domain_name='cas.usherbrooke.ca')
+                cas_count = 0
+                for cookie in cas_jar:
+                    cookies_dict[f"cas_{cookie.name}"] = cookie.value
+                    cas_count += 1
+                if cas_count > 0:
+                    print(f"  ✓ Found {cas_count} CAS cookie(s)")
+            except Exception as e:
+                print(f"  ⚠ Could not extract CAS cookies: {e}")
+
         if cookies_dict:
-            print(f"✓ Found {len(cookies_dict)} cookie(s)")
+            print(f"✓ Total: {len(cookies_dict)} cookie(s)")
             return cookies_dict
         else:
-            print("✗ No EZproxy cookies found in browser")
+            print("✗ No authentication cookies found in browser")
             return None
 
     except PermissionError as e:
@@ -169,6 +187,116 @@ def is_authenticated(session_cookies: dict) -> bool:
     required_cookies = ['ezproxy']  # Common EZproxy cookie name
 
     return any(key in session_cookies for key in required_cookies)
+
+
+def verify_session_active(cookies: dict, timeout: int = 10) -> bool:
+    """
+    Verify if the EZproxy/CAS session is still active by making a test request.
+
+    Args:
+        cookies: Dictionary of cookies from extract_cookies_from_browser()
+        timeout: Request timeout in seconds
+
+    Returns:
+        True if session is valid, False if expired or invalid
+
+    Example:
+        >>> cookies = extract_cookies_from_browser()
+        >>> if verify_session_active(cookies):
+        ...     print("Session is active - proceed with downloads")
+        ... else:
+        ...     print("Session expired - re-authenticate in browser")
+    """
+    import requests
+    import urllib3
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+    # Test URL - EZproxy login with a DOI
+    test_url = "http://ezproxy.usherbrooke.ca/login?url=https://doi.org/10.1111/ddi.12496"
+
+    session = requests.Session()
+
+    # Set up cookies
+    if cookies:
+        for name, value in cookies.items():
+            if name.startswith('cas_'):
+                session.cookies.set(name[4:], value, domain='cas.usherbrooke.ca')
+            else:
+                session.cookies.set(name, value, domain='.ezproxy.usherbrooke.ca')
+
+    try:
+        response = session.get(
+            test_url,
+            timeout=timeout,
+            headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'},
+            allow_redirects=True,
+            verify=False
+        )
+
+        # Check if we ended up at CAS login (session expired)
+        if 'cas.usherbrooke.ca/login' in response.url:
+            return False
+
+        # Check for HTTP 403 (access denied)
+        if response.status_code == 403:
+            return False
+
+        # If we got redirected to the actual resource, session is valid
+        return True
+
+    except Exception:
+        return False
+
+
+def print_authentication_instructions():
+    """Print instructions for authenticating with EZproxy."""
+    print("\n" + "=" * 70)
+    print("EZPROXY AUTHENTICATION REQUIRED")
+    print("=" * 70)
+    print("\nYour EZproxy session has expired. To re-authenticate:\n")
+    print("1. Open Firefox")
+    print("2. Visit this URL:")
+    print("   http://ezproxy.usherbrooke.ca/login?url=https://doi.org/10.1111/ddi.12496")
+    print("3. Complete UdeS Microsoft SSO login + 2FA")
+    print("4. Wait until you see the article page (confirming authentication)")
+    print("5. IMPORTANT: Keep Firefox open OR close it BEFORE running your script")
+    print("   (Firefox locks cookies while running on Windows)")
+    print("6. Run your script IMMEDIATELY (sessions expire quickly)")
+    print("\n" + "=" * 70)
+
+
+def create_proxied_publisher_url(publisher_url: str) -> str:
+    """
+    Convert a publisher URL to EZproxy-proxied format.
+
+    This creates URLs like:
+    - https://onlinelibrary-wiley-com.ezproxy.usherbrooke.ca/...
+    - https://www-nature-com.ezproxy.usherbrooke.ca/...
+
+    These URLs may work without the full CAS authentication flow if you
+    have a valid EZproxy session cookie.
+
+    Args:
+        publisher_url: Original publisher URL
+
+    Returns:
+        EZproxy-proxied URL with rewritten hostname
+
+    Example:
+        >>> create_proxied_publisher_url("https://onlinelibrary.wiley.com/doi/10.1111/ddi.12496")
+        'https://onlinelibrary-wiley-com.ezproxy.usherbrooke.ca/doi/10.1111/ddi.12496'
+    """
+    from urllib.parse import urlparse, urlunparse
+
+    parsed = urlparse(publisher_url)
+
+    # Convert hostname: onlinelibrary.wiley.com → onlinelibrary-wiley-com.ezproxy.usherbrooke.ca
+    proxied_host = parsed.netloc.replace('.', '-') + '.ezproxy.usherbrooke.ca'
+
+    # Reconstruct URL with proxied hostname
+    proxied = parsed._replace(netloc=proxied_host)
+
+    return urlunparse(proxied)
 
 
 if __name__ == "__main__":
