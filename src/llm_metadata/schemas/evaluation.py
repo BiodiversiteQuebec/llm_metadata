@@ -15,10 +15,17 @@ If you currently have dicts (e.g. rows from a DataFrame), validate first:
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, Callable, Hashable, Iterable, Optional, Sequence
 
 from pydantic import BaseModel
+
+
+@dataclass(frozen=True)
+class FuzzyMatchConfig:
+	"""Configuration for fuzzy string matching on specific fields."""
+
+	threshold: int = 80  # Minimum similarity score (0-100)
 
 
 @dataclass(frozen=True)
@@ -29,6 +36,7 @@ class EvaluationConfig:
 	strip_strings: bool = True
 	collapse_whitespace: bool = True
 	treat_lists_as_sets: bool = True
+	fuzzy_match_fields: dict[str, FuzzyMatchConfig] = field(default_factory=dict)
 
 
 @dataclass
@@ -161,6 +169,69 @@ class EvaluationReport:
 		)
 
 
+def _fuzzy_match_strings(s1: str, s2: str, threshold: int) -> bool:
+	"""Check if two strings match within fuzzy threshold."""
+	try:
+		from rapidfuzz import fuzz
+	except ImportError:
+		raise ImportError(
+			"rapidfuzz is required for fuzzy matching; install with `pip install rapidfuzz`"
+		)
+	return fuzz.ratio(s1, s2) >= threshold
+
+
+def _fuzzy_match_lists(
+	true_items: list[str], pred_items: list[str], threshold: int
+) -> tuple[set[str], set[str]]:
+	"""Fuzzy match two lists and return normalized sets using true values as canonical.
+	
+	Returns (true_normalized, pred_normalized) where matching items use the same string.
+	"""
+	try:
+		from rapidfuzz import fuzz
+	except ImportError:
+		raise ImportError(
+			"rapidfuzz is required for fuzzy matching; install with `pip install rapidfuzz`"
+		)
+	
+	true_normalized = set()
+	pred_normalized = set()
+	
+	# Create mapping from pred to true based on fuzzy matching
+	for pred_item in pred_items:
+		if not isinstance(pred_item, str):
+			pred_normalized.add(str(pred_item))
+			continue
+		
+		pred_lower = pred_item.lower().strip()
+		best_match = None
+		best_score = 0
+		
+		for true_item in true_items:
+			if not isinstance(true_item, str):
+				continue
+			true_lower = true_item.lower().strip()
+			score = fuzz.ratio(pred_lower, true_lower)
+			if score > best_score:
+				best_score = score
+				if score >= threshold:
+					best_match = true_lower
+		
+		if best_match:
+			pred_normalized.add(best_match)
+		else:
+			pred_normalized.add(pred_lower)
+	
+	# Add all true items (normalized)
+	for true_item in true_items:
+		if isinstance(true_item, str):
+			true_normalized.add(true_item.lower().strip())
+		else:
+			true_normalized.add(str(true_item))
+	
+	return true_normalized, pred_normalized
+
+
 def _normalize_string(value: str, config: EvaluationConfig) -> str:
 	s = value
 	if config.strip_strings:
@@ -227,6 +298,74 @@ def compare_models(
 		true_raw = true_data.get(field)
 		pred_raw = pred_data.get(field)
 
+		# Apply fuzzy matching BEFORE general normalization if configured
+		fuzzy_config = config.fuzzy_match_fields.get(field)
+		if fuzzy_config:
+			# Handle fuzzy matching for lists
+			if isinstance(true_raw, (list, tuple)) or isinstance(pred_raw, (list, tuple)):
+				true_list = list(true_raw) if true_raw else []
+				pred_list = list(pred_raw) if pred_raw else []
+				
+				true_set, pred_set = _fuzzy_match_lists(
+					[str(x) for x in true_list],
+					[str(x) for x in pred_list],
+					fuzzy_config.threshold
+				)
+				
+				tp = len(true_set & pred_set)
+				fp = len(pred_set - true_set)
+				fn = len(true_set - pred_set)
+				match = (fp == 0 and fn == 0)
+				
+				results.append(
+					FieldResult(
+						record_id=record_id,
+						field=field,
+						true_value=true_raw,
+						pred_value=pred_raw,
+						match=match,
+						tp=tp,
+						fp=fp,
+						fn=fn,
+						tn=0,
+					)
+				)
+				continue
+			
+			# Handle fuzzy matching for scalars
+			if isinstance(true_raw, str) and isinstance(pred_raw, str):
+				if _fuzzy_match_strings(true_raw, pred_raw, fuzzy_config.threshold):
+					results.append(
+						FieldResult(
+							record_id=record_id,
+							field=field,
+							true_value=true_raw,
+							pred_value=pred_raw,
+							match=True,
+							tp=1,
+							fp=0,
+							fn=0,
+							tn=0,
+						)
+					)
+					continue
+				else:
+					results.append(
+						FieldResult(
+							record_id=record_id,
+							field=field,
+							true_value=true_raw,
+							pred_value=pred_raw,
+							match=False,
+							tp=0,
+							fp=1,
+							fn=1,
+							tn=0,
+						)
+					)
+					continue
+
+		# Standard normalization (no fuzzy matching)
 		true_norm = _normalize_value(true_raw, config)
 		pred_norm = _normalize_value(pred_raw, config)
 

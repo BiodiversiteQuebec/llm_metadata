@@ -132,6 +132,82 @@ Valid data stored as `data/dataset_092624_validated.xlsx`.
 
 ---
 
+### 2026-01-09: Normalization Architecture Refactoring
+**Task:** Refactor vocabulary normalization and fuzzy matching from notebook-level code into reusable schema validators and evaluation module.
+
+**Work Performed:**
+- **Notebook:** `notebooks/fuster_test_extraction_evaluation.ipynb`
+- **Schema Enhancements (`fuster_features.py`):**
+  - Moved `DATA_TYPE_MAPPING` and `GEO_TYPE_MAPPING` dictionaries from notebook to module level
+  - Updated `_normalize_ebv_value()` and `_normalize_geospatial_value()` to use vocabulary mappings
+  - Vocabulary normalization now happens automatically during Pydantic validation
+- **Evaluation Module (`evaluation.py`):**
+  - Created `FuzzyMatchConfig` dataclass for field-specific fuzzy matching configuration
+  - Added `fuzzy_match_fields` parameter to `EvaluationConfig`
+  - Implemented `_fuzzy_match_strings()` and `_fuzzy_match_lists()` helper functions
+  - Modified `compare_models()` to apply fuzzy matching before standard normalization
+- **Notebook Simplification:**
+  - Removed ~150 lines of manual normalization code
+  - Replaced with declarative configuration approach
+- **Testing:**
+  - Created `tests/test_evaluation_fuzzy.py` with unittest framework
+  - Tests cover fuzzy matching, vocabulary normalization, and declarative config
+
+**Results:**
+| Metric | Value | Interpretation |
+|--------|-------|----------------|
+| Micro-average Precision | 0.365 | Model extracts correctly ~37% of the time |
+| Micro-average Recall | 0.676 | Model finds ~68% of true features |
+| Micro-average F1 | 0.474 | Balanced performance metric |
+| Macro-average F1 | 0.515 | Average across all field types |
+
+**Per-Field Performance:**
+| Field | Precision | Recall | F1 | Status |
+|-------|-----------|--------|-----|--------|
+| temp_range_i | 1.000 | 0.800 | 0.889 | ⭐ Best |
+| temp_range_f | 0.750 | 0.600 | 0.667 | ⭐ Strong |
+| species | 0.375 | 1.000 | 0.545 | ✓ Perfect recall |
+| spatial_range_km2 | 1.000 | 0.250 | 0.400 | ⚠️ Conservative |
+| data_type | 0.250 | 0.429 | 0.316 | ⚠️ Weak |
+| geospatial_info | 0.167 | 0.750 | 0.273 | ❌ Poor |
+
+**Key Findings:**
+1. **Temporal extraction reliable:** Year fields (F1 > 0.65) perform best
+2. **Fuzzy matching effective:** Species achieves 100% recall with threshold=70
+3. **Systematic over-extraction:** Model identifies more `data_type` (9 FP) and `geospatial_info_dataset` (15 FP) values than annotators
+4. **Conservative numeric extraction:** `spatial_range_km2` has perfect precision but misses 75% of values
+
+**Architectural Benefits:**
+- **Single source of truth:** Vocabulary normalization in schema validators
+- **Experiment-friendly:** Fuzzy thresholds configured declaratively
+- **Code reduction:** 35% less notebook code (~150 lines removed)
+- **Reusable:** Evaluation config can be shared across notebooks
+- **No performance regression:** Metrics consistent with manual normalization approach
+
+**Migration Pattern:**
+```python
+# Old approach: Manual normalization in notebook
+manual_normalized = {doi: normalize_extraction(m) for doi, m in manual_by_doi.items()}
+
+# New approach: Declarative config
+config = EvaluationConfig(
+    treat_lists_as_sets=True,
+    fuzzy_match_fields={"species": FuzzyMatchConfig(threshold=70)}
+)
+report = evaluate_indexed(true_by_id=manual_by_doi, pred_by_id=auto_by_doi, config=config)
+```
+
+**Next Steps:**
+- Error analysis on 15 FP in `geospatial_info_dataset` and 9 FP in `data_type`
+- Evidence extraction to understand model reasoning
+- Expand test set to all 11 abstract-annotated Dryad records
+- Field-specific confidence tuning for extraction aggressiveness
+
+**Documentation:**
+📄 [Refactoring Summary](../docs/normalization_refactoring.md)
+
+---
+
 ### 2026-01-08: Article Full Text Retrieval Exploration
 **Task:** Explore methods to retrieve full text articles associated with Dryad/Zenodo data papers from the Fuster et al. annotated dataset.
 

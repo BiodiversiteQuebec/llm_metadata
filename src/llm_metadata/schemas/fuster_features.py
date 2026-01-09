@@ -17,6 +17,52 @@ import pandas as pd
 from pydantic import BaseModel, Field, field_validator, model_validator
 
 
+# Vocabulary normalization mappings for manual annotations
+# Maps free-text values to controlled vocabulary enums
+DATA_TYPE_MAPPING = {
+    # Direct matches
+    "abundance": "abundance",
+    "presence-absence": "presence-absence",
+    "presence only": "presence-only",
+    "presence-only": "presence-only",
+    "density": "density",
+    "distribution": "distribution",
+    "traits": "traits",
+    "ecosystem function": "ecosystem_function",
+    "ecosystem_function": "ecosystem_function",
+    "ecosystem structure": "ecosystem_structure",
+    "ecosystem_structure": "ecosystem_structure",
+    "genetic analysis": "genetic_analysis",
+    "genetic_analysis": "genetic_analysis",
+    "ebv genetic analysis": "genetic_analysis",
+    "time series": "time_series",
+    "time_series": "time_series",
+    "species richness": "species_richness",
+    "species_richness": "species_richness",
+    "other": "other",
+    "unknown": "unknown",
+}
+
+GEO_TYPE_MAPPING = {
+    "sample": "sample",
+    "sample coordinates": "sample",
+    "site": "site",
+    "site coordinates": "site",
+    "range": "range",
+    "range coordinates": "range",
+    "distribution": "distribution",
+    "species distribution": "distribution",
+    "geographic features": "geographic_features",
+    "geographic_features": "geographic_features",
+    "administrative units": "administrative_units",
+    "administrative_units": "administrative_units",
+    "maps": "maps",
+    "site ids": "site_ids",
+    "site_ids": "site_ids",
+    "unknown": "unknown",
+}
+
+
 class EBVDataType(str, Enum):
     """
     Essential Biodiversity Variable (EBV) data type categories.
@@ -307,7 +353,7 @@ class DatasetFeatureExtraction(BaseModel):
 
     @staticmethod
     def _normalize_ebv_value(value: str) -> str:
-        """Normalize EBV data type value to match enum format."""
+        """Normalize EBV data type value to match enum format using vocabulary mapping."""
         if not isinstance(value, str):
             return value
         
@@ -319,7 +365,11 @@ class DatasetFeatureExtraction(BaseModel):
         
         # Handle common pluralizations and variations
         normalized = normalized.replace('analyses', 'analysis')
-        normalized = normalized.replace('records', '') # 'presence records' -> 'presence'
+        normalized = normalized.replace('records', '').strip()  # 'presence records' -> 'presence'
+        
+        # Check vocabulary mapping first
+        if normalized in DATA_TYPE_MAPPING:
+            return DATA_TYPE_MAPPING[normalized]
         
         # Replace spaces and hyphens with underscores for enum matching
         normalized = normalized.replace(' ', '_').replace('-', '_')
@@ -424,11 +474,16 @@ class DatasetFeatureExtraction(BaseModel):
 
     @staticmethod
     def _normalize_geospatial_value(v: str) -> str:
-        """Normalize geospatial info value to match enum format."""
+        """Normalize geospatial info value to match enum format using vocabulary mapping."""
         if not isinstance(v, str):
             return v
         
-        normalized = v.lower().strip().replace('-', '_').replace(' ', '_')
+        # Check vocabulary mapping first (handles multi-word phrases)
+        key = v.lower().strip()
+        if key in GEO_TYPE_MAPPING:
+            return GEO_TYPE_MAPPING[key]
+        
+        normalized = key.replace('-', '_').replace(' ', '_')
         normalized = normalized.strip('_')
         
         # Map common variations to valid enum values
