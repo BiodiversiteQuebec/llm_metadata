@@ -26,35 +26,6 @@ DEFAULT_TIMEOUT = 30  # seconds
 MAX_RETRIES = 3
 RETRY_DELAY = 2  # seconds (exponential backoff)
 
-# Proxy configuration from environment variables
-# Set these in your .env if you have university VPN/proxy access
-HTTP_PROXY = os.getenv('HTTP_PROXY')
-HTTPS_PROXY = os.getenv('HTTPS_PROXY')
-
-
-def get_proxies() -> Optional[Dict[str, str]]:
-    """
-    Get proxy configuration from environment variables.
-
-    Returns:
-        Dictionary with proxy settings or None if not configured
-
-    Example:
-        Set in .env:
-        HTTP_PROXY=http://proxy.university.edu:8080
-        HTTPS_PROXY=http://proxy.university.edu:8080
-    """
-    if HTTP_PROXY or HTTPS_PROXY:
-        proxies = {}
-        if HTTP_PROXY:
-            proxies['http'] = HTTP_PROXY
-        if HTTPS_PROXY:
-            proxies['https'] = HTTPS_PROXY
-        logger.debug(f"Using proxy configuration: {proxies}")
-        return proxies
-    return None
-
-
 def sanitize_doi(doi: str) -> str:
     """
     Sanitize DOI for use as filename.
@@ -87,8 +58,7 @@ def download_pdf_from_url(
     pdf_url: str,
     output_path: Path,
     timeout: int = DEFAULT_TIMEOUT,
-    max_retries: int = MAX_RETRIES,
-    use_proxy: bool = True
+    max_retries: int = MAX_RETRIES
 ) -> bool:
     """
     Download PDF from a single URL with retry logic.
@@ -98,12 +68,10 @@ def download_pdf_from_url(
         output_path: Path to save the PDF
         timeout: Request timeout in seconds
         max_retries: Number of retry attempts
-        use_proxy: Whether to use proxy (if configured)
 
     Returns:
         True if download succeeded, False otherwise
     """
-    proxies = get_proxies() if use_proxy else None
 
     for attempt in range(1, max_retries + 1):
         try:
@@ -113,7 +81,6 @@ def download_pdf_from_url(
             response = requests.get(
                 pdf_url,
                 timeout=timeout,
-                proxies=proxies,
                 headers={
                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
                 },
@@ -175,8 +142,7 @@ def download_pdf(
     output_dir: Optional[Path] = None,
     timeout: int = DEFAULT_TIMEOUT,
     max_retries: int = MAX_RETRIES,
-    year: Optional[int] = None,
-    use_proxy: bool = True
+    year: Optional[int] = None
 ) -> Optional[Path]:
     """
     Download PDF from URL with error handling and retry logic.
@@ -188,7 +154,6 @@ def download_pdf(
         timeout: Request timeout in seconds (default: 30)
         max_retries: Number of retry attempts (default: 3)
         year: Publication year for subdirectory organization (optional)
-        use_proxy: Whether to use proxy if configured (default: True)
 
     Returns:
         Path to downloaded file or None on failure
@@ -226,8 +191,7 @@ def download_pdf(
         pdf_url=pdf_url,
         output_path=output_path,
         timeout=timeout,
-        max_retries=max_retries,
-        use_proxy=use_proxy
+        max_retries=max_retries
     )
 
     if success:
@@ -473,8 +437,7 @@ def download_pdf_with_fallback(
         success = download_pdf_from_url(
             pdf_url=openalex_pdf_url,
             output_path=output_path,
-            timeout=timeout,
-            use_proxy=True
+            timeout=timeout
         )
         if success:
             return output_path
@@ -499,8 +462,7 @@ def download_pdf_with_fallback(
                         pdf_url=url,
                         output_path=output_path,
                         timeout=timeout,
-                        max_retries=2,  # Fewer retries for fallback attempts
-                        use_proxy=True
+                        max_retries=2  # Fewer retries for fallback attempts
                     )
                     if success:
                         return output_path
@@ -523,6 +485,34 @@ def download_pdf_with_fallback(
         )
         if ezproxy_path:
             return ezproxy_path
+        
+    # Strategy 4: Sci-Hub
+    try:
+        from llm_metadata.scihub import SciHub
+        
+        logger.info(f"Strategy 4: Trying Sci-Hub for {doi}")
+        sh = SciHub()
+        
+        # Get the PDF URL from Sci-Hub
+        result = sh.fetch(doi)
+        
+        if result.get('pdf'):
+            success = download_pdf_from_url(
+                pdf_url=result['pdf'],
+                output_path=output_path,
+                timeout=timeout,
+                max_retries=2
+            )
+            if success:
+                return output_path
+        else:
+            logger.debug(f"Sci-Hub: No PDF found for {doi}")
+            
+    except ImportError:
+        logger.warning("scihub_dmunozg package not available, skipping Sci-Hub fallback")
+    except Exception as e:
+        logger.warning(f"Sci-Hub fallback error: {e}")
+    
 
     # All strategies failed
     logger.error(f"All download strategies failed for {doi}")

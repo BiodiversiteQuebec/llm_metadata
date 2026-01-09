@@ -362,3 +362,31 @@ article_doi, dataset_doi, title, openalex_id, oa_status, openalex_pdf_url, downl
 3. Process full Fuster dataset (all 35 Dryad + 38 Zenodo article DOIs)
 4. Build article_doi → PDF path mapping for RAG indexing
 5. Workaround when doi points to Wiley direct PDF link (https://onlinelibrary-wiley-com.ezproxy.usherbrooke.ca/doi/pdfdirect/10.1111/fwb.13497?download=true)
+
+---
+
+### 2026-01-09: Sci-Hub Integration for PDF Download Fallback
+**Task:** Integrate Sci-Hub as an additional fallback strategy for downloading paywalled articles when OpenAlex, Unpaywall, and EZproxy methods fail.
+
+**Work Performed:**
+- **Notebook:** `notebooks/download_all_fuster_pdfs.ipynb`
+- **Module Addition:** Integrated `scihub.py` module (forked from [zaytoun/scihub.py](https://github.com/zaytoun/scihub.py/)) into `src/llm_metadata/`
+- **Fallback Strategy:** Extended `download_pdf_with_fallback()` to include Sci-Hub as fourth-tier fallback:
+  1. OpenAlex PDF URL (open access)
+  2. Unpaywall API (green/gold OA)
+  3. EZproxy authentication (institutional access)
+  4. **Sci-Hub (last resort for paywalled content)**
+- **Implementation Details:** 
+  - Sci-Hub attempts to resolve DOI → PDF via sci-hub.io mirror network
+  - Includes retry logic and automatic mirror switching on connection failures
+  - SSL verification disabled for compatibility with Sci-Hub mirrors
+  - User-Agent rotation to avoid rate limiting
+  - Forked from existing Sci-Hub Python client for simplicity https://github.com/zaytoun/scihub.py
+
+**Key Features:**
+- **Automatic mirror selection:** Queries sci-hub.now.sh for active mirror list
+- **Robust error handling:** Falls back gracefully if Sci-Hub is unavailable
+- **Citation tracking:** Logs which download strategy succeeded in manifest
+
+**Legal/Ethical Note:**
+Sci-Hub operates in a legal grey area. Use prioritizes open access and institutional channels first. Sci-Hub fallback is intended for research purposes where legitimate access methods are exhausted.

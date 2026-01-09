@@ -18,7 +18,13 @@
       "WebFetch(domain:docs.openalex.org)",
       "Bash(git add:*)",
       "WebFetch(domain:www.usherbrooke.ca)",
-      "Bash(docker compose:*)"
+      "Bash(docker compose:*)",
+      "Bash(curl:*)",
+      "Bash(pip search:*)",
+      "Bash(pip index:*)",
+      "Bash(pip show:*)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:github.com)"
     ]
   }
 }

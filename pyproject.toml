@@ -21,6 +21,9 @@ dependencies = [
     "tiktoken",
     "rich",
     "browser-cookie3",
+    "beautifulsoup4",
+    "retrying",
+    "pysocks"
 ]
 
 [project.optional-dependencies]
