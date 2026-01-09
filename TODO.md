@@ -34,7 +34,6 @@
 
   * [x] Metrics definition & utils (evaluation.py with precision/recall/F1)
 
-
   * [ ] Benchmark report generation
 
 ## Benchmarking from papers full text
@@ -49,6 +48,10 @@
   * [ ] Investigation of datasets with source `semantic_scholar` 🔥
 
 * [x] Retrieval of annotated papers full text (url + pdfs) from DOIs (OpenAlex + Unpaywall fallback)
+
+* [x] Download all benchmark pdfs 🔥
+
+  * [ ] Why only 75 articles ?
 
 * [x] Paper full text chunking + vector db infrastructure + workflow (with metadata: sections, page numbers, authors, doi, etc) 🔥
   * [x] Docker infrastructure: compose up GROBID + Qdrant (`docker-compose.yml`)
