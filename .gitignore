@@ -11,3 +11,6 @@ presentation/*
 build/*
 dist/*
 .ipynb_checkpoints/
+qdrant_storage/
+*/pdfs/*
+artifacts/

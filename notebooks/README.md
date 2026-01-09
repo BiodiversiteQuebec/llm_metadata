@@ -184,3 +184,181 @@ Valid data stored as `data/dataset_092624_validated.xlsx`.
 - Build mapping database: `dataset_doi` → `article_doi` → `article_pdf_path`
 - Handle open access detection (check `is_oa` and `oa_locations` from Unpaywall)
 - Create batch download utility with progress tracking and error handling
+
+---
+
+### 2026-01-08: PDF Chunking and RAG Infrastructure Implementation
+**Task:** Implement complete PDF-to-RAG pipeline infrastructure for full-text feature extraction from scientific articles.
+
+**Work Performed:**
+- **Architecture:** Implemented modular pipeline following `tasks/article-full-text-chunking.md` specification
+- **Services:** Configured Docker Compose with GROBID (PDF parsing) and Qdrant (vector storage)
+- **Core Modules:**
+  1. `pdf_parsing.py` - GROBID client + TEI XML parsing with section hierarchy extraction
+  2. `section_normalize.py` - Regex-based heading normalization to canonical section types
+  3. `chunking.py` - Section-aware chunking with tiktoken token counting (target: 450, max: 650, overlap: 80 tokens)
+  4. `embedding.py` - OpenAI text-embedding-3-large wrapper with JSONL caching
+  5. `vector_store.py` - Qdrant client with filtered search and payload indexing
+  6. `registry.py` - SQLite registry for document processing status tracking
+- **Schemas:** Created `chunk_metadata.py` with Pydantic models for section/chunk metadata and integration with existing `OpenAlexWork`
+- **Infrastructure:**
+  - Updated `pyproject.toml` with dependencies: lxml, qdrant-client, tiktoken, rich, grobid-client-python
+  - Created `.env` entries for GROBID_URL and QDRANT_URL
+  - Initialized `data/registry.sqlite` with documents and chunks tables
+  - Created `artifacts/tei/` and `artifacts/chunks/` directories
+- **Notebook:** Created `notebooks/pdf_chunking_exploration.ipynb` for end-to-end pipeline testing
+
+**Results:**
+✓ All 10 core modules implemented (7 Python modules + 3 infrastructure files)
+✓ Unit tests pass for section normalization (10/10 test cases)
+✓ Chunking test: 2 chunks from 88-token sample (54+35 tokens, detecting equations/tables/figures)
+✓ Registry database initialized with documents and chunks tables
+
+**Architecture Highlights:**
+- **Section-aware chunking:** Never crosses section boundaries, preserves semantic coherence
+- **Token-based sizing:** Uses tiktoken for deterministic chunking compatible with OpenAI embeddings API
+- **Idempotent pipeline:** SHA256-based caching for embeddings, registry-based status tracking
+- **Rich metadata:** Chunk payloads include document, section, and content flags (equations, tables, figures)
+- **Filtered retrieval:** Qdrant indexes on doi, publication_year, section_type, is_references, author_orcids
+
+**Key Design Patterns:**
+1. **Conservative extraction:** Follows Fuster methodology - only extract information explicitly supported by text
+2. **Pydantic-first validation:** Unified schema layer for type safety and serialization
+3. **Local-first processing:** Docker services for GROBID/Qdrant avoid vendor lock-in
+4. **Notebook-driven development:** Per CLAUDE.md workflow, all testing/evaluation via notebooks
+
+**Known Limitations (v1):**
+- Tables and figures ignored (no structured extraction or OCR)
+- GROBID dependency requires Docker (fallback: pymupdf for v1.1)
+- No Prefect orchestration yet (manual batch processing only)
+- Section classification uses regex patterns (could add ML-based fallback)
+
+**Next Steps:**
+1. Test full pipeline with actual Fuster dataset PDFs
+2. Compare full-text vs abstract-only feature extraction quality
+3. Measure throughput and OpenAI embedding costs for batch processing
+4. Implement Prefect flow for automated batch processing
+5. Evaluate RAG retrieval quality with section-type filtering
+
+---
+
+### 2026-01-08: PDF Chunking Pipeline - End-to-End Testing and Query Examples
+**Task:** Debug and test complete PDF-to-RAG pipeline with semantic search and metadata filtering capabilities.
+
+**Work Performed:**
+- **Notebook:** `notebooks/pdf_chunking_exploration.ipynb`
+- **Bug Fixes:**
+  1. **GROBID API Call:** Replaced broken `grobid_client` CLI with direct REST API using `requests.post()` to `/api/processFulltextDocument`
+  2. **Variable Naming Conflict:** Fixed Python scoping issue in `chunking.py` where loop variable `chunk_text` shadowed function name - renamed to `text_content`
+  3. **Qdrant Point IDs:** Implemented `chunk_id_to_int()` using MD5 hash to convert string IDs to required integers, stored original IDs in payload as `chunk_id_str`
+  4. **Qdrant API Updates:** Updated `search_chunks()` to use new `query_points()` method instead of deprecated `search()`, fixed `get_collection_stats()` with `hasattr()` checks
+- **Feature Enhancements:**
+  1. **Semantic Query Search:** Added natural language query example ("Provide a description of the datasets used within the study") with OpenAI embedding generation and relevance-ranked retrieval
+  2. **Metadata Filtering:** Implemented three filtering patterns:
+     - Filter by normalized section type (e.g., all DISCUSSION chunks)
+     - Filter by raw section title keywords (e.g., sections containing "dataset")
+     - Filter by content flags (e.g., chunks with figure mentions)
+  3. **Enhanced Visualizations:** Added chunk count histogram by section type alongside token distribution plots
+
+**Pipeline Test Results:**
+| Stage | Status | Details |
+|-------|--------|---------|
+| GROBID Parsing | ✓ | Extracted 23 sections from test PDF (10.1002_ece3.1476.pdf, 6.3 MB) |
+| Section Normalization | ✓ | Classified sections: 18 OTHER, 3 DISCUSSION, 2 INTRO, 1 ABSTRACT, 1 CONCLUSION |
+| Chunking | ✓ | Generated 25 chunks, avg 359 tokens (range: 7-649), 60% with figure mentions |
+| Embeddings | ✓ | Created 3072-dimensional vectors using text-embedding-3-large, cached to JSONL |
+| Qdrant Indexing | ✓ | Stored 25 points with full metadata payload |
+| Retrieval | ✓ | Both semantic and metadata-based queries working |
+| Registry | ✓ | Document tracked in SQLite with SHA256 hash |
+
+**Semantic Search Example:**
+Query: *"Provide a description of the datasets used within the study"*
+- **Top Match (Score: 0.4119):** "Ecological survey dataset" section with detailed methodology description
+- **Key Finding:** Raw section titles preserved in payload enable semantic matching on section names
+- Successfully retrieved 5 relevant chunks describing datasets, sampling methods, and data sources
+
+**Metadata Filtering Examples:**
+1. **Section Type Filter:** Retrieved 3 DISCUSSION chunks (all 548-628 tokens)
+2. **Section Title Filter:** Found 3 chunks with "dataset" in title (Forest survey, Ecological survey, Ecological district)
+3. **Content Flag Filter:** Retrieved 5 chunks with `has_figure_mention=True`
+
+**Key Insights:**
+- **Dual metadata storage** (raw `section_title` + normalized `section_type`) provides flexibility for both semantic and categorical queries
+- **Section-aware chunking** preserves context boundaries (no cross-section splits)
+- **Token-based sizing** ensures chunks fit within embedding model limits (8191 tokens for text-embedding-3-large)
+- **Metadata filtering** offers fast structural queries without embedding overhead
+
+**Performance Metrics:**
+- Parsing time: ~20 seconds for 6.3 MB PDF
+- Chunking: <1 second for 25 chunks
+- Embedding generation: ~2 seconds for 25 chunks (with caching)
+- Indexing: ~13 seconds (includes collection recreation)
+- Retrieval: <200ms per query
+
+**Next Steps:**
+1. Batch process all Fuster dataset PDFs (~73 articles with DOIs)
+2. Compare RAG-based feature extraction vs abstract-only extraction
+3. Implement hybrid search (semantic + metadata filtering combined)
+4. Add citation formatting with section path in RAG responses
+5. Evaluate retrieval quality with precision@k metrics
+
+---
+
+### 2026-01-08: PDF Retrieval Infrastructure for Fuster Dataset Articles
+**Task:** Implement robust PDF download pipeline for scientific articles linked to Dryad datasets with multiple fallback strategies.
+
+**Work Performed:**
+- **Notebook:** `notebooks/download_dryad_pdfs_fuster.ipynb`
+- **Infrastructure Modules:**
+  1. `openalex.py` - OpenAlex API integration for work metadata and PDF URL extraction
+  2. `pdf_download.py` - Multi-strategy PDF downloader with `download_pdf_with_fallback()` function
+  3. `ezproxy.py` - Browser cookie extraction for university proxy authentication
+- **Download Strategies (in order):**
+  1. **OpenAlex PDF URL** - Direct download from publisher-provided open access links
+  2. **Unpaywall API fallback** - Query alternative OA locations if primary URL fails
+  3. **EZProxy retry** - Attempt download through institutional proxy with browser cookies
+- **Workflow Improvements:**
+  - Single-pass OpenAlex API calls with caching (eliminates redundant requests)
+  - Proper error handling and status tracking for each download attempt
+  - Manifest CSV generation for tracking download success/failure
+  - Polite API usage with rate limiting (1s between OpenAlex calls, 0.5s between downloads)
+
+**Dataset Integration:**
+- Loaded `data/dataset_article_mapping.csv` (created from Hypothesis 2 work on 2026-01-08)
+- Filtered to Dryad datasets with valid article DOIs (35/37 = 94.6% coverage)
+- Sample processing: 5 randomly selected works for testing
+
+**Results:**
+| Status | Count | Details |
+|--------|-------|---------|
+| Downloaded | Variable | Success depends on OA status and proxy configuration |
+| No OpenAlex work | 0 | All DOIs resolved successfully |
+| Failed | Variable | Expected for closed-access articles without proxy |
+
+**Key Features:**
+- **Fallback resilience:** Three-tier strategy maximizes retrieval success
+- **Institutional access:** EZProxy support enables retrieval of subscription-only articles when browser cookies available
+- **Metadata preservation:** Tracks OpenAlex ID, OA status, PDF URL source, and download path
+- **Output organization:** PDFs saved to `data/pdfs/fuster/` with DOI-based filenames
+
+**Dependencies Added:**
+- `playwright` for browser automation (optional, for cookie extraction)
+- `browser-cookie3` for reading browser cookies (Firefox/Chrome/Edge)
+
+**Manifest Structure:**
+```csv
+article_doi, dataset_doi, title, openalex_id, oa_status, openalex_pdf_url, downloaded_pdf_path, status, error
+```
+
+**Troubleshooting Guide Included:**
+1. Set `OPENALEX_EMAIL` in `.env` for Unpaywall API (polite pool access)
+2. Run browser-based authentication first, then extract cookies
+3. Expect failures for closed-access articles without institutional access
+
+**Next Steps:**
+0. Debug notebook with EZProxy (certificate issues)
+1. Batch download all fuster OA articles
+2. Monitor download success rates across OA status categories
+3. Process full Fuster dataset (all 35 Dryad + 38 Zenodo article DOIs)
+4. Build article_doi → PDF path mapping for RAG indexing
+5. Workaround when doi points to Wiley direct PDF link (https://onlinelibrary-wiley-com.ezproxy.usherbrooke.ca/doi/pdfdirect/10.1111/fwb.13497?download=true)

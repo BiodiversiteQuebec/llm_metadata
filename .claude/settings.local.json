@@ -16,7 +16,9 @@
       "Bash(touch:*)",
       "WebSearch",
       "WebFetch(domain:docs.openalex.org)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "WebFetch(domain:www.usherbrooke.ca)",
+      "Bash(docker compose:*)"
     ]
   }
 }

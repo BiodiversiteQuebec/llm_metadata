@@ -16,6 +16,11 @@ dependencies = [
     "prefect",
     "openai",
     "pandera",
+    "lxml",
+    "qdrant-client",
+    "tiktoken",
+    "rich",
+    "browser-cookie3",
 ]
 
 [project.optional-dependencies]
@@ -25,6 +30,7 @@ dev = [
     "ipykernel",
     "loguru",
     "openpyxl",
+    "grobid-client-python",
 ]
 
 [tool.setuptools.packages.find]
