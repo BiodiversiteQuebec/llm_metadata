@@ -138,20 +138,55 @@ class FeatureLocation(str, Enum):
     UNKNOWN = "unknown"
 
 
+class FieldEvidence(BaseModel):
+    """
+    Supporting evidence for a single field extraction.
+    
+    Provides confidence scores, direct quotes, and reasoning to explain
+    why a particular value was extracted from text. Enables analysis of
+    extraction quality and debugging of low-confidence extractions.
+    """
+    field_name: str = Field(
+        ...,
+        description="Name of the field this evidence supports (e.g., 'species', 'data_type')"
+    )
+    confidence: Optional[float] = Field(
+        None,
+        ge=0,
+        le=1,
+        description="Confidence score (0-1) for this extraction. 1.0 = very confident, 0.0 = very uncertain."
+    )
+    quote: Optional[str] = Field(
+        None,
+        description="Direct quote from the text supporting this extraction"
+    )
+    reasoning: Optional[str] = Field(
+        None,
+        description="Brief explanation of why this value was extracted"
+    )
+    source_section: Optional[str] = Field(
+        None,
+        description="Text section where evidence was found (e.g., 'abstract', 'methods', 'results')"
+    )
+
+
 class DatasetFeatureExtraction(BaseModel):
     """
-    Detailed dataset features following Essential Biodiversity Variables (EBV) framework.
+    Lightweight schema for LLM-based dataset feature extraction (Fuster et al. EBV framework).
 
-    This schema captures comprehensive dataset characteristics including:
+    This is the base extraction schema sent to ChatGPT for feature extraction tasks.
+    It defines the structure and controlled vocabularies without validation/normalization logic.
+
+    For validating manual annotations from Excel/CSV files, use DatasetFeatureExtractionValidated.
+
+    **Key features:**
     - EBV data type categories with time-series indicators
     - Spatiotemporal extent (geospatial and temporal information)
     - Taxonomic information
     - Dataset source references
-    - Feature provenance (where information was found)
+    - Optional evidence tracking (confidence, quotes, reasoning)
 
-    Based on Fuster et al. methodology for evaluating biodiversity dataset quality
-    and completeness. Some enum values are inferred as the full classification
-    framework was not completely specified in the reference.
+    Reference: Fuster et al. methodology for biodiversity dataset characterization.
     """
 
     # EBV data type (categorical)
@@ -211,7 +246,34 @@ class DatasetFeatureExtraction(BaseModel):
         description="Reason for invalid classification. See InvalidReason enum for common values."
     )
 
-    # --- Field Validators ---
+    # Evidence tracking (optional, for extraction quality analysis)
+    evidence: Optional[list[FieldEvidence]] = Field(
+        None,
+        description="List of evidence supporting extracted fields. Include confidence scores, quotes, and reasoning for key extractions."
+    )
+
+    class Config:
+        """Pydantic model configuration."""
+        use_enum_values = True  # Serialize enums as their values
+        populate_by_name = True  # Allow field population by alias or name
+
+
+class DatasetFeatureExtractionValidated(DatasetFeatureExtraction):
+    """
+    Extended schema with validation/normalization for manual annotations from Excel/CSV.
+
+    Inherits all fields from DatasetFeatureExtraction and adds field validators to:
+    - Clean NaN/NA values and placeholder strings
+    - Normalize vocabulary (e.g., 'presence only' → 'presence-only')
+    - Parse comma-separated lists
+    - Coerce numeric types from pandas DataFrames
+    - Handle European-style decimals (0,5 → 0.5)
+
+    Use this for validating manually annotated datasets.
+    Use base DatasetFeatureExtraction for LLM extraction prompts.
+    """
+    
+    # --- Field Validators (for manual annotation normalization) ---
     
     @model_validator(mode='before')
     @classmethod
