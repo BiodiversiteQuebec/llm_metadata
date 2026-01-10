@@ -14,7 +14,7 @@ from pydantic import ValidationError as PydanticValidationError
 from loguru import logger
 
 from llm_metadata.schemas.fuster_features import (
-    DatasetFeatureExtraction,
+    DatasetFeatures,
     EBVDataType,
     GeospatialInfoType,
 )
@@ -71,7 +71,7 @@ class ValidationReport:
         errors: List of ValidationError objects with detailed error info
         warnings: List of warning messages (e.g., coerced enum values)
     """
-    valid_rows: list[DatasetFeatureExtraction] = field(default_factory=list)
+    valid_rows: list[DatasetFeatures] = field(default_factory=list)
     valid_indices: list[Any] = field(default_factory=list)
     invalid_rows: list[dict] = field(default_factory=list)
     invalid_indices: list[Any] = field(default_factory=list)
@@ -171,7 +171,7 @@ class DataFrameValidator:
     
     def __init__(
         self,
-        model: type = DatasetFeatureExtraction,
+        model: type = DatasetFeatures,
         strict: bool = False,
     ):
         """

@@ -198,14 +198,14 @@ class FieldEvidence(BaseModel):
     )
 
 
-class DatasetFeatureExtraction(BaseModel):
+class DatasetFeatures(BaseModel):
     """
-    Lightweight schema for LLM-based dataset feature extraction (Fuster et al. EBV framework).
+    Schema for LLM-based feature extraction to describe biodiversity dataset (Fuster et al. EBV framework).
 
     This is the base extraction schema sent to ChatGPT for feature extraction tasks.
     It defines the structure and controlled vocabularies without validation/normalization logic.
 
-    For validating manual annotations from Excel/CSV files, use DatasetFeatureExtractionValidated.
+    For validating manual annotations from Excel/CSV files, use DatasetFeaturesValidated.
 
     **Key features:**
     - EBV data type categories with time-series indicators
@@ -274,7 +274,21 @@ class DatasetFeatureExtraction(BaseModel):
         description="Reason for invalid classification. See InvalidReason enum for common values."
     )
 
-    # Evidence tracking (optional, for extraction quality analysis)
+    class Config:
+        """Pydantic model configuration."""
+        use_enum_values = True  # Serialize enums as their values
+        populate_by_name = True  # Allow field population by alias or name
+
+class DatasetFeaturesEvidences(DatasetFeatures):
+    """
+    Extended schema including detailed evidence tracking for each extracted field.
+
+    Inherits all fields from DatasetFeatures and adds:
+    - evidence: List of FieldEvidence objects documenting supporting quotes, confidence, and reasoning.
+
+    Use this schema when detailed provenance and confidence analysis is required
+    for dataset feature extractions.
+    """
     evidence: Optional[list[FieldEvidence]] = Field(
         None,
         description=(
@@ -289,17 +303,11 @@ class DatasetFeatureExtraction(BaseModel):
         )
     )
 
-    class Config:
-        """Pydantic model configuration."""
-        use_enum_values = True  # Serialize enums as their values
-        populate_by_name = True  # Allow field population by alias or name
-
-
-class DatasetFeatureExtractionValidated(DatasetFeatureExtraction):
+class DatasetFeaturesValidated(DatasetFeatures):
     """
     Extended schema with validation/normalization for manual annotations from Excel/CSV.
 
-    Inherits all fields from DatasetFeatureExtraction and adds field validators to:
+    Inherits all fields from DatasetFeatures and adds field validators to:
     - Clean NaN/NA values and placeholder strings
     - Normalize vocabulary (e.g., 'presence only' → 'presence-only')
     - Parse comma-separated lists

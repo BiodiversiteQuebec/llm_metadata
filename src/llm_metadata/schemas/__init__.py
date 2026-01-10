@@ -13,7 +13,7 @@ from llm_metadata.schemas.abstract_metadata import (
     DEFAULT_DATASET_CATEGORIES,
 )
 from llm_metadata.schemas.fuster_features import (
-    DatasetFeatureExtraction,
+    DatasetFeatures,
     EBVDataType,
     GeospatialInfoType,
     FeatureLocation,
@@ -37,7 +37,7 @@ __all__ = [
     "DatasetAbstractMetadata",
     "DEFAULT_DATASET_CATEGORIES",
     # Fuster features
-    "DatasetFeatureExtraction",
+    "DatasetFeatures",
     "EBVDataType",
     "GeospatialInfoType",
     "FeatureLocation",

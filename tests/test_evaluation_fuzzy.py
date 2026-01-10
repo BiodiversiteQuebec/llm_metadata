@@ -6,7 +6,7 @@ from llm_metadata.schemas.evaluation import (
     FuzzyMatchConfig,
     evaluate_indexed,
 )
-from llm_metadata.schemas.fuster_features import DatasetFeatureExtraction
+from llm_metadata.schemas.fuster_features import DatasetFeatures
 
 
 class TestEvaluationFuzzy(unittest.TestCase):
@@ -16,10 +16,10 @@ class TestEvaluationFuzzy(unittest.TestCase):
         """Test fuzzy matching for species lists."""
         
         # Create test data with slight variations
-        manual = DatasetFeatureExtraction(
+        manual = DatasetFeatures(
             species=["Tamias striatus", "Ursus americanus"]
         )
-        automated = DatasetFeatureExtraction(
+        automated = DatasetFeatures(
             species=["Tamias striata", "Ursus americanus"]  # Slight typo in first species
         )
         
@@ -55,7 +55,7 @@ class TestEvaluationFuzzy(unittest.TestCase):
         """Test that vocabulary normalization happens in schema validators."""
         
         # Test data_type normalization
-        manual = DatasetFeatureExtraction(
+        manual = DatasetFeatures(
             data_type=["presence only", "EBV genetic analysis"]
         )
         
@@ -64,7 +64,7 @@ class TestEvaluationFuzzy(unittest.TestCase):
         self.assertIn("genetic_analysis", manual.data_type)
         
         # Test geospatial_info_dataset normalization
-        manual2 = DatasetFeatureExtraction(
+        manual2 = DatasetFeatures(
             geospatial_info_dataset=["site coordinates", "geographic features"]
         )
         
@@ -74,11 +74,11 @@ class TestEvaluationFuzzy(unittest.TestCase):
     def test_evaluation_config_declarative(self):
         """Test declarative evaluation configuration."""
         
-        manual = DatasetFeatureExtraction(
+        manual = DatasetFeatures(
             species=["Species one", "Species two"],
             data_type=["abundance"]
         )
-        automated = DatasetFeatureExtraction(
+        automated = DatasetFeatures(
             species=["species one", "species TWO"],  # Different case
             data_type=["abundance"]
         )

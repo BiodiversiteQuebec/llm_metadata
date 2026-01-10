@@ -1,10 +1,10 @@
 import unittest
 
-from llm_metadata.schemas import DatasetFeatureExtraction
+from llm_metadata.schemas import DatasetFeatures
 from llm_metadata.schemas.evaluation import evaluate_pairs, micro_average, macro_f1
 
 
-class _Rec(DatasetFeatureExtraction):
+class _Rec(DatasetFeatures):
     record_id: str
 
 

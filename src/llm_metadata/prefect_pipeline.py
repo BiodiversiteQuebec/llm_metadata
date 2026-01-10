@@ -8,7 +8,7 @@ import pandas as pd
 
 from llm_metadata.zenodo import get_record_by_doi, get_record_by_doi_list
 from llm_metadata.gpt_classify import classify_abstract
-from llm_metadata.schemas import DatasetFeatureExtraction
+from llm_metadata.schemas import DatasetFeatures
 from llm_metadata.openalex import get_works_by_filters_all
 from llm_metadata.schemas.openalex_work import OpenAlexWork, work_dict_to_model, works_to_dict_list
 from llm_metadata.pdf_download import download_pdf
@@ -35,7 +35,7 @@ def fetch_abstracts(dois: List[str]) -> List[str]:
     return abstracts
 
 @task
-def classify_abstract_task(abstract: str, response_format:BaseModel = DatasetFeatureExtraction) -> dict:
+def classify_abstract_task(abstract: str, response_format:BaseModel = DatasetFeatures) -> dict:
     classification = classify_abstract(abstract, response_format=response_format)
     return classification
 
