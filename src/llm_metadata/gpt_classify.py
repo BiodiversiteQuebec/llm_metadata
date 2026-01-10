@@ -3,16 +3,31 @@ import json
 import os
 from pathlib import Path
 from typing import Dict, Optional
+from joblib import Memory
 
 from llm_metadata.schemas import DatasetAbstractMetadata
+
+# Setup cache
+memory = Memory("./cache", verbose=0)
+
+MODEL_COST_PER_1M_TOKENS = {
+    "gpt-5-nano": {"input": 0.05, "output": 0.40, "cache": 0.005},
+    "gpt-5-mini": {"input": 0.25, "output": 2.00, "cache": 0.025},
+    "gpt-5": {"input": 1.25, "output": 10.00, "cache": 0.125},
+    "gpt-5.1": {"input": 1.25, "output": 10.00, "cache": 0.125},
+    "gpt-5.2": {"input": 1.75, "output": 14.00, "cache": 0.175},
+    "gpt-4.1": {"input": 2.00, "output": 8.00, "cache": 0.50},
+    "gpt-4o": {"input": 2.50, "output": 10.00, "cache": 1.25},
+
+    # "gpt-4": legacy; not consistently listed on the current pricing table.
+}
+
 
 MODEL = "gpt-5-mini"
 MAX_OUTPUT_TOKENS = 4096  # Increased from 1024 to allow complete JSON generation for complex schemas
 TEMPERATURE = None # Pas valid pour les modèles à raisonnement (GPT-5 / o-series), utilisé pour gpt-4o, et gpt-5.1 et gpt-5.2 sans raisonnement
 REASONING = {"effort": "low"} # options: low, medium, high, none (pour gpt-5.1, gpt-5.2)
 SYSTEM_MESSAGE = """
-
-
 You are EcodataGPT, a structured data extraction engine.
 
 Goal: extract fields from the user's abstract into the provided schema.
@@ -24,6 +39,56 @@ Rules:
 - Output must conform exactly to the schema (types, enums, lists).
 """.strip()
 
+@memory.cache
+def _response_parse(
+    model: str,
+    messages: list,
+    text_format: type,
+    temperature: Optional[float],
+    max_output_tokens: int,
+):
+    client = OpenAI()
+
+    response = client.responses.parse(
+        model=model,
+        input=messages,
+        text_format=text_format,
+        temperature=temperature,
+        max_output_tokens=max_output_tokens,
+    )
+
+    return response.model_dump()
+
+def _response_usage_cost(usage: dict, model: str = MODEL) -> dict:
+    # Get model-specific costs
+    try:
+        costs = MODEL_COST_PER_1M_TOKENS[model]
+    except KeyError:
+        raise ValueError(f"Unknown model '{model}' for cost calculation.")
+    
+    input_tokens = usage.get('input_tokens', 0)
+    cached_tokens = usage.get('input_tokens_details', {}).get('cached_tokens', 0)
+    reasoning_tokens = usage.get('output_tokens_details', {}).get('reasoning_tokens', 0)
+    output_tokens = usage.get('output_tokens', 0)
+
+    input_cost = round((input_tokens - cached_tokens) * costs["input"] / 1_000_000, 4)
+    cache_cost = round(cached_tokens * costs["cache"] / 1_000_000, 4)
+    reasoning_cost = round(reasoning_tokens * costs["output"] / 1_000_000, 4)
+    output_cost = round(output_tokens * costs["output"] / 1_000_000, 4)
+
+    total_cost = round(input_cost + cache_cost + output_cost + reasoning_cost, 4)
+
+    return {
+        'input_tokens': input_tokens,
+        'cached_tokens': cached_tokens,
+        'reasoning_tokens': reasoning_tokens,
+        'output_tokens': output_tokens,
+        'input_cost': input_cost,
+        'cache_cost': cache_cost,
+        'reasoning_cost': reasoning_cost,
+        'output_cost': output_cost,
+        'total_cost': total_cost,
+    }
 
 def classify_abstract(
     abstract: str,
@@ -34,11 +99,9 @@ def classify_abstract(
     text_format: type = DatasetAbstractMetadata,
     reasoning: Optional[Dict] = REASONING,
 ):
-    client = OpenAI()
-
-    response = client.responses.parse(
+    response = _response_parse(
         model=model,
-        input=[
+        messages=[
             {"role": "system", "content": system_message},
             {"role": "user", "content": abstract},
         ],
@@ -47,12 +110,19 @@ def classify_abstract(
         max_output_tokens=max_output_tokens,
     )
 
+    # Parse output depending on response["output"] type
+    if isinstance(response["output"], list):
+        parsed_output = [o['content'][0]['parsed'] for o in response["output"] if o and o['content'] and 'parsed' in o['content'][0]][0]
+    else:
+        parsed_output = response["output"]['parsed'] if response["output"] and 'parsed' in response["output"] else None
+
     out = {
         "prompt": system_message,
         "abstract": abstract,
         "model": model,
-        "response": response,  # full response object
-        "output": response.output_parsed,  # parsed Pydantic model
+        "response": response,  # full response as dict
+        "output": text_format.model_validate(parsed_output) if parsed_output is not None else None,  # parsed output as pydantic model
+        "usage_cost": _response_usage_cost(response["usage"], model=model) if response.get("usage") else None,
     }
 
     if temperature is not None:
@@ -71,9 +141,6 @@ if __name__ == "__main__":
 
     # Print os.getwd for debugging
     print(f"Current working directory: {os.getcwd()}")
-
-    # print OpenAI API key for debugging
-    print(f"OpenAI API Key: {os.getenv('OPENAI_API_KEY')}")
 
     # Get the abstract from the user
     abstract_text = """

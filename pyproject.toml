@@ -23,7 +23,8 @@ dependencies = [
     "browser-cookie3",
     "beautifulsoup4",
     "retrying",
-    "pysocks"
+    "pysocks",
+    "joblib",
 ]
 
 [project.optional-dependencies]

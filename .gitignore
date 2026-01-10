@@ -14,3 +14,5 @@ dist/*
 qdrant_storage/
 */pdfs/*
 artifacts/
+src/llm_metadata/gpt_classify.py
+*/cache/*
