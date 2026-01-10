@@ -145,16 +145,44 @@ class FieldEvidence(BaseModel):
     Provides confidence scores, direct quotes, and reasoning to explain
     why a particular value was extracted from text. Enables analysis of
     extraction quality and debugging of low-confidence extractions.
+    
+    **Multiple Evidence Strategy:**
+    Create multiple FieldEvidence entries for the same field when:
+    - Multiple distinct quotes support the same extracted value (corroborating evidence)
+    - Multiple values are identified for list fields (e.g., different species mentioned in different parts)
+    - Same value has different confidence levels depending on source/context
+    - Conflicting or ambiguous evidence requires separate documentation
+    
+    This approach enables fine-grained provenance tracking and confidence analysis per evidence piece.
     """
     field_name: str = Field(
         ...,
         description="Name of the field this evidence supports (e.g., 'species', 'data_type')"
     )
-    confidence: Optional[float] = Field(
+    value: Optional[str] = Field(
+        None,
+        description="Extracted value as string. Cast to string if numerical, list, or other type (e.g., '[\"Tamias striatus\", \"Mammalia\"]', '100000', 'abundance')."
+    )
+    confidence: Optional[int] = Field(
         None,
         ge=0,
-        le=1,
-        description="Confidence score (0-1) for this extraction. 1.0 = very confident, 0.0 = very uncertain."
+        le=5,
+        description=(
+            "Confidence score (0-5) for this extraction. Score based on DIRECTNESS of evidence, not reasoning confidence.\n\n"
+            "  5 = Value explicitly stated using exact terminology\n"
+            "      Example: Text says 'presence-absence data' → data_type: presence-absence (confidence: 5)\n\n"
+            "  4 = Value stated using synonyms or clear direct paraphrasing\n"
+            "      Example: Text says 'occurrence records' → data_type: presence-absence (confidence: 4)\n\n"
+            "  3 = Value inferred from domain-specific evidence or methodology\n"
+            "      Example: Text says 'identified individuals' → data_type: presence-absence (confidence: 3)\n"
+            "      Example: Text says 'counted birds at each site' → data_type: abundance (confidence: 3)\n\n"
+            "  2 = Value inferred from weak, ambiguous, or indirect evidence\n"
+            "      Example: Text says 'studied wildlife' → data_type: ??? (confidence: 2)\n\n"
+            "  1 = Value highly speculative, requires significant interpretation\n"
+            "      Example: Guessing data type from unrelated context (confidence: 1)\n\n"
+            "  0 = No supporting evidence found, or unable to extract reliably\n\n"
+            "CRITICAL: Use 5 ONLY when the value appears explicitly in text. Inferred values should be ≤3."
+        )
     )
     quote: Optional[str] = Field(
         None,
@@ -249,7 +277,16 @@ class DatasetFeatureExtraction(BaseModel):
     # Evidence tracking (optional, for extraction quality analysis)
     evidence: Optional[list[FieldEvidence]] = Field(
         None,
-        description="List of evidence supporting extracted fields. Include confidence scores, quotes, and reasoning for key extractions."
+        description=(
+            "List of evidence supporting extracted fields. Include confidence scores, quotes, and reasoning for key extractions.\n\n"
+            "**IMPORTANT:** Create multiple evidence entries for the same field when:\n"
+            "  - Multiple quotes support the same value (corroborating evidence)\n"
+            "  - Different values extracted for list fields (e.g., each species mention)\n"
+            "  - Same value with varying confidence based on different contexts\n"
+            "  - Conflicting or ambiguous evidence needs separate documentation\n\n"
+            "Example: For species=['Tamias striatus', 'raccoons'], provide two FieldEvidence objects with field_name='species', "
+            "each containing its own value, quote, confidence, and reasoning."
+        )
     )
 
     class Config:
