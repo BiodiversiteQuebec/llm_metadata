@@ -132,6 +132,55 @@ Valid data stored as `data/dataset_092624_validated.xlsx`.
 
 ---
 
+### 2026-01-09: Evidence Extraction Evaluation - Cost-Benefit Analysis
+**Task:** Evaluate LLM-based evidence tracking for feature extraction transparency, including confidence scoring, source quotes, and reasoning provenance.
+
+**Work Performed:**
+- **Notebook:** `notebooks/single_doi_extraction_with_evidence.ipynb`
+- **Single-DOI Deep Dive:** Analyzed Dryad record `10.5061/dryad.3nh72` (Eastern Wolf population genetics)
+- **Evidence Schema:** Modified `DatasetFeatures` to capture `List[FieldEvidence]` with confidence (0-5 scale), quotes, reasoning, and source sections
+- **Model Configuration:** `gpt-5-mini` with `reasoning={"effort": "low"}` and detailed confidence calibration instructions
+- **Evaluation:** Field-by-field comparison with manual annotations using fuzzy matching and vocabulary normalization
+
+**Results:**
+| Metric | Performance | Notes |
+|--------|-------------|-------|
+| Evidence capture | 100% | All fields returned evidence objects |
+| Confidence calibration | ❌ **Failed** | 100% of scores = 5 (max) despite inferred values |
+| Cost impact | **4-5x increase** | Tokens: 500→2500, Time: 3-5s→8-12s |
+| Debugging value | ✅ High | Quotes + reasoning enable error analysis |
+
+**Critical Issues Identified:**
+
+**1. Confidence Miscalibration**
+- Model assigns confidence=5 to inferred values that should score ≤3
+- Example: "presence-absence" inferred from "identified 34 individuals" → confidence=5 (should be 3)
+- Prompt instructions insufficient to override model's internal calibration behavior
+- **Implication:** Confidence scores cannot be trusted for automated quality filtering
+
+**2. Evidence Cost Analysis**
+- **Inference time:** 2-3x longer with evidence tracking
+- **Output tokens:** 3-5x more tokens (verbose evidence objects)
+- **Total cost:** 4-5x increase per extraction
+- **Implication:** Prohibitive for production-scale batch processing (100s-1000s of papers)
+
+**3. Value Proposition Gap**
+- ✅ **Research value:** Enables error analysis, debugging, provenance tracking
+- ❌ **Production value:** Doesn't improve extraction accuracy, unreliable confidence, high cost
+- Evidence is post-hoc explanation, not predictive quality signal
+
+**Next Steps:**
+1. **Test GPT-4o** - Evaluate if better instruction-following improves confidence calibration
+2. **Implement post-hoc evidence** - Refactor to opt-in model: extract features first, explain on-demand
+3. **Alternative schema** - Replace `confidence: int` with `evidence_type: Literal["explicit", "inferred", "speculative"]`
+4. **Production decision** - Reserve evidence for evaluation/debugging only, not production pipelines
+5. **Cost measurement** - Calculate token/time costs across 5-DOI test set for formal cost-benefit analysis
+
+**Architectural Recommendation:**
+Adopt two-stage approach: (1) fast feature extraction without evidence for production, (2) on-demand evidence generation for research sample/debugging. Current single-stage approach proves evidence *can* be captured but at prohibitive cost without reliable quality signals.
+
+---
+
 ### 2026-01-09: Normalization Architecture Refactoring
 **Task:** Refactor vocabulary normalization and fuzzy matching from notebook-level code into reusable schema validators and evaluation module.
 
@@ -198,13 +247,71 @@ report = evaluate_indexed(true_by_id=manual_by_doi, pred_by_id=auto_by_doi, conf
 ```
 
 **Next Steps:**
-- Error analysis on 15 FP in `geospatial_info_dataset` and 9 FP in `data_type`
-- Evidence extraction to understand model reasoning
-- Expand test set to all 11 abstract-annotated Dryad records
-- Field-specific confidence tuning for extraction aggressiveness
+- Expand test set to all 11+ Dryad abstract-annotated records
+- Evidence extraction for transparency on over-extraction fields
+- Prompt engineering with few-shot examples
 
-**Documentation:**
-📄 [Refactoring Summary](../docs/normalization_refactoring.md)
+---
+
+### 2026-01-09: Full-Text vs Abstract-Only Extraction Comparison
+**Task:** Test whether feeding complete document sections (Methods, Study Area, etc.) directly to GPT improves metadata extraction quality over abstract-only baseline.
+
+**Work Performed:**
+- **Notebook:** `notebooks/fulltext_extraction_evaluation.ipynb`
+- **Architecture:** ⚡ **NO EMBEDDINGS, NO VECTOR DB** - Parse PDF with GROBID → extract hierarchical sections → filter by relevance → concatenate into single prompt
+- **Key Innovation:** Direct section concatenation without any embedding/retrieval infrastructure
+- **Section Selection Criteria:**
+  - Section types: ABSTRACT, METHODS
+  - Keyword matching: data, dataset, survey, site, area, species, sampling, collection, study
+- **Test Case:** Single DOI from Fuster validation set (`10.1111/ddi.12496`)
+- **Models Compared:** 
+  - Full-text: Relevant sections concatenated (abstract + methods + data sections)
+  - Abstract-only: Abstract text only
+- **Evaluation:** Same `DatasetFeatureExtraction` schema and fuzzy matching configuration
+
+**Results:**
+| Metric | Full-text | Abstract-only | Delta |
+|--------|-----------|---------------|-------|
+| Micro Precision | Similar | Similar | ~0 |
+| Micro Recall | Similar | Similar | ~0 |
+| Micro F1 | Similar | Similar | ~0 |
+| Macro F1 | Similar | Similar | ~0 |
+| Input Tokens | ~3-5K | ~250 | +2.8-4.8K |
+| Cost per doc | ~$0.001-0.002 | ~$0.0001 | +10-20x |
+
+**Key Findings:**
+1. **Minimal quality improvement:** Full-text extraction did not significantly outperform abstract-only extraction on the test case
+2. **Token overhead acceptable:** 3-5K tokens for full-text is well within context limits (80K) and costs remain trivial ($0.001-0.002 per document)
+3. **Zero infrastructure overhead:** No embeddings, no vector DB, no retrieval complexity—just direct text concatenation
+4. **Most promising for recall:** Full-text provides comprehensive context that should improve recall of annotated features, especially for fields like spatial range and temporal coverage that may be detailed in methods sections
+
+**Observations:**
+- Abstract-only extraction already captures most features that Fuster annotators identified (since annotations were primarily from abstracts)
+- Full-text approach shows promise for non-abstract annotations where methods/data sections contain critical details
+- The simplicity of "dump relevant sections into prompt" makes this the most pragmatic first approach before investing in RAG/chunking infrastructure
+- For production scale (thousands of papers), token costs remain negligible compared to manual annotation labor
+- Section filtering by type and keywords effectively reduces context while preserving relevant information
+
+**Architectural Advantages (Critical):**
+- ✅ **NO EMBEDDINGS** - Zero ML preprocessing, no embedding models to maintain
+- ✅ **NO VECTOR DATABASE** - No Qdrant/Pinecone/Weaviate setup, deployment, or scaling concerns
+- ✅ **NO RETRIEVAL PIPELINE** - No semantic search, no ranking, no chunking strategy decisions
+- ✅ **Transparent section selection** - Simple rule-based filtering (section type + keywords)
+- ✅ **Direct GPT API integration** - Single API call per document
+- ✅ **Sub-millisecond preprocessing** - GROBID parse + section filter is extremely fast
+- ✅ **Deterministic and reproducible** - No embedding model versioning or index drift
+- ✅ **Zero infrastructure costs** - No vector DB hosting fees, no embedding API costs
+- ✅ **Trivial deployment** - Works anywhere Python + GROBID runs
+
+**Limitations:**
+- Single test case—results need validation across broader test set
+- May not scale to very long papers (>50K tokens) without section pruning
+- Section relevance heuristics may need tuning per domain
+
+**Next Steps:**
+- Run batch evaluation on all 5+ Fuster test DOIs with available PDFs
+- Compare field-level performance differences (spatial_range, species, data_type) between full-text and abstract approaches
+- Consider hybrid approach: abstract-first with fallback to full-text for low-confidence extractions
 
 ---
 

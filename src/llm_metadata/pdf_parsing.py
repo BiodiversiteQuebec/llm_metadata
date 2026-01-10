@@ -19,7 +19,6 @@ from pydantic import BaseModel, Field
 
 from llm_metadata.schemas.chunk_metadata import SectionType, ParserInfo
 
-
 # TEI namespace for XML parsing
 TEI_NS = {"tei": "http://www.tei-c.org/ns/1.0"}
 
@@ -162,6 +161,13 @@ def call_grobid(
     # Call GROBID REST API directly
     url = f"{grobid_url}/api/processFulltextDocument"
     
+    tei_path = output_dir / f"{pdf_path.stem}.grobid.tei.xml"
+    
+    # Simple filesystem check
+    if tei_path.exists():
+        return tei_path
+    
+    # Otherwise call GROBID
     try:
         with open(pdf_path, 'rb') as pdf_file:
             files = {'input': pdf_file}
@@ -173,7 +179,6 @@ def call_grobid(
             response.raise_for_status()
             
         # Save TEI XML output
-        tei_path = output_dir / f"{pdf_path.stem}.grobid.tei.xml"
         with open(tei_path, 'w', encoding='utf-8') as f:
             f.write(response.text)
             

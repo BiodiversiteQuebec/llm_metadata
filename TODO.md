@@ -65,6 +65,8 @@
   * [x] Registry SQLite: `data/registry.sqlite`
   * See [tasks/article-full-text-chunking.md](tasks/article-full-text-chunking.md) for full plan
 
+* Batch section identification + feature extraction + evaluation
+
 * [ ] LLM feature extraction from full text (with context retrieval from vector db) for sample annotated data + evaluation
 
 * [ ] Feature prompt engineering
@@ -93,26 +95,37 @@
 
 ## Feature extraction from paper full text
 
-* [x] Recherche d'articles à partir d'un api de papiers scientifiques (OpenAlex) 🔥
+* [x] Recherche d'articles à partir d'un api de papiers scientifiques (OpenAlex)
 
-* [ ] Full papers folder + repo
+* [x] Full papers folder + repo
   * [x] Small db with paper metadata (dataset_article_mapping.csv with 75 article DOIs)
-  * [ ] Download PDFs using OpenAlex
-    * [ ] Implement Unpaywall API client with rate limiting
-    * [ ] Check open access availability (is_oa flag)
-    * [ ] Download PDFs from best_oa_location
-    * [ ] Store PDFs in data/pdfs/ organized by source
-    * [ ] Generate metadata file with download status and OA license info
-    * [ ] Handle restricted access articles (log for manual retrieval)
-  * [ ] Téléchargement d'articles en distribution ouverte (via Unpaywall)
-  * [ ] Téléchargement d'articles en distribution restreinte (manual/institutional access)
+  * [x] Download PDFs using OpenAlex
+    * [x] Implement Unpaywall API client with rate limiting
+    * [x] Check open access availability (is_oa flag)
+    * [x] Download PDFs from best_oa_location
+    * [x] Store PDFs in data/pdfs/ organized by source
+    * [x] Generate metadata file with download status and OA license info
+    * [x] Handle restricted access articles (log for manual retrieval)
+  * [x] Téléchargement d'articles en distribution ouverte (via Unpaywall)
+  * [x] Téléchargement d'articles en distribution restreinte (manual/institutional access)
+  * [x] Téléchargement d'articles en distribution restreinte (via sci-hub)
 
-* [ ] Chunking & embeddings
+* [x] Chunking & embeddings
+  * [x] Scientific articles chunking + vector db
+  * [x] Section detection (methodology) and add it to metadata
+  * [x] Retrieval and vector db integration notebook
 
-  * [ ] Scientific articles chunking + vector db
+* [ ] LLM feature extraction from full text
+  * [x] Section-specific (methods) -> Great results on 1 article
+    * [ ] Batch processing of annotated articles
+  * [ ] Full-text
+  * [ ] Retrieval-augmented generation (RAG) approach based on vector db
 
-  * [ ] Section detection (methodology) and add it to metadata
+## To production
 
+* [ ] Streamline artifacts, manifests, data storage
+* [ ] Workflow orchestration prefect
+* [ ] Full db model (articles, datasets, features, runs, evaluations, etc) and postgres setup
 
 
 Web app dashboard
