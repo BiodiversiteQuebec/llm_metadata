@@ -573,3 +573,106 @@ article_doi, dataset_doi, title, openalex_id, oa_status, openalex_pdf_url, downl
 
 **Legal/Ethical Note:**
 Sci-Hub operates in a legal grey area. Use prioritizes open access and institutional channels first. Sci-Hub fallback is intended for research purposes where legitimate access methods are exhausted.
+
+### 2026-01-11 : Documentation update to reflect developped architecture, workflows and usage instructions.
+
+#### Current State Analysis
+
+Your codebase naturally organizes into **4 distinct workflow stages** that align with modern LLM data engineering:
+
+##### 1. **Data Ingestion & Preprocessing** 
+- Repository APIs (Dryad, Zenodo, OpenAlex)
+- PDF acquisition (Unpaywall, EZproxy, Sci-Hub)
+- Full-text extraction (GROBID, TEI parsing)
+- Document structure parsing
+
+##### 2. **Feature Engineering & Prompt Design**
+- Pydantic schema definitions (response format)
+- Section classification & chunking
+- Token counting & embedding generation
+- Evidence schema engineering
+
+##### 3. **LLM Inference**
+- GPT classification engine
+- Batch processing (Prefect pipelines)
+- Abstract vs full-text extraction
+- Cost tracking & caching
+
+##### 4. **Validation & Evaluation**
+- Ground truth normalization
+- Fuzzy matching
+- Precision/recall/F1 metrics
+- Comparative analysis
+
+I'll update both CLAUDE.md and README.md to reflect the 4-stage LLM data engineering pipeline. Let me organize this work: 
+
+Created 4 todos
+
+Starting: *Update CLAUDE.md with pipeline architecture* (1/4)
+
+Using "Replace String in File"
+
+#### Terminology Recommendations
+
+✅ **What Works Well**
+
+**1. Four-Stage Pipeline Structure**
+- **Pro:** Clear mental model for both external users and developers
+- **Pro:** Maps naturally to your codebase organization
+- **Pro:** Scales well (users can jump to the stage they need)
+
+**2. Hybrid Terminology (Domain + Engineering)**
+- Stage names use **engineering terms** ("Ingestion", "Inference") — universal
+- Examples use **domain terms** ("EBV features", "species", "temporal range") — concrete
+- **Pro:** External researchers understand the ecology, engineers understand the pipeline
+
+**3. "Schema Design & Prompt Engineering" (Stage 2)**
+- **Pro:** Accurately describes Pydantic's dual role (LLM output format + validation)
+- **Pro:** Signals that schema IS the prompt engineering (structured outputs)
+- **Alternative considered:** "Model Configuration" — too vague
+
+## ⚠️ **Potential Tradeoffs**
+
+**1. "Evaluation" vs "Ground Truthing"**
+- **Current choice:** "Evaluation & Validation"
+- **Tradeoff:** 
+  - ✅ "Evaluation" is standard ML terminology (precision/recall)
+  - ✅ "Validation" captures Pydantic schema validation
+  - ❌ Loses domain flavor of "ground truthing" (ecologists preparing reference data)
+- **Recommendation:** Keep "Evaluation" in headings, mention "ground truth" in descriptions
+
+**2. "Inference" vs "Classification" vs "Extraction"**
+- **Current choice:** "LLM Inference"
+- **Tradeoff:**
+  - ✅ "Inference" is technically accurate (running the model)
+  - ❌ Ecologists might prefer "Metadata Extraction" (more concrete)
+  - ❌ "Classification" undersells it (you're extracting structured features, not just categorizing)
+- **Recommendation:** Keep "Inference" in stage name, use "extraction" in examples
+
+**3. Module Names vs Stage Names**
+- **Observation:** Some modules don't align with stage names
+  - gpt_classify.py → "classification" not "inference"
+  - validation.py → validates input data, not evaluation metrics
+- **Tradeoff:**
+  - ✅ Changing module names = breaking changes
+  - ✅ Stage names provide conceptual clarity
+- **Recommendation:** Keep module names unchanged, let stage structure provide organization
+
+🎯 **Overall Assessment**
+
+Your current terminology achieves the right balance:
+
+| Aspect | Domain (Ecology) | Engineering (LLM) | Choice |
+|--------|------------------|-------------------|---------|
+| **Stage names** | ❌ Too abstract | ✅ Clear workflow | **Engineering** |
+| **Examples** | ✅ Concrete tasks | ❌ Too technical | **Domain** |
+| **Schema fields** | ✅ EBV terminology | ❌ Generic "features" | **Domain** |
+| **Module names** | Mixed | Mixed | **Status quo** |
+
+**Final Recommendation:** No changes needed. The current structure gives external users a clear workflow map while preserving domain terminology where it matters (schema fields, use cases, research context). Code agents (Claude, Copilot) will understand the pipeline stages, and ecologists will recognize the EBV framework.
+
+#### 📊 **Future Development**
+
+1. **Consider renaming gpt_classify.py → `llm_inference.py`** in next major version (v2.0+) for consistency, but not worth the breaking change now.
+
+2. **Refactor project structure** to reflect stages in future releases (e.g., `llm_metadata/ingestion/`, `llm_metadata/inference/`), but keep flat structure for now.
