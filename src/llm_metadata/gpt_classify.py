@@ -1,4 +1,5 @@
 from openai import OpenAI
+from openai.types.responses.parsed_response import ParsedResponse
 import json
 import os
 from pathlib import Path
@@ -99,7 +100,7 @@ def classify_abstract(
     text_format: type = DatasetAbstractMetadata,
     reasoning: Optional[Dict] = REASONING,
 ):
-    response = _response_parse(
+    response_dict = _response_parse(
         model=model,
         messages=[
             {"role": "system", "content": system_message},
@@ -110,19 +111,16 @@ def classify_abstract(
         max_output_tokens=max_output_tokens,
     )
 
-    # Parse output depending on response["output"] type
-    if isinstance(response["output"], list):
-        parsed_output = [o['content'][0]['parsed'] for o in response["output"] if o and o['content'] and 'parsed' in o['content'][0]][0]
-    else:
-        parsed_output = response["output"]['parsed'] if response["output"] and 'parsed' in response["output"] else None
+    # Cast response dict to ParsedResponse using model_construct (bypasses validation)
+    response: ParsedResponse[DatasetAbstractMetadata] = ParsedResponse[DatasetAbstractMetadata].model_construct(**response_dict)
 
     out = {
         "prompt": system_message,
         "abstract": abstract,
         "model": model,
-        "response": response,  # full response as dict
-        "output": text_format.model_validate(parsed_output) if parsed_output is not None else None,  # parsed output as pydantic model
-        "usage_cost": _response_usage_cost(response["usage"], model=model) if response.get("usage") else None,
+        "response": response,  # full response as ParsedResponse
+        "output": response.output_parsed,  # parsed output only
+        "usage_cost": _response_usage_cost(response_dict["usage"], model=model) if response_dict.get("usage") else None,
     }
 
     if temperature is not None:
