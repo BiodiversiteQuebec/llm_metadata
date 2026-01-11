@@ -1,9 +1,10 @@
 from openai import OpenAI
 from openai.types.responses.parsed_response import ParsedResponse
+from pydantic import BaseModel
 import json
 import os
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Dict, Optional, Union
 from joblib import Memory
 
 from llm_metadata.schemas import DatasetAbstractMetadata
@@ -40,25 +41,6 @@ Rules:
 - Output must conform exactly to the schema (types, enums, lists).
 """.strip()
 
-@memory.cache
-def _response_parse(
-    model: str,
-    messages: list,
-    text_format: type,
-    temperature: Optional[float],
-    max_output_tokens: int,
-):
-    client = OpenAI()
-
-    response = client.responses.parse(
-        model=model,
-        input=messages,
-        text_format=text_format,
-        temperature=temperature,
-        max_output_tokens=max_output_tokens,
-    )
-
-    return response.model_dump()
 
 def _response_usage_cost(usage: dict, model: str = MODEL) -> dict:
     # Get model-specific costs
@@ -100,19 +82,37 @@ def classify_abstract(
     text_format: type = DatasetAbstractMetadata,
     reasoning: Optional[Dict] = REASONING,
 ):
-    response_dict = _response_parse(
-        model=model,
-        messages=[
-            {"role": "system", "content": system_message},
-            {"role": "user", "content": abstract},
-        ],
-        text_format=text_format,
-        temperature=temperature,
-        max_output_tokens=max_output_tokens,
-    )
+    # Create a unique str for the parameters to use for caching
+    parameters_str = json.dumps({
+        "abstract": abstract,
+        "system_message": system_message,
+        "temperature": temperature,
+        "model": model,
+        "max_output_tokens": max_output_tokens,
+        "text_format": json.dumps(text_format.model_json_schema(), sort_keys=True),
+        "reasoning": reasoning,
+    }, sort_keys=True)
+
+    # _response_parse is defined within classify_abstract to allow caching with joblib while passing parameters
+    @memory.cache
+    def _response_parse(parameters_json_dump: str) -> dict:
+        openai = OpenAI()
+        response = openai.responses.parse(
+            model=model,
+            input=[
+                {"role": "system", "content": system_message},
+                {"role": "user", "content": abstract},
+            ],
+            text_format=text_format,
+            temperature=temperature,
+            max_output_tokens=max_output_tokens,
+        )
+        return response.model_dump()
+    
+    response_dict = _response_parse(parameters_str)
 
     # Cast response dict to ParsedResponse using model_construct (bypasses validation)
-    response: ParsedResponse[DatasetAbstractMetadata] = ParsedResponse[DatasetAbstractMetadata].model_construct(**response_dict)
+    response: ParsedResponse = ParsedResponse[text_format].model_construct(**response_dict)
 
     out = {
         "prompt": system_message,
