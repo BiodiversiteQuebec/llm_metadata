@@ -676,3 +676,131 @@ Your current terminology achieves the right balance:
 1. **Consider renaming gpt_classify.py → `llm_inference.py`** in next major version (v2.0+) for consistency, but not worth the breaking change now.
 
 2. **Refactor project structure** to reflect stages in future releases (e.g., `llm_metadata/ingestion/`, `llm_metadata/inference/`), but keep flat structure for now.
+
+---
+
+### 2026-01-11: Prefect Flows for Staged Full-Text Extraction Pipeline
+**Task:** Build modular Prefect flows with separate parallelization for GROBID parsing and GPT classification stages.
+
+**Work Performed:**
+- **Module:** `src/llm_metadata/fulltext_pipeline.py`
+- **Architecture:** Created staged pipeline with three distinct flows for independent parallelization:
+  1. `grobid_parsing_flow` - PDF parsing with GROBID (high parallelization)
+  2. `prompt_building_flow` - Section selection and prompt construction
+  3. `gpt_classification_flow` - GPT API calls (controlled parallelization)
+- **Configuration Dataclasses:**
+  - `SectionSelectionConfig` - Section filtering by type (ABSTRACT, METHODS) and keywords
+  - `GPTClassifyConfig` - Model, reasoning effort, token limits
+  - `FulltextPipelineConfig` - Combined pipeline configuration
+- **Intermediate Records:**
+  - `ParsedDocumentRecord` - Holds GROBID output between stages
+  - `PromptRecord` - Holds built prompt with token stats
+- **Input/Output Manifests:**
+  - `FulltextInputRecord` - Article DOI, dataset DOI, PDF path
+  - `FulltextOutputRecord` - Extraction results, costs, errors
+
+**Parallelization Strategy:**
+| Stage | Default Workers | Rationale |
+|-------|-----------------|-----------|
+| GROBID parsing | 10 | GROBID service handles concurrent requests well |
+| Prompt building | 5 | CPU-bound text processing |
+| GPT classification | 5 | API rate limits and cost control |
+
+**Key Features:**
+- **Staged execution:** Each stage completes before next begins (allows inspection)
+- **Flexible input:** Accepts input_records, manifest CSV, PDF paths, or directory scan
+- **Error resilience:** Failed PDFs don't block other processing
+- **Cost tracking:** Per-document and total cost in output manifest
+
+**Usage Example:**
+```python
+from llm_metadata.fulltext_pipeline import (
+    staged_fulltext_pipeline,
+    FulltextPipelineConfig,
+    SectionSelectionConfig,
+    GPTClassifyConfig,
+)
+
+config = FulltextPipelineConfig(
+    section_config=SectionSelectionConfig(include_all=True),
+    gpt_config=GPTClassifyConfig(model="gpt-5-mini", reasoning={"effort": "low"}),
+)
+
+results = staged_fulltext_pipeline(
+    input_records=records,
+    config=config,
+    grobid_workers=10,
+    gpt_workers=5,
+)
+```
+
+**Alternative Flows:**
+- `fulltext_extraction_pipeline` - Combined single-stage flow (simpler, less control)
+- `grobid_parsing_flow` - GROBID only (for pre-processing)
+- `gpt_classification_flow` - Classification only (for re-running on cached prompts)
+
+---
+
+### 2026-01-11: Batch Full-Text Extraction Evaluation on Fuster Dataset
+**Task:** Evaluate full-text extraction pipeline on all Fuster validation PDFs using staged Prefect workflow.
+
+**Work Performed:**
+- **Notebook:** `notebooks/batch_fulltext_evaluation.ipynb`
+- **Pipeline:** Used `staged_fulltext_pipeline` with GROBID (10 workers) + GPT (5 workers)
+- **Model:** `gpt-5-mini` with `reasoning={"effort": "low"}`
+- **Sections:** All sections included (`include_all=True`)
+- **Ground Truth:** Validated with `DatasetFeaturesNormalized` model
+- **Evaluation:** `evaluate_indexed()` with fuzzy matching for species (threshold=80)
+
+**Dataset Coverage:**
+| Stage | Count | Notes |
+|-------|-------|-------|
+| Fuster ground truth | 418 | Original annotated dataset |
+| With article DOI linkage | ~100 | Dryad/Zenodo with `cited_articles` |
+| PDF download success | 70 | OpenAlex + Unpaywall + Sci-Hub |
+| GROBID parsing success | **45** | 25 PDFs failed parsing |
+| Ground truth validated | 45 | 100% schema compliance |
+
+**Why Only 45 Evaluated Records:**
+1. **Original dataset scope:** 418 records include Semantic Scholar articles (no data paper linkage)
+2. **DOI linkage:** Only ~100 Dryad/Zenodo datasets have article DOIs in `cited_articles` column
+3. **PDF acquisition:** 5 DOIs failed download (no OpenAlex work, all strategies failed)
+4. **GROBID failures:** 25 PDFs (36%) failed GROBID parsing due to:
+   - Scanned/image-only PDFs (no extractable text layer)
+   - Malformed PDF structure
+   - Non-standard encodings
+   - Very short documents (e.g., preprint stubs)
+
+**GROBID Failure Analysis:**
+```
+Failed DOIs (sample):
+  10.1639/0007-2745-119.1.008  - Bryologist journal (special format)
+  10.1111/mec.14361            - Molecular Ecology (parsing error)
+  10.22541/au.161832268.87346989/v1 - Authorea preprint
+  10.1002/ece3.3947            - Ecology & Evolution
+  10.1002/eap.1713             - Ecological Applications
+```
+
+**Results:**
+| Metric | Value |
+|--------|-------|
+| Records processed | 70 |
+| GROBID success | 45 (64%) |
+| GPT extraction success | 45 (100% of parsed) |
+| Total cost | ~$0.15 |
+| Avg cost per PDF | ~$0.003 |
+
+**Output:**
+- Manifest: `artifacts/fulltext_results/fulltext_results_20260111_140027.csv`
+
+**Key Findings:**
+1. **GROBID is the bottleneck:** 36% of PDFs fail parsing, not GPT extraction
+2. **Cost is negligible:** $0.003 per document for full-text extraction
+3. **Parallelization effective:** 10 GROBID workers + 5 GPT workers processed 70 PDFs efficiently
+4. **Ground truth coverage limited:** Full evaluation requires addressing GROBID failures
+
+**Next Steps:**
+1. Investigate GROBID failures - add fallback to PyMuPDF for simple text extraction
+2. Run comparative evaluation: full-text vs abstract-only on 45 successful records
+3. Implement hybrid approach: abstract extraction for GROBID failures
+4. Consider GROBID configuration tuning for problematic PDF types
