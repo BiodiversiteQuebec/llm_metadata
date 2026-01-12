@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 from typing import Dict, Optional, Union
 from joblib import Memory
+import pypdf
 
 from llm_metadata.schemas import DatasetAbstractMetadata
 
@@ -131,6 +132,90 @@ def classify_abstract(
 
     return out
 
+
+def extract_text_from_pdf(pdf_path: Union[str, Path], max_pages: Optional[int] = None) -> str:
+    """
+    Extract text content from a PDF file.
+    
+    Args:
+        pdf_path: Path to the PDF file
+        max_pages: Optional limit on number of pages to extract (None = all pages)
+    
+    Returns:
+        Extracted text content as a single string
+    
+    Raises:
+        FileNotFoundError: If PDF file doesn't exist
+        Exception: If PDF extraction fails
+    """
+    pdf_path = Path(pdf_path)
+    if not pdf_path.exists():
+        raise FileNotFoundError(f"PDF file not found: {pdf_path}")
+    
+    try:
+        with open(pdf_path, 'rb') as file:
+            reader = pypdf.PdfReader(file)
+            pages_to_extract = min(len(reader.pages), max_pages) if max_pages else len(reader.pages)
+            
+            text_parts = []
+            for page_num in range(pages_to_extract):
+                page = reader.pages[page_num]
+                text = page.extract_text()
+                if text and text.strip():
+                    text_parts.append(text)
+            
+            return "\n\n".join(text_parts)
+    except Exception as e:
+        raise Exception(f"Failed to extract text from PDF {pdf_path}: {str(e)}")
+
+
+def classify_pdf(
+    pdf_path: Union[str, Path],
+    system_message: str = SYSTEM_MESSAGE,
+    temperature: Optional[float] = TEMPERATURE,
+    model: str = MODEL,
+    max_output_tokens: int = MAX_OUTPUT_TOKENS,
+    text_format: type = DatasetAbstractMetadata,
+    reasoning: Optional[Dict] = REASONING,
+    max_pages: Optional[int] = None,
+):
+    """
+    Extract text from a PDF file and classify it using GPT.
+    
+    Args:
+        pdf_path: Path to PDF file
+        system_message: System prompt for classification
+        temperature: Temperature for sampling (None for reasoning models)
+        model: Model name to use
+        max_output_tokens: Maximum output tokens
+        text_format: Pydantic model for structured output
+        reasoning: Reasoning configuration for GPT-5 series
+        max_pages: Optional limit on pages to extract (None = all pages)
+    
+    Returns:
+        Classification result dict with same structure as classify_abstract
+    """
+    # Extract text from PDF
+    pdf_text = extract_text_from_pdf(pdf_path, max_pages=max_pages)
+    
+    # Use the existing classify_abstract function
+    result = classify_abstract(
+        abstract=pdf_text,
+        system_message=system_message,
+        temperature=temperature,
+        model=model,
+        max_output_tokens=max_output_tokens,
+        text_format=text_format,
+        reasoning=reasoning,
+    )
+    
+    # Add PDF path to the result
+    result["pdf_path"] = str(pdf_path)
+    result["extraction_method"] = "raw_pdf"
+    
+    return result
+
+
 if __name__ == "__main__":
     # Load .env
     from dotenv import load_dotenv
@@ -140,11 +225,27 @@ if __name__ == "__main__":
     # Print os.getwd for debugging
     print(f"Current working directory: {os.getcwd()}")
 
-    # Get the abstract from the user
+    # Example 1: Classify from abstract text
+    print("=== Example 1: Classifying from abstract text ===")
     abstract_text = """
     Future human land use and climate change may disrupt movement behaviors of terrestrial animals, thereby altering the ability of individuals to move across a landscape. Some of the expected changes result from processes whose effects will be difficult to alter, such as global climate change. We present a novel framework in which we use models to (1) identify the ecological changes from these difficult-to-alter processes, as well as (2) the potential conservation measures that are best able to compensate for these changes. We illustrated this framework with the case of an endangered caribou population in Québec, Canada. We coupled a spatially explicit individual-based movement model with a range of landscape scenarios to assess the impacts of varying degrees of climate change, and the ability of conservation actions to compensate for such impacts on caribou movement behaviors. We found that (1) climate change impacts reduced movement potential, and that (2) the complete restoration of secondary roads inside protected areas was able to fully offset this reduction, suggesting that road restoration would be an effective compensatory conservation action. By evaluating conservation actions via landscape use simulated by an individual-based model, we were able to identify compensatory conservation options for an endangered species facing climate change.
     """
-    # Get the classification from GPT
     classification = classify_abstract(abstract_text)
-    # Print the classification
-    print(classification)
+    print(f"Classification result: {classification['output']}")
+    print(f"Cost: ${classification['usage_cost']['total_cost']}")
+    print()
+
+    # Example 2: Classify from raw PDF file
+    print("=== Example 2: Classifying from raw PDF ===")
+    # Uncomment and update the PDF path to test:
+    # pdf_path = Path("data/pdfs/sample.pdf")
+    # if pdf_path.exists():
+    #     pdf_classification = classify_pdf(
+    #         pdf_path=pdf_path,
+    #         max_pages=10  # Limit to first 10 pages
+    #     )
+    #     print(f"PDF Classification result: {pdf_classification['output']}")
+    #     print(f"Cost: ${pdf_classification['usage_cost']['total_cost']}")
+    # else:
+    #     print(f"PDF file not found: {pdf_path}")
+    print("(Example commented out - update PDF path to test)")

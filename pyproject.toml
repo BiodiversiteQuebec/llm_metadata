@@ -25,6 +25,7 @@ dependencies = [
     "retrying",
     "pysocks",
     "joblib",
+    "pypdf",
 ]
 
 [project.optional-dependencies]

@@ -1,4 +1,43 @@
 """
+⚠️ DEPRECATED: This module is deprecated and will be removed in a future version.
+
+This module has been split into three focused pipelines:
+1. text_pipeline.py - Direct text classification
+2. pdf_pipeline.py - Raw PDF extraction and classification
+3. section_pipeline.py - GROBID-based section extraction and classification
+
+For a unified interface, use:
+    from llm_metadata.pipelines import classify
+
+Migration examples:
+
+    Old (raw PDF):
+        config = FulltextPipelineConfig(
+            gpt_config=GPTClassifyConfig(extraction_method="raw_pdf")
+        )
+        results = fulltext_extraction_pipeline(config=config)
+    
+    New (PDF pipeline):
+        from llm_metadata.pdf_pipeline import PDFClassificationConfig, pdf_classification_flow
+        config = PDFClassificationConfig()
+        results = pdf_classification_flow(input_records, config)
+    
+    Old (GROBID sections):
+        config = FulltextPipelineConfig(
+            gpt_config=GPTClassifyConfig(extraction_method="grobid")
+        )
+        results = fulltext_extraction_pipeline(config=config)
+    
+    New (Section pipeline):
+        from llm_metadata.section_pipeline import SectionClassificationConfig, section_classification_flow
+        config = SectionClassificationConfig()
+        results = section_classification_flow(input_records, config)
+
+See docs/pipelines_guide.md for complete documentation.
+
+---
+
+Original docstring:
 Prefect pipeline for full-text extraction using GROBID-parsed PDFs.
 
 This module provides batch processing capabilities for extracting structured metadata
@@ -15,6 +54,7 @@ Features:
 from __future__ import annotations
 
 import re
+import warnings
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
@@ -25,8 +65,15 @@ from prefect import flow, task
 from prefect.task_runners import ThreadPoolTaskRunner
 from pydantic import BaseModel, Field
 
+warnings.warn(
+    "fulltext_pipeline.py is deprecated. Use text_pipeline.py, pdf_pipeline.py, "
+    "or section_pipeline.py instead. See docs/pipelines_guide.md for migration guide.",
+    DeprecationWarning,
+    stacklevel=2
+)
+
 from llm_metadata.chunking import count_tokens
-from llm_metadata.gpt_classify import classify_abstract
+from llm_metadata.gpt_classify import classify_abstract, classify_pdf, extract_text_from_pdf
 from llm_metadata.pdf_parsing import ParsedDocument, Section, process_pdf
 from llm_metadata.schemas.chunk_metadata import SectionType
 from llm_metadata.schemas.fuster_features import DatasetFeatures
@@ -75,11 +122,15 @@ class GPTClassifyConfig:
         reasoning: Reasoning config for GPT-5 series (e.g., {"effort": "low"})
         max_output_tokens: Maximum tokens for output
         temperature: Temperature for non-reasoning models (None for reasoning models)
+        extraction_method: Method for text extraction ('grobid' or 'raw_pdf')
+        max_pdf_pages: Maximum pages to extract for raw_pdf method (None = all)
     """
     model: str = "gpt-5-mini"
     reasoning: Optional[Dict[str, str]] = field(default_factory=lambda: {"effort": "low"})
     max_output_tokens: int = 4096
     temperature: Optional[float] = None
+    extraction_method: str = "grobid"  # 'grobid' or 'raw_pdf'
+    max_pdf_pages: Optional[int] = None
 
 
 @dataclass
@@ -291,6 +342,27 @@ def build_fulltext_prompt(
 # =============================================================================
 
 @task(retries=2, retry_delay_seconds=5)
+def extract_raw_pdf_text_task(
+    pdf_path: Path,
+    max_pages: Optional[int] = None
+) -> Optional[str]:
+    """Extract text from raw PDF without GROBID parsing.
+
+    Args:
+        pdf_path: Path to PDF file
+        max_pages: Optional limit on pages to extract
+
+    Returns:
+        Extracted text or None if extraction fails
+    """
+    try:
+        return extract_text_from_pdf(pdf_path, max_pages=max_pages)
+    except Exception as e:
+        print(f"Raw PDF extraction failed for {pdf_path}: {e}")
+        return None
+
+
+@task(retries=2, retry_delay_seconds=5)
 def parse_pdf_task(
     pdf_path: Path,
     work_id: str,
@@ -428,36 +500,67 @@ def process_single_pdf(
     )
 
     try:
-        # Step 1: Parse PDF
-        doc = parse_pdf_task.fn(pdf_path, work_id, config.grobid_url)
-        if doc is None:
-            output.status = "error"
-            output.error_message = "GROBID parsing failed"
-            return output
+        if config.gpt_config.extraction_method == "raw_pdf":
+            # Raw PDF extraction mode
+            print(f"Extracting text from raw PDF: {pdf_path.name}")
+            raw_text = extract_raw_pdf_text_task.fn(pdf_path, max_pages=config.gpt_config.max_pdf_pages)
+            
+            if not raw_text or not raw_text.strip():
+                output.status = "error"
+                output.error_message = "No text extracted from PDF"
+                return output
+            
+            # Count tokens
+            output.fulltext_tokens = count_tokens(raw_text)
+            output.sections_used = 1  # Treating entire PDF as one section
+            
+            # Classify using raw text
+            result = classify_fulltext_task.fn(raw_text, config.gpt_config, config.text_format)
+            
+            # Extract results
+            if result.get("output"):
+                output.extraction = result["output"].model_dump(mode="python")
+            
+            if result.get("usage_cost"):
+                usage = result["usage_cost"]
+                output.input_tokens = usage.get("input_tokens")
+                output.output_tokens = usage.get("output_tokens")
+                output.cost_usd = usage.get("total_cost")
+            
+            output.status = "success"
+            
+        else:
+            # GROBID parsing mode (original behavior)
+            # Step 1: Parse PDF
+            doc = parse_pdf_task.fn(pdf_path, work_id, config.grobid_url)
+            if doc is None:
+                output.status = "error"
+                output.error_message = "GROBID parsing failed"
+                return output
 
-        # Step 2: Select sections
-        sections = select_sections_task.fn(doc, config.section_config)
-        output.sections_used = len(sections)
+            # Step 2: Select sections
+            sections = select_sections_task.fn(doc, config.section_config)
+            output.sections_used = len(sections)
 
-        # Step 3: Build prompt
-        prompt = build_prompt_task.fn(doc, sections, config.section_config.include_abstract)
-        output.fulltext_tokens = count_tokens(prompt)
-        output.abstract_tokens = count_tokens(doc.abstract) if doc.abstract else 0
+            # Step 3: Build prompt
+            prompt = build_prompt_task.fn(doc, sections, config.section_config.include_abstract)
+            output.fulltext_tokens = count_tokens(prompt)
+            output.abstract_tokens = count_tokens(doc.abstract) if doc.abstract else 0
 
-        # Step 4: Classify
-        result = classify_fulltext_task.fn(prompt, config.gpt_config, config.text_format)
+            # Step 4: Classify
+            result = classify_fulltext_task.fn(prompt, config.gpt_config, config.text_format)
 
-        # Extract usage stats
-        if result.get("usage_cost"):
-            output.input_tokens = result["usage_cost"].get("input_tokens")
-            output.output_tokens = result["usage_cost"].get("output_tokens")
-            output.cost_usd = result["usage_cost"].get("total_cost")
+            # Extract usage stats
+            if result.get("usage_cost"):
+                output.input_tokens = result["usage_cost"].get("input_tokens")
+                output.output_tokens = result["usage_cost"].get("output_tokens")
+                output.cost_usd = result["usage_cost"].get("total_cost")
 
-        # Extract features
-        if result.get("output"):
-            output.extraction = result["output"].model_dump(mode="python")
+            # Extract features
+            if result.get("output"):
+                output.extraction = result["output"].model_dump(mode="python")
 
-        output.status = "success"
+            output.status = "success"
 
     except Exception as e:
         output.status = "error"
@@ -1027,27 +1130,48 @@ if __name__ == "__main__":
     from dotenv import load_dotenv
     load_dotenv()
 
-    # Example: Process all PDFs in fuster directory
-    config = FulltextPipelineConfig(
+    # Example 1: Process with GROBID parsing (default)
+    config_grobid = FulltextPipelineConfig(
         section_config=SectionSelectionConfig(
             include_all=True  # Use all sections for testing
         ),
         gpt_config=GPTClassifyConfig(
             model="gpt-5-mini",
-            reasoning={"effort": "low"}
+            reasoning={"effort": "low"},
+            extraction_method="grobid"  # Use GROBID parsing
         ),
         pdf_dir=Path("data/pdfs/fuster"),
         output_dir=Path("artifacts/fulltext_results")
     )
 
-    # Run with manifest
+    # Example 2: Process with raw PDF text extraction (no GROBID)
+    config_raw = FulltextPipelineConfig(
+        gpt_config=GPTClassifyConfig(
+            model="gpt-5-mini",
+            reasoning={"effort": "low"},
+            extraction_method="raw_pdf",  # Use raw PDF extraction
+            max_pdf_pages=20  # Limit to first 20 pages
+        ),
+        pdf_dir=Path("data/pdfs/fuster"),
+        output_dir=Path("artifacts/fulltext_results")
+    )
+
+    # Run with manifest (choose one config)
     manifest_path = Path("data/pdfs/fuster/manifest.csv")
     output_path = Path("artifacts/fulltext_results/output_manifest.csv")
 
+    # Use GROBID mode
     results = fulltext_extraction_pipeline(
-        config=config,
+        config=config_grobid,
         input_manifest=manifest_path,
         output_manifest=output_path
     )
+
+    # Or use raw PDF mode (uncomment to use)
+    # results = fulltext_extraction_pipeline(
+    #     config=config_raw,
+    #     input_manifest=manifest_path,
+    #     output_manifest=output_path
+    # )
 
     print(f"\nProcessed {len(results)} PDFs")
