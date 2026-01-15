@@ -126,6 +126,8 @@
 * [ ] Streamline artifacts, manifests, data storage
 * [ ] Workflow orchestration prefect
 * [ ] Full db model (articles, datasets, features, runs, evaluations, etc) and postgres setup
+* [ ] Refactor tests related to pipelines to reflect project structure
+* [ ] Refactor classification modules to reflect pipelines structure
 
 
 Web app dashboard
