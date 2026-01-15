@@ -10,13 +10,13 @@ class _Rec(DatasetFeatures):
 
 class TestEvaluation(unittest.TestCase):
     def test_evaluate_pairs_scalar_and_list_fields(self):
-        fields = ["taxons", "temp_range_i", "temp_range_f", "data_type"]
+        fields = ["species", "temp_range_i", "temp_range_f", "data_type"]
 
         true = [
             _Rec.model_validate(
                 {
                     "record_id": "r1",
-                    "taxons": "caribou",
+                    "species": ["caribou"],
                     "temp_range_i": 1999,
                     "temp_range_f": 2015,
                     "data_type": ["abundance", "time_series"],
@@ -25,7 +25,7 @@ class TestEvaluation(unittest.TestCase):
             _Rec.model_validate(
                 {
                     "record_id": "r2",
-                    "taxons": None,
+                    "species": None,
                     "temp_range_i": 2000,
                     "data_type": ["abundance"],
                 }
@@ -36,7 +36,7 @@ class TestEvaluation(unittest.TestCase):
             _Rec.model_validate(
                 {
                     "record_id": "r1",
-                    "taxons": "Caribou",  # case-insensitive match
+                    "species": ["Caribou"],  # case-insensitive match
                     "temp_range_i": 1999,
                     "temp_range_f": 2014,  # wrong
                     "data_type": ["abundance"],  # partial
@@ -45,7 +45,7 @@ class TestEvaluation(unittest.TestCase):
             _Rec.model_validate(
                 {
                     "record_id": "r2",
-                    "taxons": "",  # becomes None via schema validator
+                    "species": None,  # both None
                     "temp_range_i": None,  # missing
                     "data_type": ["abundance", "density"],  # fp density
                 }
@@ -61,11 +61,11 @@ class TestEvaluation(unittest.TestCase):
 
         metrics = report.field_metrics
 
-        # taxons: r1 matches (tp=1), r2 both None (tn=1)
-        self.assertEqual(metrics["taxons"].tp, 1)
-        self.assertEqual(metrics["taxons"].tn, 1)
-        self.assertEqual(metrics["taxons"].fp, 0)
-        self.assertEqual(metrics["taxons"].fn, 0)
+        # species: r1 matches (tp=1), r2 both None (tn=1)
+        self.assertEqual(metrics["species"].tp, 1)
+        self.assertEqual(metrics["species"].tn, 1)
+        self.assertEqual(metrics["species"].fp, 0)
+        self.assertEqual(metrics["species"].fn, 0)
 
         # temp_range_f: r1 wrong (fp=1, fn=1), r2 both None (tn=1)
         self.assertEqual(metrics["temp_range_f"].tp, 0)

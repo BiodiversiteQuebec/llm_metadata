@@ -6,7 +6,7 @@ from llm_metadata.schemas.evaluation import (
     FuzzyMatchConfig,
     evaluate_indexed,
 )
-from llm_metadata.schemas.fuster_features import DatasetFeatures
+from llm_metadata.schemas.fuster_features import DatasetFeatures, DatasetFeaturesNormalized
 
 
 class TestEvaluationFuzzy(unittest.TestCase):
@@ -52,22 +52,22 @@ class TestEvaluationFuzzy(unittest.TestCase):
         self.assertGreaterEqual(fuzzy_metrics.f1, strict_metrics.f1)
 
     def test_vocabulary_normalization_in_schema(self):
-        """Test that vocabulary normalization happens in schema validators."""
-        
-        # Test data_type normalization
-        manual = DatasetFeatures(
+        """Test that vocabulary normalization happens in DatasetFeaturesNormalized validators."""
+
+        # Test data_type normalization - must use Normalized class
+        manual = DatasetFeaturesNormalized(
             data_type=["presence only", "EBV genetic analysis"]
         )
-        
+
         # Should normalize to enum values
         self.assertIn("presence-only", manual.data_type)
         self.assertIn("genetic_analysis", manual.data_type)
-        
+
         # Test geospatial_info_dataset normalization
-        manual2 = DatasetFeatures(
+        manual2 = DatasetFeaturesNormalized(
             geospatial_info_dataset=["site coordinates", "geographic features"]
         )
-        
+
         self.assertIn("site", manual2.geospatial_info_dataset)
         self.assertIn("geographic_features", manual2.geospatial_info_dataset)
 

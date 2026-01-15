@@ -24,7 +24,22 @@
       "Bash(pip index:*)",
       "Bash(pip show:*)",
       "WebFetch(domain:raw.githubusercontent.com)",
-      "WebFetch(domain:github.com)"
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:platform.openai.com)",
+      "WebFetch(domain:community.openai.com)",
+      "Bash(RUN_SLOW_TESTS=1 python:*)",
+      "Bash(pip install:*)",
+      "Bash(claude mcp add --transport stdio -e \"JUPYTER_URL=http://localhost:88881\" -e \"JUPYTER_TOKEN=7f2578705ef1b2e6a70585cf998138ff8e78fb6d41e1f06b\" -e \"ALLOW_IMG_OUTPUT=TRUE\" jupyter -- uvx jupyter-mcp-server@latest)",
+      "Bash(claude mcp add --help:*)",
+      "mcp__jupyter__use_notebook",
+      "mcp__jupyter__read_cell",
+      "mcp__jupyter__list_kernels",
+      "mcp__jupyter__read_notebook",
+      "mcp__ide__executeCode",
+      "mcp__jupyter__execute_cell",
+      "mcp__jupyter__list_notebooks",
+      "mcp__jupyter__list_files",
+      "Bash(uv run:*)"
     ]
   }
 }

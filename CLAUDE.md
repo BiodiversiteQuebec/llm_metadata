@@ -47,6 +47,30 @@ OPENAI_API_KEY=your_openai_api_key
 ZENODO_ACCESS_TOKEN=your_zenodo_token  # Optional, for Zenodo features only
 ```
 
+### Runtime Requirements
+
+**IMPORTANT:** Always run Python through `uv` so the project `.venv` is used and `.env` is loaded.
+
+```bash
+uv run --env-file .env python your_script.py
+```
+
+
+### Jupyter MCP Server
+
+Before using the Jupyter MCP server, ensure a Jupyter Lab server is running. Use this command to check if it's running and start it if not:
+
+```bash
+export $(grep -v '^#' .env | xargs) && netstat -an | grep -q ":${JUPYTER_PORT}.*LISTEN" || jupyter lab --port=${JUPYTER_PORT} --IdentityProvider.token=${JUPYTER_TOKEN} --no-browser &
+```
+
+With uv run
+```bash
+uv run --env-file .env powershell.exe -NoProfile -Command '$p=$env:JUPYTER_PORT; $running=Test-NetConnection -ComputerName 127.0.0.1 -Port $p -InformationLevel Quiet; if ($running) { Write-Host ("Jupyter already listening on port " + $p) } else { Start-Process -WindowStyle Hidden -FilePath jupyter -ArgumentList @("lab","--port",$env:JUPYTER_PORT,"--IdentityProvider.token",$env:JUPYTER_TOKEN,"--no-browser"); Write-Host ("Started Jupyter on port " + $p) }'
+```
+
+Then start the MCP server.
+
 ## Architecture
 
 This project implements a **4-stage LLM data engineering pipeline** for ecological metadata extraction:

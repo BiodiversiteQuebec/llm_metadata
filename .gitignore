@@ -16,3 +16,6 @@ qdrant_storage/
 artifacts/
 src/llm_metadata/gpt_classify.py
 */cache/*
+*tmpclaude-*
+uv.lock
+.jupyter_ystore.db

@@ -27,9 +27,11 @@ dependencies = [
     "joblib",
     "pypdf",
 ]
+requires-python = ">=3.11,<3.13"
 
 [project.optional-dependencies]
 dev = [
+    "uv",
     "pandas",
     "python-dotenv",
     "ipykernel",
@@ -37,6 +39,11 @@ dev = [
     "openpyxl",
     "grobid-client-python",
     "rapidfuzz",
+    "jupyter-collaboration==4.0.2",
+    "jupyter-mcp-tools>=0.1.4",
+    "jupyterlab==4.4.1",
+    "jupyter-mcp-tools>=0.1.4",
+    "ipykernel",
 ]
 
 [tool.setuptools.packages.find]

@@ -9,6 +9,10 @@ open access status. Designed for ecology paper retrieval from Quebec researchers
 import os
 import requests
 from typing import Optional, List, Dict, Any
+from joblib import Memory
+
+# Setup cache
+memory = Memory("./cache", verbose=0)
 
 BASE_URL = "https://api.openalex.org"
 OPENALEX_EMAIL = os.getenv('OPENALEX_EMAIL')  # Optional for polite pool
@@ -21,7 +25,7 @@ def _build_params(mailto: bool = True) -> dict:
         params['mailto'] = OPENALEX_EMAIL
     return params
 
-
+@memory.cache
 def search_topics(query: str, per_page: int = 50) -> list:
     """
     Search OpenAlex topics by keyword.
@@ -52,7 +56,7 @@ def search_topics(query: str, per_page: int = 50) -> list:
     data = response.json()
     return data.get('results', [])
 
-
+@memory.cache
 def search_works(
     ror_id: Optional[str] = None,
     publication_year: Optional[int] = None,
@@ -122,7 +126,7 @@ def search_works(
 
     return response.json()
 
-
+@memory.cache
 def get_works_by_filters_all(
     ror_id: Optional[str] = None,
     publication_year: Optional[int] = None,
@@ -186,7 +190,7 @@ def get_works_by_filters_all(
 
     return all_works
 
-
+@memory.cache
 def get_work_by_doi(doi: str) -> Optional[dict]:
     """
     Retrieve single work by DOI.

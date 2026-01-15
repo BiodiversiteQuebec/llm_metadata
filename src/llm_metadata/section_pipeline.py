@@ -25,7 +25,7 @@ from prefect.task_runners import ThreadPoolTaskRunner
 from pydantic import BaseModel, Field
 
 from llm_metadata.chunking import count_tokens
-from llm_metadata.gpt_classify import classify_abstract
+from llm_metadata.gpt_classify import classify_abstract, SECTION_SYSTEM_MESSAGE
 from llm_metadata.pdf_parsing import ParsedDocument, Section, process_pdf
 from llm_metadata.schemas.chunk_metadata import SectionType
 from llm_metadata.schemas import DatasetAbstractMetadata
@@ -68,13 +68,14 @@ class SectionSelectionConfig:
 @dataclass
 class SectionClassificationConfig:
     """Configuration for section-based classification pipeline.
-    
+
     Attributes:
         model: Model name (e.g., "gpt-5-mini")
         reasoning: Reasoning config for GPT-5 series
         max_output_tokens: Maximum tokens for output
         temperature: Temperature for non-reasoning models
         text_format: Pydantic model for structured output
+        system_message: System prompt for GPT (defaults to SECTION_SYSTEM_MESSAGE)
         section_config: Section selection configuration
         grobid_url: GROBID service URL
         pdf_dir: Directory containing PDFs
@@ -86,6 +87,7 @@ class SectionClassificationConfig:
     max_output_tokens: int = 4096
     temperature: Optional[float] = None
     text_format: Type[BaseModel] = DatasetAbstractMetadata
+    system_message: str = field(default_factory=lambda: SECTION_SYSTEM_MESSAGE)
     section_config: SectionSelectionConfig = field(default_factory=SectionSelectionConfig)
     grobid_url: str = "http://localhost:8070"
     pdf_dir: Path = field(default_factory=lambda: Path("data/pdfs"))
@@ -289,9 +291,11 @@ def select_sections_task(
             for sec in sections
         )
         if not has_abstract:
-            # Create abstract section
+            # Create abstract section with required fields
             abstract_section = Section(
+                section_id="abstract_0",
                 title="Abstract",
+                level=1,
                 text=doc.abstract,
                 subsections=[]
             )
@@ -335,6 +339,7 @@ def classify_sections_task(
     """
     result = classify_abstract(
         abstract=prompt,
+        system_message=config.system_message,
         text_format=config.text_format,
         model=config.model,
         reasoning=config.reasoning,
