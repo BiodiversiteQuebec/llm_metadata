@@ -861,3 +861,94 @@ Failed DOIs (sample):
 1. Apply enhanced matching to full Fuster evaluation (50+ papers)
 2. Consider adding synonym/subspecies normalization for edge cases
 3. Integrate improved prompt as default for PDF classification pipeline
+
+---
+
+### 2026-01-15: Batch pdf file extraction
+
+Evaluate PDF-based metadata extraction using OpenAI's native File API across open access Fuster validation samples.
+
+**Approach:**
+- Filter to open access PDFs only (via OpenAlex `is_oa` flag)
+- Upload raw PDFs to OpenAI File API
+- Use GPT-5-mini with native PDF understanding (text + visual analysis)
+- Custom `PDF_SYSTEM_MESSAGE` optimized for document structure
+- Compare against manually annotated ground truth
+- Use `DatasetFeaturesNormalized` for ground truth validation
+
+**Key Differences from Section-Based Pipeline:**
+- No GROBID parsing required
+- OpenAI processes both text AND images from each page
+- Better for tables, figures, and visual content
+- Higher token usage (text + image per page)
+
+**Open access status**
+Open access papers: 50 out of 70
+
+Open Access Status Breakdown:
+oa_status
+gold      25
+bronze    22
+closed    20
+green      3
+Name: count, dtype: int64
+
+OA papers with direct PDF URL: 44
+OA papers requiring local file: 6
+
+Processing complete: 44 success, 6 errors
+
+**Extraction Results:**
+
+Completed: 44 success, 6 failed
+Total cost: $0.5454
+Saved output manifest to C:\Users\beav3503\dev\llm_metadata\artifacts\pdf_file_results\pdf_file_results_20260115_142843.csv (50 records)
+
+> *Error message*
+> ```
+> Error code: 400 - {'error': {'message': 'The file type you uploaded is not supported. Please try again with a pdf', 'type': 'invalid_request_error', 'param': 'input', 'code': 'unsupported_file'}}
+> ```
+
+**PDF FILE-BASED Extraction Metrics:**
+
+PDF FILE-BASED Extraction Metrics:
+======================================================================
+| field                  | tp | fp  | fn | tn | n  | precision | recall   | f1       | accuracy  | exact_match_rate |
+|------------------------|----|-----|----|----|----|-----------|----------|----------|-----------|------------------|
+| data_type              | 32 | 121 | 23 | 0  | 44 | 0.209     | 0.582    | 0.308    | 0.727     | 0.000           |
+| geospatial_info_dataset | 19 | 194 | 5  | 0  | 44 | 0.089     | 0.792    | 0.160    | 0.432     | 0.000           |
+| spatial_range_km2      | 19 | 6   | 12 | 11 | 44 | 0.760     | 0.613    | 0.679    | 0.682     | 0.682           |
+| species                | 27 | 239 | 42 | 0  | 44 | 0.102     | 0.391    | 0.161    | 0.614     | 0.068           |
+| temp_range_f           | 28 | 10  | 9  | 5  | 44 | 0.737     | 0.757    | 0.747    | 0.750     | 0.750           |
+| temp_range_i           | 31 | 7   | 6  | 5  | 44 | 0.816     | 0.838    | 0.827    | 0.818     | 0.818           |
+| temporal_range         | 0  | 41  | 37 | 3  | 44 | 0.000     | 0.000    | NaN      | 0.068     | 0.068           |
+
+Aggregate Metrics:
+==================================================
+Metric                              Value
+--------------------------------------------------
+Micro Precision                     0.202
+Micro Recall                        0.538
+Micro F1                            0.293
+Macro F1                            0.480
+Records Evaluated                      44
+
+COST ANALYSIS (PDF File-Based Extraction)
+==================================================
+Metric                                      Value
+--------------------------------------------------
+Total PDFs Processed                           44
+Avg Input Tokens per PDF                   24,521
+Avg Output Tokens per PDF                   1,929
+--------------------------------------------------
+Total Input Tokens                      1,078,909
+Total Output Tokens                        84,869
+Total Cost (USD)               $           0.5454
+Avg Cost per PDF (USD)         $          0.01240
+==================================================
+File upload extraction: 44 papers, $0.5454 total
+
+**Claude proposed next Steps:**
+- Compare metrics with section-based extraction
+- Analyze which fields benefit from visual analysis
+- Optimize cost vs. accuracy tradeoff
