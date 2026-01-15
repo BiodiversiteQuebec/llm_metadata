@@ -804,3 +804,60 @@ Failed DOIs (sample):
 2. Run comparative evaluation: full-text vs abstract-only on 45 successful records
 3. Implement hybrid approach: abstract extraction for GROBID failures
 4. Consider GROBID configuration tuning for problematic PDF types
+
+---
+
+### 2026-01-15: Species Recall Improvement Experiment
+**Task:** Achieve 85% recall on species features extraction through enhanced matching and improved prompts.
+
+**Work Performed:**
+- **Notebook:** `notebooks/species_recall_improvement.ipynb`
+- **Code Changes:**
+  - Added `_extract_species_parts()` to `evaluation.py` - extracts scientific/vernacular names from species strings
+  - Added `_species_match_score()` to `evaluation.py` - enhanced matching with substring containment
+  - Added `_enhanced_species_match_lists()` to `evaluation.py` - list matching with vernacular/scientific awareness
+  - Added `enhanced_species_matching` and `enhanced_species_threshold` to `EvaluationConfig`
+  - Updated `compare_models()` to use enhanced species matching when configured
+- **Prompt Engineering:**
+  - Created `IMPROVED_SPECIES_PROMPT` with detailed species extraction guidance
+  - Added explicit ✓/✗ examples for what to extract vs avoid
+  - Guidance on focal species vs non-focal (predators, hosts)
+- **Experiment Design:**
+  - 10 open access articles from Fuster dataset (all with species annotations)
+  - PDF classification with OpenAI File API (native PDF mode)
+  - Compared 4 configurations: Baseline/Improved × Fuzzy/Enhanced matching
+
+**Results:**
+
+| Configuration | Recall | Precision | F1 | FP | FN |
+|---------------|--------|-----------|-----|----|----|
+| Baseline + Fuzzy | 66.7% | 40.0% | 0.50 | 15 | 5 |
+| Baseline + Enhanced | **100%** | 60.0% | 0.75 | 10 | 0 |
+| Improved + Fuzzy | 53.3% | 40.0% | 0.46 | 12 | 7 |
+| **Improved + Enhanced** | **93.3%** | **73.7%** | **0.82** | **5** | **1** |
+
+**Key Findings:**
+1. **Enhanced Species Matching is Critical** - Improved recall from 66.7% to 100% for baseline extraction
+   - Handles "wood turtle (Glyptemys insculpta)" matching ground truth "Glyptemys insculpta"
+   - Substring containment catches scientific names within compound strings
+2. **Improved Prompt Reduces False Positives** - From 15 FP to 5 FP (66% reduction)
+   - Example: Caribou paper baseline extracted wolves/bears (predators); improved extracted only caribou
+3. **Best Configuration:** Improved Prompt + Enhanced Matching
+   - 93.3% recall (exceeds 85% target by 8.3%)
+   - 73.7% precision (much better than baseline's 40%)
+   - F1 = 0.824 (excellent balance)
+
+**Cost Analysis:**
+- Baseline extraction: $0.0855 (10 papers)
+- Improved extraction: $0.1204 (10 papers)
+- Per paper cost increase: ~40% (due to longer prompt)
+
+**Architectural Changes:**
+- Enhanced species matching added to `evaluation.py` as reusable component
+- New config options: `enhanced_species_matching=True`, `enhanced_species_threshold=70`
+- Backward compatible - existing code using fuzzy matching unchanged
+
+**Next Steps:**
+1. Apply enhanced matching to full Fuster evaluation (50+ papers)
+2. Consider adding synonym/subspecies normalization for edge cases
+3. Integrate improved prompt as default for PDF classification pipeline

@@ -39,7 +39,10 @@
       "mcp__jupyter__execute_cell",
       "mcp__jupyter__list_notebooks",
       "mcp__jupyter__list_files",
-      "Bash(uv run:*)"
+      "Bash(uv run:*)",
+      "mcp__jupyter__overwrite_cell_source",
+      "mcp__jupyter__insert_cell",
+      "mcp__jupyter__insert_execute_code_cell"
     ]
   }
 }

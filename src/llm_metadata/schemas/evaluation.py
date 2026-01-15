@@ -30,13 +30,71 @@ class FuzzyMatchConfig:
 
 @dataclass(frozen=True)
 class EvaluationConfig:
-	"""Configuration for how values are normalized and compared."""
+	"""Configuration for how values are normalized and compared during evaluation.
+
+	This dataclass controls string normalization, list comparison behavior,
+	fuzzy matching, and enhanced species matching for biodiversity metadata evaluation.
+
+	Attributes:
+		casefold_strings: If True, convert strings to lowercase before comparison.
+			Enables case-insensitive matching (e.g., "Caribou" matches "caribou").
+			Default: True.
+
+		strip_strings: If True, remove leading/trailing whitespace from strings.
+			Default: True.
+
+		collapse_whitespace: If True, normalize multiple spaces to single space.
+			Handles variations like "Rangifer  tarandus" vs "Rangifer tarandus".
+			Default: True.
+
+		treat_lists_as_sets: If True, compare list fields as unordered sets.
+			Order-independent matching where ["A", "B"] equals ["B", "A"].
+			When False, lists are compared element-by-element in order.
+			Default: True.
+
+		fuzzy_match_fields: Dict mapping field names to FuzzyMatchConfig.
+			Enables fuzzy string matching for specific fields using rapidfuzz.
+			Example: {"species": FuzzyMatchConfig(threshold=70)} allows
+			"Tamias striatus" to match "Tamias striata" (typo tolerance).
+			Default: {} (no fuzzy matching).
+
+		enhanced_species_matching: If True, use enhanced matching for 'species' field.
+			Handles vernacular/scientific name combinations by:
+			- Extracting scientific names from parentheses: "wood turtle (Glyptemys insculpta)"
+			- Matching ground truth against either vernacular or scientific parts
+			- Substring containment: "Glyptemys insculpta" matches if contained in prediction
+			Supersedes fuzzy_match_fields for the species field when enabled.
+			Default: False.
+
+		enhanced_species_threshold: Similarity threshold (0-100) for enhanced species matching.
+			Used when enhanced_species_matching=True. Lower values are more permissive.
+			Default: 70.
+
+	Examples:
+		Basic evaluation with case-insensitive set comparison:
+		>>> config = EvaluationConfig()
+		>>> # "Caribou" matches "caribou", ["A", "B"] matches ["B", "A"]
+
+		Fuzzy matching for species field:
+		>>> config = EvaluationConfig(
+		...     fuzzy_match_fields={"species": FuzzyMatchConfig(threshold=70)}
+		... )
+
+		Enhanced species matching (recommended for biodiversity metadata):
+		>>> config = EvaluationConfig(
+		...     enhanced_species_matching=True,
+		...     enhanced_species_threshold=70
+		... )
+		>>> # "Glyptemys insculpta" now matches "wood turtle (Glyptemys insculpta)"
+	"""
 
 	casefold_strings: bool = True
 	strip_strings: bool = True
 	collapse_whitespace: bool = True
 	treat_lists_as_sets: bool = True
 	fuzzy_match_fields: dict[str, FuzzyMatchConfig] = field(default_factory=dict)
+	enhanced_species_matching: bool = False
+	enhanced_species_threshold: int = 70
 
 
 @dataclass
@@ -297,6 +355,38 @@ def compare_models(
 	for field in fields:
 		true_raw = true_data.get(field)
 		pred_raw = pred_data.get(field)
+
+		# Apply enhanced species matching for species field if configured
+		if field == "species" and config.enhanced_species_matching:
+			if isinstance(true_raw, (list, tuple)) or isinstance(pred_raw, (list, tuple)):
+				true_list = list(true_raw) if true_raw else []
+				pred_list = list(pred_raw) if pred_raw else []
+
+				true_set, pred_set = _enhanced_species_match_lists(
+					[str(x) for x in true_list],
+					[str(x) for x in pred_list],
+					config.enhanced_species_threshold
+				)
+
+				tp = len(true_set & pred_set)
+				fp = len(pred_set - true_set)
+				fn = len(true_set - pred_set)
+				match = (fp == 0 and fn == 0)
+
+				results.append(
+					FieldResult(
+						record_id=record_id,
+						field=field,
+						true_value=true_raw,
+						pred_value=pred_raw,
+						match=match,
+						tp=tp,
+						fp=fp,
+						fn=fn,
+						tn=0,
+					)
+				)
+				continue
 
 		# Apply fuzzy matching BEFORE general normalization if configured
 		fuzzy_config = config.fuzzy_match_fields.get(field)
@@ -599,4 +689,188 @@ def macro_f1(metrics: Iterable[FieldMetrics]) -> Optional[float]:
 		if m.f1 is not None:
 			f1s.append(m.f1)
 	return (sum(f1s) / len(f1s)) if f1s else None
+
+
+# =============================================================================
+# Enhanced Species Matching
+# =============================================================================
+
+import re
+
+
+def _extract_species_parts(species_str: str) -> dict[str, str]:
+	"""
+	Extract scientific and vernacular name parts from a species string.
+
+	Handles formats like:
+	- "wood turtle (Glyptemys insculpta)" -> {"vernacular": "wood turtle", "scientific": "Glyptemys insculpta"}
+	- "Glyptemys insculpta (wood turtle)" -> {"vernacular": "wood turtle", "scientific": "Glyptemys insculpta"}
+	- "Rangifer tarandus" -> {"scientific": "Rangifer tarandus"}
+	- "caribou" -> {"vernacular": "caribou"}
+
+	Returns dict with keys 'vernacular' and/or 'scientific' containing normalized lowercase strings.
+	"""
+	if not species_str or not isinstance(species_str, str):
+		return {}
+
+	s = species_str.strip()
+	parts = {}
+
+	# Check for parentheses pattern
+	paren_match = re.match(r'^([^()]+)\s*\(([^()]+)\)\s*$', s)
+	if paren_match:
+		before_paren = paren_match.group(1).strip()
+		inside_paren = paren_match.group(2).strip()
+
+		# Heuristic: scientific names typically have capitalized genus + lowercase species
+		# and often contain 2-3 words (Genus species or Genus species subspecies)
+		def looks_scientific(text: str) -> bool:
+			words = text.split()
+			if len(words) < 2:
+				return False
+			# Check if first word is capitalized and second is lowercase
+			if words[0][0].isupper() and words[1][0].islower():
+				return True
+			return False
+
+		if looks_scientific(before_paren):
+			parts['scientific'] = before_paren.lower()
+			parts['vernacular'] = inside_paren.lower()
+		elif looks_scientific(inside_paren):
+			parts['scientific'] = inside_paren.lower()
+			parts['vernacular'] = before_paren.lower()
+		else:
+			# Can't determine, use both as full
+			parts['full'] = s.lower()
+	else:
+		# No parentheses - check if it looks scientific
+		words = s.split()
+		if len(words) >= 2 and words[0][0].isupper() and len(words[0]) > 1:
+			# Likely scientific name
+			parts['scientific'] = s.lower()
+		else:
+			# Likely vernacular name
+			parts['vernacular'] = s.lower()
+		parts['full'] = s.lower()
+
+	return parts
+
+
+def _species_match_score(true_item: str, pred_item: str, threshold: int = 70) -> tuple[bool, int]:
+	"""
+	Check if a predicted species matches a ground truth species.
+
+	Enhanced matching that handles:
+	- Exact match (case-insensitive)
+	- Vernacular name in prediction matches scientific name in ground truth
+	- Scientific name in prediction matches vernacular name in ground truth
+	- Fuzzy matching on individual parts
+
+	Returns (is_match, similarity_score).
+	"""
+	try:
+		from rapidfuzz import fuzz
+	except ImportError:
+		raise ImportError(
+			"rapidfuzz is required for species matching; install with `pip install rapidfuzz`"
+		)
+
+	true_lower = true_item.lower().strip()
+	pred_lower = pred_item.lower().strip()
+
+	# Exact match
+	if true_lower == pred_lower:
+		return True, 100
+
+	# Direct fuzzy match on full strings
+	full_score = fuzz.ratio(true_lower, pred_lower)
+	if full_score >= threshold:
+		return True, full_score
+
+	# Extract parts from both
+	true_parts = _extract_species_parts(true_item)
+	pred_parts = _extract_species_parts(pred_item)
+
+	# Try matching ground truth against each part of prediction
+	best_score = full_score
+
+	for true_key, true_val in true_parts.items():
+		for pred_key, pred_val in pred_parts.items():
+			score = fuzz.ratio(true_val, pred_val)
+			if score > best_score:
+				best_score = score
+			if score >= threshold:
+				return True, score
+
+	# Special case: ground truth might be contained in prediction
+	# e.g., true="Glyptemys insculpta" in pred="wood turtle (Glyptemys insculpta)"
+	if true_lower in pred_lower:
+		return True, 95
+
+	# Check if any true part is contained in full pred
+	for _, true_val in true_parts.items():
+		if true_val in pred_lower:
+			return True, 90
+
+	return best_score >= threshold, best_score
+
+
+def _enhanced_species_match_lists(
+	true_items: list[str], pred_items: list[str], threshold: int = 70
+) -> tuple[set[str], set[str]]:
+	"""
+	Enhanced fuzzy matching for species lists with vernacular/scientific name awareness.
+
+	Each ground truth item is matched against predictions by checking:
+	1. Exact match (case-insensitive)
+	2. Scientific name in pred matches vernacular in true (or vice versa)
+	3. Fuzzy match on extracted parts
+	4. Substring containment (e.g., "Glyptemys insculpta" in "wood turtle (Glyptemys insculpta)")
+
+	Returns (true_normalized, pred_normalized) where matching items use the canonical (true) string.
+	"""
+	true_normalized = set()
+	pred_normalized = set()
+
+	# For each prediction, find best matching true value
+	for pred_item in pred_items:
+		if not isinstance(pred_item, str):
+			pred_normalized.add(str(pred_item).lower().strip())
+			continue
+
+		pred_lower = pred_item.lower().strip()
+		best_match = None
+		best_score = 0
+
+		for true_item in true_items:
+			if not isinstance(true_item, str):
+				continue
+
+			is_match, score = _species_match_score(true_item, pred_item, threshold)
+			if score > best_score:
+				best_score = score
+				if is_match:
+					best_match = true_item.lower().strip()
+
+		if best_match:
+			pred_normalized.add(best_match)
+		else:
+			pred_normalized.add(pred_lower)
+
+	# Add all true items (normalized)
+	for true_item in true_items:
+		if isinstance(true_item, str):
+			true_normalized.add(true_item.lower().strip())
+		else:
+			true_normalized.add(str(true_item))
+
+	return true_normalized, pred_normalized
+
+
+@dataclass(frozen=True)
+class EnhancedSpeciesMatchConfig:
+	"""Configuration for enhanced species matching with vernacular/scientific name awareness."""
+
+	threshold: int = 70  # Minimum similarity score (0-100)
+	use_enhanced_matching: bool = True  # Use enhanced species matching logic
 
