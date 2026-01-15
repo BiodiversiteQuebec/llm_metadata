@@ -807,63 +807,6 @@ Failed DOIs (sample):
 
 ---
 
-### 2026-01-15: Species Recall Improvement Experiment
-**Task:** Achieve 85% recall on species features extraction through enhanced matching and improved prompts.
-
-**Work Performed:**
-- **Notebook:** `notebooks/species_recall_improvement.ipynb`
-- **Code Changes:**
-  - Added `_extract_species_parts()` to `evaluation.py` - extracts scientific/vernacular names from species strings
-  - Added `_species_match_score()` to `evaluation.py` - enhanced matching with substring containment
-  - Added `_enhanced_species_match_lists()` to `evaluation.py` - list matching with vernacular/scientific awareness
-  - Added `enhanced_species_matching` and `enhanced_species_threshold` to `EvaluationConfig`
-  - Updated `compare_models()` to use enhanced species matching when configured
-- **Prompt Engineering:**
-  - Created `IMPROVED_SPECIES_PROMPT` with detailed species extraction guidance
-  - Added explicit ✓/✗ examples for what to extract vs avoid
-  - Guidance on focal species vs non-focal (predators, hosts)
-- **Experiment Design:**
-  - 10 open access articles from Fuster dataset (all with species annotations)
-  - PDF classification with OpenAI File API (native PDF mode)
-  - Compared 4 configurations: Baseline/Improved × Fuzzy/Enhanced matching
-
-**Results:**
-
-| Configuration | Recall | Precision | F1 | FP | FN |
-|---------------|--------|-----------|-----|----|----|
-| Baseline + Fuzzy | 66.7% | 40.0% | 0.50 | 15 | 5 |
-| Baseline + Enhanced | **100%** | 60.0% | 0.75 | 10 | 0 |
-| Improved + Fuzzy | 53.3% | 40.0% | 0.46 | 12 | 7 |
-| **Improved + Enhanced** | **93.3%** | **73.7%** | **0.82** | **5** | **1** |
-
-**Key Findings:**
-1. **Enhanced Species Matching is Critical** - Improved recall from 66.7% to 100% for baseline extraction
-   - Handles "wood turtle (Glyptemys insculpta)" matching ground truth "Glyptemys insculpta"
-   - Substring containment catches scientific names within compound strings
-2. **Improved Prompt Reduces False Positives** - From 15 FP to 5 FP (66% reduction)
-   - Example: Caribou paper baseline extracted wolves/bears (predators); improved extracted only caribou
-3. **Best Configuration:** Improved Prompt + Enhanced Matching
-   - 93.3% recall (exceeds 85% target by 8.3%)
-   - 73.7% precision (much better than baseline's 40%)
-   - F1 = 0.824 (excellent balance)
-
-**Cost Analysis:**
-- Baseline extraction: $0.0855 (10 papers)
-- Improved extraction: $0.1204 (10 papers)
-- Per paper cost increase: ~40% (due to longer prompt)
-
-**Architectural Changes:**
-- Enhanced species matching added to `evaluation.py` as reusable component
-- New config options: `enhanced_species_matching=True`, `enhanced_species_threshold=70`
-- Backward compatible - existing code using fuzzy matching unchanged
-
-**Next Steps:**
-1. Apply enhanced matching to full Fuster evaluation (50+ papers)
-2. Consider adding synonym/subspecies normalization for edge cases
-3. Integrate improved prompt as default for PDF classification pipeline
-
----
-
 ### 2026-01-15: Batch pdf file extraction
 
 Evaluate PDF-based metadata extraction using OpenAI's native File API across open access Fuster validation samples.
@@ -952,3 +895,119 @@ File upload extraction: 44 papers, $0.5454 total
 - Compare metrics with section-based extraction
 - Analyze which fields benefit from visual analysis
 - Optimize cost vs. accuracy tradeoff
+---
+
+### 2026-01-15: Species Recall Improvement Experiment
+**Task:** Achieve 85% recall on species features extraction through enhanced matching and improved prompts.
+
+**Work Performed:**
+- **Notebook:** `notebooks/species_recall_improvement.ipynb`
+- **Code Changes:**
+  - Added `_extract_species_parts()` to `evaluation.py` - extracts scientific/vernacular names from species strings
+  - Added `_species_match_score()` to `evaluation.py` - enhanced matching with substring containment
+  - Added `_enhanced_species_match_lists()` to `evaluation.py` - list matching with vernacular/scientific awareness
+  - Added `enhanced_species_matching` and `enhanced_species_threshold` to `EvaluationConfig`
+  - Updated `compare_models()` to use enhanced species matching when configured
+- **Prompt Engineering:**
+  - Created `IMPROVED_SPECIES_PROMPT` with detailed species extraction guidance
+  - Added explicit ✓/✗ examples for what to extract vs avoid
+  - Guidance on focal species vs non-focal (predators, hosts)
+- **Experiment Design:**
+  - 10 open access articles from Fuster dataset (all with species annotations)
+  - PDF classification with OpenAI File API (native PDF mode)
+  - Compared 4 configurations: Baseline/Improved × Fuzzy/Enhanced matching
+
+**Results:**
+
+| Configuration | Recall | Precision | F1 | FP | FN |
+|---------------|--------|-----------|-----|----|----|
+| Baseline + Fuzzy | 66.7% | 40.0% | 0.50 | 15 | 5 |
+| Baseline + Enhanced | **100%** | 60.0% | 0.75 | 10 | 0 |
+| Improved + Fuzzy | 53.3% | 40.0% | 0.46 | 12 | 7 |
+| **Improved + Enhanced** | **93.3%** | **73.7%** | **0.82** | **5** | **1** |
+
+**Key Findings:**
+1. **Enhanced Species Matching is Critical** - Improved recall from 66.7% to 100% for baseline extraction
+   - Handles "wood turtle (Glyptemys insculpta)" matching ground truth "Glyptemys insculpta"
+   - Substring containment catches scientific names within compound strings
+2. **Improved Prompt Reduces False Positives** - From 15 FP to 5 FP (66% reduction)
+   - Example: Caribou paper baseline extracted wolves/bears (predators); improved extracted only caribou
+3. **Best Configuration:** Improved Prompt + Enhanced Matching
+   - 93.3% recall (exceeds 85% target by 8.3%)
+   - 73.7% precision (much better than baseline's 40%)
+   - F1 = 0.824 (excellent balance)
+
+**Cost Analysis:**
+- Baseline extraction: $0.0855 (10 papers)
+- Improved extraction: $0.1204 (10 papers)
+- Per paper cost increase: ~40% (due to longer prompt)
+
+**Architectural Changes:**
+- Enhanced species matching added to `evaluation.py` as reusable component
+- New config options: `enhanced_species_matching=True`, `enhanced_species_threshold=70`
+- Backward compatible - existing code using fuzzy matching unchanged
+
+**Next Steps:**
+1. Apply enhanced matching to full Fuster evaluation (50+ papers)
+2. Consider adding synonym/subspecies normalization for edge cases
+3. Integrate improved prompt as default for PDF classification pipeline
+
+---
+
+## 2026-01-15: Batch classification of all Fuster PDFs using improved species extraction
+**Task:** Re-run full PDF classification on all Fuster validation PDFs using improved species extraction prompt and enhanced matching.
+
+**Processing**
+    PDFInputRecords created: 44
+    All records will use local PDF files (native PDF mode)
+    
+
+    Running PDF file-based extraction on 44 papers...
+    Output manifest: c:\Users\beav3503\dev\llm_metadata\artifacts\pdf_file_results\pdf_file_results_20260115_154837.csv
+    
+      
+    Completed: 39 success, 5 failed
+    Total cost: $0.5066
+    Saved output manifest to c:\Users\beav3503\dev\llm_metadata\artifacts\pdf_file_results\pdf_file_results_20260115_154837.csv (44 records)
+
+
+**Results:**
+**PDF File-Based Extraction Metrics (Improved Species Extraction):**
+
+| field                   | tp | fp  | fn | tn | n  | precision | recall   | f1       | accuracy  | exact_match_rate |
+|-------------------------|----|-----|----|----|----|-----------|----------|----------|-----------|------------------|
+| data_type               | 25 | 113 | 22 | 0  | 39 | 0.181     | 0.532    | 0.270    | 0.641     | 0.000           |
+| geospatial_info_dataset | 16 | 163 | 5  | 0  | 39 | 0.089     | 0.762    | 0.160    | 0.410     | 0.000           |
+| spatial_range_km2       | 17 | 6   | 11 | 9  | 39 | 0.739     | 0.607    | 0.667    | 0.667     | 0.667           |
+| species                 | 50 | 153 | 12 | 0  | 39 | 0.246     | 0.806    | 0.377    | 1.282     | 0.513           |
+| temp_range_f            | 26 | 8   | 7  | 5  | 39 | 0.765     | 0.788    | 0.776    | 0.795     | 0.795           |
+| temp_range_i            | 29 | 5   | 4  | 5  | 39 | 0.853     | 0.879    | 0.866    | 0.872     | 0.872           |
+| temporal_range          | 1  | 36  | 32 | 2  | 39 | 0.027     | 0.030    | 0.029    | 0.077     | 0.077           |
+
+**Aggregate Metrics:**
+
+- Micro Precision: **0.233**
+- Micro Recall: **0.670**
+- Micro F1: **0.346**
+- Macro F1: **0.454**
+- Records Evaluated: **39**
+- Total Cost: **$0.5066** (39 PDFs, avg $0.013/paper)
+
+**Key Observations:**
+- **Species recall improved** to 80.6% (from ~39% in baseline), with moderate precision (24.6%).
+- **Species still highly impacted by false positives**, but overall F1 improved to 0.377.
+- **Overall extraction quality** improved for species, with similar or slightly better performance on other fields compared to baseline.
+
+**Interesting Cases:**
+
+10.5061/dryad.679s1dt, paper focused on assemblages, does it reflect the species identified (groundtruth): ['12 mammal', '199 ground-dwelling beetles', '240 flying-beetles species']
+
+10.5061/dryad.m233m, paper focused on plant species distribution, extracted values contains tp, but also fp from discussion : ['Erythronium americanum Ker Gawl. (Liliaceae)', 'Trillium erectum L. (Melanthiaceae)', 'white-tailed deer (Odocoileus virginianus)', 'moose (Alces americana)']
+
+10.5061/dryad.xksn02vb9, paper focused on genetic traits of 6 species, only 1 were deemed relevant and others ignored in groundtruth. Predicted are valid ['maize', 'rice', 'sorghum', 'soy', 'spruce', 'switchgrass']
+
+**Next Steps:**
+
+* Compare full pdf results with section-based extraction on same 39 papers
+* Analyze false positives in species extraction, data type and temporal range for further prompt improvements
+* Create functionnalities to relate species to atlas
