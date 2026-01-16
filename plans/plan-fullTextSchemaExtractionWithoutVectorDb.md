@@ -16,7 +16,7 @@ Test whether feeding complete document sections directly to GPT (without embeddi
 
 6. **Extract metadata with token logging** - Call `classify_abstract()` from `gpt_classify.py` with full-text prompt; capture `result['usage']` dict containing `prompt_tokens`, `completion_tokens`, `total_tokens`. May need to create a new function `classify_fulltext()` if necessary.
 
-7. **Evaluate vs ground truth** - Load manual annotation for DOI `10.5061/dryad.3nh72` from `fuster_annotations_validation.ipynb`, use `evaluate_indexed()` from `schemas/evaluation.py` to compute per-field precision/recall/F1
+7. **Evaluate vs ground truth** - Load manual annotation for DOI `10.5061/dryad.3nh72` from `fuster_annotations_validation.ipynb`, use `evaluate_indexed()` from `groundtruth_eval.py` to compute per-field precision/recall/F1
 
 8. **Compare with abstract-only baseline** - Re-run extraction using only `doc.abstract`, log token usage difference, compare F1 scores to quantify full-text benefit
 

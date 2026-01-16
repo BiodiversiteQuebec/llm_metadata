@@ -266,7 +266,7 @@ else:
 **Compare Automated vs Manual Extraction**
 
 ```python
-from llm_metadata.schemas.evaluation import (
+from llm_metadata.groundtruth_eval import (
     evaluate_indexed, 
     EvaluationConfig, 
     FuzzyMatchConfig,

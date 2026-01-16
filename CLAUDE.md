@@ -143,7 +143,7 @@ Data Ingestion → Schema & Prompt Engineering → LLM Inference → Evaluation 
 - **[Stage 4]** `schemas/validation.py` — Pydantic-based validation for cleaning ground truth annotations
   - Row-level validation with structured error reporting (`ValidationError`, `ErrorType`)
   - `DataFrameValidator` for batch validation of annotated datasets
-- **[Stage 4]** `schemas/evaluation.py` — Evaluation framework for precision/recall/F1 computation
+- **[Stage 4]** `groundtruth_eval.py` — Evaluation framework for precision/recall/F1 computation
   - Configurable normalization: case-folding, whitespace collapse, set-based list comparison
   - Fuzzy matching support: `FuzzyMatchConfig` with threshold-based string matching
   - Classes: `EvaluationConfig`, `FieldResult`, `FieldMetrics`, `EvaluationReport`

@@ -1,4 +1,4 @@
-"""llm_metadata.schemas.evaluation
+"""llm_metadata.groundtruth_eval
 
 Tools to compare manual vs automated extraction and compute evaluation scores.
 

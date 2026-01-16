@@ -1,7 +1,7 @@
 """Test fuzzy matching in evaluation module."""
 
 import unittest
-from llm_metadata.schemas.evaluation import (
+from llm_metadata.evaluate_groundtruth import (
     EvaluationConfig,
     FuzzyMatchConfig,
     evaluate_indexed,

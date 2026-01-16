@@ -393,4 +393,4 @@ Per [CLAUDE.md](../CLAUDE.md), document progress in `notebooks/README.md` with r
 * **Citation formatting**: Answer citation with title + DOI + section path + page range
 * **Smart section classifier**: ML-based section normalization (fallback from regex)
 * **Reference matching**: Citation graph extraction (separate module)
-* **Evaluation integration**: Extend `schemas/evaluation.py` to measure RAG retrieval quality
+* **Evaluation integration**: Extend `groundtruth_eval.py` to measure RAG retrieval quality

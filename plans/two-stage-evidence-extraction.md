@@ -271,7 +271,7 @@ Output: list[FieldEvidence]
 ## References
 
 - Current implementation: `src/llm_metadata/gpt_classify.py`
-- Evaluation framework: `src/llm_metadata/schemas/evaluation.py`
+- Evaluation framework: `src/llm_metadata/groundtruth_eval.py`
 - Evidence schema: `src/llm_metadata/schemas/fuster_features.py` (`FieldEvidence`)
 - Test notebook: `notebooks/single_doi_extraction_with_evidence.ipynb`
 
