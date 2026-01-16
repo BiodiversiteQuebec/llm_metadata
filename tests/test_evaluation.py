@@ -1,7 +1,7 @@
 import unittest
 
 from llm_metadata.schemas import DatasetFeatures
-from llm_metadata.evaluate_groundtruth import evaluate_pairs, micro_average, macro_f1
+from llm_metadata.groundtruth_eval import evaluate_pairs, micro_average, macro_f1
 
 
 class _Rec(DatasetFeatures):
