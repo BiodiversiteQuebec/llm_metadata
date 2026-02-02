@@ -26,6 +26,50 @@ DEFAULT_TIMEOUT = 30  # seconds
 MAX_RETRIES = 3
 RETRY_DELAY = 2  # seconds (exponential backoff)
 
+# PDF validation
+MIN_PDF_SIZE = 100_000  # 100 KB - valid scientific PDFs are larger than this
+PDF_MAGIC_BYTES = b"%PDF"
+
+
+class InvalidPDFError(Exception):
+    """Raised when a downloaded file is not a valid PDF."""
+    pass
+
+
+def validate_pdf(path: Path, min_size: int = MIN_PDF_SIZE) -> None:
+    """
+    Validate that a file is a real PDF.
+
+    Checks:
+    1. File exists
+    2. Starts with %PDF magic bytes (not HTML or other content)
+    3. File size >= min_size (default 100 KB)
+
+    Args:
+        path: Path to the PDF file
+        min_size: Minimum acceptable file size in bytes
+
+    Raises:
+        InvalidPDFError: If the file fails validation
+    """
+    if not path.exists():
+        raise InvalidPDFError(f"File does not exist: {path}")
+
+    # Check magic bytes
+    with open(path, "rb") as f:
+        header = f.read(4)
+    if header != PDF_MAGIC_BYTES:
+        raise InvalidPDFError(
+            f"File is not a PDF (starts with {header!r}, expected {PDF_MAGIC_BYTES!r}): {path}"
+        )
+
+    # Check file size
+    file_size = path.stat().st_size
+    if file_size < min_size:
+        raise InvalidPDFError(
+            f"PDF too small ({file_size} bytes, minimum {min_size}): {path}"
+        )
+
 def sanitize_doi(doi: str) -> str:
     """
     Sanitize DOI for use as filename.
@@ -109,13 +153,15 @@ def download_pdf_from_url(
                     if chunk:
                         f.write(chunk)
 
-            # Verify file size
-            file_size = output_path.stat().st_size
-            if file_size < 1000:  # Less than 1KB is suspicious
-                logger.warning(f"Downloaded file is very small ({file_size} bytes)")
-                output_path.unlink()  # Delete suspicious file
-                raise ValueError(f"Downloaded file too small: {file_size} bytes")
+            # Validate the downloaded file is a real PDF
+            try:
+                validate_pdf(output_path)
+            except InvalidPDFError as e:
+                logger.warning(f"Invalid PDF: {e}")
+                output_path.unlink()
+                raise
 
+            file_size = output_path.stat().st_size
             logger.info(f"Successfully downloaded: {output_path} ({file_size / 1024:.1f} KB)")
             return True
 
@@ -128,6 +174,10 @@ def download_pdf_from_url(
             logger.warning(f"Request error on attempt {attempt}/{max_retries}: {e}")
             if attempt < max_retries:
                 time.sleep(RETRY_DELAY * attempt)
+
+        except InvalidPDFError:
+            # Don't retry if the server returned non-PDF content
+            break
 
         except Exception as e:
             logger.error(f"Unexpected error: {e}")
@@ -347,13 +397,15 @@ def download_pdf_with_ezproxy(
                         if chunk:
                             f.write(chunk)
 
-                # Verify file
-                file_size = output_path.stat().st_size
-                if file_size < 1000:
-                    logger.warning(f"Downloaded file is very small ({file_size} bytes)")
+                # Validate the downloaded file is a real PDF
+                try:
+                    validate_pdf(output_path)
+                except InvalidPDFError as e:
+                    logger.warning(f"EZproxy {strategy_name}: Invalid PDF: {e}")
                     output_path.unlink()
                     continue
 
+                file_size = output_path.stat().st_size
                 logger.info(f"Successfully downloaded via EZproxy ({strategy_name}): {output_path} ({file_size / 1024:.1f} KB)")
                 return output_path
 
