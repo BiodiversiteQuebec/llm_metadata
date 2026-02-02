@@ -73,6 +73,40 @@ The `claude` command is aliased to `claude --dangerously-skip-permissions`.
 
 Host `~/.claude` is bind-mounted into the container for persistent settings. On Linux/Mac, edit the `mounts` entry in `devcontainer.json` to use `${localEnv:HOME}` instead of `${localEnv:USERPROFILE}`.
 
+## Security model
+
+Running Claude Code inside the devcontainer with `--dangerously-skip-permissions` is materially safer than running it directly on the host. The container limits the blast radius of any misinterpreted instruction or hallucinated command.
+
+### What the container isolates
+
+**Filesystem scope.** Claude can only see `/workspace` (the bind-mounted repo) and the container's own filesystem. It cannot access your home directory, SSH keys, browser profiles, credential stores, other project directories, or OS-level configuration on the host.
+
+**Process isolation.** Processes inside the container are namespaced. Claude cannot see or signal host processes, read other users' memory, access the Docker socket, or interact with other running applications.
+
+**Network control.** When `ENABLE_FIREWALL=true`, `init-firewall.sh` restricts outbound traffic to an explicit allowlist (OpenAI, GitHub, Anthropic, data APIs, package registries). This prevents data exfiltration to arbitrary endpoints.
+
+**Privilege boundaries.** Claude runs as the `dev` user (UID 1000), not root. Even with `sudo` access inside the container, Linux capabilities are dropped by default. The container cannot load kernel modules, modify the host network stack, or access raw devices.
+
+### Threat scenarios
+
+| Scenario | Without container | With container |
+|---|---|---|
+| Prompt injection causes `rm -rf ~` | Destroys home directory | Only affects container filesystem; host home untouched |
+| Hallucinated `curl ... \| sh` | Installs malware on host | Confined to ephemeral container; firewall can block it |
+| Reads `~/.ssh/id_rsa` or `~/.aws/credentials` | Full access | Files don't exist in container |
+| Exfiltrates code to external server | Unrestricted | Firewall allowlist blocks unknown destinations |
+| Modifies system packages or configs | Persists on host | Lost on container rebuild |
+
+### What it does NOT protect against
+
+- **The bind-mounted workspace.** Claude has full read/write to the repo. Git is the safety net for accidental or destructive changes.
+- **Secrets in environment variables.** `.env` is loaded into the container. Claude can read `OPENAI_API_KEY`, `ZENODO_ACCESS_TOKEN`, etc. via `printenv`. This is inherent to the workflow.
+- **Outbound network when firewall is disabled.** With `ENABLE_FIREWALL=false`, Claude can reach any network endpoint.
+
+### The practical tradeoff
+
+Running `--dangerously-skip-permissions` on the host gives Claude the same access as your user account — every file, credential, and network connection you have. The devcontainer reduces this to: one project directory, explicitly declared secrets, and (optionally) a filtered network.
+
 ## Rebuilding
 
 From the VS Code command palette: **Dev Containers: Rebuild Container**.

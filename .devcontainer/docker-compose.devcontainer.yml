@@ -1,11 +1,11 @@
 services:
   app:
     build:
-      context: ..
+      context: .
       dockerfile: .devcontainer/Dockerfile
       args:
         CLAUDE_CODE_VERSION: latest
-    env_file: ../.env
+    env_file: .env
     environment:
       GROBID_URL: http://grobid:8070
       QDRANT_URL: http://qdrant:6333
@@ -13,7 +13,7 @@ services:
       - NET_ADMIN
       - NET_RAW
     volumes:
-      - ..:/workspace:cached
+      - .:/workspace:cached
       - venv:/workspace/.venv
       - uv-cache:/home/dev/.cache/uv
       - command-history:/commandhistory
