@@ -231,10 +231,15 @@ def download_pdf(
     filename = f"{sanitized_doi}.pdf"
     output_path = output_dir / filename
 
-    # Check if file already exists
+    # Check if file already exists and is valid
     if output_path.exists():
-        logger.info(f"PDF already exists: {output_path}")
-        return output_path
+        try:
+            validate_pdf(output_path)
+            logger.info(f"PDF already exists and is valid: {output_path}")
+            return output_path
+        except InvalidPDFError as e:
+            logger.warning(f"Existing file invalid, re-downloading: {e}")
+            output_path.unlink()
 
     # Attempt download
     success = download_pdf_from_url(
@@ -320,10 +325,15 @@ def download_pdf_with_ezproxy(
     filename = f"{sanitized_doi}.pdf"
     output_path = output_dir / filename
 
-    # Check if file already exists
+    # Check if file already exists and is valid
     if output_path.exists():
-        logger.info(f"PDF already exists: {output_path}")
-        return output_path
+        try:
+            validate_pdf(output_path)
+            logger.info(f"PDF already exists and is valid: {output_path}")
+            return output_path
+        except InvalidPDFError as e:
+            logger.warning(f"Existing file invalid, re-downloading: {e}")
+            output_path.unlink()
 
     # Build URLs to try
     urls_to_try = []
@@ -478,10 +488,15 @@ def download_pdf_with_fallback(
     filename = f"{sanitized_doi}.pdf"
     output_path = output_dir / filename
 
-    # Check if file already exists
+    # Check if file already exists and is valid
     if output_path.exists():
-        logger.info(f"PDF already exists: {output_path}")
-        return output_path
+        try:
+            validate_pdf(output_path)
+            logger.info(f"PDF already exists and is valid: {output_path}")
+            return output_path
+        except InvalidPDFError as e:
+            logger.warning(f"Existing file invalid, re-downloading: {e}")
+            output_path.unlink()
 
     # Strategy 1: Try OpenAlex PDF URL
     if openalex_pdf_url:

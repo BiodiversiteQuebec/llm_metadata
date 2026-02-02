@@ -80,6 +80,19 @@ class TestValidatePDF(unittest.TestCase):
         tiny.write_bytes(b"%PDF-1.4 tiny file")
         validate_pdf(tiny, min_size=10)
 
+    def test_existing_invalid_pdf_deleted_on_redownload(self):
+        """download_pdf_with_fallback deletes existing invalid file instead of returning it."""
+        fake = self.temp_dir / "10.9999_fake.pdf"
+        fake.write_text("<!DOCTYPE html><html>Not a PDF</html>")
+        self.assertTrue(fake.exists())
+
+        result = download_pdf_with_fallback(
+            doi="10.9999/fake",
+            output_dir=self.temp_dir,
+        )
+        # Download will fail (no valid source), but the invalid file should be gone
+        self.assertFalse(fake.exists(), "Invalid existing file should have been deleted")
+
 
 @unittest.skipUnless(_has_network(), "No network access")
 class TestDownloadWithValidation(unittest.TestCase):

@@ -137,7 +137,7 @@ def download_all(
             )
             if pdf_path:
                 record["status"] = "downloaded"
-                record["downloaded_pdf_path"] = str(pdf_path)
+                record["downloaded_pdf_path"] = pdf_path.as_posix()
                 logger.info(f"  Downloaded: {pdf_path.name}")
             else:
                 record["status"] = "failed"
