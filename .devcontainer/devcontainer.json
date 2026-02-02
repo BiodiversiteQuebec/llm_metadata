@@ -1,10 +1,9 @@
 {
     "name": "LLM Metadata Dev",
     "dockerComposeFile": [
-        "../docker-compose.yml",
         "docker-compose.devcontainer.yml"
     ],
-    "service": "app",
+    "service": "claude-dev",
     "workspaceFolder": "/workspace",
     "remoteUser": "dev",
     "shutdownAction": "stopCompose",
@@ -75,6 +74,6 @@
     },
 
     "postCreateCommand": "uv sync --all-extras",
-    "postStartCommand": "sudo /usr/local/bin/init-firewall.sh && (pgrep -f jupyter-lab > /dev/null || nohup uv run jupyter lab --port=${JUPYTER_PORT} --IdentityProvider.token=${JUPYTER_TOKEN} --no-browser --ip=0.0.0.0 > /tmp/jupyter.log 2>&1 &)",
+    "postStartCommand": "(pgrep -f jupyter-lab > /dev/null || nohup uv run jupyter lab --port=${JUPYTER_PORT} --IdentityProvider.token=${JUPYTER_TOKEN} --no-browser --ip=0.0.0.0 > /tmp/jupyter.log 2>&1 &)",
     "waitFor": "postCreateCommand"
 }

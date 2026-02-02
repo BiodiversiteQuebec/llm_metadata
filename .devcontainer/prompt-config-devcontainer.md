@@ -1,7 +1,7 @@
 Edit devcontainer config for workspace.
 
 * Should load .env file for environment variables.
-* Should start from docker-compose.yml file.
+* Should start from .devcontainer/docker-compose.devcontainer.yml file.
 * Devcontainer should have access to internet.
 * Pass jupyter config to docker-compose file # Jupyter lab token, JUPYTER_PORT, JUPYTER_URL, JUPYTER_TOKEN, ALLOW_IMG_OUTPUT from .env file.
 * Should install necessary python packages from requirements.txt in the devcontainer using uvx.
