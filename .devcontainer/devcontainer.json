@@ -1,0 +1,80 @@
+{
+    "name": "LLM Metadata Dev",
+    "dockerComposeFile": [
+        "../docker-compose.yml",
+        "docker-compose.devcontainer.yml"
+    ],
+    "service": "app",
+    "workspaceFolder": "/workspace",
+    "remoteUser": "dev",
+    "shutdownAction": "stopCompose",
+
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "anthropic.claude-code",
+                "ms-python.python",
+                "ms-python.vscode-pylance",
+                "ms-toolsai.jupyter",
+                "ms-toolsai.jupyter-renderers",
+                "ms-toolsai.jupyter-keymap",
+                "charliermarsh.ruff",
+                "eamodio.gitlens"
+            ],
+            "settings": {
+                "python.defaultInterpreterPath": "/workspace/.venv/bin/python",
+                "python.envFile": "${workspaceFolder}/.env",
+                "python.analysis.extraPaths": [
+                    "${workspaceFolder}/src"
+                ],
+                "python.testing.pytestEnabled": true,
+                "python.testing.pytestArgs": [
+                    "tests"
+                ],
+                "[python]": {
+                    "editor.defaultFormatter": "charliermarsh.ruff",
+                    "editor.formatOnSave": true,
+                    "editor.codeActionsOnSave": {
+                        "source.fixAll.ruff": "explicit",
+                        "source.organizeImports.ruff": "explicit"
+                    }
+                },
+                "jupyter.notebookFileRoot": "${workspaceFolder}",
+                "terminal.integrated.defaultProfile.linux": "zsh",
+                "terminal.integrated.profiles.linux": {
+                    "zsh": {
+                        "path": "zsh"
+                    },
+                    "bash": {
+                        "path": "bash",
+                        "icon": "terminal-bash"
+                    }
+                }
+            }
+        }
+    },
+
+    "containerEnv": {
+        "PYTHONPATH": "/workspace/src",
+        "UV_LINK_MODE": "copy"
+    },
+
+    // Bind-mount host ~/.claude for persistent Claude settings across rebuilds.
+    // On Linux/Mac, change USERPROFILE to HOME.
+    "mounts": [
+        "source=${localEnv:USERPROFILE}/.claude,target=/home/dev/.claude,type=bind,consistency=cached"
+    ],
+
+    "portsAttributes": {
+        "8881": { "label": "Jupyter Lab", "onAutoForward": "notify" },
+        "8070": { "label": "GROBID", "onAutoForward": "silent" },
+        "6333": { "label": "Qdrant", "onAutoForward": "silent" },
+        "4200": { "label": "Prefect Dashboard", "onAutoForward": "notify" },
+        "8000": { "label": "Dev Server", "onAutoForward": "notify" },
+        "8080": { "label": "Dev Server Alt", "onAutoForward": "notify" }
+    },
+
+    "postCreateCommand": "uv sync --all-extras",
+    "postStartCommand": "sudo /usr/local/bin/init-firewall.sh && (pgrep -f jupyter-lab > /dev/null || nohup uv run jupyter lab --port=${JUPYTER_PORT} --IdentityProvider.token=${JUPYTER_TOKEN} --no-browser --ip=0.0.0.0 > /tmp/jupyter.log 2>&1 &)",
+    "waitFor": "postCreateCommand"
+}

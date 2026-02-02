@@ -1,0 +1,33 @@
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+      args:
+        CLAUDE_CODE_VERSION: latest
+    env_file: ../.env
+    environment:
+      GROBID_URL: http://grobid:8070
+      QDRANT_URL: http://qdrant:6333
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    volumes:
+      - ..:/workspace:cached
+      - venv:/workspace/.venv
+      - uv-cache:/home/dev/.cache/uv
+      - command-history:/commandhistory
+    ports:
+      - "${JUPYTER_PORT:-8881}:${JUPYTER_PORT:-8881}"
+      - "8000:8000"
+      - "8080:8080"
+      - "4200:4200"
+    depends_on:
+      - grobid
+      - qdrant
+    command: sleep infinity
+
+volumes:
+  venv:
+  uv-cache:
+  command-history:
