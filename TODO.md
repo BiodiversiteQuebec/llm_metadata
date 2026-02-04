@@ -54,7 +54,7 @@
   * [ ] Why only 75 articles ?
 
 * [x] Paper full text chunking + vector db infrastructure + workflow (with metadata: sections, page numbers, authors, doi, etc) 🔥
-  * [x] Docker infrastructure: compose up GROBID + Qdrant (`.devcontainer/docker-compose.devcontainer.yml`)
+  * [x] Docker infrastructure: compose up GROBID + Qdrant (`docker-compose.yml`)
   * [x] Prototyping notebook: `notebooks/pdf_chunking_exploration.ipynb`
   * [x] TEI parsing module: `src/llm_metadata/pdf_parsing.py`
   * [x] Section normalization: `src/llm_metadata/section_normalize.py`

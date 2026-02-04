@@ -2,20 +2,24 @@
 
 ## Architecture
 
+Uses the **compose overlay** pattern:
+
 ```
-.devcontainer/docker-compose.devcontainer.yml  # Claude development environment + base services (GROBID, Qdrant)
+docker-compose.yml                          # Base services (GROBID, Qdrant)
+.devcontainer/docker-compose.devcontainer.yml  # Adds app service for dev
 .devcontainer/devcontainer.json                # VS Code integration
 .devcontainer/Dockerfile                       # Python 3.12, uv, Node.js, Claude Code
 .devcontainer/init-firewall.sh                 # Outbound traffic whitelist
 ```
+
+The root `docker-compose.yml` is not modified and remains usable independently.
 
 ## What starts automatically
 
 | Step | Runs when | What it does |
 |---|---|---|
 | `postCreateCommand` | First build only | `uv sync --all-extras` — installs all Python deps into `/workspace/.venv` |
-| container entrypoint | Every container start | Sets up firewall (when enabled) before starting the main process |
-| `postStartCommand` | Every container start | Starts Jupyter Lab if not already running |
+| `postStartCommand` | Every container start | Sets up firewall, then starts Jupyter Lab if not already running |
 
 ## Services & ports
 
@@ -65,7 +69,7 @@ To add a new domain, append it to the `for domain in ...` loop in `init-firewall
 
 ## Claude Code
 
-No special `claude` alias is configured in the container.
+The `claude` command is aliased to `claude --dangerously-skip-permissions`.
 
 Host `~/.claude` is bind-mounted into the container for persistent settings. On Linux/Mac, edit the `mounts` entry in `devcontainer.json` to use `${localEnv:HOME}` instead of `${localEnv:USERPROFILE}`.
 
@@ -81,7 +85,7 @@ Running Claude Code inside the devcontainer with `--dangerously-skip-permissions
 
 **Network control.** When `ENABLE_FIREWALL=true`, `init-firewall.sh` restricts outbound traffic to an explicit allowlist (OpenAI, GitHub, Anthropic, data APIs, package registries). This prevents data exfiltration to arbitrary endpoints.
 
-**Privilege boundaries.** VS Code attaches as the `dev` user (UID 1000). The container process starts as root only to apply the firewall rules at boot, then drops privileges for the main command.
+**Privilege boundaries.** Claude runs as the `dev` user (UID 1000), not root. Even with `sudo` access inside the container, Linux capabilities are dropped by default. The container cannot load kernel modules, modify the host network stack, or access raw devices.
 
 ### Threat scenarios
 

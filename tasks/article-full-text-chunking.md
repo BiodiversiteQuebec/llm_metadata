@@ -70,7 +70,7 @@ Modules are added to the existing `src/llm_metadata/` package structure:
 
 ```
 llm_metadata/
-├─ .devcontainer/docker-compose.devcontainer.yml  # Qdrant + GROBID + app (devcontainer)
+├─ docker-compose.yml          # NEW: Qdrant + GROBID services
 ├─ .env                        # Existing: add GROBID/Qdrant URLs
 ├─ pyproject.toml              # Existing: add new dependencies
 ├─ src/llm_metadata/

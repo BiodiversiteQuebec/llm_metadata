@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     curl \
     wget \
-    gosu \
+    sudo \
     zsh \
     fzf \
     less \
@@ -58,7 +58,8 @@ ARG USER_UID=1000
 ARG USER_GID=${USER_UID}
 RUN groupadd --gid ${USER_GID} ${USERNAME} \
     && useradd --uid ${USER_UID} --gid ${USER_GID} -m -s /bin/zsh ${USERNAME} \
-    && true
+    && echo "${USERNAME} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/${USERNAME} \
+    && chmod 0440 /etc/sudoers.d/${USERNAME}
 
 # Install Claude Code globally
 ARG CLAUDE_CODE_VERSION=latest
@@ -66,14 +67,9 @@ RUN npm install -g @anthropic-ai/claude-code@${CLAUDE_CODE_VERSION}
 
 # Copy and set up firewall script
 COPY .devcontainer/init-firewall.sh /usr/local/bin/
-RUN sed -i 's/\r$//' /usr/local/bin/init-firewall.sh \
-    && chmod +x /usr/local/bin/init-firewall.sh \
-    && true
-
-# Entrypoint runs firewall init as root, then drops to the dev user.
-COPY .devcontainer/entrypoint.sh /usr/local/bin/devcontainer-entrypoint.sh
-RUN sed -i 's/\r$//' /usr/local/bin/devcontainer-entrypoint.sh \
-    && chmod +x /usr/local/bin/devcontainer-entrypoint.sh
+RUN chmod +x /usr/local/bin/init-firewall.sh \
+    && echo "${USERNAME} ALL=(root) NOPASSWD: /usr/local/bin/init-firewall.sh" > /etc/sudoers.d/${USERNAME}-firewall \
+    && chmod 0440 /etc/sudoers.d/${USERNAME}-firewall
 
 # Set up workspace, command history, uv cache, and .venv with correct ownership
 RUN mkdir -p /workspace/.venv /commandhistory /home/${USERNAME}/.cache/uv \
@@ -97,9 +93,5 @@ ENV SHELL=/bin/zsh
 ENV EDITOR=nano
 ENV VISUAL=nano
 ENV DEVCONTAINER=true
-ENV DEVCONTAINER_USER=${USERNAME}
 
 WORKDIR /workspace
-
-USER root
-ENTRYPOINT ["/usr/local/bin/devcontainer-entrypoint.sh"]
