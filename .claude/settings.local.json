@@ -42,7 +42,12 @@
       "Bash(uv run:*)",
       "mcp__jupyter__overwrite_cell_source",
       "mcp__jupyter__insert_cell",
-      "mcp__jupyter__insert_execute_code_cell"
+      "mcp__jupyter__insert_execute_code_cell",
+      "Bash(docker exec:*)",
+      "Bash(MSYS_NO_PATHCONV=1 docker exec:*)",
+      "Bash(docker cp:*)",
+      "mcp__jupyter__connect_to_jupyter",
+      "Bash(git commit:*)"
     ]
   }
 }

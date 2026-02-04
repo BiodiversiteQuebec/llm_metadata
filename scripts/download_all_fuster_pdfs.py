@@ -17,7 +17,7 @@ from pathlib import Path
 import pandas as pd
 
 from llm_metadata.openalex import get_work_by_doi, extract_pdf_url
-from llm_metadata.pdf_download import download_pdf_with_fallback
+from llm_metadata.pdf_download import download_pdf_with_fallback, sanitize_doi, validate_pdf, InvalidPDFError
 
 logging.basicConfig(
     level=logging.INFO,
@@ -116,6 +116,19 @@ def download_all(
             "status": "pending",
             "error": None,
         }
+
+        # Check if a valid PDF already exists on disk (regardless of OpenAlex)
+        existing_path = output_dir / f"{sanitize_doi(doi)}.pdf"
+        if existing_path.exists():
+            try:
+                validate_pdf(existing_path)
+                record["status"] = "downloaded"
+                record["downloaded_pdf_path"] = existing_path.as_posix()
+                logger.info(f"  Already on disk: {existing_path.name}")
+                results.append(record)
+                continue
+            except InvalidPDFError:
+                existing_path.unlink()
 
         if not work:
             record["status"] = "no_openalex_work"

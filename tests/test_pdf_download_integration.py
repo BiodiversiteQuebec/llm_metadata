@@ -19,6 +19,7 @@ from llm_metadata.pdf_download import (
     download_pdf_with_fallback,
     download_pdf_from_url,
     validate_pdf,
+    guess_publisher_pdf_url,
     InvalidPDFError,
     MIN_PDF_SIZE,
 )
@@ -142,6 +143,72 @@ class TestDownloadWithValidation(unittest.TestCase):
         self.assertFalse(success)
         # File should not remain on disk
         self.assertFalse(output_path.exists())
+
+
+class TestGuessPublisherPdfUrl(unittest.TestCase):
+    """Test publisher PDF URL guessing from DOI prefixes."""
+
+    def test_wiley_doi(self):
+        url = guess_publisher_pdf_url("10.1111/mec.14361")
+        self.assertEqual(url, "https://onlinelibrary.wiley.com/doi/pdfdirect/10.1111/mec.14361")
+
+    def test_wiley_ece_doi(self):
+        url = guess_publisher_pdf_url("10.1002/ece3.3947")
+        self.assertEqual(url, "https://onlinelibrary.wiley.com/doi/pdfdirect/10.1002/ece3.3947")
+
+    def test_springer_doi(self):
+        url = guess_publisher_pdf_url("10.1007/s10592-019-01170-8")
+        self.assertEqual(url, "https://link.springer.com/content/pdf/10.1007/s10592-019-01170-8.pdf")
+
+    def test_nature_doi(self):
+        url = guess_publisher_pdf_url("10.1038/s41477-020-0647-x")
+        self.assertEqual(url, "https://www.nature.com/articles/s41477-020-0647-x.pdf")
+
+    def test_unknown_publisher_returns_none(self):
+        url = guess_publisher_pdf_url("10.9999/unknown")
+        self.assertIsNone(url)
+
+
+def _has_ezproxy_session() -> bool:
+    """Check if a valid EZproxy session exists."""
+    try:
+        from llm_metadata.ezproxy import extract_cookies_from_browser, verify_session_active
+        cookies = extract_cookies_from_browser()
+        if not cookies:
+            return False
+        return verify_session_active(cookies)
+    except Exception:
+        return False
+
+
+@unittest.skipUnless(_has_network(), "No network access")
+@unittest.skipUnless(_has_ezproxy_session(), "No active EZproxy session")
+class TestEZproxyDownload(unittest.TestCase):
+    """Integration test: download a closed-access PDF via EZproxy."""
+
+    # Closed-access Wiley article (Molecular Ecology)
+    CLOSED_DOI = "10.1111/mec.14361"
+
+    def setUp(self):
+        self.temp_dir = Path(tempfile.mkdtemp())
+        from llm_metadata.ezproxy import extract_cookies_from_browser
+        self.cookies = extract_cookies_from_browser()
+
+    def tearDown(self):
+        if self.temp_dir.exists():
+            shutil.rmtree(self.temp_dir)
+
+    def test_download_closed_access_via_ezproxy(self):
+        """Download a closed-access Wiley article using EZproxy proxied URL."""
+        pdf_path = download_pdf_with_fallback(
+            doi=self.CLOSED_DOI,
+            output_dir=self.temp_dir,
+            use_unpaywall=False,  # Skip OA strategies to test EZproxy directly
+            ezproxy_cookies=self.cookies,
+        )
+        self.assertIsNotNone(pdf_path, f"EZproxy download should succeed for {self.CLOSED_DOI}")
+        self.assertTrue(pdf_path.exists())
+        validate_pdf(pdf_path)
 
 
 class TestExistingFusterPDFs(unittest.TestCase):
