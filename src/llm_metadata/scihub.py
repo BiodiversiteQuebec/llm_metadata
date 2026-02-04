@@ -47,14 +47,41 @@ class SciHub(object):
     def _get_available_scihub_urls(self):
         '''
         Finds available scihub urls via https://sci-hub.now.sh/
+
+        Prioritizes mirrors known to work without Cloudflare protection.
         '''
+        # Preferred mirrors (known to work as of 2026-02)
+        preferred = [
+            'https://sci-hub.st',  # Works, uses <object> tag
+            'https://sci-hub.ru',
+        ]
+
+        # Fetch dynamic list
         urls = []
-        res = requests.get('https://sci-hub.now.sh/')
-        s = self._get_soup(res.content)
-        for a in s.find_all('a', href=True):
-            if 'sci-hub.' in a['href']:
-                urls.append(a['href'])
-        return urls
+        try:
+            res = requests.get('https://sci-hub.now.sh/', timeout=10)
+            s = self._get_soup(res.content)
+            for a in s.find_all('a', href=True):
+                if 'sci-hub.' in a['href']:
+                    url = a['href'].rstrip('/')
+                    if url not in urls:
+                        urls.append(url)
+        except Exception as e:
+            logger.warning(f"Could not fetch mirror list: {e}")
+
+        # Prioritize preferred mirrors
+        result = []
+        for url in preferred:
+            if url not in result:
+                result.append(url)
+        for url in urls:
+            if url not in result:
+                result.append(url)
+
+        if not result:
+            raise Exception("No Sci-Hub mirrors available")
+
+        return result
 
     def set_proxy(self, proxy):
         '''
@@ -193,15 +220,56 @@ class SciHub(object):
 
     def _search_direct_url(self, identifier):
         """
-        Sci-Hub embeds papers in an iframe. This function finds the actual
-        source url which looks something like https://moscow.sci-hub.io/.../....pdf.
+        Find the direct PDF URL from Sci-Hub page.
+
+        Sci-Hub has changed its page structure over time:
+        - Old: embeds PDF in <iframe src="...">
+        - New: uses <object data="..."> or <embed src="...">
+        - Also: provides download links like /download/...
+
+        This function tries all known patterns.
         """
         res = self.sess.get(self.base_url + identifier, verify=False)
         s = self._get_soup(res.content)
+
+        # Strategy 1: Look for iframe (old structure)
         iframe = s.find('iframe')
-        if iframe:
-            return iframe.get('src') if not iframe.get('src').startswith('//') \
-                else 'http:' + iframe.get('src')
+        if iframe and iframe.get('src'):
+            src = iframe.get('src')
+            if src.startswith('//'):
+                return 'https:' + src
+            elif src.startswith('/'):
+                return self.base_url.rstrip('/') + src
+            return src
+
+        # Strategy 2: Look for object tag (new structure)
+        obj = s.find('object')
+        if obj and obj.get('data'):
+            data = obj.get('data')
+            # Remove viewer parameters like #navpanes=0&view=FitH
+            data = data.split('#')[0]
+            if data.startswith('/'):
+                return self.base_url.rstrip('/') + data
+            return data
+
+        # Strategy 3: Look for embed tag
+        embed = s.find('embed')
+        if embed and embed.get('src'):
+            src = embed.get('src')
+            if src.startswith('/'):
+                return self.base_url.rstrip('/') + src
+            return src
+
+        # Strategy 4: Look for download link
+        for a in s.find_all('a', href=True):
+            href = a['href']
+            if '/download/' in href or href.endswith('.pdf'):
+                if href.startswith('/'):
+                    return self.base_url.rstrip('/') + href
+                return href
+
+        # No PDF found
+        return None
 
     def _classify(self, identifier):
         """

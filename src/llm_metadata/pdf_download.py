@@ -98,6 +98,48 @@ def sanitize_doi(doi: str) -> str:
     return sanitized
 
 
+def guess_publisher_pdf_url(doi: str) -> Optional[str]:
+    """
+    Construct a likely direct PDF URL from a DOI based on known publisher patterns.
+
+    Useful for closed-access papers where OpenAlex/Unpaywall don't provide
+    a PDF URL, but we can guess the publisher's PDF endpoint from the DOI prefix.
+
+    Args:
+        doi: Article DOI (e.g. "10.1111/mec.14361")
+
+    Returns:
+        Guessed PDF URL or None if the publisher pattern is unknown
+    """
+    doi = doi.strip()
+
+    # Wiley: 10.1111/*, 10.1002/*, 10.1890/*
+    if doi.startswith(("10.1111/", "10.1002/", "10.1890/")):
+        return f"https://onlinelibrary.wiley.com/doi/pdfdirect/{doi}"
+
+    # Springer: 10.1007/*
+    if doi.startswith("10.1007/"):
+        return f"https://link.springer.com/content/pdf/{doi}.pdf"
+
+    # Nature: 10.1038/*  (e.g. 10.1038/s41477-020-0647-x)
+    if doi.startswith("10.1038/"):
+        suffix = doi.split("/", 1)[1]
+        return f"https://www.nature.com/articles/{suffix}.pdf"
+
+    # Oxford Academic (OUP): 10.1093/*
+    # OUP doesn't have a simple pattern; skip (EZproxy login may still work)
+
+    # Cambridge University Press: 10.1017/*
+    if doi.startswith("10.1017/"):
+        return f"https://www.cambridge.org/core/services/aop-cambridge-core/content/view/{doi}"
+
+    # Pensoft (BDJ): 10.3897/*
+    if doi.startswith("10.3897/"):
+        return f"https://doi.org/{doi}"
+
+    return None
+
+
 def download_pdf_from_url(
     pdf_url: str,
     output_path: Path,
@@ -541,12 +583,14 @@ def download_pdf_with_fallback(
 
     # Strategy 3: Try EZproxy (if cookies provided)
     if ezproxy_cookies:
+        # Use known PDF URL, or guess one from the DOI prefix
+        pdf_url_for_proxy = openalex_pdf_url or guess_publisher_pdf_url(doi)
         logger.info(f"Strategy 3: Trying EZproxy for {doi}")
         ezproxy_path = download_pdf_with_ezproxy(
             doi=doi,
             ezproxy_cookies=ezproxy_cookies,
             output_dir=output_dir,
-            publisher_pdf_url=openalex_pdf_url,  # Pass for proxied URL strategy
+            publisher_pdf_url=pdf_url_for_proxy,
             timeout=timeout,
             year=year
         )
@@ -555,28 +599,43 @@ def download_pdf_with_fallback(
         
     # Strategy 4: Sci-Hub
     try:
-        from llm_metadata.scihub import SciHub
-        
+        from llm_metadata.scihub import SciHub, CaptchaNeedException
+
         logger.info(f"Strategy 4: Trying Sci-Hub for {doi}")
         sh = SciHub()
-        
-        # Get the PDF URL from Sci-Hub
+
+        # Fetch returns {'pdf': bytes, 'url': str, 'name': str} or {'err': str}
         result = sh.fetch(doi)
-        
-        if result.get('pdf'):
-            success = download_pdf_from_url(
-                pdf_url=result['pdf'],
-                output_path=output_path,
-                timeout=timeout,
-                max_retries=2
-            )
-            if success:
-                return output_path
+
+        if result and result.get('pdf'):
+            # SciHub returns PDF content as bytes - write directly to file
+            pdf_bytes = result['pdf']
+
+            # Verify it's actually a PDF
+            if not pdf_bytes.startswith(PDF_MAGIC_BYTES):
+                logger.warning(f"Sci-Hub: Response is not a valid PDF for {doi}")
+            else:
+                # Write the PDF bytes to file
+                with open(output_path, 'wb') as f:
+                    f.write(pdf_bytes)
+
+                # Validate the downloaded file
+                try:
+                    validate_pdf(output_path)
+                    logger.info(f"Successfully downloaded via Sci-Hub: {output_path}")
+                    return output_path
+                except InvalidPDFError as e:
+                    logger.warning(f"Sci-Hub: Invalid PDF: {e}")
+                    output_path.unlink()
+        elif result and result.get('err'):
+            logger.debug(f"Sci-Hub error: {result['err']}")
         else:
             logger.debug(f"Sci-Hub: No PDF found for {doi}")
-            
+
     except ImportError:
-        logger.warning("scihub_dmunozg package not available, skipping Sci-Hub fallback")
+        logger.warning("scihub module not available, skipping Sci-Hub fallback")
+    except CaptchaNeedException:
+        logger.warning("Sci-Hub: Captcha required, skipping")
     except Exception as e:
         logger.warning(f"Sci-Hub fallback error: {e}")
     
