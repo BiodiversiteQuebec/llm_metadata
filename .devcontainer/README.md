@@ -39,13 +39,7 @@ All variables from the project root `.env` are loaded into the container via `en
 
 ## Firewall
 
-Controlled by the `ENABLE_FIREWALL` env var in `.env` (defaults to `true`). Set to `false` to disable:
-
-```env
-ENABLE_FIREWALL=false
-```
-
-When enabled, the container runs a **whitelist-only outbound firewall** (`init-firewall.sh`). Only these destinations are allowed:
+The container runs a **whitelist-only outbound firewall** (`init-firewall.sh`). Only these destinations are allowed:
 
 - **GitHub** (API, web, git — via IP ranges from `/meta`)
 - **Anthropic** (`api.anthropic.com`, `sentry.io`, `statsig.anthropic.com`)
