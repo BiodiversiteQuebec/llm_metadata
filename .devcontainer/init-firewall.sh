@@ -99,7 +99,7 @@ for domain in \
             exit 1
         fi
         echo "Adding $ip for $domain"
-        ipset add allowed-domains "$ip" -exist
+        ipset add allowed-domains "$ip"
     done < <(echo "$ips")
 done
 

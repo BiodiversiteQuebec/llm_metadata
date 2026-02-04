@@ -66,14 +66,14 @@ ARG CLAUDE_CODE_VERSION=latest
 RUN npm install -g @anthropic-ai/claude-code@${CLAUDE_CODE_VERSION}
 
 # Copy and set up firewall script
-COPY .devcontainer/init-firewall.sh /usr/local/bin/
+COPY init-firewall.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/init-firewall.sh \
     && echo "${USERNAME} ALL=(root) NOPASSWD: /usr/local/bin/init-firewall.sh" > /etc/sudoers.d/${USERNAME}-firewall \
     && chmod 0440 /etc/sudoers.d/${USERNAME}-firewall
 
-# Set up workspace, command history, uv cache, and .venv with correct ownership
-RUN mkdir -p /workspace/.venv /commandhistory /home/${USERNAME}/.cache/uv \
-    && chown -R ${USERNAME}:${USERNAME} /workspace /commandhistory /home/${USERNAME}/.cache
+# Set up workspace and command history
+RUN mkdir -p /workspace /commandhistory \
+    && chown -R ${USERNAME}:${USERNAME} /workspace /commandhistory
 
 USER ${USERNAME}
 
