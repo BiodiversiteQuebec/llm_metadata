@@ -8,7 +8,7 @@ This document describes the devcontainer setup for the LLM Metadata project, pro
 - **Name**: `claude-dev`
 - **User**: `devuser` with sudo privileges
 - **Compose file**: `.devcontainer/docker-compose.devcontainer.yml`
-- **Environment**: Loads `.env` file via CLI `--env-file` flag
+- **Environment**: Loads `.env` file automatically from project root
 - **Claude Code**: Always starts with `--dangerously-skip-permissions`
 - **VS Code**: Python development extensions
 
@@ -168,6 +168,16 @@ healthcheck:
     "docker-compose.devcontainer.yml"
 ]
 ```
+
+**Path Resolution & Environment Loading:**
+
+When VS Code starts the devcontainer:
+1. **Working directory**: Project root (parent of `.devcontainer/`)
+2. **Compose file paths**: Relative to `devcontainer.json` location
+3. **`.env` file**: Docker Compose v2 automatically loads `.env` from working directory
+4. **Volume/context paths**: Resolved relative to first compose file's directory (project root)
+
+This means paths in `docker-compose.devcontainer.yml` like `context: .` and `./data` resolve to project root, not `.devcontainer/`.
 
 **Extensions:**
 - `anthropic.claude-code` - Claude Code
@@ -349,8 +359,10 @@ ALLOW_IMG_OUTPUT=true
 
 ```bash
 cd /path/to/llm_metadata
-docker compose --env-file .env -f docker-compose.yml -f .devcontainer/docker-compose.devcontainer.yml up -d
+docker compose -f docker-compose.yml -f .devcontainer/docker-compose.devcontainer.yml up -d
 ```
+
+**Note:** Docker Compose v2 automatically loads `.env` from the current directory. The `--env-file .env` flag is optional but can be used for explicitness or to specify a different env file.
 
 ### SSH Agent Forwarding (Windows)
 
@@ -421,8 +433,8 @@ docker exec claude-dev sh -c "curl -s --connect-timeout 5 https://api.github.com
 ### Firewall Disabled (ENABLE_FIREWALL=false)
 
 ```bash
-# Start with firewall disabled
-ENABLE_FIREWALL=false docker compose --env-file .env -f docker-compose.yml -f .devcontainer/docker-compose.devcontainer.yml up -d claude-dev
+# Start with firewall disabled (override .env value)
+ENABLE_FIREWALL=false docker compose -f docker-compose.yml -f .devcontainer/docker-compose.devcontainer.yml up -d claude-dev
 
 # Verify setting
 docker exec claude-dev sh -c "printenv ENABLE_FIREWALL"
@@ -447,8 +459,9 @@ docker exec claude-dev sh -c "curl -s http://grobid:8070/api/isalive"
 
 **CLI:**
 ```bash
-docker compose --env-file .env -f docker-compose.yml -f .devcontainer/docker-compose.devcontainer.yml build --no-cache claude-dev
-docker compose --env-file .env -f docker-compose.yml -f .devcontainer/docker-compose.devcontainer.yml up -d claude-dev
+cd /path/to/llm_metadata
+docker compose -f docker-compose.yml -f .devcontainer/docker-compose.devcontainer.yml build --no-cache claude-dev
+docker compose -f docker-compose.yml -f .devcontainer/docker-compose.devcontainer.yml up -d claude-dev
 ```
 
 ---
