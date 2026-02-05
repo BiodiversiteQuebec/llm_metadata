@@ -53,7 +53,7 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
 
 # Create non-root dev user
-ARG USERNAME=dev
+ARG USERNAME=devuser
 ARG USER_UID=1000
 ARG USER_GID=${USER_UID}
 RUN groupadd --gid ${USER_GID} ${USERNAME} \
@@ -65,11 +65,17 @@ RUN groupadd --gid ${USER_GID} ${USERNAME} \
 ARG CLAUDE_CODE_VERSION=latest
 RUN npm install -g @anthropic-ai/claude-code@${CLAUDE_CODE_VERSION}
 
-# Copy and set up firewall script
-COPY init-firewall.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/init-firewall.sh \
+# Copy and set up firewall script (convert CRLF to LF for Windows compatibility)
+COPY .devcontainer/init-firewall.sh /usr/local/bin/
+RUN sed -i 's/\r$//' /usr/local/bin/init-firewall.sh \
+    && chmod +x /usr/local/bin/init-firewall.sh \
     && echo "${USERNAME} ALL=(root) NOPASSWD: /usr/local/bin/init-firewall.sh" > /etc/sudoers.d/${USERNAME}-firewall \
     && chmod 0440 /etc/sudoers.d/${USERNAME}-firewall
+
+# Copy and set up workspace initialization script
+COPY .devcontainer/init-workspace.sh /usr/local/bin/
+RUN sed -i 's/\r$//' /usr/local/bin/init-workspace.sh \
+    && chmod +x /usr/local/bin/init-workspace.sh
 
 # Set up workspace and command history
 RUN mkdir -p /workspace /commandhistory \

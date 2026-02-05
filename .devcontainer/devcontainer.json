@@ -4,9 +4,9 @@
         "../docker-compose.yml",
         "docker-compose.devcontainer.yml"
     ],
-    "service": "app",
+    "service": "claude-dev",
     "workspaceFolder": "/workspace",
-    "remoteUser": "dev",
+    "remoteUser": "devuser",
     "shutdownAction": "stopCompose",
 
     "customizations": {
@@ -62,19 +62,16 @@
     // Bind-mount host ~/.claude for persistent Claude settings across rebuilds.
     // On Linux/Mac, change USERPROFILE to HOME.
     "mounts": [
-        "source=${localEnv:USERPROFILE}/.claude,target=/home/dev/.claude,type=bind,consistency=cached"
+        "source=${localEnv:USERPROFILE}/.claude,target=/home/devuser/.claude,type=bind,consistency=cached"
     ],
 
     "portsAttributes": {
         "8881": { "label": "Jupyter Lab", "onAutoForward": "notify" },
         "8070": { "label": "GROBID", "onAutoForward": "silent" },
         "6333": { "label": "Qdrant", "onAutoForward": "silent" },
-        "4200": { "label": "Prefect Dashboard", "onAutoForward": "notify" },
-        "8000": { "label": "Dev Server", "onAutoForward": "notify" },
-        "8080": { "label": "Dev Server Alt", "onAutoForward": "notify" }
+        "4200": { "label": "Prefect Dashboard", "onAutoForward": "notify" }
     },
 
-    "postCreateCommand": "uv sync --all-extras",
-    "postStartCommand": "sudo /usr/local/bin/init-firewall.sh && (pgrep -f jupyter-lab > /dev/null || nohup uv run jupyter lab --port=${JUPYTER_PORT} --IdentityProvider.token=${JUPYTER_TOKEN} --no-browser --ip=0.0.0.0 > /tmp/jupyter.log 2>&1 &)",
-    "waitFor": "postCreateCommand"
+    "postStartCommand": "sudo /usr/local/bin/init-firewall.sh",
+    "postAttachCommand": "/usr/local/bin/init-workspace.sh && (pgrep -f jupyter-lab > /dev/null || nohup uv run jupyter lab --port=${JUPYTER_PORT} --IdentityProvider.token=${JUPYTER_TOKEN} --no-browser --ip=0.0.0.0 > /tmp/jupyter.log 2>&1 &)"
 }

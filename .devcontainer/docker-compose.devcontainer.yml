@@ -1,33 +1,67 @@
+networks:
+  claude-dev-network:
+    driver: bridge
+
 services:
-  app:
+  claude-dev:
     build:
-      context: ..
+      context: .
       dockerfile: .devcontainer/Dockerfile
       args:
         CLAUDE_CODE_VERSION: latest
-    env_file: ../.env
+    container_name: claude-dev
     environment:
+      # Direct access to internal services (no auth needed)
       GROBID_URL: http://grobid:8070
       QDRANT_URL: http://qdrant:6333
+      # OpenAI via reverse proxy (key injected by proxy, not in container)
+      OPENAI_API_BASE: http://claude-dev-reverse-proxy:8080/v1
+      JUPYTER_PORT: ${JUPYTER_PORT:-8881}
+      JUPYTER_TOKEN: ${JUPYTER_TOKEN}
+      JUPYTER_URL: ${JUPYTER_URL:-http://localhost:8881}
+      ALLOW_IMG_OUTPUT: ${ALLOW_IMG_OUTPUT:-true}
+      # SSH format - VS Code forwards SSH agent from host automatically
+      GIT_REPO_URL: ${GIT_REPO_URL:-git@github.com:your-org/llm_metadata.git}
+      # NOTE: OPENAI_API_KEY intentionally NOT passed to container
     cap_add:
       - NET_ADMIN
       - NET_RAW
+    networks:
+      - claude-dev-network
+      - default
     volumes:
-      - ..:/workspace:cached
-      - venv:/workspace/.venv
-      - uv-cache:/home/dev/.cache/uv
+      # Named volume for entire workspace (git clone target)
+      - workspace:/workspace
+      # Host bind mounts for shared data only
+      - ./data:/workspace/data
+      - ./.claude:/workspace/.claude
+      # Named volumes for caches
+      - uv-cache:/home/devuser/.cache/uv
       - command-history:/commandhistory
     ports:
       - "${JUPYTER_PORT:-8881}:${JUPYTER_PORT:-8881}"
-      - "8000:8000"
-      - "8080:8080"
       - "4200:4200"
     depends_on:
-      - grobid
-      - qdrant
+      - claude-dev-reverse-proxy
     command: sleep infinity
 
+  claude-dev-reverse-proxy:
+    image: nginx:alpine
+    container_name: claude-dev-reverse-proxy
+    networks:
+      - claude-dev-network
+    environment:
+      # API key passed to proxy only, injected in header
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+    volumes:
+      - .devcontainer/claude-dev-reverse-proxy.conf:/etc/nginx/templates/default.conf.template:ro
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
 volumes:
-  venv:
+  workspace:    # Git repo, source, .venv, builds
   uv-cache:
   command-history:

@@ -60,7 +60,7 @@ while read -r cidr; do
         exit 1
     fi
     echo "Adding GitHub range $cidr"
-    ipset add allowed-domains "$cidr"
+    ipset add -exist allowed-domains "$cidr"
 done < <(echo "$gh_ranges" | jq -r '(.web + .api + .git)[]' | aggregate -q)
 
 # Resolve and add allowed domains
@@ -74,7 +74,6 @@ for domain in \
     "marketplace.visualstudio.com" \
     "vscode.blob.core.windows.net" \
     "update.code.visualstudio.com" \
-    "api.openai.com" \
     "zenodo.org" \
     "api.openalex.org" \
     "api.unpaywall.org" \
@@ -93,7 +92,7 @@ for domain in \
             exit 1
         fi
         echo "Adding $ip for $domain"
-        ipset add allowed-domains "$ip"
+        ipset add -exist allowed-domains "$ip"
     done < <(echo "$ips")
 done
 
@@ -110,6 +109,11 @@ echo "Host network detected as: $HOST_NETWORK"
 # Set up remaining iptables rules
 iptables -A INPUT -s "$HOST_NETWORK" -j ACCEPT
 iptables -A OUTPUT -d "$HOST_NETWORK" -j ACCEPT
+
+# Allow all Docker internal networks (172.16.0.0/12 covers Docker's default range)
+echo "Allowing Docker internal networks..."
+iptables -A INPUT -s 172.16.0.0/12 -j ACCEPT
+iptables -A OUTPUT -d 172.16.0.0/12 -j ACCEPT
 
 # Set default policies to DROP first
 iptables -P INPUT DROP
