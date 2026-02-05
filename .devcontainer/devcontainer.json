@@ -72,6 +72,6 @@
         "4200": { "label": "Prefect Dashboard", "onAutoForward": "notify" }
     },
 
-    "postStartCommand": "sudo /usr/local/bin/init-firewall.sh",
+    "postStartCommand": "[ \"${ENABLE_FIREWALL:-true}\" = \"true\" ] && sudo /usr/local/bin/init-firewall.sh || echo 'Firewall disabled (ENABLE_FIREWALL=false)'",
     "postAttachCommand": "/usr/local/bin/init-workspace.sh && (pgrep -f jupyter-lab > /dev/null || nohup uv run jupyter lab --port=${JUPYTER_PORT} --IdentityProvider.token=${JUPYTER_TOKEN} --no-browser --ip=0.0.0.0 > /tmp/jupyter.log 2>&1 &)"
 }

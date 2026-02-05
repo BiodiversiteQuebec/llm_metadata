@@ -89,6 +89,7 @@ The container connects to **both** networks:
 - `OPENAI_API_BASE=http://claude-dev-reverse-proxy:8080/v1` (NO API key!)
 - `GIT_REPO_URL` - SSH format for git clone
 - `JUPYTER_PORT`, `JUPYTER_TOKEN`, `JUPYTER_URL`
+- `ENABLE_FIREWALL` - Set to `false` to disable firewall (default: `true`)
 
 **Reverse Proxy (`claude-dev-reverse-proxy`):**
 - `OPENAI_API_KEY` - Injected into Authorization header, never reaches container
@@ -98,7 +99,7 @@ The container connects to **both** networks:
 | Step | Hook | What it does |
 |------|------|--------------|
 | 1 | Container start | `sleep infinity` (keeps container running) |
-| 2 | `postStartCommand` | `sudo /usr/local/bin/init-firewall.sh` |
+| 2 | `postStartCommand` | Runs firewall if `ENABLE_FIREWALL=true` (default) |
 | 3 | `postAttachCommand` | `/usr/local/bin/init-workspace.sh` + Jupyter startup |
 
 **Why postAttachCommand for workspace init?**
@@ -150,6 +151,9 @@ OPENAI_API_KEY=sk-...
 # Jupyter
 JUPYTER_PORT=8881
 JUPYTER_TOKEN=your-token
+
+# Optional: Disable firewall for debugging (default: true)
+ENABLE_FIREWALL=true
 ```
 
 ### SSH Agent Forwarding (Windows)
@@ -234,10 +238,6 @@ VS Code automatically forwards your SSH agent to the container.
    - Document how to backup/restore `workspace` named volume
    - Important since source code lives in Docker volume
 
-6. **Conditional Firewall**
-   - Make firewall optional via environment variable
-   - Useful for debugging network issues
-
 ### Low Priority
 
 7. **Multi-stage Dockerfile**
@@ -280,9 +280,34 @@ docker exec claude-dev sh -c "curl -s http://qdrant:6333/healthz"
 docker exec claude-dev sh -c "sudo /usr/local/bin/init-firewall.sh"
 # Expected: Completes with "Firewall verification passed" messages
 
-# Test firewall blocking
+# Test firewall blocking (when ENABLE_FIREWALL=true)
 docker exec claude-dev sh -c "curl --connect-timeout 5 https://example.com" 2>&1
 # Expected: Connection refused or timeout (blocked by firewall)
+```
+
+### Verification: Firewall Disabled (ENABLE_FIREWALL=false)
+
+```bash
+# Start container with firewall disabled
+ENABLE_FIREWALL=false docker compose --env-file .env -f docker-compose.yml -f .devcontainer/docker-compose.devcontainer.yml up -d claude-dev
+
+# Verify ENABLE_FIREWALL is false
+docker exec claude-dev sh -c "printenv ENABLE_FIREWALL"
+# Expected: false
+
+# Test unrestricted internet access
+docker exec claude-dev sh -c "curl -s --connect-timeout 5 https://example.com | head -c 100"
+# Expected: HTML content from example.com (not blocked)
+
+# Verify internal services still work
+docker exec claude-dev sh -c "curl -s http://grobid:8070/api/isalive"
+# Expected: true
+
+docker exec claude-dev sh -c "curl -s http://qdrant:6333/healthz"
+# Expected: healthz check passed
+
+docker exec claude-dev sh -c "curl -s http://claude-dev-reverse-proxy:8080/health"
+# Expected: OK
 ```
 
 ## Rebuilding
