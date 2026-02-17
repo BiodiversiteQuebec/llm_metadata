@@ -257,6 +257,26 @@ class DatasetFeatures(BaseModel):
         None,
         description="Source repository (dryad, zenodo, semantic_scholar, referenced). Used for ground truth tracking, not extracted by LLM."
     )
+    source_url: Optional[str] = Field(
+        None,
+        description="URL from search engine result."
+    )
+    journal_url: Optional[str] = Field(
+        None,
+        description="Direct journal article page URL."
+    )
+    pdf_url: Optional[str] = Field(
+        None,
+        description="Direct PDF download link if available."
+    )
+    is_oa: Optional[bool] = Field(
+        None,
+        description="Open access flag."
+    )
+    cited_article_doi: Optional[str] = Field(
+        None,
+        description="Related/cited article DOI."
+    )
 
     class Config:
         """Pydantic model configuration."""
