@@ -97,7 +97,6 @@ Pipeline: Same 4-stage, extended for multi-source support
 ### ⏸️ Phase 3: Pipeline Integration (Blocked by Phase 2)
 - Parse and validate 254 Semantic Scholar records from Excel
 - Implement cited article retrieval via API
-- Integrate Semantic Scholar into PDF download fallback chain
 
 ### ⏸️ Phase 4: Coverage Analysis (Blocked by Phase 3)
 - Compute metrics by source (total, valid, abstracts, PDFs, OA)
