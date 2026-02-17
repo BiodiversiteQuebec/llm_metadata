@@ -47,12 +47,27 @@ WU-D1 [CLOUD] Assemble presentation materials
 
 **Streams B and C run in parallel after WU-A2.**
 
+### Model Assignment Summary
+
+| Work Unit | Tag | Claude Model | Rationale |
+|---|---|---|---|
+| WU-A1 Schema extension | CLOUD | **opus** | Multi-file architectural change (schema + prompts + tests) |
+| WU-A2 Data validation | CLOUD | **sonnet** | Structured pandas/Pydantic following existing patterns |
+| WU-B1 Abstract extraction | CLOUD | **sonnet** | Orchestrating existing pipeline at scale |
+| WU-B2 Abstract evaluation | CLOUD | **opus** | Cross-source analysis, interpretation, presentation narrative |
+| WU-C1 PDF download | LOCAL | **sonnet** | Scripting with existing fallback chain |
+| WU-C2 GROBID parsing | LOCAL | **haiku** | Running existing code on new files |
+| WU-C3 Full-text eval | LOCAL+CLOUD | **sonnet** | Structured notebook following WU-B2 patterns |
+| WU-C4 Section-based eval | LOCAL | **sonnet** | Parallel to WU-C3, same pattern |
+| WU-D1 Presentation assembly | CLOUD | **opus** | Synthesis across all streams, narrative framing |
+
 ---
 
 ## Work Unit Details
 
 ### WU-A1: Extend Schema (modulators + DataSource)
 **Tag:** `CLOUD`
+**Claude model:** `opus` — foundational multi-file change (schema, prompts, tests) that everything depends on; needs architectural understanding of Pydantic validators and prompt engineering
 **Dependencies:** None — start immediately
 
 **Changes to `src/llm_metadata/schemas/fuster_features.py`:**
@@ -72,6 +87,7 @@ WU-D1 [CLOUD] Assemble presentation materials
 
 ### WU-A2: Validate All-Source Ground Truth Data
 **Tag:** `CLOUD`
+**Claude model:** `sonnet` — structured pandas + Pydantic validation following existing notebook patterns; no novel architecture
 **Dependencies:** WU-A1
 
 Create notebook (or extend `fuster_annotations_validation.ipynb`):
@@ -85,6 +101,7 @@ Create notebook (or extend `fuster_annotations_validation.ipynb`):
 
 ### WU-B1: Abstract-Only Extraction (all valid records)
 **Tag:** `CLOUD`
+**Claude model:** `sonnet` — orchestrating existing `text_pipeline.py` infrastructure at scale; mechanical but needs correct config
 **Dependencies:** WU-A2
 
 - Use `text_pipeline.py` / `gpt_classify.py` to run `classify_abstract()` with updated `DatasetFeatures` (including modulators) on all valid records with non-null abstracts
@@ -97,6 +114,7 @@ Create notebook (or extend `fuster_annotations_validation.ipynb`):
 
 ### WU-B2: Abstract-Only Evaluation + Feature Discussion
 **Tag:** `CLOUD`
+**Claude model:** `opus` — analytical depth needed for cross-source comparison, feature-level interpretation, example selection, and narrative for presentation
 **Dependencies:** WU-B1
 
 Create/update evaluation notebook:
@@ -111,6 +129,7 @@ Create/update evaluation notebook:
 
 ### WU-C1: Download OA PDFs for Semantic Scholar Records
 **Tag:** `LOCAL` — requires local filesystem for PDF storage
+**Claude model:** `sonnet` — scripting with existing `pdf_download.py` fallback chain; needs DOI extraction from xlsx and manifest building
 **Dependencies:** WU-A2
 
 - Extract article DOIs from xlsx `cited_articles` column for SS records
@@ -124,6 +143,7 @@ Create/update evaluation notebook:
 
 ### WU-C2: GROBID-Parse New PDFs
 **Tag:** `LOCAL` — requires Docker GROBID on localhost:8070
+**Claude model:** `haiku` — straightforward execution of existing `pdf_parsing.py` on new files; no novel logic
 **Dependencies:** WU-C1
 
 - Parse all newly downloaded SS PDFs through GROBID via `pdf_parsing.py`
@@ -134,6 +154,7 @@ Create/update evaluation notebook:
 
 ### WU-C3: Full-Text Extraction (PDF File API) + Evaluation
 **Tag:** `LOCAL` (needs PDF files) + `CLOUD` (OpenAI API)
+**Claude model:** `sonnet` — follows WU-B2 evaluation patterns but with PDF pipeline; structured notebook work
 **Dependencies:** WU-C1, WU-A2
 
 - Run OpenAI native PDF File API extraction via `pdf_pipeline.py` on ALL OA PDFs (Dryad+Zenodo existing + new SS)
@@ -147,6 +168,7 @@ Create/update evaluation notebook:
 
 ### WU-C4: Section-Based Extraction + Evaluation
 **Tag:** `LOCAL` — requires GROBID output
+**Claude model:** `sonnet` — parallel to WU-C3; same evaluation notebook pattern with section pipeline
 **Dependencies:** WU-C2, WU-A2
 
 - Run section-based extraction via `section_pipeline.py` on ALL GROBID-parsed PDFs
@@ -160,6 +182,7 @@ Create/update evaluation notebook:
 
 ### WU-D1: Assemble Presentation Materials
 **Tag:** `CLOUD`
+**Claude model:** `opus` — synthesizes results from all streams into coherent narrative; needs judgment for framing, figure selection, and discussion points
 **Dependencies:** WU-B2, WU-C3, WU-C4
 
 - Update `docs/results_presentation_20260219/work_plan.md` with actual numbers and results
