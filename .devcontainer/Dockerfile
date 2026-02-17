@@ -61,9 +61,16 @@ RUN groupadd --gid ${USER_GID} ${USERNAME} \
     && echo "${USERNAME} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/${USERNAME} \
     && chmod 0440 /etc/sudoers.d/${USERNAME}
 
-# Install Claude Code globally
-ARG CLAUDE_CODE_VERSION=latest
-RUN npm install -g @anthropic-ai/claude-code@${CLAUDE_CODE_VERSION}
+# Install Claude natively and expose binary globally
+RUN curl -fsSL https://claude.ai/install.sh | bash \
+    && if [ -x /root/.local/bin/claude ]; then \
+        ln -sf /root/.local/bin/claude /usr/local/bin/claude; \
+    elif [ -x /root/.claude/local/claude ]; then \
+        ln -sf /root/.claude/local/claude /usr/local/bin/claude; \
+    else \
+        echo "Claude binary not found after install"; \
+        exit 1; \
+    fi
 
 # Copy and set up firewall script (convert CRLF to LF for Windows compatibility)
 COPY .devcontainer/init-firewall.sh /usr/local/bin/

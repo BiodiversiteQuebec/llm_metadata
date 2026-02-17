@@ -4,6 +4,7 @@ Edit devcontainer config for workspace.
 * Dev container should be named `claude-dev`.
     * Should start from .devcontainer/docker-compose.devcontainer.yml file. 
     * Should load .env file for environment variables.
+    * Install claude natively - not using npm or similar.
     * Claude should always start as --dangerously-skip-permissions
     * To be operated from vscode devcontainer. Should install relevant VSCode extensions for Python development and remove unnecessary ones.
 * Workspace should have file systeme isolation.

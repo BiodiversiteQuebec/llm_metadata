@@ -46,7 +46,7 @@ dnsutils, aggregate
 - git-delta (v0.18.2) - for better diff output
 - Node.js 20 - required for Claude Code
 - uv (from `ghcr.io/astral-sh/uv:latest`) - Python package manager
-- Claude Code (`@anthropic-ai/claude-code@latest`) - installed globally via npm
+- Claude - installed natively via `curl -fsSL https://claude.ai/install.sh | bash`
 - oh-my-zsh - shell framework
 
 **User Setup:**
