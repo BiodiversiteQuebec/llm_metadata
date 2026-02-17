@@ -439,7 +439,7 @@ This document provides detailed, task-by-task guidance for implementing Semantic
 
 **Inputs:**
 - Analysis outputs from Task 4.1
-- Goals from `tasks/integrate_semantic_scholar.md`
+- Goals from `plans/integrate_semantic_scholar.md`
 
 **Tasks:**
 1. Check abstract coverage goal:
@@ -924,5 +924,5 @@ Before starting implementation, clarify:
 
 - Semantic Scholar API Docs: https://api.semanticscholar.org/api-docs/
 - Project Architecture: `/home/runner/work/llm_metadata/llm_metadata/CLAUDE.md`
-- Task Context: `/home/runner/work/llm_metadata/llm_metadata/tasks/integrate_semantic_scholar.md`
+- Task Context: `/home/runner/work/llm_metadata/llm_metadata/plans/integrate_semantic_scholar.md`
 - Notebook Conventions: `/home/runner/work/llm_metadata/llm_metadata/notebooks/README.md`

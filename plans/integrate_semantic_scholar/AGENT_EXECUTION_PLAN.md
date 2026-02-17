@@ -30,7 +30,7 @@ Context: Add multi-source support to Pydantic schemas
 
 **Agent Instructions:**
 ```
-Read tasks/semantic_scholar_implementation_guide.md, locate Task 2.1, and implement:
+Read plans/semantic_scholar_implementation_guide.md, locate Task 2.1, and implement:
 1. Add DataSource enum to schemas/validation.py
 2. Add new fields to DatasetFeatures (source, source_url, journal_url, pdf_url, is_oa, cited_article_doi)
 3. Update validators for new fields
@@ -427,10 +427,10 @@ Results needed by **Thursday 2026-02-19** for presentation. Priority items:
 Choose one of these commands:
 ```bash
 # Option 1: Start with schema refactoring (lower complexity)
-Execute Task 2.1 from tasks/semantic_scholar_implementation_guide.md
+Execute Task 2.1 from plans/semantic_scholar_implementation_guide.md
 
 # Option 2: Start with API client (can run in parallel with 2.1)
-Execute Task 2.2 from tasks/semantic_scholar_implementation_guide.md
+Execute Task 2.2 from plans/semantic_scholar_implementation_guide.md
 
 # Option 3: Do both in parallel (recommended)
 Execute Tasks 2.1 and 2.2 in parallel using two agents

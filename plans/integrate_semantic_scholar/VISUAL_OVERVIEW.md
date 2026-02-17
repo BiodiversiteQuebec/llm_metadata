@@ -343,11 +343,11 @@ Legend: 🎯 = Target to meet  |  ✅ = Completed
 
 # Option 1: Start Task 2.1 (Schema Extension)
 cd /home/runner/work/llm_metadata/llm_metadata
-task explore "Execute Task 2.1 from tasks/semantic_scholar_implementation_guide.md"
+task explore "Execute Task 2.1 from plans/semantic_scholar_implementation_guide.md"
 
 # Option 2: Start Task 2.2 (API Client)
 cd /home/runner/work/llm_metadata/llm_metadata
-task explore "Execute Task 2.2 from tasks/semantic_scholar_implementation_guide.md"
+task explore "Execute Task 2.2 from plans/semantic_scholar_implementation_guide.md"
 
 # Option 3: Both in parallel (recommended)
 # Launch two agents simultaneously with above commands
@@ -356,7 +356,7 @@ task explore "Execute Task 2.2 from tasks/semantic_scholar_implementation_guide.
 ## 📚 Document Navigation
 
 ```
-tasks/
+plans/
 ├── integrate_semantic_scholar.md              ← Original requirements
 ├── semantic_scholar_implementation_guide.md   ← 24 detailed tasks
 ├── AGENT_EXECUTION_PLAN.md                   ← Quick-start guide

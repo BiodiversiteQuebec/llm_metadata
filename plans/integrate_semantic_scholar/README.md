@@ -26,19 +26,19 @@ This directory contains comprehensive planning documentation for integrating Sem
 
 **1. First time? Start here:**
 ```bash
-Read: tasks/VISUAL_OVERVIEW.md
+Read: plans/VISUAL_OVERVIEW.md
 # Get visual understanding of architecture and flow
 ```
 
 **2. Ready to execute? Go here:**
 ```bash
-Read: tasks/AGENT_EXECUTION_PLAN.md
+Read: plans/AGENT_EXECUTION_PLAN.md
 # Get your next task assignment and command to run
 ```
 
 **3. Need task details? Reference this:**
 ```bash
-Read: tasks/semantic_scholar_implementation_guide.md
+Read: plans/semantic_scholar_implementation_guide.md
 # Find your specific task (e.g., Task 2.1) with full specs
 ```
 
@@ -321,7 +321,7 @@ Next: Wait for Task 2.2 or start 2.3
 cd /home/runner/work/llm_metadata/llm_metadata
 
 # Read execution plan
-cat tasks/AGENT_EXECUTION_PLAN.md
+cat plans/AGENT_EXECUTION_PLAN.md
 
 # Start Task 2.1 or 2.2 (or both in parallel)
 # Follow commands in AGENT_EXECUTION_PLAN.md
