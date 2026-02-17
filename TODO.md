@@ -1,11 +1,15 @@
 # TO DO
 
-* [ ] Dryad analysis : Run abstracts extraction and main numbers
-* [ ] Benchmark dataset : Comparison pipeline
-* [ ] Benchmark dataset : Run LLMs on benchmark abstracts
+* [ ] Semantic scholar data integration
+  * [ ] Refactor annotated validation pipeline to streamline url fields (search engine (dryad, zenodo, semantic), journal_url, pdf_url ... propose relevant fields) and integrate semantic scholar data (cited articles retrieval and pdf download)
+  * [ ] Integrate semantic scholar api to retrieve cited articles and their metadata, and pdf if available
+  * [ ] Data coverage analysis on validated data (proportion of valid records, by sources, with pdfs, with open access pdfs) including semantic scholar data - In exisitng or new notebooks
+* [ ] Batch abstract classification pipeline notebook with current eval setup and run on all annotated data, including semantic scholar data
+* [ ] Run pdf full text abstract classification and generate benchmark report with current eval setup including semantic scholar data
+
 * [ ] Research : types of data from dataset
 * [ ] Research : grey literature for biodiversity data
-
+* [ ] Research : Single shot vs multiple shots and LLMs (tested gpt-4o-mini vs gpt-5-mini)
 
 
 ## Benchmarking from abstracts
@@ -24,17 +28,16 @@
 
   * [x] GPT wrapper and model update
 
-  * [ ] Prompt engineering for feature extraction and model refinement 🔥
-
-  * [ ] Research : Single shot vs multiple shots and LLMs (tested gpt-4o-mini vs gpt-5-mini)
-
   * [ ] Batch classification for manually annotated data
 
-* [ ] Evaluation of LLM feature extraction
+* [x] Evaluation of LLM feature extraction
 
   * [x] Metrics definition & utils (evaluation.py with precision/recall/F1)
 
-  * [ ] Benchmark report generation
+  * [x] Benchmark report generation
+
+
+* [ ] Prompt engineering for feature extraction and model refinement 🔥
 
 ## Benchmarking from papers full text
 
@@ -44,7 +47,6 @@
   * [x] Article DOI retrieval from Dryad/Zenodo APIs (fallback method)
   * [x] Generated dataset-to-article mapping CSV (75 article DOIs from 299 valid datasets)
   * [x] Coverage: Dryad 100%, Zenodo 56.7%
-  * [ ] Investigation of zenodo marked datasets with dryad urls 🔥
   * [ ] Investigation of datasets with source `semantic_scholar` 🔥
 
 * [x] Retrieval of annotated papers full text (url + pdfs) from DOIs (OpenAlex + Unpaywall fallback)

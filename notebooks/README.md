@@ -1011,3 +1011,28 @@ File upload extraction: 44 papers, $0.5454 total
 * Compare full pdf results with section-based extraction on same 39 papers
 * Analyze false positives in species extraction, data type and temporal range for further prompt improvements
 * Create functionnalities to relate species to atlas
+
+---
+
+## 2026-02-17: Dataset availability analysis from Fuster validation xlsx dataset
+
+Goal : Manual deep dive into the Fuster dataset to understand the data and its shenanigans, and to identify the best way to integrate it into the data retrieval and processing pipeline - with focus on integrating the semantic scholar data.
+
+* Exploration of data, validity and sources :
+    * Total number of annotated datasets in fuster : 418 (299 of which are valid, i.e. relevant to biodiversity)
+    * Total from semantic scholar : 254 (192 of which are valid)
+    * Contains links to pdfs : 103 (73 of which are valid)
+    * PDF download success rate : 67 / 73 valid
+
+* Semantic Scholar xlsx exploration :
+    * `url` provide either journal page or semantic scholar search results
+    * cited_articles is always empty for semantic scholar data, but doen't mean the article isn't accessible, just that it was not annotated in the xlsx file
+    * Should investigate how to retrieve cited articles from semantic scholar API, as it could be a good source of additional data for future work and implement in the data retrieval pipeline
+    * Main conclusion : Semantic Scholar is simply another search engine that was used to retieve datasets. The xlsx file simply makes available relevant links in a different way than zenodo/dryad. Integration necessitates to process the xlsx file and add the relevant links to the dataset records, but doesn't change much in terms of data retrieval and processing workflow.
+
+**Next steps**
+
+* [ ] Streamline urls (search engine (dryad, zenodo, semantic), journal_url, pdf_url) in validated schema and existing pipelines (dryad ?) to parse the xlsx file and add the relevant links to the dataset records
+* [ ] Integrate semantic scholar api to retrieve cited articles and their metadata, and pdf if available
+* [ ] Run download on the remaining valid pdfs from semantic scholar
+* [ ] Run extraction on all valid data with pdfs, including semantic scholar data, and compare with abstract-only approach

@@ -5,6 +5,9 @@
 
 ### Minimal
 * Include semantic scholar data
+* Add modulator features to extraction schema
+* Run all abstract only
+    * Feature based performance discussion with examples
 * Run all oa full text
     * Feature based performance discussion with examples
 * Run all oa full text with section-based approach
@@ -28,17 +31,23 @@ Goal : Automated metadata extraction from scientific documents using LLMs, compa
 ## Methods
 
 * Data
-    * Fuster datasets with manual annotations for validation
+    * Fuster approaches synthesis (based on *_location feature values)
+        * Annotation from abstract only (TBD n rows)
+        * Annotation including full text (TBD n rows)
+        * Annotation including from dataset (xlsx, etc) (TBD n rows)
     * Main numbers
         * Data with pdfs
         * Data from Semantic Scholar
         * Open access data proportion
+    * Scope
+        * Only oa when pdf is available
+        * Only valid : Not evaluating performance on irrelevant data (e.g. non-biodiversity datasets, etc), for which records were returned by the search engine query, but were deemed irrelevant - Another step could be to have a small extraction doing this classification
 
 * Extraction
     * Basic extraction demo using pydantic + openai API calls
-    * Abstract only approach
-    * PDF files
-    * Section based
+    * Abstract only approach (Goal 299 records)
+    * PDF files (Goal 48 oa records out of 73 valid records with pdfs) - TODO : Confirm number of valid records with pdfs, and oa proportion
+    * Section based (Goal all oa records with pdfs)
     * Embeddings + vector DB approach
 
 * Evaluation
