@@ -1035,4 +1035,68 @@ Goal : Manual deep dive into the Fuster dataset to understand the data and its s
 * [ ] Streamline urls (search engine (dryad, zenodo, semantic), journal_url, pdf_url) in validated schema and existing pipelines (dryad ?) to parse the xlsx file and add the relevant links to the dataset records
 * [ ] Integrate semantic scholar api to retrieve cited articles and their metadata, and pdf if available
 * [ ] Run download on the remaining valid pdfs from semantic scholar
+
+---
+
+### 2026-02-17: Agentic Implementation Plan for Semantic Scholar Integration
+
+**Task:** Create comprehensive agentic implementation plan for integrating Semantic Scholar-sourced datasets into the validation pipeline and evaluation benchmarks, expanding coverage from ~299 to ~418 total records.
+
+**Work Performed:**
+- **Plan Document:** Created `/plans/semantic_scholar_integration.md` (comprehensive 6-phase implementation strategy)
+- **Requirements Analysis:** Reviewed task specification (`tasks/integrate_semantic_scholar.md`), TODO items, and presentation requirements (`docs/results_presentation_20260219/work_plan.md`)
+- **Architecture Planning:** Mapped integration points across 4-stage pipeline (Data Ingestion → Schema/Prompt → LLM Inference → Evaluation)
+- **Agent Assignment:** Specified optimal agent types for each phase (explore, general-purpose, task) with estimated effort
+- **Risk Assessment:** Identified mitigation strategies for DOI availability, PDF access, schema refactor impacts
+
+**Implementation Strategy:**
+1. **Phase 1: Pre-Implementation Audit** (explore agent, 1-2h)
+   - Review existing patterns in `dryad.py`, `zenodo.py`, `article_retrieval.py`
+   - Analyze Semantic Scholar records in `dataset_092624.xlsx` for URL patterns
+   - Document extension points in current pipelines
+
+2. **Phase 2: Schema & Validation Refactor** (general-purpose agent, 3-4h)
+   - Extend `schemas/validation.py` with `DataSource` enum and `URLFields` model
+   - Create backward compatibility layer for legacy `url` field
+   - Validate all 418 records against updated schema (target: 100% pass rate)
+
+3. **Phase 3: Semantic Scholar Module** (general-purpose agent, 4-6h)
+   - Implement `src/llm_metadata/semantic_scholar.py` client
+   - Parse xlsx URL patterns (journal landing pages vs search results)
+   - Integrate with existing OpenAlex/Unpaywall/Sci-Hub fallback chain
+   - Extend Prefect workflows for mixed-source batches
+
+4. **Phase 4: Data Coverage Analysis** (task agent, 2-3h)
+   - Create `notebooks/semantic_scholar_coverage_analysis.ipynb`
+   - Quantify abstract availability, PDF access, OA proportion by source
+   - Generate HTML report with comparative visualizations for presentation
+
+5. **Phase 5: Batch Extraction & Evaluation** (general-purpose + task agents, 4-6h)
+   - Run `gpt_classify.py` on all 418 records (abstract + full-text for OA)
+   - Extend `groundtruth_eval.py` with source-stratified metrics
+   - Create benchmark notebook: `notebooks/semantic_scholar_benchmark.ipynb`
+
+6. **Phase 6: Documentation & Presentation Prep** (task agent, 1-2h)
+   - Update `CLAUDE.md`, `README.md`, `notebooks/README.md`
+   - Prepare materials for Thursday 2026-02-19 presentation
+   - Clean up `TODO.md` with completion status
+
+**Success Criteria:**
+- Abstract availability: ≥80% of valid Semantic Scholar records
+- PDF coverage: ≥80% of valid records with PDFs
+- Schema validation: 100% pass rate on 418 records
+- Pipeline integration: Zero breaking changes to existing workflows
+
+**Key Design Decisions:**
+- **Unified Schema:** Single `URLFields` model supports all sources (Dryad, Zenodo, Semantic Scholar)
+- **Backward Compatibility:** Migration function preserves existing notebooks and scripts
+- **Reuse Existing Infrastructure:** Semantic Scholar records leverage same OpenAlex/Unpaywall/Sci-Hub fallback chain
+- **Source-Stratified Evaluation:** Per-source metrics enable comparative analysis (Dryad vs Zenodo vs SS)
+
+**Next Steps:**
+- Begin Phase 1 audit using explore agent to understand existing patterns
+- Validate approach with stakeholders before implementation
+- Target completion by Wednesday 2026-02-18 for Thursday presentation
+
+**Report Link:** `/plans/semantic_scholar_integration.md`
 * [ ] Run extraction on all valid data with pdfs, including semantic scholar data, and compare with abstract-only approach
