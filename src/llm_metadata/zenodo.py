@@ -28,8 +28,17 @@ def get_record(params: dict):
 
 def get_record_by_doi(doi: str):
     response = get_record({'q': f'doi:"{doi}"'})
-    return response['hits']['hits'][0] if response['hits']['total'] > 0 else None
+    if response['hits']['total'] > 0:
+        record = response['hits']['hits'][0]
+        # Tag the record with its data source
+        record["source"] = "zenodo"
+        return record
+    return None
 
 def get_record_by_doi_list(dois: list):
     response = get_record({'q': ' OR '.join([f'doi:"{doi}"' for doi in dois])})
-    return response['hits']['hits']
+    records = response['hits']['hits']
+    # Tag each record with its data source
+    for record in records:
+        record["source"] = "zenodo"
+    return records
