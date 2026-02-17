@@ -83,7 +83,7 @@ This document provides detailed, task-by-task guidance for implementing Semantic
 
 **Agent Type:** `explore`
 
-**Objective:** Understand the PDF acquisition fallback chain and identify integration points.
+**Objective:** Understand the PDF acquisition fallback chain to confirm Semantic Scholar records can be processed without pipeline modification.
 
 **Inputs:**
 - `src/llm_metadata/pdf_download.py`
@@ -91,21 +91,20 @@ This document provides detailed, task-by-task guidance for implementing Semantic
 - `notebooks/README.md` (lines 1020-1031 for Semantic Scholar notes)
 
 **Tasks:**
-1. Document the current fallback chain order
-2. Identify where Semantic Scholar PDF URLs would fit
+1. Document the current fallback chain order (OpenAlex → Unpaywall → EZproxy → Sci-Hub)
+2. Confirm that `download_pdf_with_fallback()` accepts any DOI regardless of source
 3. Review success rate tracking mechanisms
 4. Examine error handling and retry logic
 5. Note configuration values (timeouts, size limits)
 
 **Outputs:**
 - PDF pipeline analysis in `/tmp/pdf_pipeline_audit.md`
-- Integration point recommendations for Semantic Scholar
-- Risk assessment for pipeline modifications
+- Confirmation that existing chain handles Semantic Scholar DOIs without changes
+- Configuration values cataloged for reference
 
 **Acceptance Criteria:**
-- ✅ Fallback chain documented with success rates
-- ✅ Integration points identified
-- ✅ Risk mitigation strategies proposed
+- ✅ Fallback chain documented
+- ✅ Confirmed no modifications needed for Semantic Scholar records
 - ✅ Configuration values cataloged
 
 ---
@@ -334,49 +333,9 @@ This document provides detailed, task-by-task guidance for implementing Semantic
 
 ---
 
-### Task 3.3: Integrate Semantic Scholar PDFs into Download Pipeline
+### Note on PDF Download for Semantic Scholar Records
 
-**Agent Type:** `general-purpose`
-
-**Objective:** Add Semantic Scholar as a PDF source in the fallback chain.
-
-**Inputs:**
-- PDF pipeline audit from Task 1.3
-- `src/llm_metadata/pdf_download.py`
-- Semantic Scholar API client from Task 2.2
-- Validated data with PDF URLs from Task 3.1
-
-**Tasks:**
-1. Add Semantic Scholar PDF URL extraction:
-   ```python
-   def get_semantic_scholar_pdf_url(doi: str) -> Optional[str]:
-       """Get PDF URL from Semantic Scholar API."""
-       paper = semantic_scholar.get_paper_by_doi(doi)
-       if paper and paper.get('openAccessPdf'):
-           return paper['openAccessPdf']['url']
-       return None
-   ```
-2. Integrate into fallback chain in `pdf_download.py`:
-   - Position: After OpenAlex, before Unpaywall
-   - Rationale: Direct API access, no screen scraping
-3. Update download tracking:
-   - Log source of successful downloads
-   - Track success rates by source
-4. Test on sample of Semantic Scholar records
-5. Update documentation in CLAUDE.md
-
-**Outputs:**
-- Modified `src/llm_metadata/pdf_download.py`
-- Integration tests for new source
-- Success rate comparison table
-- Updated fallback chain documentation
-
-**Acceptance Criteria:**
-- ✅ Semantic Scholar integrated without breaking existing flow
-- ✅ Success rate tracked by source
-- ✅ No regressions in existing download success
-- ✅ Proper error handling and logging
-- ✅ Documentation updated
+PDF acquisition for Semantic Scholar records does **not** require modifying `pdf_download.py`. The existing fallback chain (OpenAlex → Unpaywall → EZproxy → Sci-Hub) is applied to the DOIs of Semantic Scholar records directly, exactly as it is for Dryad and Zenodo records. Semantic Scholar's `openAccessPdf` field draws from the same open access repositories already covered by Unpaywall and OpenAlex, making a dedicated step redundant. PDF success rates will be reported as part of Task 4.1.
 
 ---
 
@@ -792,8 +751,8 @@ This document provides detailed, task-by-task guidance for implementing Semantic
 
 **Phase 3 (Pipeline Integration):**
 - Agent: `general-purpose`
-- Rationale: Multi-step data processing and pipeline integration
-- Execution: Sequential - each task builds on previous
+- Rationale: Multi-step data processing and API integration
+- Execution: Sequential — Task 3.2 depends on 3.1; no pdf_download.py modification required (use existing chain on Semantic Scholar DOIs)
 
 **Phase 4 (Coverage Analysis):**
 - Agent: `task` for notebook execution, `general-purpose` for notebook creation
@@ -803,7 +762,7 @@ This document provides detailed, task-by-task guidance for implementing Semantic
 **Phase 5 (Evaluation):**
 - Agent: `general-purpose`
 - Rationale: Complex evaluation logic and report generation
-- Execution: Task 5.1 and 5.2 can run in parallel; 5.3 requires both complete
+- Execution: Tasks 5.1 and 5.2 can run in parallel once data from 3.1 is ready; 5.3 requires both complete
 
 **Phase 6 (Documentation):**
 - Agent: `explore` for documentation, `task` for test execution
@@ -835,13 +794,11 @@ When delegating to an agent:
      ↓
 3.2 ← 2.2, 3.1
      ↓
-3.3 ← 2.2, 3.1
-     ↓
-4.1 ← 3.1, 3.2, 3.3
+4.1 ← 3.1, 3.2   (PDF downloads run existing chain on SS DOIs, no new task)
      ↓
 4.2 ← 4.1
      ↓
-5.1, 5.2 ← 3.1, 3.3 (parallel after data ready)
+5.1, 5.2 ← 3.1 (parallel after data ready)
      ↓
 5.3 ← 5.1, 5.2
      ↓
@@ -871,8 +828,8 @@ When delegating to an agent:
    - Mitigation: Early validation in Task 3.1, contingency plan to expand data sources
 
 5. **Integration Complexity**
-   - Risk: Multi-source architecture adds complexity
-   - Mitigation: Clear documentation, consistent patterns, thorough testing
+   - Risk: Multi-source schema changes may introduce regressions in existing Dryad/Zenodo workflows
+   - Mitigation: Backward-compatible schema extensions, no changes to pdf_download.py, thorough testing of existing workflows
 
 ---
 
@@ -883,7 +840,7 @@ When delegating to an agent:
 | Semantic Scholar records loaded | 254 | Task 3.1 |
 | Valid records | 192 | Task 3.1 |
 | Abstract coverage | ≥80% (154 records) | Task 4.1 |
-| PDF availability | Report actual % | Task 4.1 |
+| PDF availability (via existing fallback chain) | Report actual % | Task 4.1 |
 | OA proportion | ≥80% of PDFs | Task 4.2 |
 | API client test coverage | ≥80% | Task 6.3 |
 | Integration tests passing | 100% | Task 6.3 |
@@ -898,13 +855,13 @@ When delegating to an agent:
 |-------|----------------|---------------|
 | Phase 1 | 2-3 hours | Yes (blocks Phase 2) |
 | Phase 2 | 6-8 hours | Yes (blocks Phase 3) |
-| Phase 3 | 8-10 hours | Yes (blocks Phase 4, 5) |
+| Phase 3 | 5-7 hours | Yes (blocks Phase 4, 5) |
 | Phase 4 | 3-4 hours | Partial (blocks 5.3) |
 | Phase 5 | 6-8 hours | Yes (blocks 6, presentation) |
 | Phase 6 | 3-4 hours | No (can overlap) |
-| **Total** | **28-37 hours** | **Critical: 23-29 hours** |
+| **Total** | **25-34 hours** | **Critical: 20-26 hours** |
 
-With parallel execution and agent delegation, wall clock time could be reduced to 15-20 hours.
+With parallel execution and agent delegation, wall clock time could be reduced to 13-18 hours.
 
 ---
 

@@ -18,5 +18,5 @@ Relevant context files :
 Sub-tasks
   * [ ] Audit relevant code modules and pipelines to make sure we have good patterns and practices ahead of refactoring and integrating the data
   * [ ] Refactor annotated validation pipelines to streamline url fields (search engine (dryad, zenodo, semantic), journal_url, pdf_url, is_oa, title & abstract_full_text ... propose relevant fields) and integrate semantic scholar data (cited articles retrieval and pdf download) - might require to refactor codebase the pydantic model and modules that retrieves and process data (openalex, dryad, tbd)
-  * [ ] Integrate semantic scholar api to retrieve cited articles and their metadata, and pdf if available
+  * [ ] Integrate semantic scholar api to retrieve cited articles and their metadata — PDF download uses the existing fallback chain (OpenAlex → Unpaywall → EZproxy → Sci-Hub) applied to Semantic Scholar record DOIs; no modifications to pdf_download.py required
   * [ ] Data coverage analysis on validated data (proportion of valid records, by sources, with pdfs, with open access pdfs) including semantic scholar data - In exisitng or new notebooks
