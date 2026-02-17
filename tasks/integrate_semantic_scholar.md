@@ -8,12 +8,15 @@ Goal : Integrate the datasets retrieved from semantic scholar into our data retr
 
 Relevant context files :
 
-* `notebooks/README.md` and relevant notebooks (see latest entry)
+* `CLAUDE.md` for overall agentic coding and projectsinstructions.
+* `notebooks/README.md` and relevant notebooks (see latest entry lines 1027-1031)
 * `docs/results_presentation_20260219/work_plan.md` for what I want to present this Thursday, and where I want to integrate the semantic scholar data in the presentation.
 * `TODO.md` for the relevant tasks and sub-tasks to achieve this integration.
 * `src/*` for the relevant code modules to refactor and implement the integration.
+* `data/annotated_datasets_fuster.xlsx` for the data to integrate and analyze
 
 Sub-tasks
+  * [ ] Audit relevant code modules and pipelines to make sure we have good patterns and practices ahead of refactoring and integrating the data
   * [ ] Refactor annotated validation pipelines to streamline url fields (search engine (dryad, zenodo, semantic), journal_url, pdf_url, is_oa, title & abstract_full_text ... propose relevant fields) and integrate semantic scholar data (cited articles retrieval and pdf download) - might require to refactor codebase the pydantic model and modules that retrieves and process data (openalex, dryad, tbd)
   * [ ] Integrate semantic scholar api to retrieve cited articles and their metadata, and pdf if available
   * [ ] Data coverage analysis on validated data (proportion of valid records, by sources, with pdfs, with open access pdfs) including semantic scholar data - In exisitng or new notebooks
