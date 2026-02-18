@@ -25,8 +25,10 @@ memory = Memory("./cache", verbose=0)
 BASE_URL = "https://api.semanticscholar.org/graph/v1"
 REQUEST_TIMEOUT = 30  # seconds
 _RETRY_DELAYS = [2, 4, 8]  # seconds, for 429 backoff
+_AUTHENTICATED_RPS = 1.0   # introductory API key rate limit
 
 SEMANTIC_SCHOLAR_API_KEY = os.getenv("SEMANTIC_SCHOLAR_API_KEY")
+_last_request_time: float = 0.0
 
 # Default fields to retrieve for paper lookups
 DEFAULT_PAPER_FIELDS = "paperId,title,abstract,year,authors,openAccessPdf,externalIds"
@@ -48,7 +50,18 @@ def _build_headers() -> Dict[str, str]:
 
 
 def _get(url: str, params: Dict[str, Any]) -> requests.Response:
-    """Make a GET request with 429 retry backoff."""
+    """Make a GET request, respecting rate limits with 429 retry backoff.
+
+    When an API key is set, enforces 1 RPS proactively (introductory limit).
+    Unauthenticated requests use the shared public pool (no per-client throttle).
+    """
+    global _last_request_time
+    if SEMANTIC_SCHOLAR_API_KEY:
+        elapsed = time.time() - _last_request_time
+        if elapsed < _AUTHENTICATED_RPS:
+            time.sleep(_AUTHENTICATED_RPS - elapsed)
+        _last_request_time = time.time()
+
     headers = _build_headers()
     for attempt, wait in enumerate([0] + _RETRY_DELAYS):
         if wait:
