@@ -185,6 +185,7 @@ This prevents duplicate work across parallel sessions.
 ### Backlog
 
 - [ ] Geographic information model incl GADM level, protected areas, ecosystem
+  > **Plan:** [`plans/gadm_enrichment.md`](plans/gadm_enrichment.md) — `location_text` extraction field + GADM GID code enrichment via Nominatim
 - [ ] Taxonomic information model incl species, paraphyletic groups
 - [ ] Taxonomic & geographic referencing pipeline
 - [ ] `ExtractedTaxon` structured schema — LLM extracts `{name, type, count}` instead of flat `list[str]` (improves GBIF preprocessing, requires prompt + ground truth changes)
