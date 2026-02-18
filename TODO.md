@@ -90,7 +90,7 @@ This prevents duplicate work across parallel sessions.
 
 ---
 
-## Semantic Scholar Integration (post-presentation)
+## Semantic Scholar Integration
 
 > **Plan:** [`plans/integrate_semantic_scholar/semantic_scholar_implementation_guide.md`](plans/integrate_semantic_scholar/semantic_scholar_implementation_guide.md)
 > **Overview:** [`plans/integrate_semantic_scholar/README.md`](plans/integrate_semantic_scholar/README.md)
@@ -100,22 +100,22 @@ This prevents duplicate work across parallel sessions.
 
 ### SS-2.1b: URL field extensions `sonnet`
 
-- [ ] Add `source_url`, `journal_url`, `pdf_url` (HttpUrl), `is_oa` (bool), `cited_article_doi` (str) to schema
-- [ ] Validators for URL/empty handling
+- [x] Add `source_url`, `journal_url`, `pdf_url` (HttpUrl), `is_oa` (bool), `cited_article_doi` (str) to schema
+- [x] Validators for URL/empty handling
 - **Deps:** WU-A1 (DataSource enum done there) | **Ref:** Task 2.1
 
 ### SS-2.2: Semantic Scholar API client `sonnet`
 
-- [ ] Create `src/llm_metadata/semantic_scholar.py` following `openalex.py` pattern
-- [ ] Functions: `get_paper_by_doi`, `get_paper_by_title`, `get_paper_citations`, `get_paper_references`
-- [ ] Joblib caching, 1 req/sec rate limit, API key from env
-- [ ] Tests with mocked responses (≥80% coverage)
+- [x] Create `src/llm_metadata/semantic_scholar.py` following `openalex.py` pattern
+- [x] Functions: `get_paper_by_doi`, `get_paper_by_title`, `get_paper_citations`, `get_paper_references`
+- [x] Joblib caching, 1 req/sec rate limit, API key from env
+- [x] Tests with mocked responses (≥80% coverage)
 - **Deps:** Phase 1 audit (done) | **Ref:** Task 2.2
 
 ### SS-2.3: Update dryad/zenodo modules for source tracking `sonnet`
 
-- [ ] Add `source=DataSource.DRYAD/ZENODO` to returned data
-- [ ] Update `article_retrieval.py` for SS support
+- [x] Add `source=DataSource.DRYAD/ZENODO` to returned data
+- [x] Update `article_retrieval.py` for SS support
 - **Deps:** WU-A1 | **Ref:** Task 2.3
 
 ### SS-3.2: Cited article retrieval workflow `sonnet`

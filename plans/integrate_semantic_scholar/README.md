@@ -87,7 +87,7 @@ Pipeline: Same 4-stage, extended for multi-source support
 - Documented schema structure and validation patterns
 - Mapped PDF download pipeline and integration points
 
-### ⏭️ Phase 2: Schema Refactoring (NEXT - Start Now)
+### ✅ Phase 2: Schema Refactoring (NEXT - Start Now)
 - **Task 2.1**: Extend Pydantic schemas for multi-source support
 - **Task 2.2**: Create Semantic Scholar API client
 - **Task 2.3**: Update existing modules with source tracking
