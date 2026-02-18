@@ -278,6 +278,13 @@ class DatasetFeatures(BaseModel):
         description="Related/cited article DOI."
     )
 
+    # Enrichment fields (populated by preprocessing, not extracted by LLM)
+    gbif_keys: Optional[list[int]] = Field(
+        None,
+        description="GBIF backbone taxon keys resolved from species field. "
+                    "Populated by preprocessing, not extracted by LLM."
+    )
+
     class Config:
         """Pydantic model configuration."""
         use_enum_values = True  # Serialize enums as their values
