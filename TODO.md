@@ -49,6 +49,7 @@ This prevents duplicate work across parallel sessions.
 
 ### WU-C1: Download OA PDFs for SS records `sonnet`
 
+- [ ] Refactor `notebooks/download_all_fuster_pdfs.ipynb` — add SS section
 - [ ] Extract article DOIs from xlsx `cited_articles` column for SS records
 - [ ] Use existing fallback chain (OpenAlex → Unpaywall → EZproxy → Sci-Hub)
 - [ ] Store in `data/pdfs/semantic_scholar/`, build manifest CSV
@@ -56,12 +57,14 @@ This prevents duplicate work across parallel sessions.
 
 ### WU-C2: GROBID-parse new PDFs `haiku`
 
+- [ ] Extend GROBID parsing cells in `notebooks/download_all_fuster_pdfs.ipynb` (or add new cells there)
 - [ ] Parse SS PDFs through GROBID via `pdf_parsing.py`
 - [ ] Confirm existing Dryad+Zenodo PDFs (~45) already parsed
 - **Tag:** `LOCAL` | **Deps:** WU-C1 | **Files:** `pdf_parsing.py`, `artifacts/tei/`
 
 ### WU-C3: Full-text extraction (PDF File API) + eval `sonnet`
 
+- [ ] Refactor `notebooks/batch_pdf_file_evaluation.ipynb` — extend to SS OA PDFs + updated schema
 - [ ] Run PDF File API extraction via `pdf_pipeline.py` on all OA PDFs (Dryad+Zenodo + SS)
 - [ ] Evaluate against ground truth, segment by source, compare vs abstract-only (WU-B2)
 - [ ] HTML report
@@ -69,6 +72,7 @@ This prevents duplicate work across parallel sessions.
 
 ### WU-C4: Section-based extraction + eval `sonnet`
 
+- [ ] Refactor `notebooks/batch_fulltext_evaluation.ipynb` — extend to SS PDFs + updated schema
 - [ ] Run section extraction via `section_pipeline.py` on all GROBID-parsed PDFs
 - [ ] Evaluate, compare vs abstract-only (WU-B2) and full-text (WU-C3)
 - [ ] HTML report

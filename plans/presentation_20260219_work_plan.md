@@ -147,6 +147,7 @@ Notebook: `notebooks/batch_abstract_evaluation.ipynb`
 **Tag:** `LOCAL` — requires local filesystem for PDF storage
 **Claude model:** `sonnet` — scripting with existing `pdf_download.py` fallback chain; needs DOI extraction from xlsx and manifest building
 **Dependencies:** WU-A2
+**Notebook:** extend `notebooks/download_all_fuster_pdfs.ipynb` — add SS section (DOI extraction from xlsx `cited_articles`, SS-specific manifest path)
 
 - Extract article DOIs from xlsx `cited_articles` column for SS records
 - Use existing `pdf_download.py` fallback chain (OpenAlex → Unpaywall → EZproxy → Sci-Hub)
@@ -161,6 +162,7 @@ Notebook: `notebooks/batch_abstract_evaluation.ipynb`
 **Tag:** `LOCAL` — requires Docker GROBID on localhost:8070
 **Claude model:** `haiku` — straightforward execution of existing `pdf_parsing.py` on new files; no novel logic
 **Dependencies:** WU-C1
+**Notebook:** extend `notebooks/download_all_fuster_pdfs.ipynb` — add GROBID parsing cells for SS PDFs (or add new cells there if not already present)
 
 - Parse all newly downloaded SS PDFs through GROBID via `pdf_parsing.py`
 - Confirm existing Dryad+Zenodo PDFs (~45) are already parsed
@@ -172,6 +174,7 @@ Notebook: `notebooks/batch_abstract_evaluation.ipynb`
 **Tag:** `LOCAL` (needs PDF files) + `CLOUD` (OpenAI API)
 **Claude model:** `sonnet` — follows WU-B2 evaluation patterns but with PDF pipeline; structured notebook work
 **Dependencies:** WU-C1, WU-A2
+**Notebook:** refactor `notebooks/batch_pdf_file_evaluation.ipynb` — extend to include SS OA PDFs alongside existing Dryad+Zenodo PDFs; update schema to include modulator fields
 
 - Run OpenAI native PDF File API extraction via `pdf_pipeline.py` on ALL OA PDFs (Dryad+Zenodo existing + new SS)
 - Updated schema with modulators
@@ -186,6 +189,7 @@ Notebook: `notebooks/batch_abstract_evaluation.ipynb`
 **Tag:** `LOCAL` — requires GROBID output
 **Claude model:** `sonnet` — parallel to WU-C3; same evaluation notebook pattern with section pipeline
 **Dependencies:** WU-C2, WU-A2
+**Notebook:** refactor `notebooks/batch_fulltext_evaluation.ipynb` — extend to include SS GROBID-parsed PDFs alongside existing Dryad+Zenodo PDFs; update schema to include modulator fields
 
 - Run section-based extraction via `section_pipeline.py` on ALL GROBID-parsed PDFs
 - Updated schema with modulators
