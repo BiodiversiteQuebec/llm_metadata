@@ -179,6 +179,15 @@ This prevents duplicate work across parallel sessions.
 - [ ] Evaluation matcher refactor — strategy pattern to eliminate 3x duplicated TP/FP/FN logic in `compare_models()` + delete orphaned `EnhancedSpeciesMatchConfig`
 - [ ] Pipeline enrichment — use `gbif_keys` beyond evaluation for data gap analysis with real taxon IDs
 
+### Model Hierarchy & Enrichment Pattern
+
+> **Plan:** [`plans/model_hierarchy_enrichment.md`](plans/model_hierarchy_enrichment.md)
+
+- [ ] Split `DatasetFeatures` into hierarchy: `BaseFeatureModel` → `SourcesFeatureModel` / `ExtractionFeatureModel` → `EvaluationFeatureModel`
+- [ ] Move source-tracking fields (`is_oa`, `source_url`, etc.) to `SourcesFeatureModel`
+- [ ] Move derived evaluation fields (`gbif_keys`, future `gadm_codes`) to `EvaluationFeatureModel`
+- [ ] Update notebooks, pipelines, and tests to use correct subclass
+
 ---
 
 ## Production Readiness
