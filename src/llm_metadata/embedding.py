@@ -13,10 +13,10 @@ from typing import List, Dict, Optional, Tuple
 from dataclasses import dataclass
 import hashlib
 
-from openai import OpenAI
 from pydantic import BaseModel, Field
 
 from llm_metadata.schemas.chunk_metadata import ChunkMetadata
+from llm_metadata.openai_io import get_openai_client, get_openai_api_base
 
 
 # Default embedding model
@@ -195,12 +195,15 @@ def generate_embeddings_batch(
 
     if api_key is None:
         api_key = os.getenv("OPENAI_API_KEY")
-        if not api_key:
-            raise ValueError(
-                "OpenAI API key not found. Set OPENAI_API_KEY environment variable."
-            )
 
-    client = OpenAI(api_key=api_key)
+    openai_api_base = get_openai_api_base()
+    if not api_key and openai_api_base == "https://api.openai.com/v1":
+        raise ValueError(
+            "OpenAI credentials not found. Set OPENAI_API_KEY for direct API calls "
+            "or set OPENAI_API_BASE/OPENAI_BASE_URL to route through a proxy."
+        )
+
+    client = get_openai_client(api_key=api_key)
 
     # Call embeddings API
     try:

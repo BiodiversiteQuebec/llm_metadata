@@ -64,13 +64,13 @@ This prevents duplicate work across parallel sessions.
 - **Tag:** `CLOUD` | **Deps:** WU-A2 | **Files:** `text_pipeline.py`, `gpt_classify.py`, `groundtruth_eval.py`, notebook
 - **Note:** Notebook created; needs execution (OpenAI API key required). Cache lands at `{PROJECT_ROOT}/cache/` (not gitignored — committable and syncable).
 
-### WU-C1: Download OA PDFs for SS records `sonnet`
+### WU-C1: Download all PDFs (Dryad + Zenodo + SS) `sonnet`
 
-- [ ] Refactor `notebooks/download_all_fuster_pdfs.ipynb` — add SS section
-- [ ] Extract article DOIs from xlsx `cited_articles` column for SS records
-- [ ] Use existing fallback chain (OpenAlex → Unpaywall → EZproxy → Sci-Hub)
-- [ ] Store in `data/pdfs/semantic_scholar/`, build manifest CSV
-- **Tag:** `LOCAL` | **Deps:** WU-A2 | **Files:** `pdf_download.py`, `openalex.py`
+- [ ] Refactor `notebooks/download_all_fuster_pdfs.ipynb` — load from `dataset_092624_validated.xlsx` (all sources, already enriched with `pdf_url`/`is_oa` by WU-A3), not `dataset_article_mapping.csv`
+- [ ] Download **all** records with `cited_article_doi`, regardless of OA status, using existing fallback chain (OpenAlex URL → Unpaywall → EZproxy → Sci-Hub)
+- [ ] Store all PDFs in `data/pdfs/fuster/` (no separate SS folder)
+- [ ] Save manifest CSV; end with synthesis cell segmented by source (Dryad / Zenodo / SS)
+- **Tag:** `LOCAL` | **Deps:** WU-A3 | **Files:** `pdf_download.py`, `openalex.py`, notebook
 
 ### WU-C2: GROBID-parse new PDFs `haiku`
 
@@ -180,17 +180,28 @@ This prevents duplicate work across parallel sessions.
 
 > **Plan:** [`plans/gbif_species_matching.md`](plans/gbif_species_matching.md)
 
-- [ ] WU-1: `species_parsing.py` — ParsedTaxon model + shared preprocessing
-- [ ] WU-2: `gbif.py` — GBIF Species Match API wrapper
-- [ ] WU-3: Schema `gbif_keys` field + enrichment function
+- [x] WU-1: `species_parsing.py` — ParsedTaxon model + shared preprocessing
+- [x] WU-2: `gbif.py` — GBIF Species Match API wrapper
+- [x] WU-3: Schema `gbif_keys` field + enrichment function
+- [ ] WU-4: Demo notebook — GBIF vs enhanced_species evaluation comparison `sonnet`
+  - Template: `notebooks/species_recall_improvement.ipynb` (same 10 OA PDF extractions)
+  - Reuse existing extracted predictions (load from artifacts, no re-extraction)
+  - Enrich both ground truth and predictions with `enrich_with_gbif()`
+  - Run `evaluate_indexed()` with `fields=["species", "gbif_keys"]`
+  - Side-by-side P/R/F1 table: enhanced_species matching vs GBIF key set comparison
+  - Qualitative analysis: which species strings GBIF resolves vs fails (vernacular, groups, count+name)
+  - Save notebook as `notebooks/eval_gbif_vs_enhanced_species_test.ipynb`
 
 ### Backlog
 
-- [ ] Geographic information model incl GADM level, protected areas, ecosystem
+- [ ] Geographic information model incl subnational admin units (MRCs, admin regions, cities), protected areas, ecosystem
+  > **Plan:** [`plans/nominatim_enrichment.md`](plans/nominatim_enrichment.md) — `location_text` extraction field + `location_ids` enrichment via Nominatim (Wikidata QID primary, `osm_type:osm_id` fallback)
+- [ ] Demo notebook `notebooks/eval_nominatim_location_test.ipynb` — modelled on `notebooks/species_recall_improvement.ipynb`; reuse existing extractions (no new LLM calls); compare `location_text` fuzzy string vs `location_ids` set-comparison P/R/F1
 - [ ] Taxonomic information model incl species, paraphyletic groups
 - [ ] Taxonomic & geographic referencing pipeline
 - [ ] `ExtractedTaxon` structured schema — LLM extracts `{name, type, count}` instead of flat `list[str]` (improves GBIF preprocessing, requires prompt + ground truth changes)
 - [ ] Evaluation matcher refactor — strategy pattern to eliminate 3x duplicated TP/FP/FN logic in `compare_models()` + delete orphaned `EnhancedSpeciesMatchConfig`
+- [ ] *(ready, out of scope)* Species eval via `ParsedTaxon` — replace fuzzy enhanced_species matching with structured comparator in `evaluate_indexed()`: parse both GT and predictions through `ParsedTaxon`, match on normalized `scientific_name`/`common_name` fields; more principled than heuristic fuzzy, improves precision; requires custom comparator hook in `EvaluationConfig` `sonnet`
 - [ ] Pipeline enrichment — use `gbif_keys` beyond evaluation for data gap analysis with real taxon IDs
 
 ### Model Hierarchy & Enrichment Pattern
@@ -261,3 +272,4 @@ This prevents duplicate work across parallel sessions.
 | `claude/implement-wu-a2-ePym7` | WU-A2 | Validate all-source ground truth | sonnet | 2026-02-18 |
 | `claude/implement-wu-a3-Y1iX9` | WU-A3 | Enrich URL metadata (source_url, journal_url, pdf_url, is_oa) | sonnet | 2026-02-18 |
 | `claude/implement-wu-b-classification-Knvz2` | WU-B | Abstract-only extraction + evaluation notebook | sonnet | 2026-02-18 |
+| `claude/implement-gbif-key-enrichment-9mcv1` | GBIF WU-1,2,3 | GBIF species matching enrichment | sonnet | 2026-02-18 |

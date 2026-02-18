@@ -1164,3 +1164,33 @@ Goal : Manual deep dive into the Fuster dataset to understand the data and its s
 
 **Next Steps:**
 - WU-B: Abstract-only extraction + evaluation on all 299 valid records segmented by source
+
+---
+
+### 2026-02-18: WU-C1 — Download All PDFs (Dryad + Zenodo + Semantic Scholar)
+
+**Task:** Download article PDFs for all records with a `cited_article_doi` across all three sources, using the full 4-strategy fallback chain. No OA filter — attempt all records.
+
+**Work Performed:**
+- **Notebook:** `notebooks/download_all_fuster_pdfs.ipynb` (refactored)
+- **Data source changed:** Replaced `dataset_article_mapping.csv` (Dryad+Zenodo only, 75 records) with `dataset_092624_validated.xlsx` (all sources, 250 records with `cited_article_doi`)
+- **Pre-fetched URLs:** Used `pdf_url` from xlsx (populated by WU-A3 / OpenAlex) as Strategy 1 for 103 records — no extra API calls needed for those
+- **Fallback chain:** OpenAlex URL → Unpaywall → EZproxy → Sci-Hub (all 4 strategies active)
+- **Output:** `data/pdfs/fuster/` (single folder, no separate SS subfolder), `data/pdfs/fuster/manifest.csv`
+- **Synthesis:** End-of-notebook table segmented by source (Dryad / Zenodo / Semantic Scholar)
+
+**Results:**
+
+| Source | Downloaded | Total | Rate | OA downloaded | Closed downloaded |
+|---|---|---|---|---|---|
+| Dryad | 36 | 37 | 97.3% | 25/25 | 10/11 |
+| Zenodo | 33 | 38 | 86.8% | 25/27 | 8/9 |
+| Semantic Scholar | 113 | 175 | 64.6% | 44/46 | 69/76 |
+| **Total** | **182** | **250** | **72.8%** | | |
+
+**Key Issues Identified:**
+- ~45 SS failures have `semanticscholar.org/paper/…` URLs as `cited_article_doi` (not real DOIs) — no downloader can fetch these; root cause is upstream data quality in the xlsx
+- ~17 remaining failures are legitimately closed-access articles that survived all 4 strategies (including Sci-Hub)
+- 5 Zenodo failures include multi-DOI strings (e.g., `10.1101/005900; 10.6084/...`) that the pipeline can't resolve
+
+**Next Steps:** WU-C2 — GROBID-parse newly downloaded PDFs

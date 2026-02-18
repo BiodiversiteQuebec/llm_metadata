@@ -14,8 +14,9 @@ services:
       # Direct access to internal services (no auth needed)
       GROBID_URL: http://grobid:8070
       QDRANT_URL: http://qdrant:6333
-      # OpenAI via reverse proxy (key injected by proxy, not in container)
-      OPENAI_API_BASE: http://claude-dev-reverse-proxy:8080/v1
+      # Service base URLs used by app code (can be swapped via .env)
+      OPENAI_API_BASE: http://claude-dev-reverse-proxy:8080/openai/v1
+      SEMANTIC_SCHOLAR_API_BASE: http://claude-dev-reverse-proxy:8080/semantic-scholar
       JUPYTER_PORT: ${JUPYTER_PORT:-8881}
       JUPYTER_TOKEN: ${JUPYTER_TOKEN}
       JUPYTER_URL: ${JUPYTER_URL:-http://localhost:8881}
@@ -24,7 +25,7 @@ services:
       GIT_REPO_URL: ${GIT_REPO_URL:-git@github.com:your-org/llm_metadata.git}
       # Firewall toggle (set to false in .env to disable)
       ENABLE_FIREWALL: ${ENABLE_FIREWALL:-true}
-      # NOTE: OPENAI_API_KEY intentionally NOT passed to container
+      # NOTE: OPENAI_API_KEY and SEMANTIC_SCHOLAR_API_KEY intentionally NOT passed to container
     cap_add:
       - NET_ADMIN
       - NET_RAW
@@ -34,8 +35,8 @@ services:
     volumes:
       # Named volume for entire workspace (git clone target)
       - workspace:/workspace
-      # Host bind mounts for shared data only
-      - ./data:/workspace/data
+      # Host bind mount only for untracked runtime PDF data persistence
+      - ./data/_runtime_pdfs:/workspace/data/pdfs
       - ./.claude:/workspace/.claude
       # Named volumes for caches
       - uv-cache:/home/devuser/.cache/uv
@@ -53,8 +54,12 @@ services:
     networks:
       - claude-dev-network
     environment:
-      # API key passed to proxy only, injected in header
+      # Service keys passed to proxy only, injected in headers
       OPENAI_API_KEY: ${OPENAI_API_KEY}
+      SEMANTIC_SCHOLAR_API_KEY: ${SEMANTIC_SCHOLAR_API_KEY}
+      # Upstream service URLs (swappable for alternatives)
+      OPENAI_UPSTREAM_BASE: ${OPENAI_UPSTREAM_BASE:-https://api.openai.com}
+      SEMANTIC_SCHOLAR_UPSTREAM_BASE: ${SEMANTIC_SCHOLAR_UPSTREAM_BASE:-https://api.semanticscholar.org/graph/v1}
     volumes:
       - .devcontainer/claude-dev-reverse-proxy.conf:/etc/nginx/templates/default.conf.template:ro
     healthcheck:

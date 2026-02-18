@@ -14,7 +14,8 @@ This document describes the devcontainer setup for the LLM Metadata project, pro
 
 ### File System Isolation
 - **NEVER** volume mount the workspace folder to the container
-- Volume mount specific folders for data persistence (`data/`)
+- Volume mount only gitignored/untracked runtime data folders for persistence (`data/_runtime_pdfs/`)
+- Do **not** bind-mount git-tracked files under `data/`; tracked datasets come from git clone/pull in `/workspace`
 - Use named volume for `.venv` (inside workspace volume)
 - Volume mount Claude config/skills/history (`./.claude`, `~/.claude`)
 - Launch Jupyter server on startup with config from `.env`
@@ -111,7 +112,8 @@ command: sleep infinity
 |----------|-------|--------|
 | `GROBID_URL` | `http://grobid:8070` | Hardcoded |
 | `QDRANT_URL` | `http://qdrant:6333` | Hardcoded |
-| `OPENAI_API_BASE` | `http://claude-dev-reverse-proxy:8080/v1` | Hardcoded |
+| `OPENAI_API_BASE` | `http://claude-dev-reverse-proxy:8080/openai/v1` | Hardcoded |
+| `SEMANTIC_SCHOLAR_API_BASE` | `http://claude-dev-reverse-proxy:8080/semantic-scholar` | Hardcoded |
 | `JUPYTER_PORT` | `${JUPYTER_PORT:-8881}` | From .env |
 | `JUPYTER_TOKEN` | `${JUPYTER_TOKEN}` | From .env |
 | `JUPYTER_URL` | `${JUPYTER_URL:-http://localhost:8881}` | From .env |
@@ -119,13 +121,13 @@ command: sleep infinity
 | `GIT_REPO_URL` | `${GIT_REPO_URL:-git@github.com:your-org/llm_metadata.git}` | From .env |
 | `ENABLE_FIREWALL` | `${ENABLE_FIREWALL:-true}` | From .env |
 
-**Note:** `OPENAI_API_KEY` is intentionally NOT passed to the container.
+**Note:** `OPENAI_API_KEY` and `SEMANTIC_SCHOLAR_API_KEY` are intentionally NOT passed to the container.
 
 **Volumes (`claude-dev`):**
 | Type | Source | Target | Purpose |
 |------|--------|--------|---------|
 | Named | `workspace` | `/workspace` | Git repo, source, .venv (NOT host-mounted) |
-| Bind | `./data` | `/workspace/data` | Shared datasets (synced with host) |
+| Bind | `./data/_runtime_pdfs` | `/workspace/data/pdfs` | Persist untracked runtime PDF artifacts only |
 | Bind | `./.claude` | `/workspace/.claude` | Claude project settings |
 | Named | `uv-cache` | `/home/devuser/.cache/uv` | Python package cache |
 | Named | `command-history` | `/commandhistory` | Shell history |
@@ -145,7 +147,10 @@ networks:
   - claude-dev-network
 
 environment:
-  OPENAI_API_KEY: ${OPENAI_API_KEY}    # Only the proxy has the API key
+  OPENAI_API_KEY: ${OPENAI_API_KEY}    # Service key in proxy only
+  SEMANTIC_SCHOLAR_API_KEY: ${SEMANTIC_SCHOLAR_API_KEY}  # Service key in proxy only
+  OPENAI_UPSTREAM_BASE: ${OPENAI_UPSTREAM_BASE:-https://api.openai.com}
+  SEMANTIC_SCHOLAR_UPSTREAM_BASE: ${SEMANTIC_SCHOLAR_UPSTREAM_BASE:-https://api.semanticscholar.org/graph/v1}
 
 volumes:
   - .devcontainer/claude-dev-reverse-proxy.conf:/etc/nginx/templates/default.conf.template:ro
@@ -230,7 +235,7 @@ This means paths in `docker-compose.devcontainer.yml` like `context: .` and `./d
 | Hook | Command |
 |------|---------|
 | `postStartCommand` | Runs firewall if `ENABLE_FIREWALL=true` |
-| `postAttachCommand` | Runs `init-workspace.sh` + starts Jupyter |
+| `postAttachCommand` | Runs `init-workspace.sh` + starts Jupyter (auto-provisions `jupyterlab` via `uv --with` if needed) |
 
 ---
 
@@ -238,13 +243,20 @@ This means paths in `docker-compose.devcontainer.yml` like `context: .` and `./d
 
 ```bash
 #!/bin/bash
-set -e
+set -euo pipefail
 
-# Clone repository on first run (if workspace is empty)
+# Clone repository on first run (if workspace is empty),
+# and recover safely from interrupted partial clones
 if [ ! -f /workspace/.git/config ]; then
-    git clone "${GIT_REPO_URL}" /workspace/temp-clone
-    mv /workspace/temp-clone/* /workspace/temp-clone/.* /workspace/ 2>/dev/null || true
+  if [ -f /workspace/temp-clone/.git/config ]; then
+    # Promote existing partial clone into /workspace
+    # (skips /workspace/.claude if already present)
+    promote_temp_clone
+  else
     rm -rf /workspace/temp-clone
+    git clone "${GIT_REPO_URL}" /workspace/temp-clone
+    promote_temp_clone
+  fi
 fi
 
 # Create virtual environment if missing
@@ -252,8 +264,16 @@ if [ ! -d /workspace/.venv ]; then
     uv venv /workspace/.venv
 fi
 
-# Install dependencies (uses pyproject.toml)
-uv sync --frozen
+# Configure git upstream defaults in container
+git config --global push.autoSetupRemote true
+# If branch exists remotely, set local branch upstream to origin/<branch>
+
+# Install dependencies (uses lockfile when available)
+if [ -f /workspace/uv.lock ]; then
+  uv sync --frozen
+else
+  uv sync
+fi
 ```
 
 **Why `postAttachCommand`?** VS Code's SSH agent forwarding is only available after attach, so git clone must run then.
@@ -273,14 +293,15 @@ server {
     }
 
     # OpenAI API proxy
-    location / {
-        proxy_pass https://api.openai.com;
+    # /openai/* -> ${OPENAI_UPSTREAM_BASE}/*
+    location /openai/ {
+        proxy_pass ${OPENAI_UPSTREAM_BASE}/;
         proxy_http_version 1.1;
         proxy_ssl_server_name on;
 
         # Inject API key (container never sees this)
         proxy_set_header Authorization "Bearer ${OPENAI_API_KEY}";
-        proxy_set_header Host api.openai.com;
+        proxy_set_header Host $proxy_host;
         proxy_set_header X-Real-IP $remote_addr;
 
         # Timeouts for long-running completions
@@ -291,10 +312,35 @@ server {
         # Allow large request bodies for embeddings
         client_max_body_size 10M;
     }
+
+    # Semantic Scholar API proxy
+    # /semantic-scholar/* -> ${SEMANTIC_SCHOLAR_UPSTREAM_BASE}/*
+    location /semantic-scholar/ {
+        proxy_pass ${SEMANTIC_SCHOLAR_UPSTREAM_BASE}/;
+        proxy_http_version 1.1;
+        proxy_ssl_server_name on;
+
+        # Inject API key (container never sees this)
+        proxy_set_header x-api-key "${SEMANTIC_SCHOLAR_API_KEY}";
+        proxy_set_header Host $proxy_host;
+        proxy_set_header X-Real-IP $remote_addr;
+
+        proxy_connect_timeout 120s;
+        proxy_send_timeout 120s;
+        proxy_read_timeout 120s;
+        client_max_body_size 10M;
+    }
 }
 ```
 
 **Note:** nginx uses `/etc/nginx/templates/` directory for environment variable substitution at startup.
+
+### Abstract Service Proxy Workflow
+
+1. Service keys/tokens are defined in host `.env` and passed only to `claude-dev-reverse-proxy`.
+2. App-facing base URLs are passed to `claude-dev` (`OPENAI_API_BASE`, `SEMANTIC_SCHOLAR_API_BASE`).
+3. IO modules read service base URLs from OS env and fall back to official defaults.
+4. Proxy routes inject auth headers and forward to configurable upstream service URLs.
 
 ---
 
@@ -319,7 +365,7 @@ server {
 | VS Code | `marketplace.visualstudio.com`, `vscode.blob.core.windows.net`, `update.code.visualstudio.com` |
 | npm | `registry.npmjs.org` |
 
-**Note:** `api.openai.com` is NOT whitelisted - access goes through the reverse proxy.
+**Note:** `api.openai.com` and `api.semanticscholar.org` can be accessed via the reverse proxy, so app code in `claude-dev` does not need direct API keys.
 
 **Verification:** Script tests that `example.com` is blocked and `api.github.com` is accessible.
 
@@ -333,6 +379,13 @@ GIT_REPO_URL=git@github.com:your-org/llm_metadata.git
 
 # OpenAI API (passed to reverse proxy only, NOT to container)
 OPENAI_API_KEY=sk-...
+OPENAI_API_BASE=http://claude-dev-reverse-proxy:8080/openai/v1
+OPENAI_UPSTREAM_BASE=https://api.openai.com
+
+# Semantic Scholar API (passed to reverse proxy only, NOT to container)
+SEMANTIC_SCHOLAR_API_KEY=your_semantic_scholar_api_key
+SEMANTIC_SCHOLAR_API_BASE=http://claude-dev-reverse-proxy:8080/semantic-scholar
+SEMANTIC_SCHOLAR_UPSTREAM_BASE=https://api.semanticscholar.org/graph/v1
 
 # Jupyter
 JUPYTER_PORT=8881
@@ -344,6 +397,21 @@ ENABLE_FIREWALL=true
 # Optional: Allow image output in Jupyter (default: true)
 ALLOW_IMG_OUTPUT=true
 ```
+
+### Environment Variable Citation Map
+
+| Variable | Consumed by | Location |
+|----------|-------------|----------|
+| `OPENAI_API_KEY` | Reverse proxy only | `.devcontainer/claude-dev-reverse-proxy.conf` (`Authorization` header) |
+| `OPENAI_API_BASE` | OpenAI IO in app container | `src/llm_metadata/openai_io.py` (`get_openai_api_base`) |
+| `OPENAI_UPSTREAM_BASE` | Reverse proxy route target | `.devcontainer/claude-dev-reverse-proxy.conf` (`proxy_pass`) |
+| `SEMANTIC_SCHOLAR_API_KEY` | Reverse proxy only | `.devcontainer/claude-dev-reverse-proxy.conf` (`x-api-key` header) |
+| `SEMANTIC_SCHOLAR_API_BASE` | App/client in `claude-dev` | `src/llm_metadata/semantic_scholar.py` (base URL resolution) |
+| `SEMANTIC_SCHOLAR_UPSTREAM_BASE` | Reverse proxy route target | `.devcontainer/claude-dev-reverse-proxy.conf` (`proxy_pass`) |
+| `JUPYTER_PORT` | Devcontainer startup | `.devcontainer/docker-compose.devcontainer.yml`, `.devcontainer/devcontainer.json` |
+| `JUPYTER_TOKEN` | Devcontainer startup | `.devcontainer/docker-compose.devcontainer.yml`, `.devcontainer/devcontainer.json` |
+| `JUPYTER_URL` | App/container env | `.devcontainer/docker-compose.devcontainer.yml` |
+| `ALLOW_IMG_OUTPUT` | App/container env | `.devcontainer/docker-compose.devcontainer.yml` |
 
 ---
 
@@ -402,9 +470,16 @@ docker exec claude-dev sh -c "curl -s http://claude-dev-reverse-proxy:8080/healt
 docker exec claude-dev sh -c "printenv | grep OPENAI"
 # Expected: Only OPENAI_API_BASE, NOT OPENAI_API_KEY
 
+docker exec claude-dev sh -c "printenv | grep SEMANTIC_SCHOLAR"
+# Expected: SEMANTIC_SCHOLAR_API_BASE, NOT SEMANTIC_SCHOLAR_API_KEY
+
 # Test OpenAI through proxy
-docker exec claude-dev sh -c "curl -s http://claude-dev-reverse-proxy:8080/v1/models | head -c 100"
+docker exec claude-dev sh -c "curl -s http://claude-dev-reverse-proxy:8080/openai/v1/models | head -c 100"
 # Expected: JSON with model list
+
+# Test Semantic Scholar through proxy
+docker exec claude-dev sh -c "curl -s 'http://claude-dev-reverse-proxy:8080/semantic-scholar/paper/search?query=biodiversity&limit=1&fields=paperId,title' | head -c 200"
+# Expected: JSON response from Semantic Scholar search endpoint
 
 # Test internal services
 docker exec claude-dev sh -c "curl -s http://grobid:8070/api/isalive"
@@ -453,6 +528,8 @@ docker exec claude-dev sh -c "curl -s http://grobid:8070/api/isalive"
 
 ## Rebuilding
 
+After changing `.devcontainer` configuration, rebuild the dev container as the final step.
+
 **VS Code:**
 - `F1` > "Dev Containers: Rebuild Container" (uses cache)
 - `F1` > "Dev Containers: Rebuild Container Without Cache" (full rebuild)
@@ -464,6 +541,25 @@ docker compose -f docker-compose.yml -f .devcontainer/docker-compose.devcontaine
 docker compose -f docker-compose.yml -f .devcontainer/docker-compose.devcontainer.yml up -d claude-dev
 ```
 
+**Quick build step:**
+```bash
+cd /path/to/llm_metadata
+docker compose -f docker-compose.yml -f .devcontainer/docker-compose.devcontainer.yml build claude-dev
+```
+
+### Clean Start (Reset Persistent Workspace)
+
+Use this when the workspace volume contains stale git state or file locks.
+
+```bash
+cd /path/to/llm_metadata
+docker compose -f docker-compose.yml -f .devcontainer/docker-compose.devcontainer.yml down
+docker volume rm llm_metadata_workspace
+docker compose -f docker-compose.yml -f .devcontainer/docker-compose.devcontainer.yml up -d --build claude-dev
+```
+
+This recreates `/workspace` from scratch. Runtime PDF artifacts remain in the host bind mount `data/_runtime_pdfs`.
+
 ---
 
 ## Implementation Learnings
@@ -472,7 +568,7 @@ docker compose -f docker-compose.yml -f .devcontainer/docker-compose.devcontaine
 
 1. **Path Resolution in docker-compose**
    - **Issue**: Relative paths resolved from project root when using `-f`
-   - **Fix**: All paths relative to project root (`context: .`, `./data`)
+  - **Fix**: All paths relative to project root (`context: .`, `./data/_runtime_pdfs`)
 
 2. **Windows CRLF Line Endings**
    - **Issue**: Scripts fail with "No such file or directory" (bash looks for `/bin/bash\r`)

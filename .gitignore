@@ -14,6 +14,7 @@ dist/*
 qdrant_storage/
 */pdfs/*
 artifacts/
+data/_runtime_pdfs/
 src/llm_metadata/gpt_classify.py
 */cache/*
 *tmpclaude-*
