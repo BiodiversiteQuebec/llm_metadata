@@ -97,6 +97,10 @@ RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master
 RUN echo 'alias claude="claude --dangerously-skip-permissions"' >> ~/.zshrc \
     && echo 'alias claude="claude --dangerously-skip-permissions"' >> ~/.bashrc
 
+# Auto-load .env via uv when present in working directory
+RUN echo 'export UV_ENV_FILE=.env' >> ~/.zshrc \
+    && echo 'export UV_ENV_FILE=.env' >> ~/.bashrc
+
 # Persist command history across container restarts
 RUN SNIPPET="export PROMPT_COMMAND='history -a' && export HISTFILE=/commandhistory/.bash_history" \
     && echo "$SNIPPET" >> ~/.zshrc \

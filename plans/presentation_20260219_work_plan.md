@@ -270,7 +270,7 @@ After Thursday, the SS plan continues with API client (Task 2.2), URL fields, ci
 
 ## Verification
 
-1. **Schema:** `uv run --env-file .env python -m pytest tests/` passes after WU-A1
+1. **Schema:** `uv run python -m pytest tests/` passes after WU-A1
 2. **Data validation:** All 418 xlsx records validate through updated schema (WU-A2)
 3. **Abstract extraction + evaluation:** `batch_abstract_evaluation.ipynb` runs end-to-end on >=450 records; per-field P/R/F1 for all 16 fields, segmented by source (WU-B)
 4. **Full-text:** At least the existing ~44 OA Dryad+Zenodo PDFs processed through both pipelines (WU-C3, WU-C4)

@@ -6,7 +6,7 @@ metadata, and downloads PDFs using the multi-strategy fallback chain.
 Skips Zenodo-hosted DOIs (10.5281/zenodo.*).
 
 Usage:
-    uv run --env-file .env python scripts/download_all_fuster_pdfs.py
+    uv run python scripts/download_all_fuster_pdfs.py
 """
 
 import argparse

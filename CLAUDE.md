@@ -52,8 +52,10 @@ ZENODO_ACCESS_TOKEN=your_zenodo_token  # Optional, for Zenodo features only
 **IMPORTANT:** Always run Python through `uv` so the project `.venv` is used and `.env` is loaded.
 
 ```bash
-uv run --env-file .env python your_script.py
+uv run python your_script.py
 ```
+
+Set `UV_ENV_FILE=.env` in your shell profile (`.bashrc`/`.zshrc`) once. `uv run` will auto-load `.env` locally; in cloud/Docker the var is simply absent and no file is loaded.
 
 
 ### Jupyter MCP Server
@@ -66,7 +68,7 @@ export $(grep -v '^#' .env | xargs) && netstat -an | grep -q ":${JUPYTER_PORT}.*
 
 With uv run
 ```bash
-uv run --env-file .env powershell.exe -NoProfile -Command '$p=$env:JUPYTER_PORT; $running=Test-NetConnection -ComputerName 127.0.0.1 -Port $p -InformationLevel Quiet; if ($running) { Write-Host ("Jupyter already listening on port " + $p) } else { Start-Process -WindowStyle Hidden -FilePath jupyter -ArgumentList @("lab","--port",$env:JUPYTER_PORT,"--IdentityProvider.token",$env:JUPYTER_TOKEN,"--no-browser"); Write-Host ("Started Jupyter on port " + $p) }'
+uv run powershell.exe -NoProfile -Command '$p=$env:JUPYTER_PORT; $running=Test-NetConnection -ComputerName 127.0.0.1 -Port $p -InformationLevel Quiet; if ($running) { Write-Host ("Jupyter already listening on port " + $p) } else { Start-Process -WindowStyle Hidden -FilePath jupyter -ArgumentList @("lab","--port",$env:JUPYTER_PORT,"--IdentityProvider.token",$env:JUPYTER_TOKEN,"--no-browser"); Write-Host ("Started Jupyter on port " + $p) }'
 ```
 
 Then start the MCP server.

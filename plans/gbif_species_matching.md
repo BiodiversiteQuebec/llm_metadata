@@ -172,9 +172,9 @@ Note: WU-2 and WU-3 could be a single WU, but separating them allows the GBIF AP
 
 ## Verification
 
-1. `uv run --env-file .env python -m pytest tests/test_species_parsing.py` — parsing logic
-2. `uv run --env-file .env python -m pytest tests/test_gbif.py` — GBIF wrapper with mocked API
-3. `uv run --env-file .env python -m pytest tests/test_gbif_enrichment.py` — enrichment + eval integration
-4. `uv run --env-file .env python -m pytest tests/test_evaluation.py tests/test_evaluation_fuzzy.py` — existing tests unchanged (backward compat)
-5. `uv run --env-file .env python -m pytest tests/` — full suite green
+1. `uv run python -m pytest tests/test_species_parsing.py` — parsing logic
+2. `uv run python -m pytest tests/test_gbif.py` — GBIF wrapper with mocked API
+3. `uv run python -m pytest tests/test_gbif_enrichment.py` — enrichment + eval integration
+4. `uv run python -m pytest tests/test_evaluation.py tests/test_evaluation_fuzzy.py` — existing tests unchanged (backward compat)
+5. `uv run python -m pytest tests/` — full suite green
 6. Notebook smoke test: enrich a few real records via live GBIF API, run evaluation, compare `species` vs `gbif_keys` metrics
