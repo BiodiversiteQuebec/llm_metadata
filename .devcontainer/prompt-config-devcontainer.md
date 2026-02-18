@@ -9,7 +9,7 @@ Edit devcontainer config for workspace.
     * To be operated from vscode devcontainer. Should install relevant VSCode extensions for Python development and remove unnecessary ones.
 * Workspace should have file systeme isolation.
     * NEVER volume mount the workspace folder to the `claude-dev` container.
-    * Volume mount only gitignored folders for relevant data persistence (e.g., `data/pdfs/`, qdrant storage). Do not bind-mount git-tracked files under `data/`; these must come from git clone/pull inside the container workspace.
+    * Volume mount only gitignored/untracked folders for relevant data persistence (e.g., `data/_runtime_pdfs/`, qdrant storage). Do not bind-mount git-tracked files under `data/`; these must come from git clone/pull inside the container workspace.
     * RECOMMEND Volume mount .venv or virtual environment folder for python dependencies or install dependencies directly in the container.
     * Create a user `devuser` in the `claude-dev` container with sudo privileges for development.
     * Volume mount claude development config, skills, mcp servers and development history (./.claude, ~/.claude, etc)
@@ -19,8 +19,11 @@ Edit devcontainer config for workspace.
     * NEVER share network with host.
     * OPTIONAL Egress from the `claude-dev` container controlled through whitelist rules only from the '.devcontainer/init-firewall.sh' script managed by devuser. Script should be run at container startup.
     * Allow access to specific services running on host (e.g., databases, etc) if necessary.
-    * New service `claude-dev-reverse-proxy` nginx to handle reverse proxying requests from claude-dev to host services requiring secure access (openai api, etc). Store nginx config in .devcontainer/claude-dev-reverse-proxy.conf. Pass explicitly the environment variables necessary for reverse proxying through docker-compose file for claude-dev-reverse-proxy service and claude-dev service.
+    * A `claude-dev-reverse-proxy` nginx service proxies requests to external APIs that require secret keys (e.g., OpenAI, Semantic Scholar). Config in `.devcontainer/claude-dev-reverse-proxy.conf`.
+    * API keys live only in the proxy's environment. The app container (`claude-dev`) gets only base URL env vars pointing to the proxy — it never sees secrets.
+    * Follow the External Service IO pattern documented in `CLAUDE.md` when adding new proxied services.
 * Remove any vscode devcontainer.json startup commands that are not necessary for this setup.
 * Add a final step to rebuild the dev container after config changes.
+* Document all environment variables in `.devcontainer/README.md` (what each var does, which service consumes it).
 
 Propose other relevant configurations that would enhance the development experience in this devcontainer setup for this workspace.

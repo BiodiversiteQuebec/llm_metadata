@@ -41,10 +41,17 @@ python src/llm_metadata/prefect_pipeline.py
 ```
 
 ### Environment Setup
-Create a `.env` file in the project root with:
+Create a `.env` file in the project root (see `.env.example` for all vars):
 ```bash
 OPENAI_API_KEY=your_openai_api_key
-ZENODO_ACCESS_TOKEN=your_zenodo_token  # Optional, for Zenodo features only
+ZENODO_ACCESS_TOKEN=your_zenodo_token            # Optional, for Zenodo features only
+SEMANTIC_SCHOLAR_API_KEY=your_ss_api_key         # Optional, enables dedicated rate limit
+```
+
+Base URL overrides (set automatically in devcontainer, not needed locally):
+```bash
+OPENAI_API_BASE=http://proxy:8080/openai/v1      # Defaults to https://api.openai.com/v1
+SEMANTIC_SCHOLAR_API_BASE=http://proxy:8080/semantic-scholar  # Defaults to https://api.semanticscholar.org/graph/v1
 ```
 
 ### Runtime Requirements
@@ -96,6 +103,7 @@ Data Ingestion → Schema & Prompt Engineering → LLM Inference → Evaluation 
 - **[Stage 1]** `pdf_parsing.py` — GROBID-based full-text extraction, TEI XML parsing, hierarchical section structure
 - **[Stage 1]** `article_retrieval.py` — DOI matching between data papers (Dryad) and scientific articles (for ground truth preparation)
 - **[Stage 1]** `unpaywall.py` — Open access PDF discovery API
+- **[Stage 1]** `semantic_scholar.py` — Semantic Scholar Graph API client for paper search, citations, and references
 - **[Stage 1]** `registry.py` — SQLite-based document tracking database for processing status and chunk management
 
 **Key Pattern:** All batch operations (search, download, parsing) use **Prefect** for parallelization, monitoring, and retry logic.
@@ -113,6 +121,7 @@ Data Ingestion → Schema & Prompt Engineering → LLM Inference → Evaluation 
 - **[Stage 2]** `schemas/chunk_metadata.py` — Section-aware chunk metadata for full-text processing (section types, token counts, content flags)
 - **[Stage 2]** `chunking.py` — Token-based text chunking with section boundary preservation (tiktoken-based, optimized for OpenAI embeddings)
 - **[Stage 2]** `section_normalize.py` — Section classification into standard types (ABSTRACT, METHODS, RESULTS, etc.) using keyword matching
+- **[Stage 2]** `openai_io.py` — Shared OpenAI client factory with env-driven base URL routing (see External Service IO pattern)
 - **[Stage 2]** `embedding.py` — OpenAI embedding generation with local caching (text-embedding-3-large)
 - **[Stage 2]** `vector_store.py` — Qdrant vector store client for chunk indexing and semantic search
 
@@ -166,6 +175,15 @@ Data Ingestion → Schema & Prompt Engineering → LLM Inference → Evaluation 
 **Validator Boundary**: Pydantic validators handle pure, fast normalization only — delimiter splitting, whitespace stripping, vocabulary mapping. Never put network I/O or external API calls in validators. Enrichment from external services (GBIF, GADM, etc.) is a separate preprocessing step that runs *after* model construction.
 
 **Structured Preprocessing Models**: When a raw field (e.g., `species: list[str]`) needs structured parsing for downstream consumers, use a Pydantic model with `model_validator(mode='before')` that accepts the raw type (e.g., `ParsedTaxon("41 fish mock species")` → structured fields). This keeps the storage format unchanged while providing structured access when needed.
+
+**External Service IO**: Modules that call external APIs (OpenAI, Semantic Scholar, etc.) must support base URL swapping via environment variable so they can run either directly against the provider or through a reverse proxy that injects secrets.
+
+- **Env var convention**: `{SERVICE}_API_BASE` for the base URL the app code uses, `{SERVICE}_API_KEY` for the auth credential. Examples: `OPENAI_API_BASE`, `SEMANTIC_SCHOLAR_API_BASE`.
+- **Secrets are optional**: IO modules must treat API keys as `Optional`. Behind a proxy, the proxy injects auth headers — the app never sees the key. Only require a key when the base URL points to the official provider (i.e., no proxy).
+- **Always provide a safe default**: `os.getenv("SEMANTIC_SCHOLAR_API_BASE", "https://api.semanticscholar.org/graph/v1")`. When no env var is set, code hits the official endpoint directly — zero config for local development.
+- **Centralize client creation**: Use a factory module (e.g., `openai_io.py` → `get_openai_client()`) so every call site inherits the base URL routing. Avoid scattering `os.getenv` across individual functions.
+- **Devcontainer proxy pattern**: In the devcontainer, an nginx reverse proxy holds the API keys and injects auth headers. The app container only sees `{SERVICE}_API_BASE` pointing to the proxy. This keeps secrets out of the app environment. Details in `.devcontainer/README.md`.
+- **Adding a new service**: (1) create or update an IO module with env-driven base URL + default, (2) add the key to the proxy nginx config, (3) add `{SERVICE}_API_BASE` to docker-compose for the app container, (4) document in `.env.example`.
 
 ## Data Files
 

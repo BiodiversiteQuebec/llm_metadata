@@ -1,4 +1,3 @@
-from openai import OpenAI
 from openai.types.responses.parsed_response import ParsedResponse
 from pydantic import BaseModel
 import base64
@@ -10,6 +9,7 @@ from joblib import Memory
 import pypdf
 
 from llm_metadata.schemas import DatasetAbstractMetadata
+from llm_metadata.openai_io import get_openai_client
 
 # Setup cache
 memory = Memory("./cache", verbose=0)
@@ -247,7 +247,7 @@ def classify_abstract(
     # _response_parse is defined within classify_abstract to allow caching with joblib while passing parameters
     @memory.cache
     def _response_parse(parameters_json_dump: str) -> dict:
-        openai = OpenAI()
+        openai = get_openai_client()
         response = openai.responses.parse(
             model=model,
             input=[
@@ -360,7 +360,7 @@ def upload_pdf_to_openai(
     # Do NOT persistently cache uploads.
     # OpenAI file IDs can expire or be deleted (e.g., via cleanup_file=True),
     # and persisting them across runs causes flaky 404s when reused.
-    client = OpenAI()
+    client = get_openai_client()
     with open(str(pdf_path), "rb") as f:
         file = client.files.create(file=f, purpose=purpose)
     return file.id
@@ -376,7 +376,7 @@ def delete_openai_file(file_id: str) -> bool:
     Returns:
         True if deletion was successful
     """
-    client = OpenAI()
+    client = get_openai_client()
     try:
         client.files.delete(file_id)
         return True
@@ -392,7 +392,7 @@ def list_openai_files() -> List[Dict]:
     Returns:
         List of file metadata dicts
     """
-    client = OpenAI()
+    client = get_openai_client()
     files = client.files.list()
     return [file.model_dump() for file in files.data]
 
@@ -464,7 +464,7 @@ def classify_pdf_file(
 
     @memory.cache
     def _response_parse_pdf(parameters_json_dump: str, file_id: str) -> dict:
-        client = OpenAI()
+        client = get_openai_client()
         response = client.responses.parse(
             model=model,
             input=[
@@ -562,7 +562,7 @@ def classify_pdf_url(
 
     @memory.cache
     def _response_parse_pdf_url(parameters_json_dump: str) -> dict:
-        client = OpenAI()
+        client = get_openai_client()
         response = client.responses.parse(
             model=model,
             input=[

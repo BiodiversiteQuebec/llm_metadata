@@ -22,10 +22,11 @@ logger = logging.getLogger(__name__)
 # Setup cache
 memory = Memory("./cache", verbose=0)
 
-BASE_URL = "https://api.semanticscholar.org/graph/v1"
 REQUEST_TIMEOUT = 30  # seconds
 _RETRY_DELAYS = [2, 4, 8]  # seconds, for 429 backoff
 _AUTHENTICATED_RPS = 1.0   # introductory API key rate limit
+
+BASE_URL = os.getenv("SEMANTIC_SCHOLAR_API_BASE", "https://api.semanticscholar.org/graph/v1").rstrip("/")
 
 SEMANTIC_SCHOLAR_API_KEY = os.getenv("SEMANTIC_SCHOLAR_API_KEY")
 _last_request_time: float = 0.0
@@ -56,10 +57,11 @@ def _get(url: str, params: Dict[str, Any]) -> requests.Response:
     Unauthenticated requests use the shared public pool (no per-client throttle).
     """
     global _last_request_time
-    if SEMANTIC_SCHOLAR_API_KEY:
+    rate_limit = _AUTHENTICATED_RPS
+    if rate_limit > 0:
         elapsed = time.time() - _last_request_time
-        if elapsed < _AUTHENTICATED_RPS:
-            time.sleep(_AUTHENTICATED_RPS - elapsed)
+        if elapsed < rate_limit:
+            time.sleep(rate_limit - elapsed)
         _last_request_time = time.time()
 
     headers = _build_headers()
