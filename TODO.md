@@ -188,7 +188,7 @@ This prevents duplicate work across parallel sessions.
   - Run `evaluate_indexed()` with `fields=["species", "gbif_keys"]`
   - Side-by-side P/R/F1 table: enhanced_species matching vs GBIF key set comparison
   - Qualitative analysis: which species strings GBIF resolves vs fails (vernacular, groups, count+name)
-  - Save notebook as `notebooks/gbif_vs_enhanced_species_eval.ipynb`
+  - Save notebook as `notebooks/eval_gbif_vs_enhanced_species_test.ipynb`
 
 ### Backlog
 
