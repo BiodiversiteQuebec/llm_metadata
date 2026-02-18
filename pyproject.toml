@@ -27,6 +27,7 @@ dependencies = [
     "joblib",
     "pypdf",
     "loguru>=0.7.3",
+    "rapidfuzz>=3.14.3",
 ]
 requires-python = ">=3.11,<3.13"
 
@@ -53,5 +54,8 @@ include = ["llm_metadata*"]
 
 [dependency-groups]
 dev = [
+    "ipykernel>=7.2.0",
+    "jupyter>=1.1.1",
+    "nbconvert>=7.17.0",
     "pytest>=9.0.2",
 ]

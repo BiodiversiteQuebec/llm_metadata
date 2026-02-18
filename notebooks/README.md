@@ -22,13 +22,44 @@ This folder contains analysis and validation notebooks for ecological dataset ch
 - **Cache:** Notebook sets `os.chdir(PROJECT_ROOT)` before imports so joblib cache lands at `{PROJECT_ROOT}/cache/`. This path is NOT matched by the `*/cache/*` gitignore pattern (which requires a path segment before "cache"), so the cache is committable and syncable to local.
 
 **Key issues identified:**
-- `dataset_092624_validated.xlsx` does not include abstract text (WU-A2 intentionally kept the schema-only fields). Abstract text must be joined from the original `dataset_092624.xlsx` via the `id` column.
-- 3 pre-existing test failures (not caused by this work): `test_datasource_all_members` (REFERENCED enum not expected), 2 fuzzy match tests (`rapidfuzz` not installed).
+- `dataset_092624_validated.xlsx` stores Python list objects as string repr (e.g. `"['genetic_analysis']"`). Fixed in notebook with `ast.literal_eval` pre-processing before Pydantic validation.
+- `rapidfuzz` was missing from the environment; added as dependency.
+
+**Results — 288 records (36 Dryad + 67 Zenodo + 185 Semantic Scholar), model: gpt-5-mini, cost: $1.91**
+
+| Metric | Value |
+|--------|-------|
+| Micro F1 (all 14 fields) | 0.202 |
+| Macro F1 | 0.194 |
+| Core fields Micro F1 | 0.209 |
+| Modulator Micro F1 | 0.175 |
+
+Per-field:
+
+| Field | P | R | F1 |
+|-------|---|---|----|
+| temp_range_i | 0.482 | 0.357 | **0.410** |
+| temp_range_f | 0.451 | 0.330 | **0.381** |
+| multispecies | 0.293 | 0.365 | **0.325** |
+| species | 0.163 | 0.600 | **0.256** |
+| data_type | 0.127 | 0.400 | **0.193** |
+| time_series | 0.112 | 0.917 | **0.200** |
+| threatened_species | 0.474 | 0.088 | **0.149** |
+| geospatial_info | 0.064 | 0.400 | **0.111** |
+| spatial_range_km2 | 0.545 | 0.057 | **0.103** |
+| new_species_region | 0.273 | 0.057 | **0.094** |
+| temporal_range | 0.063 | 0.066 | **0.064** |
+| new_species_science | 0.333 | 0.019 | **0.036** |
+| referred_dataset | 0 | 0 | **0** |
+| bias_north_south | 0 | 0 | **0** |
+
+Cross-source (Micro F1): Dryad 0.259, Zenodo 0.273, Semantic Scholar 0.148 — SS lower because journal article abstracts are shorter/less structured than repository abstracts.
 
 **Next steps:**
-- Execute the notebook (requires OpenAI API key)
-- Fill in Summary table with actual metrics
-- Use output CSVs for WU-D1 three-way comparison
+- Use `notebooks/results/batch_abstract_evaluation_20260218_145142/` CSVs for WU-D1 three-way comparison
+- HTML report: `notebooks/results/batch_abstract_evaluation_20260218_145142/batch_abstract_evaluation.html`
+
+**Report link:** `notebooks/results/batch_abstract_evaluation_20260218_145142/batch_abstract_evaluation.html`
 
 ---
 
