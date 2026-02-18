@@ -181,6 +181,14 @@ This prevents duplicate work across parallel sessions.
 - [x] WU-1: `species_parsing.py` — ParsedTaxon model + shared preprocessing
 - [x] WU-2: `gbif.py` — GBIF Species Match API wrapper
 - [x] WU-3: Schema `gbif_keys` field + enrichment function
+- [ ] WU-4: Demo notebook — GBIF vs enhanced_species evaluation comparison `sonnet`
+  - Template: `notebooks/species_recall_improvement.ipynb` (same 10 OA PDF extractions)
+  - Reuse existing extracted predictions (load from artifacts, no re-extraction)
+  - Enrich both ground truth and predictions with `enrich_with_gbif()`
+  - Run `evaluate_indexed()` with `fields=["species", "gbif_keys"]`
+  - Side-by-side P/R/F1 table: enhanced_species matching vs GBIF key set comparison
+  - Qualitative analysis: which species strings GBIF resolves vs fails (vernacular, groups, count+name)
+  - Save notebook as `notebooks/gbif_vs_enhanced_species_eval.ipynb`
 
 ### Backlog
 
