@@ -34,8 +34,8 @@ services:
     volumes:
       # Named volume for entire workspace (git clone target)
       - workspace:/workspace
-      # Host bind mounts for shared data only
-      - ./data:/workspace/data
+      # Host bind mount only for gitignored data subfolder persistence
+      - ./data/pdfs:/workspace/data/pdfs
       - ./.claude:/workspace/.claude
       # Named volumes for caches
       - uv-cache:/home/devuser/.cache/uv

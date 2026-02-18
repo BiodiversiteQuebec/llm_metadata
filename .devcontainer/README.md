@@ -14,7 +14,8 @@ This document describes the devcontainer setup for the LLM Metadata project, pro
 
 ### File System Isolation
 - **NEVER** volume mount the workspace folder to the container
-- Volume mount specific folders for data persistence (`data/`)
+- Volume mount only gitignored data folders for persistence (`data/pdfs/`)
+- Do **not** bind-mount git-tracked files under `data/`; tracked datasets come from git clone/pull in `/workspace`
 - Use named volume for `.venv` (inside workspace volume)
 - Volume mount Claude config/skills/history (`./.claude`, `~/.claude`)
 - Launch Jupyter server on startup with config from `.env`
@@ -125,7 +126,7 @@ command: sleep infinity
 | Type | Source | Target | Purpose |
 |------|--------|--------|---------|
 | Named | `workspace` | `/workspace` | Git repo, source, .venv (NOT host-mounted) |
-| Bind | `./data` | `/workspace/data` | Shared datasets (synced with host) |
+| Bind | `./data/pdfs` | `/workspace/data/pdfs` | Persist gitignored PDF artifacts only |
 | Bind | `./.claude` | `/workspace/.claude` | Claude project settings |
 | Named | `uv-cache` | `/home/devuser/.cache/uv` | Python package cache |
 | Named | `command-history` | `/commandhistory` | Shell history |
@@ -251,6 +252,10 @@ fi
 if [ ! -d /workspace/.venv ]; then
     uv venv /workspace/.venv
 fi
+
+# Configure git upstream defaults in container
+git config --global push.autoSetupRemote true
+# If branch exists remotely, set local branch upstream to origin/<branch>
 
 # Install dependencies (uses pyproject.toml)
 uv sync --frozen
@@ -453,6 +458,8 @@ docker exec claude-dev sh -c "curl -s http://grobid:8070/api/isalive"
 
 ## Rebuilding
 
+After changing `.devcontainer` configuration, rebuild the dev container as the final step.
+
 **VS Code:**
 - `F1` > "Dev Containers: Rebuild Container" (uses cache)
 - `F1` > "Dev Containers: Rebuild Container Without Cache" (full rebuild)
@@ -464,6 +471,12 @@ docker compose -f docker-compose.yml -f .devcontainer/docker-compose.devcontaine
 docker compose -f docker-compose.yml -f .devcontainer/docker-compose.devcontainer.yml up -d claude-dev
 ```
 
+**Quick build step:**
+```bash
+cd /path/to/llm_metadata
+docker compose -f docker-compose.yml -f .devcontainer/docker-compose.devcontainer.yml build claude-dev
+```
+
 ---
 
 ## Implementation Learnings
@@ -472,7 +485,7 @@ docker compose -f docker-compose.yml -f .devcontainer/docker-compose.devcontaine
 
 1. **Path Resolution in docker-compose**
    - **Issue**: Relative paths resolved from project root when using `-f`
-   - **Fix**: All paths relative to project root (`context: .`, `./data`)
+  - **Fix**: All paths relative to project root (`context: .`, `./data/pdfs`)
 
 2. **Windows CRLF Line Endings**
    - **Issue**: Scripts fail with "No such file or directory" (bash looks for `/bin/bash\r`)
