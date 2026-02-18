@@ -1036,3 +1036,38 @@ Goal : Manual deep dive into the Fuster dataset to understand the data and its s
 * [ ] Integrate semantic scholar api to retrieve cited articles and their metadata, and pdf if available
 * [ ] Run download on the remaining valid pdfs from semantic scholar
 * [ ] Run extraction on all valid data with pdfs, including semantic scholar data, and compare with abstract-only approach
+
+---
+
+### 2026-02-18: WU-A2 — All-Source Ground Truth Validation
+
+**Task:** Validate all 418 annotated records (Dryad + Zenodo + Semantic Scholar) through the updated `DatasetFeaturesNormalized` schema (WU-A1), compute per-source coverage stats, filter to valid biodiversity records, and overwrite `data/dataset_092624_validated.xlsx`.
+
+**Work Performed:**
+- **Notebook:** `notebooks/fuster_annotations_validation.ipynb`
+- **Schema update:** Switched `DataFrameValidator` from default `DatasetFeatures` to explicit `DatasetFeaturesNormalized`, which includes the 6 WU-A1 modulator fields (`time_series`, `multispecies`, `threatened_species`, `new_species_science`, `new_species_region`, `bias_north_south`) and `DataSource` enum coercion.
+- **SS URL inspection:** Added Section 1.5 to inspect `url` / `url.1` for Semantic Scholar records. Both columns are identical DOI URLs for all SS records — no journal vs search URL distinction required; `url` maps directly to `source_url`.
+- **Coverage stats:** Added Section 5 with per-source table (records, valid, has_abstract, has_doi, has_cited_articles).
+- **Valid record filter:** Added Section 6 to filter schema-valid rows to `valid_yn == 'yes'` (biodiversity-relevant records only).
+- **Presentation stats table:** Added Section 7 with formatted table for Methods section.
+- **Export:** Updated Section 8 to export only valid records (not all 418).
+
+**Results:**
+
+| Source | Records | Valid | Abstract | Has DOI | Cited Art. |
+|---|---|---|---|---|---|
+| dryad | 47 | 37 | 46 | 47 | 44 |
+| zenodo | 114 | 67 | 114 | 114 | 59 |
+| semantic_scholar | 254 | 192 | 246 | 156 | 0 |
+| **TOTAL** | **415** | **296** | **406** | **317** | **103** |
+
+- Schema validation: **418/418 pass** (100%) — all records comply with `DatasetFeaturesNormalized`
+- Exported **299 valid records** to `data/dataset_092624_validated.xlsx` (was 418 previously — now filtered to valid_yn='yes')
+
+**Key Issues Identified:**
+- SS records have zero `cited_articles` — no article DOI linkage for SS in the current xlsx
+- SS DOI coverage is ~61% (156/254) vs 100% for Dryad and Zenodo
+- `url` and `url.1` are always identical for SS records; no separate journal URL to parse
+
+**Next Steps:**
+- WU-B: Abstract-only extraction + evaluation on all 299 valid records segmented by source
