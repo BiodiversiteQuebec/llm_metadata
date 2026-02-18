@@ -1,7 +1,6 @@
 """Tests for modulator fields, DataSource enum, and boolean coercion in fuster_features schema."""
 
-import math
-import unittest
+import pytest
 
 from llm_metadata.schemas.fuster_features import (
     DatasetFeatures,
@@ -10,30 +9,30 @@ from llm_metadata.schemas.fuster_features import (
 )
 
 
-class TestDataSourceEnum(unittest.TestCase):
+class TestDataSourceEnum:
     """Test DataSource enum values and usage."""
 
     def test_enum_values(self):
-        self.assertEqual(DataSource.DRYAD, "dryad")
-        self.assertEqual(DataSource.ZENODO, "zenodo")
-        self.assertEqual(DataSource.SEMANTIC_SCHOLAR, "semantic_scholar")
-        self.assertEqual(DataSource.REFERENCED, "referenced")
+        assert DataSource.DRYAD == "dryad"
+        assert DataSource.ZENODO == "zenodo"
+        assert DataSource.SEMANTIC_SCHOLAR == "semantic_scholar"
+        assert DataSource.REFERENCED == "referenced"
 
     def test_source_field_on_base_model(self):
         m = DatasetFeatures(source="dryad")
-        self.assertEqual(m.source, "dryad")
+        assert m.source == "dryad"
 
     def test_source_field_none_default(self):
         m = DatasetFeatures()
-        self.assertIsNone(m.source)
+        assert m.source is None
 
     def test_source_field_all_values(self):
         for val in ("dryad", "zenodo", "semantic_scholar", "referenced"):
             m = DatasetFeatures(source=val)
-            self.assertEqual(m.source, val)
+            assert m.source == val
 
 
-class TestModulatorFieldsBase(unittest.TestCase):
+class TestModulatorFieldsBase:
     """Test modulator boolean fields on the base DatasetFeatures model."""
 
     MODULATOR_FIELDS = [
@@ -44,17 +43,17 @@ class TestModulatorFieldsBase(unittest.TestCase):
     def test_all_none_by_default(self):
         m = DatasetFeatures()
         for field in self.MODULATOR_FIELDS:
-            self.assertIsNone(getattr(m, field), f"{field} should default to None")
+            assert getattr(m, field) is None, f"{field} should default to None"
 
     def test_set_true(self):
         m = DatasetFeatures(**{f: True for f in self.MODULATOR_FIELDS})
         for field in self.MODULATOR_FIELDS:
-            self.assertTrue(getattr(m, field), f"{field} should be True")
+            assert getattr(m, field) is True, f"{field} should be True"
 
     def test_set_false(self):
         m = DatasetFeatures(**{f: False for f in self.MODULATOR_FIELDS})
         for field in self.MODULATOR_FIELDS:
-            self.assertFalse(getattr(m, field), f"{field} should be False")
+            assert getattr(m, field) is False, f"{field} should be False"
 
     def test_mixed_values(self):
         m = DatasetFeatures(
@@ -62,9 +61,9 @@ class TestModulatorFieldsBase(unittest.TestCase):
             multispecies=False,
             threatened_species=None,
         )
-        self.assertTrue(m.time_series)
-        self.assertFalse(m.multispecies)
-        self.assertIsNone(m.threatened_species)
+        assert m.time_series is True
+        assert m.multispecies is False
+        assert m.threatened_species is None
 
     def test_serialization_roundtrip(self):
         m = DatasetFeatures(
@@ -73,71 +72,71 @@ class TestModulatorFieldsBase(unittest.TestCase):
             source="zenodo",
         )
         d = m.model_dump()
-        self.assertTrue(d["time_series"])
-        self.assertFalse(d["multispecies"])
-        self.assertEqual(d["source"], "zenodo")
+        assert d["time_series"] is True
+        assert d["multispecies"] is False
+        assert d["source"] == "zenodo"
 
         m2 = DatasetFeatures.model_validate(d)
-        self.assertTrue(m2.time_series)
-        self.assertFalse(m2.multispecies)
-        self.assertEqual(m2.source, "zenodo")
+        assert m2.time_series is True
+        assert m2.multispecies is False
+        assert m2.source == "zenodo"
 
 
-class TestBooleanCoercionValidator(unittest.TestCase):
+class TestBooleanCoercionValidator:
     """Test boolean coercion in DatasetFeaturesNormalized for ground truth data."""
 
     def test_string_yes_no(self):
         """time_series in ground truth uses 'yes'/'no' strings."""
         m = DatasetFeaturesNormalized(time_series="yes", multispecies="no")
-        self.assertTrue(m.time_series)
-        self.assertFalse(m.multispecies)
+        assert m.time_series is True
+        assert m.multispecies is False
 
     def test_string_true_false(self):
         m = DatasetFeaturesNormalized(time_series="true", multispecies="false")
-        self.assertTrue(m.time_series)
-        self.assertFalse(m.multispecies)
+        assert m.time_series is True
+        assert m.multispecies is False
 
     def test_string_1_0(self):
         m = DatasetFeaturesNormalized(time_series="1", multispecies="0")
-        self.assertTrue(m.time_series)
-        self.assertFalse(m.multispecies)
+        assert m.time_series is True
+        assert m.multispecies is False
 
     def test_bool_passthrough(self):
         m = DatasetFeaturesNormalized(time_series=True, multispecies=False)
-        self.assertTrue(m.time_series)
-        self.assertFalse(m.multispecies)
+        assert m.time_series is True
+        assert m.multispecies is False
 
     def test_int_coercion(self):
         m = DatasetFeaturesNormalized(time_series=1, multispecies=0)
-        self.assertTrue(m.time_series)
-        self.assertFalse(m.multispecies)
+        assert m.time_series is True
+        assert m.multispecies is False
 
     def test_nan_to_none(self):
         m = DatasetFeaturesNormalized(time_series=float("nan"))
-        self.assertIsNone(m.time_series)
+        assert m.time_series is None
 
     def test_empty_string_to_none(self):
         m = DatasetFeaturesNormalized(time_series="")
-        self.assertIsNone(m.time_series)
+        assert m.time_series is None
 
     def test_na_strings_to_none(self):
         for val in ("na", "N/A", "NaN", "none", "NA"):
             m = DatasetFeaturesNormalized(time_series=val)
-            self.assertIsNone(m.time_series, f"'{val}' should coerce to None")
+            assert m.time_series is None, f"'{val}' should coerce to None"
 
     def test_none_passthrough(self):
         m = DatasetFeaturesNormalized(time_series=None)
-        self.assertIsNone(m.time_series)
+        assert m.time_series is None
 
     def test_case_insensitive(self):
         m = DatasetFeaturesNormalized(time_series="YES", multispecies="No")
-        self.assertTrue(m.time_series)
-        self.assertFalse(m.multispecies)
+        assert m.time_series is True
+        assert m.multispecies is False
 
     def test_whitespace_handling(self):
         m = DatasetFeaturesNormalized(time_series="  yes  ", multispecies="  no  ")
-        self.assertTrue(m.time_series)
-        self.assertFalse(m.multispecies)
+        assert m.time_series is True
+        assert m.multispecies is False
 
     def test_all_modulator_fields_coerce(self):
         """All 6 modulator fields should go through the boolean coercion validator."""
@@ -149,40 +148,40 @@ class TestBooleanCoercionValidator(unittest.TestCase):
             new_species_region="1",
             bias_north_south="0",
         )
-        self.assertTrue(m.time_series)
-        self.assertFalse(m.multispecies)
-        self.assertTrue(m.threatened_species)
-        self.assertFalse(m.new_species_science)
-        self.assertTrue(m.new_species_region)
-        self.assertFalse(m.bias_north_south)
+        assert m.time_series is True
+        assert m.multispecies is False
+        assert m.threatened_species is True
+        assert m.new_species_science is False
+        assert m.new_species_region is True
+        assert m.bias_north_south is False
 
 
-class TestSourceCoercionValidator(unittest.TestCase):
+class TestSourceCoercionValidator:
     """Test source field coercion in DatasetFeaturesNormalized."""
 
     def test_string_values(self):
         for val in ("dryad", "zenodo", "semantic_scholar", "referenced"):
             m = DatasetFeaturesNormalized(source=val)
-            self.assertEqual(m.source, val)
+            assert m.source == val
 
     def test_case_normalization(self):
         m = DatasetFeaturesNormalized(source="Dryad")
-        self.assertEqual(m.source, "dryad")
+        assert m.source == "dryad"
 
     def test_nan_to_none(self):
         m = DatasetFeaturesNormalized(source=float("nan"))
-        self.assertIsNone(m.source)
+        assert m.source is None
 
     def test_empty_string_to_none(self):
         m = DatasetFeaturesNormalized(source="")
-        self.assertIsNone(m.source)
+        assert m.source is None
 
     def test_none_passthrough(self):
         m = DatasetFeaturesNormalized(source=None)
-        self.assertIsNone(m.source)
+        assert m.source is None
 
 
-class TestNormalizedModelWithModulators(unittest.TestCase):
+class TestNormalizedModelWithModulators:
     """Integration tests: full DatasetFeaturesNormalized with modulator fields and existing fields."""
 
     def test_full_ground_truth_record(self):
@@ -205,19 +204,19 @@ class TestNormalizedModelWithModulators(unittest.TestCase):
             bias_north_south=False,
         )
         # Existing field normalization
-        self.assertIn("abundance", m.data_type)
-        self.assertIn("presence-absence", m.data_type)
-        self.assertIn("site", m.geospatial_info_dataset)
-        self.assertAlmostEqual(m.spatial_range_km2, 1000.5)
-        self.assertEqual(m.temp_range_i, 2005)
-        self.assertEqual(m.temp_range_f, 2015)
-        self.assertEqual(len(m.species), 2)
+        assert "abundance" in m.data_type
+        assert "presence-absence" in m.data_type
+        assert "site" in m.geospatial_info_dataset
+        assert abs(m.spatial_range_km2 - 1000.5) < 1e-7
+        assert m.temp_range_i == 2005
+        assert m.temp_range_f == 2015
+        assert len(m.species) == 2
 
         # Modulator fields
-        self.assertTrue(m.time_series)
-        self.assertTrue(m.multispecies)
-        self.assertFalse(m.threatened_species)
-        self.assertEqual(m.source, "dryad")
+        assert m.time_series is True
+        assert m.multispecies is True
+        assert m.threatened_species is False
+        assert m.source == "dryad"
 
     def test_record_with_all_nan_modulators(self):
         """Simulate a record where all modulator fields are NaN (common in xlsx)."""
@@ -231,15 +230,11 @@ class TestNormalizedModelWithModulators(unittest.TestCase):
             bias_north_south=float("nan"),
             source=float("nan"),
         )
-        self.assertIn("abundance", m.data_type)
-        self.assertIsNone(m.time_series)
-        self.assertIsNone(m.multispecies)
-        self.assertIsNone(m.threatened_species)
-        self.assertIsNone(m.new_species_science)
-        self.assertIsNone(m.new_species_region)
-        self.assertIsNone(m.bias_north_south)
-        self.assertIsNone(m.source)
-
-
-if __name__ == "__main__":
-    unittest.main()
+        assert "abundance" in m.data_type
+        assert m.time_series is None
+        assert m.multispecies is None
+        assert m.threatened_species is None
+        assert m.new_species_science is None
+        assert m.new_species_region is None
+        assert m.bias_north_south is None
+        assert m.source is None

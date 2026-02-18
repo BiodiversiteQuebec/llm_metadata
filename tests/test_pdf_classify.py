@@ -2,18 +2,12 @@
 Tests for PDF classification using OpenAI's File API.
 
 These tests make real API calls to OpenAI and incur costs.
-Run with: python -m unittest tests.test_pdf_classify -v
-
 Set RUN_SLOW_TESTS=1 to run expensive API tests.
 """
 
 import os
-import unittest
+import pytest
 from pathlib import Path
-
-from dotenv import load_dotenv
-
-load_dotenv()
 
 from llm_metadata.gpt_classify import (
     classify_pdf_file,
@@ -43,35 +37,38 @@ def run_slow_tests() -> bool:
     return os.environ.get("RUN_SLOW_TESTS", "").lower() in ("1", "true", "yes")
 
 
-@unittest.skipUnless(has_openai_key(), "OPENAI_API_KEY not set")
-class TestUploadPdfToOpenAI(unittest.TestCase):
+@pytest.mark.skipif(not has_openai_key(), reason="OPENAI_API_KEY not set")
+class TestUploadPdfToOpenAI:
     """Tests for PDF file upload to OpenAI."""
 
     def test_upload_valid_pdf(self):
         """Test uploading a valid PDF file."""
-        self.assertTrue(SAMPLE_PDF_PATH.exists(), f"Test PDF not found: {SAMPLE_PDF_PATH}")
+        assert SAMPLE_PDF_PATH.exists(), f"Test PDF not found: {SAMPLE_PDF_PATH}"
 
         file_id = upload_pdf_to_openai(SAMPLE_PDF_PATH)
 
-        self.assertIsInstance(file_id, str)
-        self.assertTrue(file_id.startswith("file-"))
+        assert isinstance(file_id, str)
+        assert file_id.startswith("file-")
 
         # Cleanup
         delete_openai_file(file_id)
 
     def test_upload_nonexistent_file_raises(self):
         """Test uploading a non-existent file raises error."""
-        with self.assertRaises(FileNotFoundError):
+        with pytest.raises(FileNotFoundError):
             upload_pdf_to_openai(TEST_DATA_DIR / "nonexistent.pdf")
 
 
-@unittest.skipUnless(has_openai_key() and run_slow_tests(), "Slow test - set RUN_SLOW_TESTS=1")
-class TestClassifyPdfFile(unittest.TestCase):
+@pytest.mark.skipif(
+    not (has_openai_key() and run_slow_tests()),
+    reason="Slow test - set RUN_SLOW_TESTS=1"
+)
+class TestClassifyPdfFile:
     """Tests for classify_pdf_file function."""
 
     def test_classify_local_pdf_basic(self):
         """Test basic PDF classification from local file."""
-        self.assertTrue(SAMPLE_PDF_PATH.exists(), f"Test PDF not found: {SAMPLE_PDF_PATH}")
+        assert SAMPLE_PDF_PATH.exists(), f"Test PDF not found: {SAMPLE_PDF_PATH}"
 
         result = classify_pdf_file(
             pdf_path=SAMPLE_PDF_PATH,
@@ -83,29 +80,29 @@ class TestClassifyPdfFile(unittest.TestCase):
         )
 
         # Verify result structure
-        self.assertIn("output", result)
-        self.assertIn("usage_cost", result)
-        self.assertIn("extraction_method", result)
-        self.assertIn("pdf_path", result)
-        self.assertIn("file_id", result)
+        assert "output" in result
+        assert "usage_cost" in result
+        assert "extraction_method" in result
+        assert "pdf_path" in result
+        assert "file_id" in result
 
         # Verify extraction method
-        self.assertEqual(result["extraction_method"], "openai_file_api")
+        assert result["extraction_method"] == "openai_file_api"
 
         # Verify output is correct type
-        self.assertIsInstance(result["output"], DatasetFeatures)
+        assert isinstance(result["output"], DatasetFeatures)
 
         # Verify usage cost structure
         usage = result["usage_cost"]
-        self.assertIn("input_tokens", usage)
-        self.assertIn("output_tokens", usage)
-        self.assertIn("total_cost", usage)
-        self.assertGreater(usage["input_tokens"], 0)
-        self.assertGreater(usage["output_tokens"], 0)
+        assert "input_tokens" in usage
+        assert "output_tokens" in usage
+        assert "total_cost" in usage
+        assert usage["input_tokens"] > 0
+        assert usage["output_tokens"] > 0
 
     def test_classify_local_pdf_extracts_features(self):
         """Test that PDF classification extracts meaningful features."""
-        self.assertTrue(SAMPLE_PDF_PATH.exists())
+        assert SAMPLE_PDF_PATH.exists()
 
         result = classify_pdf_file(
             pdf_path=SAMPLE_PDF_PATH,
@@ -121,11 +118,11 @@ class TestClassifyPdfFile(unittest.TestCase):
             output.temp_range_i is not None or
             output.geospatial_info_dataset is not None
         )
-        self.assertTrue(has_data, "Expected at least some features to be extracted")
+        assert has_data, "Expected at least some features to be extracted"
 
     def test_classify_with_cleanup(self):
         """Test PDF classification with file cleanup."""
-        self.assertTrue(SAMPLE_PDF_PATH.exists())
+        assert SAMPLE_PDF_PATH.exists()
 
         result = classify_pdf_file(
             pdf_path=SAMPLE_PDF_PATH,
@@ -134,12 +131,15 @@ class TestClassifyPdfFile(unittest.TestCase):
         )
 
         # File ID should still be in result even after cleanup
-        self.assertIn("file_id", result)
-        self.assertIsNotNone(result["file_id"])
+        assert "file_id" in result
+        assert result["file_id"] is not None
 
 
-@unittest.skipUnless(has_openai_key() and run_slow_tests(), "Slow test - set RUN_SLOW_TESTS=1")
-class TestClassifyPdfUrl(unittest.TestCase):
+@pytest.mark.skipif(
+    not (has_openai_key() and run_slow_tests()),
+    reason="Slow test - set RUN_SLOW_TESTS=1"
+)
+class TestClassifyPdfUrl:
     """Tests for classify_pdf_url function."""
 
     def test_classify_pdf_from_url_basic(self):
@@ -154,19 +154,19 @@ class TestClassifyPdfUrl(unittest.TestCase):
         )
 
         # Verify result structure
-        self.assertIn("output", result)
-        self.assertIn("usage_cost", result)
-        self.assertIn("extraction_method", result)
-        self.assertIn("pdf_url", result)
+        assert "output" in result
+        assert "usage_cost" in result
+        assert "extraction_method" in result
+        assert "pdf_url" in result
 
         # Verify extraction method
-        self.assertEqual(result["extraction_method"], "openai_url_api")
+        assert result["extraction_method"] == "openai_url_api"
 
         # Verify output is correct type
-        self.assertIsInstance(result["output"], DatasetFeatures)
+        assert isinstance(result["output"], DatasetFeatures)
 
         # Verify URL is stored
-        self.assertEqual(result["pdf_url"], TEST_PDF_URL)
+        assert result["pdf_url"] == TEST_PDF_URL
 
     def test_classify_pdf_url_returns_valid_output(self):
         """Test that URL-based PDF classification returns valid DatasetFeatures."""
@@ -178,16 +178,15 @@ class TestClassifyPdfUrl(unittest.TestCase):
         output = result["output"]
 
         # Verify the output is a valid DatasetFeatures instance
-        # The test PDF is a ML paper so may not have biodiversity features
-        self.assertIsInstance(output, DatasetFeatures)
+        assert isinstance(output, DatasetFeatures)
 
         # Verify the output can be serialized
         output_dict = output.model_dump()
-        self.assertIsInstance(output_dict, dict)
+        assert isinstance(output_dict, dict)
 
 
-@unittest.skipUnless(has_openai_key(), "OPENAI_API_KEY not set")
-class TestPdfClassifyEdgeCases(unittest.TestCase):
+@pytest.mark.skipif(not has_openai_key(), reason="OPENAI_API_KEY not set")
+class TestPdfClassifyEdgeCases:
     """Edge case tests for PDF classification."""
 
     def test_invalid_pdf_file_raises(self):
@@ -197,21 +196,15 @@ class TestPdfClassifyEdgeCases(unittest.TestCase):
         fake_pdf.write_text("<!DOCTYPE html><html><body>Not a PDF</body></html>")
 
         try:
-            with self.assertRaises(Exception) as context:
+            with pytest.raises(Exception) as exc_info:
                 classify_pdf_file(
                     pdf_path=fake_pdf,
                     text_format=DatasetFeatures,
                 )
             # Should fail with unsupported file type error
-            error_msg = str(context.exception).lower()
-            self.assertTrue(
-                "unsupported" in error_msg or "pdf" in error_msg,
+            error_msg = str(exc_info.value).lower()
+            assert "unsupported" in error_msg or "pdf" in error_msg, \
                 f"Expected 'unsupported' or 'pdf' in error: {error_msg}"
-            )
         finally:
             # Cleanup
             fake_pdf.unlink(missing_ok=True)
-
-
-if __name__ == "__main__":
-    unittest.main()

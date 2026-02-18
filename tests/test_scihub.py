@@ -4,16 +4,14 @@ Unit tests for Sci-Hub module.
 Tests URL discovery, paper fetching, and integration with pdf_download.
 """
 
-import unittest
+import pytest
 from unittest.mock import patch, Mock, MagicMock
-import tempfile
 from pathlib import Path
-import shutil
 
 from llm_metadata.scihub import SciHub, CaptchaNeedException
 
 
-class TestSciHubURLDiscovery(unittest.TestCase):
+class TestSciHubURLDiscovery:
     """Test Sci-Hub URL discovery functionality."""
 
     def test_get_available_urls(self):
@@ -21,17 +19,17 @@ class TestSciHubURLDiscovery(unittest.TestCase):
         sh = SciHub()
 
         # Should have at least one URL
-        self.assertIsNotNone(sh.available_base_url_list)
-        self.assertGreater(len(sh.available_base_url_list), 0)
+        assert sh.available_base_url_list is not None
+        assert len(sh.available_base_url_list) > 0
 
         # Base URL should be set
-        self.assertIsNotNone(sh.base_url)
-        self.assertTrue(sh.base_url.startswith('http'))
+        assert sh.base_url is not None
+        assert sh.base_url.startswith('http')
 
     def test_base_url_ends_with_slash(self):
         """Test that base_url is properly formatted with trailing slash."""
         sh = SciHub()
-        self.assertTrue(sh.base_url.endswith('/'))
+        assert sh.base_url.endswith('/')
 
     @patch('llm_metadata.scihub.requests.get')
     def test_url_discovery_fallback(self, mock_get):
@@ -40,15 +38,15 @@ class TestSciHubURLDiscovery(unittest.TestCase):
 
         # Should still work using preferred/fallback mirrors
         sh = SciHub()
-        self.assertGreater(len(sh.available_base_url_list), 0)
+        assert len(sh.available_base_url_list) > 0
         # Should use the first preferred mirror
-        self.assertIn('sci-hub', sh.base_url)
+        assert 'sci-hub' in sh.base_url
 
 
-class TestSciHubClassify(unittest.TestCase):
+class TestSciHubClassify:
     """Test identifier classification."""
 
-    def setUp(self):
+    def setup_method(self):
         """Skip initialization to avoid network calls."""
         self.sh = SciHub.__new__(SciHub)
         self.sh.sess = Mock()
@@ -57,33 +55,27 @@ class TestSciHubClassify(unittest.TestCase):
 
     def test_classify_doi(self):
         """Test DOI classification."""
-        self.assertEqual(self.sh._classify("10.1111/mec.14361"), "doi")
-        self.assertEqual(self.sh._classify("10.1371/journal.pone.0128238"), "doi")
+        assert self.sh._classify("10.1111/mec.14361") == "doi"
+        assert self.sh._classify("10.1371/journal.pone.0128238") == "doi"
 
     def test_classify_pmid(self):
         """Test PMID classification."""
-        self.assertEqual(self.sh._classify("12345678"), "pmid")
-        self.assertEqual(self.sh._classify("9876543"), "pmid")
+        assert self.sh._classify("12345678") == "pmid"
+        assert self.sh._classify("9876543") == "pmid"
 
     def test_classify_url_direct(self):
         """Test direct PDF URL classification."""
-        self.assertEqual(
-            self.sh._classify("https://example.com/paper.pdf"),
-            "url-direct"
-        )
+        assert self.sh._classify("https://example.com/paper.pdf") == "url-direct"
 
     def test_classify_url_non_direct(self):
         """Test non-direct URL classification."""
-        self.assertEqual(
-            self.sh._classify("https://example.com/paper"),
-            "url-non-direct"
-        )
+        assert self.sh._classify("https://example.com/paper") == "url-non-direct"
 
 
-class TestSciHubFetch(unittest.TestCase):
+class TestSciHubFetch:
     """Test paper fetching functionality."""
 
-    def setUp(self):
+    def setup_method(self):
         """Create a SciHub instance with mocked session."""
         self.sh = SciHub.__new__(SciHub)
         self.sh.sess = MagicMock()
@@ -112,9 +104,9 @@ class TestSciHubFetch(unittest.TestCase):
         result = self.sh.fetch("10.1111/mec.14361")
 
         # Result should contain PDF bytes
-        self.assertIn('pdf', result)
-        self.assertIsInstance(result['pdf'], bytes)
-        self.assertTrue(result['pdf'].startswith(b'%PDF'))
+        assert 'pdf' in result
+        assert isinstance(result['pdf'], bytes)
+        assert result['pdf'].startswith(b'%PDF')
 
     def test_fetch_returns_pdf_bytes_object(self):
         """Test that fetch returns PDF as bytes (new object structure)."""
@@ -138,9 +130,9 @@ class TestSciHubFetch(unittest.TestCase):
         result = self.sh.fetch("10.1093/jhered/esx005")
 
         # Result should contain PDF bytes
-        self.assertIn('pdf', result)
-        self.assertIsInstance(result['pdf'], bytes)
-        self.assertTrue(result['pdf'].startswith(b'%PDF'))
+        assert 'pdf' in result
+        assert isinstance(result['pdf'], bytes)
+        assert result['pdf'].startswith(b'%PDF')
 
     def test_fetch_captcha_handling(self):
         """Test that captcha responses raise CaptchaNeedException."""
@@ -159,7 +151,7 @@ class TestSciHubFetch(unittest.TestCase):
 
         self.sh.sess.get.side_effect = [page_response, captcha_response]
 
-        with self.assertRaises(CaptchaNeedException):
+        with pytest.raises(CaptchaNeedException):
             self.sh.fetch("10.1111/mec.14361")
 
     def test_fetch_returns_url(self):
@@ -180,26 +172,27 @@ class TestSciHubFetch(unittest.TestCase):
 
         result = self.sh.fetch("10.1111/mec.14361")
 
-        self.assertIn('url', result)
-        self.assertTrue(result['url'].endswith('.pdf'))
+        assert 'url' in result
+        assert result['url'].endswith('.pdf')
 
 
-class TestSciHubDownload(unittest.TestCase):
+class TestSciHubDownload:
     """Test download functionality."""
 
-    def setUp(self):
+    def setup_method(self, tmp_path=None):
         """Create temp directory for downloads."""
-        self.temp_dir = Path(tempfile.mkdtemp())
+        import tempfile
+        self._tempdir_obj = tempfile.TemporaryDirectory()
+        self.temp_dir = Path(self._tempdir_obj.name)
 
         self.sh = SciHub.__new__(SciHub)
         self.sh.sess = MagicMock()
         self.sh.available_base_url_list = ['https://sci-hub.st']
         self.sh.base_url = 'https://sci-hub.st/'
 
-    def tearDown(self):
+    def teardown_method(self):
         """Clean up temp directory."""
-        if self.temp_dir.exists():
-            shutil.rmtree(self.temp_dir)
+        self._tempdir_obj.cleanup()
 
     def test_download_saves_file(self):
         """Test that download saves PDF to specified path."""
@@ -223,15 +216,15 @@ class TestSciHubDownload(unittest.TestCase):
         output_path = self.temp_dir / "test_paper.pdf"
         result = self.sh.download("10.1111/mec.14361", path=str(output_path))
 
-        self.assertIn('pdf', result)
-        self.assertTrue(output_path.exists())
+        assert 'pdf' in result
+        assert output_path.exists()
 
         with open(output_path, 'rb') as f:
             saved_content = f.read()
-        self.assertEqual(saved_content, pdf_content)
+        assert saved_content == pdf_content
 
 
-class TestSciHubIntegrationLive(unittest.TestCase):
+class TestSciHubIntegrationLive:
     """
     Live integration tests for Sci-Hub.
 
@@ -239,7 +232,7 @@ class TestSciHubIntegrationLive(unittest.TestCase):
     They may fail due to network issues, captchas, or mirror availability.
     """
 
-    @unittest.skip("Live test - run manually")
+    @pytest.mark.skip(reason="Live test - run manually")
     def test_live_fetch_open_access_paper(self):
         """Test fetching an open access paper through Sci-Hub."""
         sh = SciHub()
@@ -250,14 +243,14 @@ class TestSciHubIntegrationLive(unittest.TestCase):
         result = sh.fetch(doi)
 
         if 'err' in result:
-            self.skipTest(f"Sci-Hub fetch failed: {result['err']}")
+            pytest.skip(f"Sci-Hub fetch failed: {result['err']}")
 
-        self.assertIn('pdf', result)
-        self.assertIsInstance(result['pdf'], bytes)
+        assert 'pdf' in result
+        assert isinstance(result['pdf'], bytes)
         # Check PDF magic bytes
-        self.assertTrue(result['pdf'].startswith(b'%PDF'))
+        assert result['pdf'].startswith(b'%PDF')
 
-    @unittest.skip("Live test - run manually")
+    @pytest.mark.skip(reason="Live test - run manually")
     def test_live_fetch_wiley_paper(self):
         """Test fetching a Wiley paper (common failure case)."""
         sh = SciHub()
@@ -268,14 +261,13 @@ class TestSciHubIntegrationLive(unittest.TestCase):
         result = sh.fetch(doi)
 
         if 'err' in result:
-            print(f"Sci-Hub fetch failed: {result['err']}")
             return
 
-        self.assertIn('pdf', result)
-        self.assertIsInstance(result['pdf'], bytes)
+        assert 'pdf' in result
+        assert isinstance(result['pdf'], bytes)
 
 
-class TestSciHubPDFDownloadIntegration(unittest.TestCase):
+class TestSciHubPDFDownloadIntegration:
     """Test Sci-Hub integration with pdf_download module."""
 
     def test_scihub_integration_uses_bytes_correctly(self):
@@ -307,15 +299,11 @@ class TestSciHubPDFDownloadIntegration(unittest.TestCase):
         result = sh.fetch("10.1111/test")
 
         # Verify result structure
-        self.assertIn('pdf', result)
-        self.assertIn('url', result)
+        assert 'pdf' in result
+        assert 'url' in result
 
         # pdf should be bytes (the actual PDF content)
-        self.assertIsInstance(result['pdf'], bytes)
+        assert isinstance(result['pdf'], bytes)
 
         # url should be string (the PDF URL)
-        self.assertIsInstance(result['url'], str)
-
-
-if __name__ == '__main__':
-    unittest.main()
+        assert isinstance(result['url'], str)

@@ -44,18 +44,25 @@ dev = [
     "jupyter-collaboration==4.0.2",
     "jupyter-mcp-tools>=0.1.4",
     "jupyterlab==4.4.1",
-    "jupyter-mcp-tools>=0.1.4",
-    "ipykernel",
+    "pytest>=9.0.2",
 ]
 
 [tool.setuptools.packages.find]
 where = ["src"]
 include = ["llm_metadata*"]
 
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+
 [dependency-groups]
 dev = [
     "ipykernel>=7.2.0",
     "jupyter>=1.1.1",
     "nbconvert>=7.17.0",
+    "pandas>=1.5",
+    "python-dotenv>=1.0",
     "pytest>=9.0.2",
 ]

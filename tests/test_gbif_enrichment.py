@@ -7,13 +7,7 @@ Tests cover:
 - End-to-end evaluation with gbif_keys using evaluate_indexed
 """
 
-import sys
-import os
-import unittest
 from unittest.mock import patch, MagicMock
-
-sys.path.insert(0, os.path.dirname(__file__))
-import config  # noqa: F401
 
 from llm_metadata.schemas import DatasetFeatures
 from llm_metadata.gbif import GBIFMatch, enrich_with_gbif
@@ -51,31 +45,31 @@ def _make_resolved_taxon(key: int, original: str):
 # Tests: gbif_keys field on DatasetFeatures
 # ---------------------------------------------------------------------------
 
-class TestGbifKeysField(unittest.TestCase):
+class TestGbifKeysField:
 
     def test_gbif_keys_defaults_to_none(self):
         m = DatasetFeatures()
-        self.assertIsNone(m.gbif_keys)
+        assert m.gbif_keys is None
 
     def test_gbif_keys_accepts_list_of_ints(self):
         m = DatasetFeatures(gbif_keys=[5219243, 2435099])
-        self.assertEqual(m.gbif_keys, [5219243, 2435099])
+        assert m.gbif_keys == [5219243, 2435099]
 
     def test_gbif_keys_accepts_none(self):
         m = DatasetFeatures(gbif_keys=None)
-        self.assertIsNone(m.gbif_keys)
+        assert m.gbif_keys is None
 
     def test_gbif_keys_not_set_by_species_field(self):
         """Setting species should not auto-populate gbif_keys."""
         m = DatasetFeatures(species=["Tamias striatus"])
-        self.assertIsNone(m.gbif_keys)
+        assert m.gbif_keys is None
 
 
 # ---------------------------------------------------------------------------
 # Tests: enrich_with_gbif()
 # ---------------------------------------------------------------------------
 
-class TestEnrichWithGbif(unittest.TestCase):
+class TestEnrichWithGbif:
 
     def test_enrich_with_known_species_populates_gbif_keys(self):
         model = DatasetFeatures(species=["Tamias striatus"])
@@ -93,19 +87,19 @@ class TestEnrichWithGbif(unittest.TestCase):
         with patch("llm_metadata.gbif.resolve_species_list", return_value=resolved):
             enriched = enrich_with_gbif(model)
 
-        self.assertEqual(enriched.gbif_keys, [5219243])
+        assert enriched.gbif_keys == [5219243]
         # Original unchanged
-        self.assertIsNone(model.gbif_keys)
+        assert model.gbif_keys is None
 
     def test_enrich_with_none_species_gives_none_keys(self):
         model = DatasetFeatures(species=None)
         enriched = enrich_with_gbif(model)
-        self.assertIsNone(enriched.gbif_keys)
+        assert enriched.gbif_keys is None
 
     def test_enrich_with_empty_species_gives_none_keys(self):
         model = DatasetFeatures(species=[])
         enriched = enrich_with_gbif(model)
-        self.assertIsNone(enriched.gbif_keys)
+        assert enriched.gbif_keys is None
 
     def test_enrich_with_unmatchable_species_gives_none(self):
         model = DatasetFeatures(species=["xyzzy unknown organism"])
@@ -123,7 +117,7 @@ class TestEnrichWithGbif(unittest.TestCase):
         with patch("llm_metadata.gbif.resolve_species_list", return_value=resolved):
             enriched = enrich_with_gbif(model)
 
-        self.assertIsNone(enriched.gbif_keys)
+        assert enriched.gbif_keys is None
 
     def test_enrich_multiple_species(self):
         model = DatasetFeatures(species=["Tamias striatus", "Rangifer tarandus"])
@@ -146,7 +140,7 @@ class TestEnrichWithGbif(unittest.TestCase):
         with patch("llm_metadata.gbif.resolve_species_list", return_value=resolved):
             enriched = enrich_with_gbif(model)
 
-        self.assertEqual(sorted(enriched.gbif_keys), [2435099, 5219243])
+        assert sorted(enriched.gbif_keys) == [2435099, 5219243]
 
     def test_enrich_partial_match(self):
         """Some species match, some don't — only matched keys are populated."""
@@ -170,7 +164,7 @@ class TestEnrichWithGbif(unittest.TestCase):
         with patch("llm_metadata.gbif.resolve_species_list", return_value=resolved):
             enriched = enrich_with_gbif(model)
 
-        self.assertEqual(enriched.gbif_keys, [5219243])
+        assert enriched.gbif_keys == [5219243]
 
     def test_enrich_returns_copy_not_mutated(self):
         """enrich_with_gbif must not mutate the original model."""
@@ -189,15 +183,15 @@ class TestEnrichWithGbif(unittest.TestCase):
         with patch("llm_metadata.gbif.resolve_species_list", return_value=resolved):
             enriched = enrich_with_gbif(model)
 
-        self.assertIsNone(model.gbif_keys)  # original unchanged
-        self.assertIsNotNone(enriched.gbif_keys)
+        assert model.gbif_keys is None  # original unchanged
+        assert enriched.gbif_keys is not None
 
 
 # ---------------------------------------------------------------------------
 # End-to-end: evaluate_indexed with gbif_keys
 # ---------------------------------------------------------------------------
 
-class TestEvaluateIndexedWithGbifKeys(unittest.TestCase):
+class TestEvaluateIndexedWithGbifKeys:
 
     def test_gbif_keys_metrics_exist_in_report(self):
         """evaluate_indexed should produce metrics for gbif_keys field."""
@@ -216,7 +210,7 @@ class TestEvaluateIndexedWithGbifKeys(unittest.TestCase):
             fields=["species", "gbif_keys"],
         )
 
-        self.assertIn("gbif_keys", report.field_metrics)
+        assert "gbif_keys" in report.field_metrics
 
     def test_gbif_keys_perfect_match(self):
         """Identical gbif_keys should yield perfect precision/recall."""
@@ -230,9 +224,9 @@ class TestEvaluateIndexedWithGbifKeys(unittest.TestCase):
         )
 
         m = report.metrics_for("gbif_keys")
-        self.assertEqual(m.tp, 2)
-        self.assertEqual(m.fp, 0)
-        self.assertEqual(m.fn, 0)
+        assert m.tp == 2
+        assert m.fp == 0
+        assert m.fn == 0
 
     def test_gbif_keys_partial_match(self):
         """Partial key overlap should yield non-zero FP and FN."""
@@ -246,9 +240,9 @@ class TestEvaluateIndexedWithGbifKeys(unittest.TestCase):
         )
 
         m = report.metrics_for("gbif_keys")
-        self.assertEqual(m.tp, 1)   # 5219243 shared
-        self.assertEqual(m.fp, 1)   # 9999999 in pred, not in true
-        self.assertEqual(m.fn, 1)   # 2435099 in true, not in pred
+        assert m.tp == 1   # 5219243 shared
+        assert m.fp == 1   # 9999999 in pred, not in true
+        assert m.fn == 1   # 2435099 in true, not in pred
 
     def test_species_and_gbif_keys_evaluated_independently(self):
         """Both fields evaluated in single run — each has its own metrics entry."""
@@ -267,9 +261,5 @@ class TestEvaluateIndexedWithGbifKeys(unittest.TestCase):
             fields=["species", "gbif_keys"],
         )
 
-        self.assertIn("species", report.field_metrics)
-        self.assertIn("gbif_keys", report.field_metrics)
-
-
-if __name__ == "__main__":
-    unittest.main()
+        assert "species" in report.field_metrics
+        assert "gbif_keys" in report.field_metrics
