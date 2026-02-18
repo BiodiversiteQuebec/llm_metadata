@@ -55,12 +55,14 @@ This prevents duplicate work across parallel sessions.
 
 ### WU-B: Abstract-only extraction + evaluation `sonnet`
 
-- [ ] Notebook: `notebooks/batch_abstract_evaluation.ipynb` (mirrors `batch_fulltext_evaluation.ipynb` / `batch_pdf_file_evaluation.ipynb`)
-- [ ] Steps 1–8: load → configure → extract → prep → evaluate → analysis → cost → export
-- [ ] Per-field P/R/F1 for all 16 fields (10 original + 6 modulators)
-- [ ] Segment by source (Dryad vs Zenodo vs SS), feature discussion, side-by-side examples
-- [ ] HTML report in `notebooks/results/`, extraction CSV for WU-D1
+- [x] Notebook: `notebooks/batch_abstract_evaluation.ipynb` (mirrors `batch_fulltext_evaluation.ipynb` / `batch_pdf_file_evaluation.ipynb`)
+- [x] Steps 1–8: load → configure → extract → prep → evaluate → analysis → cost → export
+- [x] Per-field P/R/F1 for all 14 evaluatable fields (8 core + 6 modulators)
+- [x] Segment by source (Dryad vs Zenodo vs SS), cross-source summary table, mismatch examples
+- [x] HTML report in `notebooks/results/`, extraction CSV for WU-D1
+- [x] `text_pipeline.py`: added `system_message` field to `TextClassificationConfig`
 - **Tag:** `CLOUD` | **Deps:** WU-A2 | **Files:** `text_pipeline.py`, `gpt_classify.py`, `groundtruth_eval.py`, notebook
+- **Note:** Notebook created; needs execution (OpenAI API key required). Cache lands at `{PROJECT_ROOT}/cache/` (not gitignored — committable and syncable).
 
 ### WU-C1: Download OA PDFs for SS records `sonnet`
 
@@ -258,3 +260,4 @@ This prevents duplicate work across parallel sessions.
 | `claude/wu-a1-dlX7N` | WU-A1 | Extend schema — modulators + DataSource | opus | 2026-02-18 |
 | `claude/implement-wu-a2-ePym7` | WU-A2 | Validate all-source ground truth | sonnet | 2026-02-18 |
 | `claude/implement-wu-a3-Y1iX9` | WU-A3 | Enrich URL metadata (source_url, journal_url, pdf_url, is_oa) | sonnet | 2026-02-18 |
+| `claude/implement-wu-b-classification-Knvz2` | WU-B | Abstract-only extraction + evaluation notebook | sonnet | 2026-02-18 |

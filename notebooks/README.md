@@ -4,6 +4,34 @@ This folder contains analysis and validation notebooks for ecological dataset ch
 
 ## Recent Activity
 
+### 2026-02-18: WU-B — Abstract-only extraction + evaluation notebook
+
+**Task:** Create `notebooks/batch_abstract_evaluation.ipynb` to run GPT-5-mini abstract classification on all 299 valid records (Dryad + Zenodo + Semantic Scholar) and evaluate against ground truth. Per-field P/R/F1 for 14 fields: 8 core EBV + 6 modulators.
+
+**Work Performed:**
+- **`notebooks/batch_abstract_evaluation.ipynb`** (new): 8-step notebook mirroring `batch_fulltext_evaluation.ipynb` and `batch_pdf_file_evaluation.ipynb`:
+  - Step 1: Load validated xlsx + join original xlsx for abstract text; validate GT via `DatasetFeaturesNormalized`
+  - Step 2: Configure `TextClassificationConfig` with `DatasetFeatures` schema + `SYSTEM_MESSAGE`
+  - Step 3: Run `text_classification_flow()` (Prefect, ThreadPool, max_workers=5)
+  - Step 4: Convert results to `DatasetFeaturesNormalized` for evaluation
+  - Step 5: `evaluate_indexed()` on all 14 fields with `enhanced_species_matching=True`
+  - Step 6: Per-field table + cross-source breakdown (Dryad / Zenodo / Semantic Scholar)
+  - Step 7: Cost analysis per source
+  - Step 8: Export detail CSV + field/source summary CSVs + HTML report
+- **`src/llm_metadata/text_pipeline.py`**: Added `system_message: str` field to `TextClassificationConfig` (defaulting to `SYSTEM_MESSAGE` from `gpt_classify.py`), passed through to `classify_abstract()`.
+- **Cache:** Notebook sets `os.chdir(PROJECT_ROOT)` before imports so joblib cache lands at `{PROJECT_ROOT}/cache/`. This path is NOT matched by the `*/cache/*` gitignore pattern (which requires a path segment before "cache"), so the cache is committable and syncable to local.
+
+**Key issues identified:**
+- `dataset_092624_validated.xlsx` does not include abstract text (WU-A2 intentionally kept the schema-only fields). Abstract text must be joined from the original `dataset_092624.xlsx` via the `id` column.
+- 3 pre-existing test failures (not caused by this work): `test_datasource_all_members` (REFERENCED enum not expected), 2 fuzzy match tests (`rapidfuzz` not installed).
+
+**Next steps:**
+- Execute the notebook (requires OpenAI API key)
+- Fill in Summary table with actual metrics
+- Use output CSVs for WU-D1 three-way comparison
+
+---
+
 ### 2026-02-18: WU-A3 — Enrich URL metadata (source_url, journal_url, pdf_url, is_oa)
 
 **Task:** Populate the 5 URL/OA metadata fields added by WU-A1 in the validated xlsx and dataset-article mapping CSV, so downstream consumers (WU-B extraction, WU-C1 PDF download) have complete metadata.
