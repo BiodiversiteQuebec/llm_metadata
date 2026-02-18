@@ -178,9 +178,17 @@ This prevents duplicate work across parallel sessions.
 
 > **Plan:** [`plans/gbif_species_matching.md`](plans/gbif_species_matching.md)
 
-- [ ] WU-1: `species_parsing.py` — ParsedTaxon model + shared preprocessing
-- [ ] WU-2: `gbif.py` — GBIF Species Match API wrapper
-- [ ] WU-3: Schema `gbif_keys` field + enrichment function
+- [x] WU-1: `species_parsing.py` — ParsedTaxon model + shared preprocessing
+- [x] WU-2: `gbif.py` — GBIF Species Match API wrapper
+- [x] WU-3: Schema `gbif_keys` field + enrichment function
+- [ ] WU-4: Demo notebook — GBIF vs enhanced_species evaluation comparison `sonnet`
+  - Template: `notebooks/species_recall_improvement.ipynb` (same 10 OA PDF extractions)
+  - Reuse existing extracted predictions (load from artifacts, no re-extraction)
+  - Enrich both ground truth and predictions with `enrich_with_gbif()`
+  - Run `evaluate_indexed()` with `fields=["species", "gbif_keys"]`
+  - Side-by-side P/R/F1 table: enhanced_species matching vs GBIF key set comparison
+  - Qualitative analysis: which species strings GBIF resolves vs fails (vernacular, groups, count+name)
+  - Save notebook as `notebooks/eval_gbif_vs_enhanced_species_test.ipynb`
 
 ### Backlog
 
@@ -191,6 +199,7 @@ This prevents duplicate work across parallel sessions.
 - [ ] Taxonomic & geographic referencing pipeline
 - [ ] `ExtractedTaxon` structured schema — LLM extracts `{name, type, count}` instead of flat `list[str]` (improves GBIF preprocessing, requires prompt + ground truth changes)
 - [ ] Evaluation matcher refactor — strategy pattern to eliminate 3x duplicated TP/FP/FN logic in `compare_models()` + delete orphaned `EnhancedSpeciesMatchConfig`
+- [ ] *(ready, out of scope)* Species eval via `ParsedTaxon` — replace fuzzy enhanced_species matching with structured comparator in `evaluate_indexed()`: parse both GT and predictions through `ParsedTaxon`, match on normalized `scientific_name`/`common_name` fields; more principled than heuristic fuzzy, improves precision; requires custom comparator hook in `EvaluationConfig` `sonnet`
 - [ ] Pipeline enrichment — use `gbif_keys` beyond evaluation for data gap analysis with real taxon IDs
 
 ### Model Hierarchy & Enrichment Pattern
@@ -260,3 +269,4 @@ This prevents duplicate work across parallel sessions.
 | `claude/wu-a1-dlX7N` | WU-A1 | Extend schema — modulators + DataSource | opus | 2026-02-18 |
 | `claude/implement-wu-a2-ePym7` | WU-A2 | Validate all-source ground truth | sonnet | 2026-02-18 |
 | `claude/implement-wu-a3-Y1iX9` | WU-A3 | Enrich URL metadata (source_url, journal_url, pdf_url, is_oa) | sonnet | 2026-02-18 |
+| `claude/implement-gbif-key-enrichment-9mcv1` | GBIF WU-1,2,3 | GBIF species matching enrichment | sonnet | 2026-02-18 |
