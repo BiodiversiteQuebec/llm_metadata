@@ -137,6 +137,19 @@ class FeatureLocation(str, Enum):
     REPOSITORY = "repository"
     UNKNOWN = "unknown"
 
+
+class DataSource(str, Enum):
+    """
+    Source repository from which a dataset record was obtained.
+
+    Used for ground truth tracking and multi-source evaluation segmentation.
+    """
+    DRYAD = "dryad"
+    ZENODO = "zenodo"
+    SEMANTIC_SCHOLAR = "semantic_scholar"
+    REFERENCED = "referenced"
+
+
 class DatasetFeatures(BaseModel):
     """
     Schema for LLM-based feature extraction to describe biodiversity dataset (Fuster et al. EBV framework).
@@ -203,6 +216,32 @@ class DatasetFeatures(BaseModel):
         description="Referred dataset source (e.g. 'Ministère des Ressources naturelles...')."
     )
 
+    # Modulator features (boolean indicators for dataset characteristics)
+    time_series: Optional[bool] = Field(
+        None,
+        description="Whether the dataset contains time-series data (repeated measurements over time)."
+    )
+    multispecies: Optional[bool] = Field(
+        None,
+        description="Whether the dataset covers multiple species."
+    )
+    threatened_species: Optional[bool] = Field(
+        None,
+        description="Whether the dataset includes threatened, endangered, or at-risk species."
+    )
+    new_species_science: Optional[bool] = Field(
+        None,
+        description="Whether the dataset describes species new to science (newly described taxa)."
+    )
+    new_species_region: Optional[bool] = Field(
+        None,
+        description="Whether the dataset reports species new to a particular region (range extensions or first records)."
+    )
+    bias_north_south: Optional[bool] = Field(
+        None,
+        description="Whether the dataset exhibits a geographic bias toward the Global North over the Global South."
+    )
+
     # Validation fields
     valid_yn: Optional[ValidationStatus] = Field(
         None,
@@ -211,6 +250,12 @@ class DatasetFeatures(BaseModel):
     reason_not_valid: Optional[str] = Field(
         None,
         description="Reason for invalid classification. See InvalidReason enum for common values."
+    )
+
+    # Data source tracking (for ground truth, not LLM extraction)
+    source: Optional[DataSource] = Field(
+        None,
+        description="Source repository (dryad, zenodo, semantic_scholar, referenced). Used for ground truth tracking, not extracted by LLM."
     )
 
     class Config:
@@ -524,6 +569,51 @@ class DatasetFeaturesNormalized(DatasetFeatures):
         }
         
         return mapping.get(normalized, normalized)
+
+    @field_validator(
+        'time_series', 'multispecies', 'threatened_species',
+        'new_species_science', 'new_species_region', 'bias_north_south',
+        mode='before',
+    )
+    @classmethod
+    def coerce_bool(cls, v: Any) -> Optional[bool]:
+        """
+        Coerce various boolean representations to Optional[bool].
+
+        Handles: True/False, "yes"/"no", "true"/"false", "1"/"0", 1/0, NaN → None.
+        """
+        if v is None:
+            return None
+        if isinstance(v, bool):
+            return v
+        if isinstance(v, (int, float)):
+            if isinstance(v, float) and (math.isnan(v) or pd.isna(v)):
+                return None
+            return bool(v)
+        if isinstance(v, str):
+            s = v.strip().lower()
+            if s in ('yes', 'true', '1'):
+                return True
+            if s in ('no', 'false', '0'):
+                return False
+            if s in ('', 'na', 'n/a', 'nan', 'none'):
+                return None
+        return None
+
+    @field_validator('source', mode='before')
+    @classmethod
+    def coerce_source(cls, v: Any) -> Optional[str]:
+        """Coerce source strings to DataSource enum values."""
+        if v is None:
+            return None
+        if isinstance(v, (float, int)) and pd.isna(v):
+            return None
+        if isinstance(v, str):
+            s = v.strip().lower()
+            if s in ('', 'na', 'n/a', 'nan', 'none'):
+                return None
+            return s
+        return v
 
     @field_validator('spatial_range_km2', mode='before')
     @classmethod

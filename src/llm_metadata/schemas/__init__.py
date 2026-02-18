@@ -14,6 +14,8 @@ from llm_metadata.schemas.abstract_metadata import (
 )
 from llm_metadata.schemas.fuster_features import (
     DatasetFeatures,
+    DatasetFeaturesNormalized,
+    DataSource,
     EBVDataType,
     GeospatialInfoType,
     FeatureLocation,
@@ -38,6 +40,8 @@ __all__ = [
     "DEFAULT_DATASET_CATEGORIES",
     # Fuster features
     "DatasetFeatures",
+    "DatasetFeaturesNormalized",
+    "DataSource",
     "EBVDataType",
     "GeospatialInfoType",
     "FeatureLocation",

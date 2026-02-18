@@ -40,6 +40,17 @@ Rules:
 - If a field is not clearly stated, set it to null (or an empty list) as allowed by the schema.
 - Prefer conservative outputs over over-extraction.
 - Output must conform exactly to the schema (types, enums, lists).
+
+## Modulator Boolean Fields
+
+Set each to true only when the text provides explicit evidence; otherwise set to null.
+
+- **time_series**: true if the dataset contains repeated measurements at the same locations/populations over time (e.g. "annual surveys from 2005 to 2015", "monitored monthly"). A single snapshot is NOT a time series.
+- **multispecies**: true if the dataset covers more than one species or taxonomic group.
+- **threatened_species**: true if any studied species are described as threatened, endangered, vulnerable, at-risk, or listed under IUCN/CITES/national red lists.
+- **new_species_science**: true if the study describes or names a species new to science (newly described taxon).
+- **new_species_region**: true if the study reports a species recorded in a region for the first time (range extension, first regional record).
+- **bias_north_south**: true if the text explicitly discusses geographic bias toward the Global North or underrepresentation of the Global South.
 """.strip()
 
 SECTION_SYSTEM_MESSAGE = """
@@ -80,6 +91,17 @@ Different sections contain different types of information:
    - Extract scientific names, common names, and taxonomic groups exactly as written
    - Include counts if given ("12 mammal species", "41 fish species")
    - Do NOT expand abbreviations or infer genera
+
+## Modulator Boolean Fields
+
+Set each to true only when the text provides explicit evidence; otherwise set to null.
+
+- **time_series**: true if the dataset contains repeated measurements at the same locations/populations over time (e.g. "annual surveys from 2005 to 2015", "monitored monthly"). A single snapshot is NOT a time series.
+- **multispecies**: true if the dataset covers more than one species or taxonomic group.
+- **threatened_species**: true if any studied species are described as threatened, endangered, vulnerable, at-risk, or listed under IUCN/CITES/national red lists.
+- **new_species_science**: true if the study describes or names a species new to science (newly described taxon).
+- **new_species_region**: true if the study reports a species recorded in a region for the first time (range extension, first regional record).
+- **bias_north_south**: true if the text explicitly discusses geographic bias toward the Global North or underrepresentation of the Global South.
 
 ## General Rules
 
@@ -148,6 +170,17 @@ Scientific papers typically follow this structure - prioritize sections accordin
    - Check tables for complete species lists
    - Include counts if given ("12 mammal species")
    - Do NOT expand abbreviations or infer genera
+
+## Modulator Boolean Fields
+
+Set each to true only when the text provides explicit evidence; otherwise set to null.
+
+- **time_series**: true if the dataset contains repeated measurements at the same locations/populations over time (e.g. "annual surveys from 2005 to 2015", "monitored monthly"). A single snapshot is NOT a time series.
+- **multispecies**: true if the dataset covers more than one species or taxonomic group.
+- **threatened_species**: true if any studied species are described as threatened, endangered, vulnerable, at-risk, or listed under IUCN/CITES/national red lists.
+- **new_species_science**: true if the study describes or names a species new to science (newly described taxon).
+- **new_species_region**: true if the study reports a species recorded in a region for the first time (range extension, first regional record).
+- **bias_north_south**: true if the text explicitly discusses geographic bias toward the Global North or underrepresentation of the Global South.
 
 ## Extraction Philosophy
 
