@@ -23,8 +23,8 @@ logger = logging.getLogger(__name__)
 memory = Memory("./cache", verbose=0)
 
 BASE_URL = "https://api.semanticscholar.org/graph/v1"
-RATE_LIMIT_DELAY = 1.0  # seconds between requests (unauthenticated)
-REQUEST_TIMEOUT = 30    # seconds
+REQUEST_TIMEOUT = 30  # seconds
+_RETRY_DELAYS = [2, 4, 8]  # seconds, for 429 backoff
 
 SEMANTIC_SCHOLAR_API_KEY = os.getenv("SEMANTIC_SCHOLAR_API_KEY")
 
@@ -34,29 +34,31 @@ DEFAULT_SEARCH_FIELDS = "paperId,title,abstract,year,authors"
 DEFAULT_CITATION_FIELDS = "paperId,title,abstract"
 DEFAULT_REFERENCE_FIELDS = "paperId,title,abstract"
 
-_last_request_time: float = 0.0
-
 
 def _build_headers() -> Dict[str, str]:
-    """Build request headers, including optional API key."""
+    """Build request headers, including optional API key.
+
+    Unauthenticated: uses the shared public pool (1000 req/sec across all users).
+    Authenticated: sends x-api-key header for a dedicated higher rate limit.
+    """
     headers = {}
     if SEMANTIC_SCHOLAR_API_KEY:
         headers["x-api-key"] = SEMANTIC_SCHOLAR_API_KEY
     return headers
 
 
-def _rate_limit() -> None:
-    """Enforce rate limiting between API requests.
-
-    Unauthenticated: 1 request/second
-    Authenticated: 10 requests/second
-    """
-    global _last_request_time
-    delay = RATE_LIMIT_DELAY if not SEMANTIC_SCHOLAR_API_KEY else 0.1
-    elapsed = time.time() - _last_request_time
-    if elapsed < delay:
-        time.sleep(delay - elapsed)
-    _last_request_time = time.time()
+def _get(url: str, params: Dict[str, Any]) -> requests.Response:
+    """Make a GET request with 429 retry backoff."""
+    headers = _build_headers()
+    for attempt, wait in enumerate([0] + _RETRY_DELAYS):
+        if wait:
+            logger.warning("Rate limited (429), retrying in %ss...", wait)
+            time.sleep(wait)
+        response = requests.get(url, params=params, headers=headers, timeout=REQUEST_TIMEOUT)
+        if response.status_code != 429:
+            return response
+    response.raise_for_status()
+    return response
 
 
 def _clean_doi(doi: str) -> str:
@@ -95,10 +97,7 @@ def get_paper_by_doi(doi: str) -> Optional[Dict[str, Any]]:
     paper_id = f"DOI:{clean}"
     endpoint = f"{BASE_URL}/paper/{paper_id}"
     params = {"fields": DEFAULT_PAPER_FIELDS}
-    headers = _build_headers()
-
-    _rate_limit()
-    response = requests.get(endpoint, params=params, headers=headers, timeout=REQUEST_TIMEOUT)
+    response = _get(endpoint, params)
 
     if response.status_code == 404:
         logger.debug("Paper not found in Semantic Scholar for DOI: %s", doi)
@@ -131,10 +130,7 @@ def get_paper_by_title(title: str) -> Optional[Dict[str, Any]]:
         "fields": DEFAULT_SEARCH_FIELDS,
         "limit": 1,
     }
-    headers = _build_headers()
-
-    _rate_limit()
-    response = requests.get(endpoint, params=params, headers=headers, timeout=REQUEST_TIMEOUT)
+    response = _get(endpoint, params)
 
     if response.status_code == 404:
         logger.debug("No papers found for title: %s", title)
@@ -169,10 +165,7 @@ def get_paper_citations(paper_id: str, limit: int = 100) -> List[Dict[str, Any]]
         "limit": limit,
         "fields": DEFAULT_CITATION_FIELDS,
     }
-    headers = _build_headers()
-
-    _rate_limit()
-    response = requests.get(endpoint, params=params, headers=headers, timeout=REQUEST_TIMEOUT)
+    response = _get(endpoint, params)
 
     if response.status_code == 404:
         logger.debug("Paper not found for citations lookup: %s", paper_id)
@@ -211,10 +204,7 @@ def get_paper_references(paper_id: str, limit: int = 100) -> List[Dict[str, Any]
         "limit": limit,
         "fields": DEFAULT_REFERENCE_FIELDS,
     }
-    headers = _build_headers()
-
-    _rate_limit()
-    response = requests.get(endpoint, params=params, headers=headers, timeout=REQUEST_TIMEOUT)
+    response = _get(endpoint, params)
 
     if response.status_code == 404:
         logger.debug("Paper not found for references lookup: %s", paper_id)
