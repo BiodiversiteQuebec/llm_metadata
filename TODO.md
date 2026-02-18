@@ -31,14 +31,14 @@ This prevents duplicate work across parallel sessions.
 - [x] Update tests for new fields + boolean coercion edge cases (`tests/test_schema_modulators.py`, 27 new tests)
 - **Tag:** `CLOUD` | **Deps:** none | **Files:** `schemas/fuster_features.py`, `schemas/__init__.py`, `gpt_classify.py`, `tests/test_schema_modulators.py`
 
-### WU-A2: Validate all-source ground truth (includes SS Task 3.1) `sonnet`
+### WU-A2: Validate all-source ground truth (includes SS Task 3.1) `sonnet` ✅
 
-- [ ] Edit `notebooks/fuster_annotations_validation.ipynb` (do NOT create a new notebook)
-- [ ] Load `data/dataset_092624.xlsx`, validate all records (Dryad+Zenodo+SS) through updated schema
-- [ ] Parse URL fields for SS records (journal URLs vs search URLs)
-- [ ] Filter to valid records (~491 across Dryad+Zenodo+SS)
-- [ ] Compute coverage stats by source (records, abstracts, DOIs, cited_articles)
-- [ ] Overwrite `data/dataset_092624_validated.xlsx` with all-source validated output
+- [x] Edit `notebooks/fuster_annotations_validation.ipynb` (do NOT create a new notebook)
+- [x] Load `data/dataset_092624.xlsx`, validate all records (Dryad+Zenodo+SS) through updated schema
+- [x] Parse URL fields for SS records (journal URLs vs search URLs)
+- [x] Filter to valid records (299 across Dryad+Zenodo+SS)
+- [x] Compute coverage stats by source (records, abstracts, DOIs, cited_articles)
+- [x] Overwrite `data/dataset_092624_validated.xlsx` with all-source validated output
 - **Tag:** `CLOUD` | **Deps:** WU-A1 | **Files:** `data/dataset_092624.xlsx`, `notebooks/fuster_annotations_validation.ipynb`
 
 ### WU-B: Abstract-only extraction + evaluation `sonnet`
@@ -222,3 +222,4 @@ This prevents duplicate work across parallel sessions.
 | Branch | Task ID | Description | Model | Finished |
 |---|---|---|---|---|
 | `claude/wu-a1-dlX7N` | WU-A1 | Extend schema — modulators + DataSource | opus | 2026-02-18 |
+| `claude/implement-wu-a2-ePym7` | WU-A2 | Validate all-source ground truth | sonnet | 2026-02-18 |
