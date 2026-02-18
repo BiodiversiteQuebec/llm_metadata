@@ -186,6 +186,7 @@ This prevents duplicate work across parallel sessions.
 
 - [ ] Geographic information model incl GADM level, protected areas, ecosystem
   > **Plan:** [`plans/gadm_enrichment.md`](plans/gadm_enrichment.md) — `location_text` extraction field + GADM GID code enrichment via Nominatim
+- [ ] Demo notebook: GADM evaluation vs `location_text` — modelled on `notebooks/species_recall_improvement.ipynb`; reuse existing extractions (no new LLM calls); compare fuzzy string vs GID set-comparison P/R/F1
 - [ ] Taxonomic information model incl species, paraphyletic groups
 - [ ] Taxonomic & geographic referencing pipeline
 - [ ] `ExtractedTaxon` structured schema — LLM extracts `{name, type, count}` instead of flat `list[str]` (improves GBIF preprocessing, requires prompt + ground truth changes)
