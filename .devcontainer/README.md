@@ -235,7 +235,7 @@ This means paths in `docker-compose.devcontainer.yml` like `context: .` and `./d
 | Hook | Command |
 |------|---------|
 | `postStartCommand` | Runs firewall if `ENABLE_FIREWALL=true` |
-| `postAttachCommand` | Runs `init-workspace.sh` + starts Jupyter |
+| `postAttachCommand` | Runs `init-workspace.sh` + starts Jupyter (auto-provisions `jupyterlab` via `uv --with` if needed) |
 
 ---
 
@@ -243,13 +243,20 @@ This means paths in `docker-compose.devcontainer.yml` like `context: .` and `./d
 
 ```bash
 #!/bin/bash
-set -e
+set -euo pipefail
 
-# Clone repository on first run (if workspace is empty)
+# Clone repository on first run (if workspace is empty),
+# and recover safely from interrupted partial clones
 if [ ! -f /workspace/.git/config ]; then
-    git clone "${GIT_REPO_URL}" /workspace/temp-clone
-    mv /workspace/temp-clone/* /workspace/temp-clone/.* /workspace/ 2>/dev/null || true
+  if [ -f /workspace/temp-clone/.git/config ]; then
+    # Promote existing partial clone into /workspace
+    # (skips /workspace/.claude if already present)
+    promote_temp_clone
+  else
     rm -rf /workspace/temp-clone
+    git clone "${GIT_REPO_URL}" /workspace/temp-clone
+    promote_temp_clone
+  fi
 fi
 
 # Create virtual environment if missing
@@ -261,8 +268,12 @@ fi
 git config --global push.autoSetupRemote true
 # If branch exists remotely, set local branch upstream to origin/<branch>
 
-# Install dependencies (uses pyproject.toml)
-uv sync --frozen
+# Install dependencies (uses lockfile when available)
+if [ -f /workspace/uv.lock ]; then
+  uv sync --frozen
+else
+  uv sync
+fi
 ```
 
 **Why `postAttachCommand`?** VS Code's SSH agent forwarding is only available after attach, so git clone must run then.
