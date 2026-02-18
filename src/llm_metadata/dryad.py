@@ -5,7 +5,7 @@ BASE_URL = "https://datadryad.org/api/v2/"
 
 def search_datasets(keywords: Union[str, list], per_page=30, auth_token=None):
     endpoint = BASE_URL + "search"
-    
+
     headers = {}
     if auth_token:
         headers["Authorization"] = f"Bearer {auth_token}"
@@ -23,7 +23,7 @@ def search_datasets(keywords: Union[str, list], per_page=30, auth_token=None):
             "page": page,
             "per_page": per_page
         }
-        
+
         response = requests.get(endpoint, headers=headers, params=params)
 
         if response.status_code != 200:
@@ -32,12 +32,15 @@ def search_datasets(keywords: Union[str, list], per_page=30, auth_token=None):
 
         response = response.json()
         data = response.get("_embedded", {}).get("stash:datasets", [])
+        # Tag each record with its data source
+        for record in data:
+            record["source"] = "dryad"
         all_results.extend(data)
 
         # Assuming the response contains a 'total' key that indicates the total number of results
         if len(all_results) >= response.get("total", 0):
             break
-        
+
         page += 1
 
     return all_results
@@ -56,7 +59,10 @@ def get_dataset(doi):
         print("Error:", response.status_code, response.text)
         return None
 
-    return response.json()
+    record = response.json()
+    # Tag the record with its data source
+    record["source"] = "dryad"
+    return record
 
 if __name__ == "__main__":
     doi = "doi:10.5061/dryad.n726pq6"
