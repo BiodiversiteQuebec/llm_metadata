@@ -1,155 +1,223 @@
-# TO DO
+# TODO
 
-* [ ] Semantic scholar data integration
-  * [ ] Refactor annotated validation pipeline to streamline url fields (search engine (dryad, zenodo, semantic), journal_url, pdf_url ... propose relevant fields) and integrate semantic scholar data (cited articles retrieval and pdf download)
-  * [ ] Integrate semantic scholar api to retrieve cited articles and their metadata, and pdf if available
-  * [ ] Data coverage analysis on validated data (proportion of valid records, by sources, with pdfs, with open access pdfs) including semantic scholar data - In exisitng or new notebooks
-* [ ] Batch abstract classification pipeline notebook with current eval setup and run on all annotated data, including semantic scholar data
-* [ ] Run pdf full text abstract classification and generate benchmark report with current eval setup including semantic scholar data
+## Active Claude Sessions
 
-* [ ] Research : types of data from dataset
-* [ ] Research : grey literature for biodiversity data
-* [ ] Research : Single shot vs multiple shots and LLMs (tested gpt-4o-mini vs gpt-5-mini)
+<!--
+HOW TO USE: When a Claude session starts a task, add a row below.
+When done, move the row to the "Completed Sessions" table at the bottom.
+This prevents duplicate work across parallel sessions.
+-->
 
+| Branch | Task ID | Description | Model | Started |
+|---|---|---|---|---|
+| | | *(no active sessions)* | | |
 
-## Benchmarking from abstracts
+---
 
-* [x] Pydantic model for benchmark dataset and normalization of annotated data
+## Presentation Deliverables (Thursday 2026-02-19)
 
-* [x] Refine pydantic model based on feature descriptions from Fuster et al.
+> **Plan:** [`plans/presentation_20260219_work_plan.md`](plans/presentation_20260219_work_plan.md)
+>
+> 5 deliverables: (1) SS data in pipeline, (2) modulator features, (3) abstract-only eval, (4) OA full-text eval, (5) section-based eval
 
-  * [x] Species field. Make sure that the definition covers values examples in the annotated data
+### WU-A1: Extend schema — modulators + DataSource `opus`
 
-  * [x] valid_yn and reason_not_valid fields. Make sure that the definition covers values in the annotated data as enum, incl "other" reason
+- [ ] Add 6 `Optional[bool]` modulator fields to `DatasetFeatures`: `time_series`, `multispecies`, `threatened_species`, `new_species_science`, `new_species_region`, `bias_north_south`
+- [ ] Add `DataSource(str, Enum)` with `dryad`, `zenodo`, `semantic_scholar`
+- [ ] Add `source: Optional[DataSource]` field
+- [ ] Add boolean coercion validator in `DatasetFeaturesNormalized`
+- [ ] Update system prompts in `gpt_classify.py` for modulator extraction
+- [ ] Update tests for new fields + boolean coercion edge cases
+- **Tag:** `CLOUD` | **Deps:** none | **Files:** `schemas/fuster_features.py`, `gpt_classify.py`, `tests/`
 
-* [ ] LLM feature extraction pipeline
+### WU-A2: Validate all-source ground truth `sonnet`
 
-  * [x] Test run on sample annotated abstracts
+- [ ] Load `data/dataset_092624.xlsx`, validate all 418 records through updated schema
+- [ ] Filter to valid records (~491 across Dryad+Zenodo+SS)
+- [ ] Compute coverage stats by source (records, abstracts, DOIs, cited_articles)
+- [ ] Export `data/dataset_092624_all_sources_validated.xlsx`
+- **Tag:** `CLOUD` | **Deps:** WU-A1 | **Files:** `data/dataset_092624.xlsx`, notebook
 
-  * [x] GPT wrapper and model update
+### WU-B1: Abstract-only extraction (all records) `sonnet`
 
-  * [ ] Batch classification for manually annotated data
+- [ ] Run `classify_abstract()` on all valid records with non-null abstracts (updated schema incl modulators)
+- [ ] Model: `gpt-5-mini`, `reasoning={"effort": "low"}`
+- [ ] Track cost per record and by source, cache via joblib
+- **Tag:** `CLOUD` | **Deps:** WU-A2 | **Files:** `text_pipeline.py`, `gpt_classify.py`
 
-* [x] Evaluation of LLM feature extraction
+### WU-B2: Abstract-only evaluation + feature discussion `opus`
 
-  * [x] Metrics definition & utils (evaluation.py with precision/recall/F1)
+- [ ] Compare extractions vs ground truth using `groundtruth_eval.py`
+- [ ] Per-field P/R/F1 for all 16 fields (10 original + 6 modulators)
+- [ ] Segment by source (Dryad vs Zenodo vs SS)
+- [ ] Feature discussion: which fields extract well/poorly, cross-source variation
+- [ ] HTML report + side-by-side examples
+- **Tag:** `CLOUD` | **Deps:** WU-B1 | **Files:** `groundtruth_eval.py`, notebook, `notebooks/results/`
 
-  * [x] Benchmark report generation
+### WU-C1: Download OA PDFs for SS records `sonnet`
 
+- [ ] Extract article DOIs from xlsx `cited_articles` column for SS records
+- [ ] Use existing fallback chain (OpenAlex → Unpaywall → EZproxy → Sci-Hub)
+- [ ] Store in `data/pdfs/semantic_scholar/`, build manifest CSV
+- **Tag:** `LOCAL` | **Deps:** WU-A2 | **Files:** `pdf_download.py`, `openalex.py`
 
-* [ ] Prompt engineering for feature extraction and model refinement 🔥
+### WU-C2: GROBID-parse new PDFs `haiku`
 
-## Benchmarking from papers full text
+- [ ] Parse SS PDFs through GROBID via `pdf_parsing.py`
+- [ ] Confirm existing Dryad+Zenodo PDFs (~45) already parsed
+- **Tag:** `LOCAL` | **Deps:** WU-C1 | **Files:** `pdf_parsing.py`, `artifacts/tei/`
 
-* [ ] Retrieval of paper DOIs from dataset repositories (Dryad, Zenodo) 🔥
+### WU-C3: Full-text extraction (PDF File API) + eval `sonnet`
 
-  * [x] Article DOI retrieval from Excel cited_articles column (24.4% coverage)
-  * [x] Article DOI retrieval from Dryad/Zenodo APIs (fallback method)
-  * [x] Generated dataset-to-article mapping CSV (75 article DOIs from 299 valid datasets)
-  * [x] Coverage: Dryad 100%, Zenodo 56.7%
-  * [ ] Investigation of datasets with source `semantic_scholar` 🔥
+- [ ] Run PDF File API extraction via `pdf_pipeline.py` on all OA PDFs (Dryad+Zenodo + SS)
+- [ ] Evaluate against ground truth, segment by source, compare vs abstract-only (WU-B2)
+- [ ] HTML report
+- **Tag:** `LOCAL+CLOUD` | **Deps:** WU-C1, WU-A2 | **Files:** `pdf_pipeline.py`, notebook
 
-* [x] Retrieval of annotated papers full text (url + pdfs) from DOIs (OpenAlex + Unpaywall fallback)
+### WU-C4: Section-based extraction + eval `sonnet`
 
-* [x] Download all benchmark pdfs 🔥
+- [ ] Run section extraction via `section_pipeline.py` on all GROBID-parsed PDFs
+- [ ] Evaluate, compare vs abstract-only (WU-B2) and full-text (WU-C3)
+- [ ] HTML report
+- **Tag:** `LOCAL` | **Deps:** WU-C2, WU-A2 | **Files:** `section_pipeline.py`, notebook
 
-  * [ ] Why only 75 articles ?
+### WU-D1: Assemble presentation materials `opus`
 
-* [x] Paper full text chunking + vector db infrastructure + workflow (with metadata: sections, page numbers, authors, doi, etc) 🔥
-  * [x] Docker infrastructure: compose up GROBID + Qdrant (`docker-compose.yml`)
-  * [x] Prototyping notebook: `notebooks/pdf_chunking_exploration.ipynb`
-  * [x] TEI parsing module: `src/llm_metadata/pdf_parsing.py`
-  * [x] Section normalization: `src/llm_metadata/section_normalize.py`
-  * [x] Chunking with tiktoken: `src/llm_metadata/chunking.py`
-  * [x] Embedding wrapper: `src/llm_metadata/embedding.py`
-  * [x] Qdrant indexing: `src/llm_metadata/vector_store.py`
-  * [x] Chunk metadata schema: `src/llm_metadata/schemas/chunk_metadata.py`
-  * [x] Registry SQLite: `data/registry.sqlite`
-  * See [tasks/article-full-text-chunking.md](tasks/article-full-text-chunking.md) for full plan
+- [ ] Three-way comparison table: Abstract vs Full-text (PDF API) vs Section-based
+- [ ] Cross-source comparison: Dryad vs Zenodo vs SS
+- [ ] Feature-specific analysis + modulator performance
+- [ ] Cost analysis per approach
+- [ ] Lab log entry in `notebooks/README.md`
+- **Tag:** `CLOUD` | **Deps:** WU-B2, WU-C3, WU-C4 | **Files:** `docs/results_presentation_20260219/work_plan.md`
 
-* Batch section identification + feature extraction + evaluation
+---
 
-* [ ] LLM feature extraction from full text (with context retrieval from vector db) for sample annotated data + evaluation
+## Semantic Scholar Integration (post-presentation)
 
-* [ ] Feature prompt engineering
+> **Plan:** [`plans/integrate_semantic_scholar/semantic_scholar_implementation_guide.md`](plans/integrate_semantic_scholar/semantic_scholar_implementation_guide.md)
+> **Overview:** [`plans/integrate_semantic_scholar/README.md`](plans/integrate_semantic_scholar/README.md)
+>
+> Phase 1 (audit) is COMPLETE. Presentation WU-* covers tasks 2.1 (partial), 3.1, 4.1, 5.1–5.3.
+> Remaining tasks below are deferred until after the presentation.
 
-* [ ] Batch classification
+### SS-2.1b: URL field extensions `sonnet`
 
-* [ ] Evaluation of LLM feature extraction from full text
+- [ ] Add `source_url`, `journal_url`, `pdf_url` (HttpUrl), `is_oa` (bool), `cited_article_doi` (str) to schema
+- [ ] Validators for URL/empty handling
+- **Deps:** WU-A1 (DataSource enum done there) | **Ref:** Task 2.1
 
-## Feature extraction from abstract
+### SS-2.2: Semantic Scholar API client `sonnet`
 
-* [ ] Dryad update -> notebook
+- [ ] Create `src/llm_metadata/semantic_scholar.py` following `openalex.py` pattern
+- [ ] Functions: `get_paper_by_doi`, `get_paper_by_title`, `get_paper_citations`, `get_paper_references`
+- [ ] Joblib caching, 1 req/sec rate limit, API key from env
+- [ ] Tests with mocked responses (≥80% coverage)
+- **Deps:** Phase 1 audit (done) | **Ref:** Task 2.2
 
-* [ ] Feature schema model (incl score and definition, excerpt)
+### SS-2.3: Update dryad/zenodo modules for source tracking `sonnet`
 
-  * [ ] Geographic information model incl GADM level, protected areas, ecosystem
-  
-  * [ ] Taxonomic information model incl information descriptors (species, groupe paraphylétique, etc)
+- [ ] Add `source=DataSource.DRYAD/ZENODO` to returned data
+- [ ] Update `article_retrieval.py` for SS support
+- **Deps:** WU-A1 | **Ref:** Task 2.3
 
-* [ ] Taxonomic & geographic referencement
+### SS-3.2: Cited article retrieval workflow `sonnet`
 
-  * [ ] Référencement des informations de géographie
+- [ ] Use SS API to retrieve citing papers for datasets
+- [ ] Generate mapping CSV (`data/semantic_scholar_cited_articles.csv`)
+- **Deps:** SS-2.2, WU-A2 | **Ref:** Task 3.2
 
-  * [ ] Référencement des informations taxonomiques
+### SS-4.2: Validate coverage goals `haiku`
 
+- [ ] Check ≥80% abstract coverage, ≥80% OA PDF proportion
+- [ ] Gap analysis and recommendations
+- **Deps:** WU-A2 | **Ref:** Task 4.2
 
+### SS-6.1: Update CLAUDE.md `haiku`
 
-## Feature extraction from paper full text
+- [ ] Add SS module to Stage 1, multi-source architecture, troubleshooting
+- **Deps:** SS-2.2 | **Ref:** Task 6.1
 
-* [x] Recherche d'articles à partir d'un api de papiers scientifiques (OpenAlex)
+### SS-6.2: Lab log entries in notebooks/README.md `haiku`
 
-* [x] Full papers folder + repo
-  * [x] Small db with paper metadata (dataset_article_mapping.csv with 75 article DOIs)
-  * [x] Download PDFs using OpenAlex
-    * [x] Implement Unpaywall API client with rate limiting
-    * [x] Check open access availability (is_oa flag)
-    * [x] Download PDFs from best_oa_location
-    * [x] Store PDFs in data/pdfs/ organized by source
-    * [x] Generate metadata file with download status and OA license info
-    * [x] Handle restricted access articles (log for manual retrieval)
-  * [x] Téléchargement d'articles en distribution ouverte (via Unpaywall)
-  * [x] Téléchargement d'articles en distribution restreinte (manual/institutional access)
-  * [x] Téléchargement d'articles en distribution restreinte (via sci-hub)
+- [ ] Date-headed entries for all integration work
+- **Deps:** all eval tasks | **Ref:** Task 6.2
 
-* [x] Chunking & embeddings
-  * [x] Scientific articles chunking + vector db
-  * [x] Section detection (methodology) and add it to metadata
-  * [x] Retrieval and vector db integration notebook
+### SS-6.3: Tests for new functionality `sonnet`
 
-* [ ] LLM feature extraction from full text
-  * [x] Section-specific (methods) -> Great results on 1 article
-    * [ ] Batch processing of annotated articles
-  * [ ] Full-text
-  * [ ] Retrieval-augmented generation (RAG) approach based on vector db
+- [ ] Unit tests for `semantic_scholar.py`, integration tests for multi-source validation
+- [ ] Full suite passes, ≥80% coverage on new code
+- **Deps:** SS-2.2, SS-2.3 | **Ref:** Task 6.3
 
-## To production
+---
 
-* [ ] Streamline artifacts, manifests, data storage
-* [ ] Workflow orchestration prefect
-* [ ] Full db model (articles, datasets, features, runs, evaluations, etc) and postgres setup
-* [ ] Refactor tests related to pipelines to reflect project structure
-* [ ] Refactor classification modules to reflect pipelines structure
+## Research Backlog
 
+- [ ] Research: types of data from dataset
+- [ ] Research: grey literature for biodiversity data
+- [ ] Research: single shot vs multiple shots and LLMs (tested gpt-4o-mini vs gpt-5-mini)
+- [ ] Prompt engineering for feature extraction and model refinement
 
-Web app dashboard
+---
 
+## Feature Extraction — Advanced Schema
 
+- [ ] Geographic information model incl GADM level, protected areas, ecosystem
+- [ ] Taxonomic information model incl species, paraphyletic groups
+- [ ] Taxonomic & geographic referencing pipeline
 
+---
 
+## Production Readiness
 
+- [ ] Streamline artifacts, manifests, data storage
+- [ ] Workflow orchestration with Prefect
+- [ ] Full DB model (articles, datasets, features, runs, evaluations) + Postgres
+- [ ] Refactor tests to reflect pipeline structure
+- [ ] Refactor classification modules to reflect pipeline structure
+- [ ] Web app dashboard
 
+---
 
+## Completed
 
+<details>
+<summary>Benchmarking from abstracts</summary>
 
+- [x] Pydantic model for benchmark dataset + normalization
+- [x] Species field refinement (covers annotated data values)
+- [x] valid_yn and reason_not_valid as enum
+- [x] Test run on sample annotated abstracts
+- [x] GPT wrapper and model update
+- [x] Metrics definition & utils (evaluation.py with P/R/F1)
+- [x] Benchmark report generation
+</details>
 
+<details>
+<summary>Full-text infrastructure</summary>
 
-Jour 1 - Abstract benchmarking
+- [x] Article DOI retrieval from Excel cited_articles (24.4% coverage)
+- [x] Article DOI retrieval from Dryad/Zenodo APIs (fallback)
+- [x] Dataset-to-article mapping CSV (75 article DOIs from 299 valid)
+- [x] Coverage: Dryad 100%, Zenodo 56.7%
+- [x] PDF download via OpenAlex + Unpaywall + Sci-Hub
+- [x] Docker: GROBID + Qdrant compose
+- [x] TEI parsing, section normalization, chunking, embeddings, vector store
+- [x] Chunk metadata schema, Registry SQLite
+- [x] Section-specific extraction (methods) — great results on 1 article
+</details>
 
-Jour 2 - Dryad feature dashboard
+<details>
+<summary>Semantic Scholar audit (Phase 1)</summary>
 
-Jour 3 - Benchmark full paper
+- [x] Task 1.1: Audit API client modules (dryad, zenodo, openalex, unpaywall)
+- [x] Task 1.2: Audit validation and schema modules
+- [x] Task 1.3: Audit PDF download pipeline
+</details>
 
-Jour 4 - QCBS 2025 papers
+---
 
-Jour 5 - Feature extraction from data
+## Completed Sessions
+
+| Branch | Task ID | Description | Model | Finished |
+|---|---|---|---|---|
+| | | *(none yet)* | | |
