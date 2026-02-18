@@ -1,57 +1,53 @@
-import config
+import pytest
+import tempfile
+from pathlib import Path
+import shutil
+
 from llm_metadata.pdf_download import (
     sanitize_doi,
     download_pdf,
     batch_download_pdfs
 )
-import unittest
-import tempfile
-from pathlib import Path
-import shutil
 
 
-class TestDOISanitization(unittest.TestCase):
+class TestDOISanitization:
     """Test DOI sanitization for filenames."""
 
     def test_sanitize_doi_basic(self):
         """Test basic DOI sanitization."""
         doi = "10.1371/journal.pone.0128238"
         sanitized = sanitize_doi(doi)
-        self.assertEqual(sanitized, "10.1371_journal.pone.0128238")
+        assert sanitized == "10.1371_journal.pone.0128238"
 
     def test_sanitize_doi_with_prefix(self):
         """Test DOI sanitization with URL prefix."""
         doi = "https://doi.org/10.1371/journal.pone.0128238"
         sanitized = sanitize_doi(doi)
-        self.assertEqual(sanitized, "10.1371_journal.pone.0128238")
+        assert sanitized == "10.1371_journal.pone.0128238"
 
     def test_sanitize_doi_with_doi_prefix(self):
         """Test DOI sanitization with 'doi:' prefix."""
         doi = "doi:10.1371/journal.pone.0128238"
         sanitized = sanitize_doi(doi)
-        self.assertEqual(sanitized, "10.1371_journal.pone.0128238")
+        assert sanitized == "10.1371_journal.pone.0128238"
 
     def test_sanitize_doi_special_chars(self):
         """Test DOI with various special characters."""
         doi = "10.1234/test:special/chars"
         sanitized = sanitize_doi(doi)
         # Should replace all problematic characters
-        self.assertNotIn("/", sanitized)
-        self.assertNotIn(":", sanitized)
-        self.assertNotIn("\\", sanitized)
+        assert "/" not in sanitized
+        assert ":" not in sanitized
+        assert "\\" not in sanitized
 
 
-class TestPDFDownload(unittest.TestCase):
+class TestPDFDownload:
     """Test PDF download functionality."""
 
-    def setUp(self):
+    @pytest.fixture(autouse=True)
+    def setup_temp_dir(self, tmp_path):
         """Create temporary directory for test downloads."""
-        self.temp_dir = Path(tempfile.mkdtemp())
-
-    def tearDown(self):
-        """Clean up temporary directory."""
-        if self.temp_dir.exists():
-            shutil.rmtree(self.temp_dir)
+        self.temp_dir = tmp_path
 
     def test_download_pdf_success(self):
         """Test successful PDF download from PLOS ONE."""
@@ -67,10 +63,10 @@ class TestPDFDownload(unittest.TestCase):
         )
 
         # Verify download
-        self.assertIsNotNone(pdf_path, "Download should succeed")
-        self.assertTrue(pdf_path.exists(), "PDF file should exist")
-        self.assertGreater(pdf_path.stat().st_size, 1000, "PDF should be larger than 1KB")
-        self.assertTrue(pdf_path.name.endswith('.pdf'), "File should have .pdf extension")
+        assert pdf_path is not None, "Download should succeed"
+        assert pdf_path.exists(), "PDF file should exist"
+        assert pdf_path.stat().st_size > 1000, "PDF should be larger than 1KB"
+        assert pdf_path.name.endswith('.pdf'), "File should have .pdf extension"
 
     def test_download_pdf_with_year_subdirectory(self):
         """Test PDF download with year-based subdirectory."""
@@ -86,8 +82,8 @@ class TestPDFDownload(unittest.TestCase):
         )
 
         # Verify year subdirectory created
-        self.assertIsNotNone(pdf_path)
-        self.assertIn(str(year), str(pdf_path))
+        assert pdf_path is not None
+        assert str(year) in str(pdf_path)
 
     def test_download_pdf_invalid_url(self):
         """Test that invalid URL returns None."""
@@ -99,7 +95,7 @@ class TestPDFDownload(unittest.TestCase):
             max_retries=1
         )
 
-        self.assertIsNone(pdf_path, "Invalid URL should return None")
+        assert pdf_path is None, "Invalid URL should return None"
 
     def test_download_pdf_already_exists(self):
         """Test that existing PDF is not re-downloaded."""
@@ -113,7 +109,7 @@ class TestPDFDownload(unittest.TestCase):
             output_dir=self.temp_dir
         )
 
-        self.assertIsNotNone(pdf_path1)
+        assert pdf_path1 is not None
 
         # Get modification time
         mtime1 = pdf_path1.stat().st_mtime
@@ -126,24 +122,20 @@ class TestPDFDownload(unittest.TestCase):
         )
 
         # Should return same path
-        self.assertEqual(pdf_path1, pdf_path2)
+        assert pdf_path1 == pdf_path2
 
         # Modification time should be unchanged (not re-downloaded)
         mtime2 = pdf_path2.stat().st_mtime
-        self.assertEqual(mtime1, mtime2)
+        assert mtime1 == mtime2
 
 
-class TestBatchDownload(unittest.TestCase):
+class TestBatchDownload:
     """Test batch PDF download functionality."""
 
-    def setUp(self):
+    @pytest.fixture(autouse=True)
+    def setup_temp_dir(self, tmp_path):
         """Create temporary directory for test downloads."""
-        self.temp_dir = Path(tempfile.mkdtemp())
-
-    def tearDown(self):
-        """Clean up temporary directory."""
-        if self.temp_dir.exists():
-            shutil.rmtree(self.temp_dir)
+        self.temp_dir = tmp_path
 
     def test_batch_download_pdfs(self):
         """Test batch download with mixed valid/invalid URLs."""
@@ -168,15 +160,11 @@ class TestBatchDownload(unittest.TestCase):
         )
 
         # Verify results structure
-        self.assertIn('successful', results)
-        self.assertIn('failed', results)
+        assert 'successful' in results
+        assert 'failed' in results
 
         # At least one should succeed
-        self.assertGreater(len(results['successful']), 0, "Should have at least one successful download")
+        assert len(results['successful']) > 0, "Should have at least one successful download"
 
         # At least one should fail
-        self.assertGreater(len(results['failed']), 0, "Should have at least one failed download")
-
-
-if __name__ == '__main__':
-    unittest.main()
+        assert len(results['failed']) > 0, "Should have at least one failed download"

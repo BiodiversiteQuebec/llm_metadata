@@ -8,11 +8,8 @@ Tests the full download-and-validate flow:
 - All existing fuster PDFs pass validation
 """
 
-import config
+import pytest
 import requests
-import unittest
-import tempfile
-import shutil
 from pathlib import Path
 
 from llm_metadata.pdf_download import (
@@ -44,36 +41,31 @@ def _has_network() -> bool:
         return False
 
 
-class TestValidatePDF(unittest.TestCase):
+class TestValidatePDF:
     """Test the validate_pdf function."""
 
-    def setUp(self):
-        self.temp_dir = Path(tempfile.mkdtemp())
-
-    def tearDown(self):
-        if self.temp_dir.exists():
-            shutil.rmtree(self.temp_dir)
+    @pytest.fixture(autouse=True)
+    def setup_temp_dir(self, tmp_path):
+        self.temp_dir = tmp_path
 
     def test_validate_missing_file(self):
         """validate_pdf raises for nonexistent file."""
-        with self.assertRaises(InvalidPDFError):
+        with pytest.raises(InvalidPDFError):
             validate_pdf(self.temp_dir / "nonexistent.pdf")
 
     def test_validate_html_file(self):
         """validate_pdf rejects HTML content saved as .pdf."""
         fake = self.temp_dir / "fake.pdf"
         fake.write_text("<!DOCTYPE html><html><body>Not a PDF</body></html>")
-        with self.assertRaises(InvalidPDFError) as ctx:
+        with pytest.raises(InvalidPDFError, match="not a PDF"):
             validate_pdf(fake)
-        self.assertIn("not a PDF", str(ctx.exception))
 
     def test_validate_small_pdf(self):
         """validate_pdf rejects a file with valid header but too small."""
         tiny = self.temp_dir / "tiny.pdf"
         tiny.write_bytes(b"%PDF-1.4 tiny file")
-        with self.assertRaises(InvalidPDFError) as ctx:
+        with pytest.raises(InvalidPDFError, match="too small"):
             validate_pdf(tiny)
-        self.assertIn("too small", str(ctx.exception))
 
     def test_validate_custom_min_size(self):
         """validate_pdf accepts a small PDF when min_size is lowered."""
@@ -85,26 +77,23 @@ class TestValidatePDF(unittest.TestCase):
         """download_pdf_with_fallback deletes existing invalid file instead of returning it."""
         fake = self.temp_dir / "10.9999_fake.pdf"
         fake.write_text("<!DOCTYPE html><html>Not a PDF</html>")
-        self.assertTrue(fake.exists())
+        assert fake.exists()
 
         result = download_pdf_with_fallback(
             doi="10.9999/fake",
             output_dir=self.temp_dir,
         )
         # Download will fail (no valid source), but the invalid file should be gone
-        self.assertFalse(fake.exists(), "Invalid existing file should have been deleted")
+        assert not fake.exists(), "Invalid existing file should have been deleted"
 
 
-@unittest.skipUnless(_has_network(), "No network access")
-class TestDownloadWithValidation(unittest.TestCase):
+@pytest.mark.skipif(not _has_network(), reason="No network access")
+class TestDownloadWithValidation:
     """Integration test: download a real PDF and verify it passes validation."""
 
-    def setUp(self):
-        self.temp_dir = Path(tempfile.mkdtemp())
-
-    def tearDown(self):
-        if self.temp_dir.exists():
-            shutil.rmtree(self.temp_dir)
+    @pytest.fixture(autouse=True)
+    def setup_temp_dir(self, tmp_path):
+        self.temp_dir = tmp_path
 
     def test_download_and_validate_oa_pdf(self):
         """Download a known OA PDF and validate it."""
@@ -113,8 +102,8 @@ class TestDownloadWithValidation(unittest.TestCase):
             openalex_pdf_url=OA_PDF_URL,
             output_dir=self.temp_dir,
         )
-        self.assertIsNotNone(pdf_path, "Download should succeed for OA article")
-        self.assertTrue(pdf_path.exists())
+        assert pdf_path is not None, "Download should succeed for OA article"
+        assert pdf_path.exists()
 
         # The downloaded file must pass validation
         validate_pdf(pdf_path)
@@ -122,10 +111,10 @@ class TestDownloadWithValidation(unittest.TestCase):
         # Double-check: file should be a real PDF
         with open(pdf_path, "rb") as f:
             header = f.read(4)
-        self.assertEqual(header, b"%PDF")
+        assert header == b"%PDF"
 
         # File should be well above the minimum size
-        self.assertGreater(pdf_path.stat().st_size, MIN_PDF_SIZE)
+        assert pdf_path.stat().st_size > MIN_PDF_SIZE
 
     def test_download_rejects_html_response(self):
         """download_pdf_from_url rejects an HTML page served as PDF."""
@@ -140,33 +129,33 @@ class TestDownloadWithValidation(unittest.TestCase):
         )
 
         # Should fail because the response is HTML, not PDF
-        self.assertFalse(success)
+        assert not success
         # File should not remain on disk
-        self.assertFalse(output_path.exists())
+        assert not output_path.exists()
 
 
-class TestGuessPublisherPdfUrl(unittest.TestCase):
+class TestGuessPublisherPdfUrl:
     """Test publisher PDF URL guessing from DOI prefixes."""
 
     def test_wiley_doi(self):
         url = guess_publisher_pdf_url("10.1111/mec.14361")
-        self.assertEqual(url, "https://onlinelibrary.wiley.com/doi/pdfdirect/10.1111/mec.14361")
+        assert url == "https://onlinelibrary.wiley.com/doi/pdfdirect/10.1111/mec.14361"
 
     def test_wiley_ece_doi(self):
         url = guess_publisher_pdf_url("10.1002/ece3.3947")
-        self.assertEqual(url, "https://onlinelibrary.wiley.com/doi/pdfdirect/10.1002/ece3.3947")
+        assert url == "https://onlinelibrary.wiley.com/doi/pdfdirect/10.1002/ece3.3947"
 
     def test_springer_doi(self):
         url = guess_publisher_pdf_url("10.1007/s10592-019-01170-8")
-        self.assertEqual(url, "https://link.springer.com/content/pdf/10.1007/s10592-019-01170-8.pdf")
+        assert url == "https://link.springer.com/content/pdf/10.1007/s10592-019-01170-8.pdf"
 
     def test_nature_doi(self):
         url = guess_publisher_pdf_url("10.1038/s41477-020-0647-x")
-        self.assertEqual(url, "https://www.nature.com/articles/s41477-020-0647-x.pdf")
+        assert url == "https://www.nature.com/articles/s41477-020-0647-x.pdf"
 
     def test_unknown_publisher_returns_none(self):
         url = guess_publisher_pdf_url("10.9999/unknown")
-        self.assertIsNone(url)
+        assert url is None
 
 
 def _has_ezproxy_session() -> bool:
@@ -181,22 +170,19 @@ def _has_ezproxy_session() -> bool:
         return False
 
 
-@unittest.skipUnless(_has_network(), "No network access")
-@unittest.skipUnless(_has_ezproxy_session(), "No active EZproxy session")
-class TestEZproxyDownload(unittest.TestCase):
+@pytest.mark.skipif(not _has_network(), reason="No network access")
+@pytest.mark.skipif(not _has_ezproxy_session(), reason="No active EZproxy session")
+class TestEZproxyDownload:
     """Integration test: download a closed-access PDF via EZproxy."""
 
     # Closed-access Wiley article (Molecular Ecology)
     CLOSED_DOI = "10.1111/mec.14361"
 
-    def setUp(self):
-        self.temp_dir = Path(tempfile.mkdtemp())
+    @pytest.fixture(autouse=True)
+    def setup(self, tmp_path):
+        self.temp_dir = tmp_path
         from llm_metadata.ezproxy import extract_cookies_from_browser
         self.cookies = extract_cookies_from_browser()
-
-    def tearDown(self):
-        if self.temp_dir.exists():
-            shutil.rmtree(self.temp_dir)
 
     def test_download_closed_access_via_ezproxy(self):
         """Download a closed-access Wiley article using EZproxy proxied URL."""
@@ -206,12 +192,12 @@ class TestEZproxyDownload(unittest.TestCase):
             use_unpaywall=False,  # Skip OA strategies to test EZproxy directly
             ezproxy_cookies=self.cookies,
         )
-        self.assertIsNotNone(pdf_path, f"EZproxy download should succeed for {self.CLOSED_DOI}")
-        self.assertTrue(pdf_path.exists())
+        assert pdf_path is not None, f"EZproxy download should succeed for {self.CLOSED_DOI}"
+        assert pdf_path.exists()
         validate_pdf(pdf_path)
 
 
-class TestExistingFusterPDFs(unittest.TestCase):
+class TestExistingFusterPDFs:
     """Validate all existing PDFs in data/pdfs/fuster/ are real PDFs."""
 
     FUSTER_DIR = PROJECT_ROOT / "data" / "pdfs" / "fuster"
@@ -219,11 +205,11 @@ class TestExistingFusterPDFs(unittest.TestCase):
     def test_all_fuster_pdfs_valid(self):
         """Every .pdf file in the fuster directory must be a valid PDF."""
         if not self.FUSTER_DIR.exists():
-            self.skipTest(f"{self.FUSTER_DIR} does not exist")
+            pytest.skip(f"{self.FUSTER_DIR} does not exist")
 
         pdf_files = list(self.FUSTER_DIR.glob("*.pdf"))
         if not pdf_files:
-            self.skipTest("No PDF files found in data/pdfs/fuster/")
+            pytest.skip("No PDF files found in data/pdfs/fuster/")
 
         invalid = []
         for pdf_path in pdf_files:
@@ -232,12 +218,5 @@ class TestExistingFusterPDFs(unittest.TestCase):
             except InvalidPDFError as e:
                 invalid.append(str(e))
 
-        self.assertEqual(
-            invalid,
-            [],
-            f"Found {len(invalid)} invalid PDF(s):\n" + "\n".join(invalid),
-        )
-
-
-if __name__ == "__main__":
-    unittest.main()
+        assert invalid == [], \
+            f"Found {len(invalid)} invalid PDF(s):\n" + "\n".join(invalid)

@@ -4,15 +4,9 @@ Unit tests for the Semantic Scholar API client module.
 All tests use mocked HTTP responses to avoid real API calls.
 """
 
-import sys
-import os
-import unittest
+import pytest
+import requests
 from unittest.mock import patch, MagicMock
-
-# Ensure tests directory is on the path for config import
-sys.path.insert(0, os.path.dirname(__file__))
-
-import config  # noqa: F401 – loads .env and configures environment
 
 from llm_metadata.semantic_scholar import (
     get_paper_by_doi,
@@ -132,39 +126,38 @@ def _make_mock_response(status_code: int, json_data=None):
 # Tests
 # ---------------------------------------------------------------------------
 
-class TestCleanDoi(unittest.TestCase):
+class TestCleanDoi:
     """Test the internal DOI cleaning helper."""
 
     def test_strips_https_prefix(self):
-        self.assertEqual(_clean_doi("https://doi.org/10.1234/foo"), "10.1234/foo")
+        assert _clean_doi("https://doi.org/10.1234/foo") == "10.1234/foo"
 
     def test_strips_http_prefix(self):
-        self.assertEqual(_clean_doi("http://doi.org/10.1234/foo"), "10.1234/foo")
+        assert _clean_doi("http://doi.org/10.1234/foo") == "10.1234/foo"
 
     def test_strips_doi_colon_prefix(self):
-        self.assertEqual(_clean_doi("doi:10.1234/foo"), "10.1234/foo")
+        assert _clean_doi("doi:10.1234/foo") == "10.1234/foo"
 
     def test_already_clean_doi(self):
-        self.assertEqual(_clean_doi("10.1234/foo"), "10.1234/foo")
+        assert _clean_doi("10.1234/foo") == "10.1234/foo"
 
     def test_strips_whitespace(self):
-        self.assertEqual(_clean_doi("  10.1234/foo  "), "10.1234/foo")
+        assert _clean_doi("  10.1234/foo  ") == "10.1234/foo"
 
 
-class TestGetPaperByDoi(unittest.TestCase):
+class TestGetPaperByDoi:
     """Tests for get_paper_by_doi."""
 
     @patch("llm_metadata.semantic_scholar.requests.get")
     def test_returns_paper_on_200(self, mock_get):
         mock_get.return_value = _make_mock_response(200, SAMPLE_PAPER_RESPONSE)
 
-        # Bypass joblib cache for unit tests
         from llm_metadata.semantic_scholar import get_paper_by_doi as _fn
         result = _fn.__wrapped__("10.7717/peerj.18853")
 
-        self.assertIsNotNone(result)
-        self.assertEqual(result["paperId"], "abc123def456")
-        self.assertEqual(result["title"], SAMPLE_PAPER_RESPONSE["title"])
+        assert result is not None
+        assert result["paperId"] == "abc123def456"
+        assert result["title"] == SAMPLE_PAPER_RESPONSE["title"]
 
     @patch("llm_metadata.semantic_scholar.requests.get")
     def test_returns_none_on_404(self, mock_get):
@@ -176,7 +169,7 @@ class TestGetPaperByDoi(unittest.TestCase):
         from llm_metadata.semantic_scholar import get_paper_by_doi as _fn
         result = _fn.__wrapped__("10.9999/nonexistent")
 
-        self.assertIsNone(result)
+        assert result is None
 
     @patch("llm_metadata.semantic_scholar.requests.get")
     def test_doi_with_https_prefix_is_cleaned(self, mock_get):
@@ -185,11 +178,11 @@ class TestGetPaperByDoi(unittest.TestCase):
         from llm_metadata.semantic_scholar import get_paper_by_doi as _fn
         result = _fn.__wrapped__("https://doi.org/10.7717/peerj.18853")
 
-        self.assertIsNotNone(result)
+        assert result is not None
         # Verify the call used the DOI: prefix format
         call_args = mock_get.call_args
         called_url = call_args[0][0]
-        self.assertIn("DOI:10.7717/peerj.18853", called_url)
+        assert "DOI:10.7717/peerj.18853" in called_url
 
     @patch("llm_metadata.semantic_scholar.requests.get")
     def test_raises_on_server_error(self, mock_get):
@@ -199,11 +192,11 @@ class TestGetPaperByDoi(unittest.TestCase):
         mock_get.return_value = mock_500
 
         from llm_metadata.semantic_scholar import get_paper_by_doi as _fn
-        with self.assertRaises(Exception):
+        with pytest.raises(Exception):
             _fn.__wrapped__("10.1234/server-error")
 
 
-class TestGetPaperByTitle(unittest.TestCase):
+class TestGetPaperByTitle:
     """Tests for get_paper_by_title."""
 
     @patch("llm_metadata.semantic_scholar.requests.get")
@@ -213,8 +206,8 @@ class TestGetPaperByTitle(unittest.TestCase):
         from llm_metadata.semantic_scholar import get_paper_by_title as _fn
         result = _fn.__wrapped__("biodiversity monitoring")
 
-        self.assertIsNotNone(result)
-        self.assertEqual(result["paperId"], "abc123def456")
+        assert result is not None
+        assert result["paperId"] == "abc123def456"
 
     @patch("llm_metadata.semantic_scholar.requests.get")
     def test_returns_none_when_no_results(self, mock_get):
@@ -223,7 +216,7 @@ class TestGetPaperByTitle(unittest.TestCase):
         from llm_metadata.semantic_scholar import get_paper_by_title as _fn
         result = _fn.__wrapped__("zzzzz unlikely title zzzzz")
 
-        self.assertIsNone(result)
+        assert result is None
 
     @patch("llm_metadata.semantic_scholar.requests.get")
     def test_returns_none_on_404(self, mock_get):
@@ -235,10 +228,10 @@ class TestGetPaperByTitle(unittest.TestCase):
         from llm_metadata.semantic_scholar import get_paper_by_title as _fn
         result = _fn.__wrapped__("some title")
 
-        self.assertIsNone(result)
+        assert result is None
 
 
-class TestGetPaperCitations(unittest.TestCase):
+class TestGetPaperCitations:
     """Tests for get_paper_citations."""
 
     @patch("llm_metadata.semantic_scholar.requests.get")
@@ -248,10 +241,10 @@ class TestGetPaperCitations(unittest.TestCase):
         from llm_metadata.semantic_scholar import get_paper_citations as _fn
         results = _fn.__wrapped__("abc123def456", limit=100)
 
-        self.assertIsInstance(results, list)
-        self.assertEqual(len(results), 2)
-        self.assertEqual(results[0]["paperId"], "cite001")
-        self.assertEqual(results[1]["paperId"], "cite002")
+        assert isinstance(results, list)
+        assert len(results) == 2
+        assert results[0]["paperId"] == "cite001"
+        assert results[1]["paperId"] == "cite002"
 
     @patch("llm_metadata.semantic_scholar.requests.get")
     def test_returns_empty_list_on_404(self, mock_get):
@@ -263,7 +256,7 @@ class TestGetPaperCitations(unittest.TestCase):
         from llm_metadata.semantic_scholar import get_paper_citations as _fn
         results = _fn.__wrapped__("nonexistent_id", limit=100)
 
-        self.assertEqual(results, [])
+        assert results == []
 
     @patch("llm_metadata.semantic_scholar.requests.get")
     def test_returns_empty_list_when_no_data(self, mock_get):
@@ -272,10 +265,10 @@ class TestGetPaperCitations(unittest.TestCase):
         from llm_metadata.semantic_scholar import get_paper_citations as _fn
         results = _fn.__wrapped__("abc123def456", limit=100)
 
-        self.assertEqual(results, [])
+        assert results == []
 
 
-class TestGetPaperReferences(unittest.TestCase):
+class TestGetPaperReferences:
     """Tests for get_paper_references."""
 
     @patch("llm_metadata.semantic_scholar.requests.get")
@@ -285,9 +278,9 @@ class TestGetPaperReferences(unittest.TestCase):
         from llm_metadata.semantic_scholar import get_paper_references as _fn
         results = _fn.__wrapped__("abc123def456", limit=100)
 
-        self.assertIsInstance(results, list)
-        self.assertEqual(len(results), 1)
-        self.assertEqual(results[0]["paperId"], "ref001")
+        assert isinstance(results, list)
+        assert len(results) == 1
+        assert results[0]["paperId"] == "ref001"
 
     @patch("llm_metadata.semantic_scholar.requests.get")
     def test_returns_empty_list_on_404(self, mock_get):
@@ -299,10 +292,10 @@ class TestGetPaperReferences(unittest.TestCase):
         from llm_metadata.semantic_scholar import get_paper_references as _fn
         results = _fn.__wrapped__("nonexistent_id", limit=100)
 
-        self.assertEqual(results, [])
+        assert results == []
 
 
-class TestGetOpenAccessPdfUrl(unittest.TestCase):
+class TestGetOpenAccessPdfUrl:
     """Tests for get_open_access_pdf_url."""
 
     @patch("llm_metadata.semantic_scholar.requests.get")
@@ -310,12 +303,10 @@ class TestGetOpenAccessPdfUrl(unittest.TestCase):
         mock_get.return_value = _make_mock_response(200, SAMPLE_PAPER_RESPONSE)
 
         from llm_metadata.semantic_scholar import get_open_access_pdf_url as _fn
-        # get_open_access_pdf_url calls get_paper_by_doi internally; both are cached
-        # We access the unwrapped version of the inner function via patching requests.get
         url = _fn.__wrapped__("10.7717/peerj.18853")
 
-        self.assertIsNotNone(url)
-        self.assertEqual(url, "https://peerj.com/articles/18853.pdf")
+        assert url is not None
+        assert url == "https://peerj.com/articles/18853.pdf"
 
     @patch("llm_metadata.semantic_scholar.requests.get")
     def test_returns_none_for_non_oa_paper(self, mock_get):
@@ -324,7 +315,7 @@ class TestGetOpenAccessPdfUrl(unittest.TestCase):
         from llm_metadata.semantic_scholar import get_open_access_pdf_url as _fn
         url = _fn.__wrapped__("10.9999/closed.paper")
 
-        self.assertIsNone(url)
+        assert url is None
 
     @patch("llm_metadata.semantic_scholar.requests.get")
     def test_returns_none_when_paper_not_found(self, mock_get):
@@ -336,10 +327,10 @@ class TestGetOpenAccessPdfUrl(unittest.TestCase):
         from llm_metadata.semantic_scholar import get_open_access_pdf_url as _fn
         url = _fn.__wrapped__("10.9999/nonexistent")
 
-        self.assertIsNone(url)
+        assert url is None
 
 
-class TestNetworkErrorHandling(unittest.TestCase):
+class TestNetworkErrorHandling:
     """Tests for network error scenarios."""
 
     @patch("llm_metadata.semantic_scholar.requests.get")
@@ -347,8 +338,7 @@ class TestNetworkErrorHandling(unittest.TestCase):
         mock_get.side_effect = requests.exceptions.ConnectionError("Connection refused")
 
         from llm_metadata.semantic_scholar import get_paper_by_doi as _fn
-        import requests as req_module
-        with self.assertRaises(req_module.exceptions.ConnectionError):
+        with pytest.raises(requests.exceptions.ConnectionError):
             _fn.__wrapped__("10.1234/test")
 
     @patch("llm_metadata.semantic_scholar.requests.get")
@@ -356,14 +346,5 @@ class TestNetworkErrorHandling(unittest.TestCase):
         mock_get.side_effect = requests.exceptions.Timeout("Request timed out")
 
         from llm_metadata.semantic_scholar import get_paper_by_doi as _fn
-        import requests as req_module
-        with self.assertRaises(req_module.exceptions.Timeout):
+        with pytest.raises(requests.exceptions.Timeout):
             _fn.__wrapped__("10.1234/test")
-
-
-# need requests available at module level for exception type references
-import requests  # noqa: E402
-
-
-if __name__ == "__main__":
-    unittest.main()
