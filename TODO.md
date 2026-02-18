@@ -62,13 +62,13 @@ This prevents duplicate work across parallel sessions.
 - [ ] HTML report in `notebooks/results/`, extraction CSV for WU-D1
 - **Tag:** `CLOUD` | **Deps:** WU-A2 | **Files:** `text_pipeline.py`, `gpt_classify.py`, `groundtruth_eval.py`, notebook
 
-### WU-C1: Download OA PDFs for SS records `sonnet`
+### WU-C1: Download all PDFs (Dryad + Zenodo + SS) `sonnet`
 
-- [ ] Refactor `notebooks/download_all_fuster_pdfs.ipynb` — add SS section
-- [ ] Extract article DOIs from xlsx `cited_articles` column for SS records
-- [ ] Use existing fallback chain (OpenAlex → Unpaywall → EZproxy → Sci-Hub)
-- [ ] Store in `data/pdfs/`, build manifest CSV
-- **Tag:** `LOCAL` | **Deps:** WU-A2 | **Files:** `pdf_download.py`, `openalex.py`
+- [ ] Refactor `notebooks/download_all_fuster_pdfs.ipynb` — load from `dataset_092624_validated.xlsx` (all sources, already enriched with `pdf_url`/`is_oa` by WU-A3), not `dataset_article_mapping.csv`
+- [ ] Download **all** records with `cited_article_doi`, regardless of OA status, using existing fallback chain (OpenAlex URL → Unpaywall → EZproxy → Sci-Hub)
+- [ ] Store all PDFs in `data/pdfs/fuster/` (no separate SS folder)
+- [ ] Save manifest CSV; end with synthesis cell segmented by source (Dryad / Zenodo / SS)
+- **Tag:** `LOCAL` | **Deps:** WU-A3 | **Files:** `pdf_download.py`, `openalex.py`, notebook
 
 ### WU-C2: GROBID-parse new PDFs `haiku`
 

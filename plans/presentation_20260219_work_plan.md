@@ -146,18 +146,18 @@ Notebook: `notebooks/batch_abstract_evaluation.ipynb`
 
 ---
 
-### WU-C1: Download OA PDFs for Semantic Scholar Records
+### WU-C1: Download All PDFs (Dryad + Zenodo + SS)
 **Tag:** `LOCAL` — requires local filesystem for PDF storage
 **Claude model:** `sonnet` — scripting with existing `pdf_download.py` fallback chain; needs DOI extraction from xlsx and manifest building
-**Dependencies:** WU-A2
-**Notebook:** extend `notebooks/download_all_fuster_pdfs.ipynb` — add SS section (DOI extraction from xlsx `cited_articles`, SS-specific manifest path)
+**Dependencies:** WU-A3 (xlsx already enriched with `pdf_url`, `is_oa`, `cited_article_doi`)
+**Notebook:** refactor `notebooks/download_all_fuster_pdfs.ipynb` — replace `dataset_article_mapping.csv` source with `dataset_092624_validated.xlsx`; unified flow for all sources
 
-- Extract article DOIs from xlsx `cited_articles` column for SS records
-- Use existing `pdf_download.py` fallback chain (OpenAlex → Unpaywall → EZproxy → Sci-Hub)
-- Check OA status via `openalex.py`
-- Store PDFs in `data/pdfs/`
-- Build manifest CSV (DOI, OA status, download status, file path)
-- **Risk:** SS PDF yield may be low — document coverage for presentation
+- Load `dataset_092624_validated.xlsx`; filter to records with `cited_article_doi`
+- Use `pdf_url` from xlsx (pre-fetched by WU-A3) as primary download URL
+- Run `download_pdf_with_fallback()` for **all** records regardless of OA status (OpenAlex URL → Unpaywall → EZproxy → Sci-Hub)
+- Store all PDFs in `data/pdfs/fuster/` (no separate SS folder)
+- Save manifest CSV (`data/pdfs/fuster/manifest.csv`) with columns: `article_doi`, `source`, `is_oa`, `status`, `file_path`
+- End with a synthesis cell: download stats segmented by source (Dryad / Zenodo / SS)
 
 ---
 
