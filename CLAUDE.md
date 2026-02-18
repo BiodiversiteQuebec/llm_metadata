@@ -217,3 +217,45 @@ This creates a research journal that documents the evolution of the project's me
 - **Model Selection**: Currently using `gpt-5-mini` (cost-effective, faster than GPT-4)
 - **Reasoning Parameter**: GPT-5 series models use `reasoning={"effort": "low"}` instead of `temperature` for inference control
 - **Structured Output**: All extraction uses OpenAI's `responses.parse()` API with Pydantic `text_format` for guaranteed schema compliance
+
+## Task Management & Session Coordination
+
+### Session Start
+- Read `TODO.md` for current project state and task assignments
+- Check Active Sessions table for conflicts before starting work
+- Read referenced plan file in `plans/` for task details
+
+### Plans
+- Plan files live in `plans/`, one file per initiative
+- `TODO.md` references plans; plans hold the detail
+- Keep plans concise — prefer actionable work units over prose
+- Do not create multiple files for a single initiative (no separate "agent plan", "visual overview", "execution guide")
+
+### Task Parallelization & Flow
+- Plan files should declare **dependencies** between work units so independent tasks can run in parallel
+- Use a simple notation: `deps: [2.1, 2.3]` means "blocked until 2.1 and 2.3 are done"
+- Group tasks into **execution rounds** — each round contains tasks whose dependencies are satisfied
+- Within a round, independent tasks can be dispatched to parallel sessions or subagents
+
+Example:
+```
+Round 1: Task 2.1 || Task 2.2          (no deps, run in parallel)
+Round 2: Task 2.3                       (deps: 2.1)
+Round 3: Task 3.1 || Task 3.2          (deps: 2.3 and 2.2 respectively)
+```
+
+### Model Recommendations
+Each work unit in a plan should include a **model recommendation** to guide session dispatch:
+
+| Model | Use for |
+|-------|---------|
+| `opus` | Architecture decisions, complex multi-file refactors, research requiring deep reasoning |
+| `sonnet` | Standard implementation, API clients, schema changes, notebook work, most coding tasks |
+| `haiku` | Documentation updates, simple edits, file moves, mechanical refactors |
+
+Notation in plan files: `model: sonnet` on each work unit. Default to `sonnet` if unspecified.
+
+### Session End
+- Update `TODO.md`: mark tasks complete, clear Active Sessions entry
+- If notebook work was done, update `notebooks/README.md` per Lab Logging Protocol
+- Commit and push
