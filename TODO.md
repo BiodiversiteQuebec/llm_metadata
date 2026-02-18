@@ -38,21 +38,14 @@ This prevents duplicate work across parallel sessions.
 - [ ] Export `data/dataset_092624_all_sources_validated.xlsx`
 - **Tag:** `CLOUD` | **Deps:** WU-A1 | **Files:** `data/dataset_092624.xlsx`, notebook
 
-### WU-B1: Abstract-only extraction (all records) `sonnet`
+### WU-B: Abstract-only extraction + evaluation `sonnet`
 
-- [ ] Run `classify_abstract()` on all valid records with non-null abstracts (updated schema incl modulators)
-- [ ] Model: `gpt-5-mini`, `reasoning={"effort": "low"}`
-- [ ] Track cost per record and by source, cache via joblib
-- **Tag:** `CLOUD` | **Deps:** WU-A2 | **Files:** `text_pipeline.py`, `gpt_classify.py`
-
-### WU-B2: Abstract-only evaluation + feature discussion `opus`
-
-- [ ] Compare extractions vs ground truth using `groundtruth_eval.py`
+- [ ] Notebook: `notebooks/batch_abstract_evaluation.ipynb` (mirrors `batch_fulltext_evaluation.ipynb` / `batch_pdf_file_evaluation.ipynb`)
+- [ ] Steps 1–8: load → configure → extract → prep → evaluate → analysis → cost → export
 - [ ] Per-field P/R/F1 for all 16 fields (10 original + 6 modulators)
-- [ ] Segment by source (Dryad vs Zenodo vs SS)
-- [ ] Feature discussion: which fields extract well/poorly, cross-source variation
-- [ ] HTML report + side-by-side examples
-- **Tag:** `CLOUD` | **Deps:** WU-B1 | **Files:** `groundtruth_eval.py`, notebook, `notebooks/results/`
+- [ ] Segment by source (Dryad vs Zenodo vs SS), feature discussion, side-by-side examples
+- [ ] HTML report in `notebooks/results/`, extraction CSV for WU-D1
+- **Tag:** `CLOUD` | **Deps:** WU-A2 | **Files:** `text_pipeline.py`, `gpt_classify.py`, `groundtruth_eval.py`, notebook
 
 ### WU-C1: Download OA PDFs for SS records `sonnet`
 
@@ -88,7 +81,7 @@ This prevents duplicate work across parallel sessions.
 - [ ] Feature-specific analysis + modulator performance
 - [ ] Cost analysis per approach
 - [ ] Lab log entry in `notebooks/README.md`
-- **Tag:** `CLOUD` | **Deps:** WU-B2, WU-C3, WU-C4 | **Files:** `docs/results_presentation_20260219/work_plan.md`
+- **Tag:** `CLOUD` | **Deps:** WU-B, WU-C3, WU-C4 | **Files:** `docs/results_presentation_20260219/work_plan.md`
 
 ---
 

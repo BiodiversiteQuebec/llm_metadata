@@ -25,14 +25,14 @@ WU-A2 [CLOUD] Validate all 491 records from xlsx (Dryad+Zenodo+SS)
     +---------------------------+
     |                           |
     v                           v
-WU-B1 [CLOUD]                WU-C1 [LOCAL]
+WU-B [CLOUD]                 WU-C1 [LOCAL]
 Abstract extraction            Download SS OA PDFs
-(all 491 valid records)        (via existing fallback chain)
++ evaluation notebook          (via existing fallback chain)
+(batch_abstract_evaluation)    |
+    |                           v
+    |                        WU-C2 [LOCAL]
+    |                        GROBID-parse new PDFs
     |                           |
-    v                           v
-WU-B2 [CLOUD]                WU-C2 [LOCAL]
-Abstract evaluation            GROBID-parse new PDFs
-+ feature discussion           |
     |                     +----+----+
     |                     |         |
     |                     v         v
@@ -53,11 +53,10 @@ WU-D1 [CLOUD] Assemble presentation materials
 |---|---|---|---|
 | WU-A1 Schema extension | CLOUD | **opus** | Multi-file architectural change (schema + prompts + tests) |
 | WU-A2 Data validation | CLOUD | **sonnet** | Structured pandas/Pydantic following existing patterns |
-| WU-B1 Abstract extraction | CLOUD | **sonnet** | Orchestrating existing pipeline at scale |
-| WU-B2 Abstract evaluation | CLOUD | **opus** | Cross-source analysis, interpretation, presentation narrative |
+| WU-B Abstract eval notebook | CLOUD | **sonnet** | Extraction + evaluation in one notebook (mirrors batch_* pattern) |
 | WU-C1 PDF download | LOCAL | **sonnet** | Scripting with existing fallback chain |
 | WU-C2 GROBID parsing | LOCAL | **haiku** | Running existing code on new files |
-| WU-C3 Full-text eval | LOCAL+CLOUD | **sonnet** | Structured notebook following WU-B2 patterns |
+| WU-C3 Full-text eval | LOCAL+CLOUD | **sonnet** | Structured notebook following WU-B pattern |
 | WU-C4 Section-based eval | LOCAL | **sonnet** | Parallel to WU-C3, same pattern |
 | WU-D1 Presentation assembly | CLOUD | **opus** | Synthesis across all streams, narrative framing |
 
@@ -98,31 +97,49 @@ Create notebook (or extend `fuster_annotations_validation.ipynb`):
 
 ---
 
-### WU-B1: Abstract-Only Extraction (all valid records)
+### WU-B: Abstract-Only Extraction + Evaluation
 **Tag:** `CLOUD`
-**Claude model:** `sonnet` — orchestrating existing `text_pipeline.py` infrastructure at scale; mechanical but needs correct config
+**Claude model:** `sonnet` — mirrors the structure of `batch_fulltext_evaluation.ipynb` and `batch_pdf_file_evaluation.ipynb`; extraction and evaluation in a single notebook
 **Dependencies:** WU-A2
 
-- Use `text_pipeline.py` / `gpt_classify.py` to run `classify_abstract()` with updated `DatasetFeatures` (including modulators) on all valid records with non-null abstracts
-- Model: `gpt-5-mini`, `reasoning={"effort": "low"}`
-- Track cost per record and by source
-- Cache via joblib
-- Output: extraction results CSV/DataFrame
+Notebook: `notebooks/batch_abstract_evaluation.ipynb`
 
----
+**Step 1 – Load data**
+- Read `data/dataset_092624_all_sources_validated.xlsx` (output of WU-A2)
+- Filter to records with non-null abstracts
+- Validate ground truth through `DatasetFeaturesNormalized`
+- Coverage table: record count by source
 
-### WU-B2: Abstract-Only Evaluation + Feature Discussion
-**Tag:** `CLOUD`
-**Claude model:** `opus` — analytical depth needed for cross-source comparison, feature-level interpretation, example selection, and narrative for presentation
-**Dependencies:** WU-B1
+**Step 2 – Configure**
+- `TextClassificationConfig`: `model="gpt-5-mini"`, `reasoning={"effort": "low"}`, `system_message=SYSTEM_MESSAGE`
 
-Create/update evaluation notebook:
-- Compare LLM extractions vs ground truth using `groundtruth_eval.py`
-- Compute per-field P/R/F1 for all 16 fields (10 original + 6 modulators)
-- Segment metrics by source (Dryad vs Zenodo vs SS)
-- Feature-based discussion: which fields extract well/poorly, cross-source variation
-- Generate HTML report in `notebooks/results/`
-- Side-by-side examples for presentation
+**Step 3 – Extract**
+- Build `List[TextInputRecord]` (id=DOI or dataset_id, text=abstract)
+- Run `text_classification_flow()` — Prefect flow, `ThreadPoolTaskRunner(max_workers=5)`
+- Joblib cache ensures reruns are free
+
+**Step 4 – Prep**
+- Convert `TextOutputRecord` list to `DatasetFeaturesNormalized` Pydantic models
+- Build `pred_by_id` dict keyed by record id
+
+**Step 5 – Evaluate**
+- Run `evaluate_indexed()` on all 16 fields (10 original + 6 modulators)
+- `EvaluationConfig(casefold_strings=True, treat_lists_as_sets=True, fuzzy_match_fields={"species": FuzzyMatchConfig(threshold=80)})`
+- Micro P/R/F1 + Macro F1
+
+**Step 6 – Analysis**
+- Per-field metrics table (all 16 fields)
+- Segment by source: Dryad vs Zenodo vs SS
+- Feature discussion: which fields extract well/poorly, cross-source variation
+- Side-by-side mismatch examples for presentation
+
+**Step 7 – Cost analysis**
+- Total cost, cost per record, cost by source
+- Token count note vs full-text approaches
+
+**Step 8 – Export**
+- HTML report → `notebooks/results/<timestamped>/`
+- Extraction results CSV for WU-D1
 
 ---
 
@@ -159,7 +176,7 @@ Create/update evaluation notebook:
 - Run OpenAI native PDF File API extraction via `pdf_pipeline.py` on ALL OA PDFs (Dryad+Zenodo existing + new SS)
 - Updated schema with modulators
 - Evaluate against ground truth, segment by source
-- Compare vs abstract-only (WU-B2)
+- Compare vs abstract-only (WU-B)
 - Feature-based performance discussion
 - HTML report in `notebooks/results/`
 
@@ -173,7 +190,7 @@ Create/update evaluation notebook:
 - Run section-based extraction via `section_pipeline.py` on ALL GROBID-parsed PDFs
 - Updated schema with modulators
 - Evaluate against ground truth, segment by source
-- Compare vs abstract-only (WU-B2) and full-text PDF API (WU-C3)
+- Compare vs abstract-only (WU-B) and full-text PDF API (WU-C3)
 - Feature-based performance discussion
 - HTML report in `notebooks/results/`
 
@@ -182,7 +199,7 @@ Create/update evaluation notebook:
 ### WU-D1: Assemble Presentation Materials
 **Tag:** `CLOUD`
 **Claude model:** `opus` — synthesizes results from all streams into coherent narrative; needs judgment for framing, figure selection, and discussion points
-**Dependencies:** WU-B2, WU-C3, WU-C4
+**Dependencies:** WU-B, WU-C3, WU-C4
 
 - Update `docs/results_presentation_20260219/work_plan.md` with actual numbers and results
 - Three-way comparison table: Abstract-only vs Full-text (PDF API) vs Section-based
@@ -197,7 +214,7 @@ Create/update evaluation notebook:
 
 **Fastest path to core deliverable (abstract-only for all sources):**
 ```
-WU-A1 → WU-A2 → WU-B1 → WU-B2 → WU-D1 (partial)
+WU-A1 → WU-A2 → WU-B → WU-D1 (partial)
 ```
 All CLOUD — can run entirely in this environment.
 
@@ -219,7 +236,7 @@ WU-A2 → WU-C1 → WU-C2 → WU-C3/WU-C4 → WU-D1
 | 2.3 Module updates | — | Not needed for evaluation pipeline |
 | 3.1 Parse xlsx | WU-A2 | — |
 | 4.1 Coverage analysis | WU-A2 | — |
-| 5.1 Abstract eval | WU-B1 + WU-B2 | — |
+| 5.1 Abstract eval | WU-B | — |
 | 5.2 Full-text eval | WU-C3 + WU-C4 | — |
 | 5.3 Presentation | WU-D1 | — |
 
@@ -233,8 +250,8 @@ After Thursday, the SS plan continues with API client (Task 2.2), URL fields, ci
 |---|---|---|
 | `src/llm_metadata/schemas/fuster_features.py` | WU-A1 | +6 modulator fields, +DataSource enum, +source field, +validators |
 | `src/llm_metadata/gpt_classify.py` | WU-A1 | Update system prompts for modulator extraction |
-| `src/llm_metadata/groundtruth_eval.py` | WU-B2 | Minor: verify boolean field comparison works |
-| `src/llm_metadata/text_pipeline.py` | WU-B1 | Use for batch abstract extraction |
+| `src/llm_metadata/groundtruth_eval.py` | WU-B | Minor: verify boolean field comparison works |
+| `src/llm_metadata/text_pipeline.py` | WU-B | Use for batch abstract extraction |
 | `src/llm_metadata/pdf_pipeline.py` | WU-C3 | Use for PDF File API extraction |
 | `src/llm_metadata/section_pipeline.py` | WU-C4 | Use for section-based extraction |
 | `src/llm_metadata/pdf_download.py` | WU-C1 | Use as-is (no changes) |
@@ -248,7 +265,6 @@ After Thursday, the SS plan continues with API client (Task 2.2), URL fields, ci
 
 1. **Schema:** `uv run --env-file .env python -m pytest tests/` passes after WU-A1
 2. **Data validation:** All 418 xlsx records validate through updated schema (WU-A2)
-3. **Abstract extraction:** Extraction runs on >=450 records without errors (WU-B1)
-4. **Evaluation:** Per-field P/R/F1 metrics computed for all 16 fields, segmented by source (WU-B2)
-5. **Full-text:** At least the existing ~44 OA Dryad+Zenodo PDFs processed through both pipelines (WU-C3, WU-C4)
-6. **Presentation:** `work_plan.md` has actual numbers, not TBD placeholders (WU-D1)
+3. **Abstract extraction + evaluation:** `batch_abstract_evaluation.ipynb` runs end-to-end on >=450 records; per-field P/R/F1 for all 16 fields, segmented by source (WU-B)
+4. **Full-text:** At least the existing ~44 OA Dryad+Zenodo PDFs processed through both pipelines (WU-C3, WU-C4)
+5. **Presentation:** `work_plan.md` has actual numbers, not TBD placeholders (WU-D1)
