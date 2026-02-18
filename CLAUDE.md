@@ -255,6 +255,8 @@ Each work unit in a plan should include a **model recommendation** to guide sess
 
 Notation in plan files: `model: sonnet` on each work unit. Default to `sonnet` if unspecified.
 
+When launching subagents via the Task tool, pass the `model` parameter matching the work unit's recommendation (e.g., `model="haiku"` for a docs task tagged `model: haiku`).
+
 ### Session End
 - Update `TODO.md`: mark tasks complete, clear Active Sessions entry
 - If notebook work was done, update `notebooks/README.md` per Lab Logging Protocol
