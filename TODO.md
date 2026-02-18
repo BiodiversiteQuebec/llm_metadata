@@ -178,9 +178,9 @@ This prevents duplicate work across parallel sessions.
 
 > **Plan:** [`plans/gbif_species_matching.md`](plans/gbif_species_matching.md)
 
-- [ ] WU-1: `species_parsing.py` — ParsedTaxon model + shared preprocessing
-- [ ] WU-2: `gbif.py` — GBIF Species Match API wrapper
-- [ ] WU-3: Schema `gbif_keys` field + enrichment function
+- [x] WU-1: `species_parsing.py` — ParsedTaxon model + shared preprocessing
+- [x] WU-2: `gbif.py` — GBIF Species Match API wrapper
+- [x] WU-3: Schema `gbif_keys` field + enrichment function
 
 ### Backlog
 
@@ -260,3 +260,4 @@ This prevents duplicate work across parallel sessions.
 | `claude/wu-a1-dlX7N` | WU-A1 | Extend schema — modulators + DataSource | opus | 2026-02-18 |
 | `claude/implement-wu-a2-ePym7` | WU-A2 | Validate all-source ground truth | sonnet | 2026-02-18 |
 | `claude/implement-wu-a3-Y1iX9` | WU-A3 | Enrich URL metadata (source_url, journal_url, pdf_url, is_oa) | sonnet | 2026-02-18 |
+| `claude/implement-gbif-key-enrichment-9mcv1` | GBIF WU-1,2,3 | GBIF species matching enrichment | sonnet | 2026-02-18 |
