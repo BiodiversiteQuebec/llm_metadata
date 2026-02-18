@@ -72,7 +72,6 @@ WU-D1 [CLOUD] Assemble presentation materials
 
 **Changes to `src/llm_metadata/schemas/fuster_features.py`:**
 - Add 6 `Optional[bool]` fields to `DatasetFeatures`: `time_series`, `multispecies`, `threatened_species`, `new_species_science`, `new_species_region`, `bias_north_south`
-- Add `DataSource(str, Enum)` with values `dryad`, `zenodo`, `semantic_scholar`
 - Add `source: Optional[DataSource]` field (for ground truth tracking, not LLM extraction)
 - Add boolean coercion validator in `DatasetFeaturesNormalized` (yes/no/1/0/NaN → `Optional[bool]`)
 
