@@ -41,6 +41,18 @@ This prevents duplicate work across parallel sessions.
 - [x] Overwrite `data/dataset_092624_validated.xlsx` with all-source validated output
 - **Tag:** `CLOUD` | **Deps:** WU-A1 | **Files:** `data/dataset_092624.xlsx`, `notebooks/fuster_annotations_validation.ipynb`
 
+### WU-A3: Enrich URL metadata (source_url, journal_url, pdf_url, is_oa) `sonnet`
+
+> **Plan:** [`plans/enrich_url_metadata.md`](plans/enrich_url_metadata.md)
+
+- [ ] Add `enrich_article_metadata()` to `article_retrieval.py` (OpenAlex + SS fallback)
+- [ ] Column rename in validation notebook (`url` → `source_url`, `cited_articles` → `cited_article_doi`)
+- [ ] Fill `cited_article_doi` for SS records (extract DOI from `source_url`)
+- [ ] Enrich `journal_url`, `pdf_url`, `is_oa` via OpenAlex for all records with article DOI
+- [ ] Update `dataset_article_mapping.csv` with new columns
+- [ ] Re-export `dataset_092624_validated.xlsx` with all fields populated
+- **Tag:** `CLOUD` | **Deps:** WU-A2 | **Files:** `article_retrieval.py`, `fuster_annotations_validation.ipynb`
+
 ### WU-B: Abstract-only extraction + evaluation `sonnet`
 
 - [ ] Notebook: `notebooks/batch_abstract_evaluation.ipynb` (mirrors `batch_fulltext_evaluation.ipynb` / `batch_pdf_file_evaluation.ipynb`)
