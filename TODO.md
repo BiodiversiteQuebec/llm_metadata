@@ -159,6 +159,17 @@ This prevents duplicate work across parallel sessions.
 
 ## Feature Extraction — Advanced Schema
 
+### GBIF Species Matching
+
+> **Plan:** [`plans/gbif_species_matching.md`](plans/gbif_species_matching.md)
+
+- [ ] WU-1: `species_parsing.py` — ParsedTaxon model + shared preprocessing
+- [ ] WU-2: Refactor evaluation matchers to strategy pattern
+- [ ] WU-3: `gbif.py` — GBIF Species Match API wrapper
+- [ ] WU-4: `gbif_matcher()` — evaluation strategy integration
+
+### Backlog
+
 - [ ] Geographic information model incl GADM level, protected areas, ecosystem
 - [ ] Taxonomic information model incl species, paraphyletic groups
 - [ ] Taxonomic & geographic referencing pipeline
