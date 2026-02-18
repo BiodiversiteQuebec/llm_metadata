@@ -4,6 +4,40 @@ This folder contains analysis and validation notebooks for ecological dataset ch
 
 ## Recent Activity
 
+### 2026-02-18: WU-A3 — Enrich URL metadata (source_url, journal_url, pdf_url, is_oa)
+
+**Task:** Populate the 5 URL/OA metadata fields added by WU-A1 in the validated xlsx and dataset-article mapping CSV, so downstream consumers (WU-B extraction, WU-C1 PDF download) have complete metadata.
+
+**Work Performed:**
+- **`src/llm_metadata/article_retrieval.py`**: Added `enrich_article_metadata(article_doi)` function that queries OpenAlex for `journal_url`, `pdf_url`, `is_oa`, with Semantic Scholar as fallback for `pdf_url`.
+- **`notebooks/fuster_annotations_validation.ipynb`**: Added 4 new cells and updated 2 existing cells:
+  - **Cell 1.6** (new): Renames `url` → `source_url` and `cited_articles` → `cited_article_doi` in-memory before validation, so Pydantic maps columns to correct schema field names.
+  - **Stats cells updated**: Section 5 and Section 7 cells updated to reference new column names `source_url` / `cited_article_doi`.
+  - **Cell A3.3** (new): Fills `cited_article_doi` for SS records (extract DOI from `source_url`) and runs Dryad/Zenodo API fallback for missing DOIs.
+  - **Cell A3.4** (new): Enriches `journal_url`, `pdf_url`, `is_oa` via `enrich_article_metadata()` for all records with a `cited_article_doi`.
+  - **Cell A3.5** (new): Updates `data/dataset_article_mapping.csv` with 3 new columns and appends SS records.
+  - **Export cell updated**: Added coverage summary for 5 enriched fields.
+
+**Results — Coverage by source (valid records only, n=299):**
+
+| source | n | has_abstract | source_url | cited_article_doi | journal_url | pdf_url | is_oa |
+|---|---|---|---|---|---|---|---|
+| dryad | 37 | 36/37 (97%) | 37/37 (100%) | 37/37 (100%) | 25/37 (68%) | 34/37 (92%) | 36/37 (97%) |
+| zenodo | 67 | 67/67 (100%) | 67/67 (100%) | 38/67 (57%) | 27/67 (40%) | 33/67 (49%) | 36/67 (54%) |
+| semantic_scholar | 192 | 186/192 (97%) | 175/192 (91%) | 175/192 (91%) | 46/192 (24%) | 122/192 (64%) | 122/192 (64%) |
+| referenced | 3 | 0/3 (0%) | 0/3 (0%) | 0/3 (0%) | 0/3 (0%) | 0/3 (0%) | 0/3 (0%) |
+| **TOTAL** | **299** | **289/299 (97%)** | **279/299 (93%)** | **250/299 (84%)** | **98/299 (33%)** | **189/299 (63%)** | **194/299 (65%)** |
+
+`dataset_article_mapping.csv` extended: 305 rows (original Dryad+Zenodo rows + SS rows), 9 columns (original 6 + `journal_url`, `pdf_url`, `is_oa`).
+
+**Key Issues Identified:**
+- `id` and `title` are not schema fields so are absent from `valid_rows_to_dataframe()` output — recovered from `raw_df` via shared DataFrame index.
+- `test_datasource_all_members` and 2 evaluation fuzzy tests are pre-existing failures from WU-A1, unrelated to WU-A3 changes.
+
+**Next Steps:** WU-B (abstract-only extraction) and WU-C1 (OA PDF download for SS records) can now proceed with complete metadata.
+
+---
+
 ### 2026-01-06: Fuster et al. annotation cleaning and validation
 **Task:** Cleaning and validation of manual annotations from `dataset_092624.xlsx` based on the Fuster et al. dataset feature description using pydantic and validation functions.
 
