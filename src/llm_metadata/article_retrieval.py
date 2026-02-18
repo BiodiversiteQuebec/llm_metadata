@@ -7,9 +7,11 @@ This module implements the recommended workflow for retrieving article DOIs:
 """
 
 import pandas as pd
-from typing import Optional, Dict
+from typing import Optional, Dict, Any
 from llm_metadata.dryad import get_dataset
 from llm_metadata.zenodo import get_record_by_doi
+from llm_metadata.openalex import get_work_by_doi
+from llm_metadata.semantic_scholar import get_open_access_pdf_url
 
 
 def extract_doi_from_url(url: str) -> str:
@@ -146,6 +148,33 @@ def retrieve_article_doi(row: pd.Series) -> Dict[str, str]:
         if article_doi:
             result['article_doi'] = article_doi
             result['retrieval_method'] = 'zenodo_api'
+
+    return result
+
+
+def enrich_article_metadata(article_doi: str) -> Dict[str, Any]:
+    """Query OpenAlex (+ Semantic Scholar fallback) for journal_url, pdf_url, is_oa.
+
+    Args:
+        article_doi: Article DOI (with or without https://doi.org/ prefix)
+
+    Returns:
+        Dict with keys: journal_url, pdf_url, is_oa (all Optional)
+    """
+    result: Dict[str, Any] = {'journal_url': None, 'pdf_url': None, 'is_oa': None}
+
+    work = get_work_by_doi(article_doi)
+    if work:
+        oa = work.get('open_access') or {}
+        result['is_oa'] = oa.get('is_oa')
+
+        best_oa = work.get('best_oa_location') or {}
+        result['journal_url'] = best_oa.get('landing_page_url')
+        result['pdf_url'] = best_oa.get('pdf_url')
+
+    # Semantic Scholar fallback for pdf_url
+    if not result['pdf_url']:
+        result['pdf_url'] = get_open_access_pdf_url(article_doi)
 
     return result
 

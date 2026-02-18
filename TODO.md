@@ -41,16 +41,16 @@ This prevents duplicate work across parallel sessions.
 - [x] Overwrite `data/dataset_092624_validated.xlsx` with all-source validated output
 - **Tag:** `CLOUD` | **Deps:** WU-A1 | **Files:** `data/dataset_092624.xlsx`, `notebooks/fuster_annotations_validation.ipynb`
 
-### WU-A3: Enrich URL metadata (source_url, journal_url, pdf_url, is_oa) `sonnet`
+### WU-A3: Enrich URL metadata (source_url, journal_url, pdf_url, is_oa) `sonnet` ✅
 
 > **Plan:** [`plans/enrich_url_metadata.md`](plans/enrich_url_metadata.md)
 
-- [ ] Add `enrich_article_metadata()` to `article_retrieval.py` (OpenAlex + SS fallback)
-- [ ] Column rename in validation notebook (`url` → `source_url`, `cited_articles` → `cited_article_doi`)
-- [ ] Fill `cited_article_doi` for SS records (extract DOI from `source_url`)
-- [ ] Enrich `journal_url`, `pdf_url`, `is_oa` via OpenAlex for all records with article DOI
-- [ ] Update `dataset_article_mapping.csv` with new columns
-- [ ] Re-export `dataset_092624_validated.xlsx` with all fields populated
+- [x] Add `enrich_article_metadata()` to `article_retrieval.py` (OpenAlex + SS fallback)
+- [x] Column rename in validation notebook (`url` → `source_url`, `cited_articles` → `cited_article_doi`)
+- [x] Fill `cited_article_doi` for SS records (extract DOI from `source_url`)
+- [x] Enrich `journal_url`, `pdf_url`, `is_oa` via OpenAlex for all records with article DOI
+- [x] Update `dataset_article_mapping.csv` with new columns
+- [x] Re-export `dataset_092624_validated.xlsx` with all fields populated
 - **Tag:** `CLOUD` | **Deps:** WU-A2 | **Files:** `article_retrieval.py`, `fuster_annotations_validation.ipynb`
 
 ### WU-B: Abstract-only extraction + evaluation `sonnet`
@@ -257,3 +257,4 @@ This prevents duplicate work across parallel sessions.
 |---|---|---|---|---|
 | `claude/wu-a1-dlX7N` | WU-A1 | Extend schema — modulators + DataSource | opus | 2026-02-18 |
 | `claude/implement-wu-a2-ePym7` | WU-A2 | Validate all-source ground truth | sonnet | 2026-02-18 |
+| `claude/implement-wu-a3-Y1iX9` | WU-A3 | Enrich URL metadata (source_url, journal_url, pdf_url, is_oa) | sonnet | 2026-02-18 |
