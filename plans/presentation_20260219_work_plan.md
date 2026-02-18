@@ -83,16 +83,19 @@ WU-D1 [CLOUD] Assemble presentation materials
 
 ---
 
-### WU-A2: Validate All-Source Ground Truth Data
+### WU-A2: Validate All-Source Ground Truth Data (includes SS Phase 3 Task 3.1)
 **Tag:** `CLOUD`
 **Claude model:** `sonnet` — structured pandas + Pydantic validation following existing notebook patterns; no novel architecture
 **Dependencies:** WU-A1
+**Also covers:** Semantic Scholar implementation guide Task 3.1 (Parse and Validate SS Records from xlsx)
 
-Create notebook (or extend `fuster_annotations_validation.ipynb`):
-- Load `data/dataset_092624.xlsx`, validate ALL 418 records through updated `DatasetFeaturesNormalized`
+Edit existing notebook `notebooks/fuster_annotations_validation.ipynb`:
+- Load `data/dataset_092624.xlsx`, validate ALL records (Dryad+Zenodo+SS) through updated `DatasetFeaturesNormalized`
 - Filter to valid records (~491 across all sources)
+- Parse URL fields for SS records (journal URLs vs search URLs, map to schema fields, handle empty/malformed)
 - Compute coverage stats: records by source, with abstracts, with DOIs, with `cited_articles`
-- Export: `data/dataset_092624_all_sources_validated.xlsx`
+- Validation error breakdown by source
+- Export: `data/dataset_092624_validated.xlsx`
 - Stats table for presentation Methods section (source breakdown, OA proportions)
 
 ---
@@ -105,7 +108,7 @@ Create notebook (or extend `fuster_annotations_validation.ipynb`):
 Notebook: `notebooks/batch_abstract_evaluation.ipynb`
 
 **Step 1 – Load data**
-- Read `data/dataset_092624_all_sources_validated.xlsx` (output of WU-A2)
+- Read `data/dataset_092624_validated.xlsx` (output of WU-A2)
 - Filter to records with non-null abstracts
 - Validate ground truth through `DatasetFeaturesNormalized`
 - Coverage table: record count by source
@@ -238,7 +241,7 @@ WU-A2 → WU-C1 → WU-C2 → WU-C3/WU-C4 → WU-D1
 | 2.1 Schema extension | WU-A1 (DataSource + source field) | URL fields (source_url, journal_url, pdf_url) |
 | 2.2 SS API client | — | Full API client not needed for xlsx evaluation |
 | 2.3 Module updates | — | Not needed for evaluation pipeline |
-| 3.1 Parse xlsx | WU-A2 | — |
+| 3.1 Parse xlsx | WU-A2 (merged) | — |
 | 4.1 Coverage analysis | WU-A2 | — |
 | 5.1 Abstract eval | WU-B | — |
 | 5.2 Full-text eval | WU-C3 + WU-C4 | — |
