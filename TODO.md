@@ -67,7 +67,7 @@ This prevents duplicate work across parallel sessions.
 - [ ] Refactor `notebooks/download_all_fuster_pdfs.ipynb` — add SS section
 - [ ] Extract article DOIs from xlsx `cited_articles` column for SS records
 - [ ] Use existing fallback chain (OpenAlex → Unpaywall → EZproxy → Sci-Hub)
-- [ ] Store in `data/pdfs/semantic_scholar/`, build manifest CSV
+- [ ] Store in `data/pdfs/`, build manifest CSV
 - **Tag:** `LOCAL` | **Deps:** WU-A2 | **Files:** `pdf_download.py`, `openalex.py`
 
 ### WU-C2: GROBID-parse new PDFs `haiku`

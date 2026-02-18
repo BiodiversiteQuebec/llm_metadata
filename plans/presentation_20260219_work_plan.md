@@ -155,7 +155,7 @@ Notebook: `notebooks/batch_abstract_evaluation.ipynb`
 - Extract article DOIs from xlsx `cited_articles` column for SS records
 - Use existing `pdf_download.py` fallback chain (OpenAlex → Unpaywall → EZproxy → Sci-Hub)
 - Check OA status via `openalex.py`
-- Store PDFs in `data/pdfs/semantic_scholar/`
+- Store PDFs in `data/pdfs/`
 - Build manifest CSV (DOI, OA status, download status, file path)
 - **Risk:** SS PDF yield may be low — document coverage for presentation
 
