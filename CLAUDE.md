@@ -261,4 +261,3 @@ When launching subagents via the Task tool, pass the `model` parameter matching 
 - Update `TODO.md`: mark tasks complete, clear Active Sessions entry
 - If notebook work was done, update `notebooks/README.md` per Lab Logging Protocol
 - Commit and push
-- Rename the session with a ✅ prefix: `claude session rename "✅ <short task summary>"`
