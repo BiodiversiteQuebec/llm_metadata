@@ -1,0 +1,4 @@
+source,n,micro_precision,micro_recall,micro_f1,macro_f1
+dryad,36,0.242,0.277,0.259,0.237
+zenodo,67,0.243,0.311,0.273,0.329
+semantic_scholar,185,0.1,0.287,0.148,0.155

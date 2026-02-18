@@ -4,6 +4,65 @@ This folder contains analysis and validation notebooks for ecological dataset ch
 
 ## Recent Activity
 
+### 2026-02-18: WU-B — Abstract-only extraction + evaluation notebook
+
+**Task:** Create `notebooks/batch_abstract_evaluation.ipynb` to run GPT-5-mini abstract classification on all 299 valid records (Dryad + Zenodo + Semantic Scholar) and evaluate against ground truth. Per-field P/R/F1 for 14 fields: 8 core EBV + 6 modulators.
+
+**Work Performed:**
+- **`notebooks/batch_abstract_evaluation.ipynb`** (new): 8-step notebook mirroring `batch_fulltext_evaluation.ipynb` and `batch_pdf_file_evaluation.ipynb`:
+  - Step 1: Load validated xlsx + join original xlsx for abstract text; validate GT via `DatasetFeaturesNormalized`
+  - Step 2: Configure `TextClassificationConfig` with `DatasetFeatures` schema + `SYSTEM_MESSAGE`
+  - Step 3: Run `text_classification_flow()` (Prefect, ThreadPool, max_workers=5)
+  - Step 4: Convert results to `DatasetFeaturesNormalized` for evaluation
+  - Step 5: `evaluate_indexed()` on all 14 fields with `enhanced_species_matching=True`
+  - Step 6: Per-field table + cross-source breakdown (Dryad / Zenodo / Semantic Scholar)
+  - Step 7: Cost analysis per source
+  - Step 8: Export detail CSV + field/source summary CSVs + HTML report
+- **`src/llm_metadata/text_pipeline.py`**: Added `system_message: str` field to `TextClassificationConfig` (defaulting to `SYSTEM_MESSAGE` from `gpt_classify.py`), passed through to `classify_abstract()`.
+- **Cache:** Notebook sets `os.chdir(PROJECT_ROOT)` before imports so joblib cache lands at `{PROJECT_ROOT}/cache/`. This path is NOT matched by the `*/cache/*` gitignore pattern (which requires a path segment before "cache"), so the cache is committable and syncable to local.
+
+**Key issues identified:**
+- `dataset_092624_validated.xlsx` stores Python list objects as string repr (e.g. `"['genetic_analysis']"`). Fixed in notebook with `ast.literal_eval` pre-processing before Pydantic validation.
+- `rapidfuzz` was missing from the environment; added as dependency.
+
+**Results — 288 records (36 Dryad + 67 Zenodo + 185 Semantic Scholar), model: gpt-5-mini, cost: $1.91**
+
+| Metric | Value |
+|--------|-------|
+| Micro F1 (all 14 fields) | 0.202 |
+| Macro F1 | 0.194 |
+| Core fields Micro F1 | 0.209 |
+| Modulator Micro F1 | 0.175 |
+
+Per-field:
+
+| Field | P | R | F1 |
+|-------|---|---|----|
+| temp_range_i | 0.482 | 0.357 | **0.410** |
+| temp_range_f | 0.451 | 0.330 | **0.381** |
+| multispecies | 0.293 | 0.365 | **0.325** |
+| species | 0.163 | 0.600 | **0.256** |
+| data_type | 0.127 | 0.400 | **0.193** |
+| time_series | 0.112 | 0.917 | **0.200** |
+| threatened_species | 0.474 | 0.088 | **0.149** |
+| geospatial_info | 0.064 | 0.400 | **0.111** |
+| spatial_range_km2 | 0.545 | 0.057 | **0.103** |
+| new_species_region | 0.273 | 0.057 | **0.094** |
+| temporal_range | 0.063 | 0.066 | **0.064** |
+| new_species_science | 0.333 | 0.019 | **0.036** |
+| referred_dataset | 0 | 0 | **0** |
+| bias_north_south | 0 | 0 | **0** |
+
+Cross-source (Micro F1): Dryad 0.259, Zenodo 0.273, Semantic Scholar 0.148 — SS lower because journal article abstracts are shorter/less structured than repository abstracts.
+
+**Next steps:**
+- Use `notebooks/results/batch_abstract_evaluation_20260218_145142/` CSVs for WU-D1 three-way comparison
+- HTML report: `notebooks/results/batch_abstract_evaluation_20260218_145142/batch_abstract_evaluation.html`
+
+**Report link:** `notebooks/results/batch_abstract_evaluation_20260218_145142/batch_abstract_evaluation.html`
+
+---
+
 ### 2026-02-18: WU-A3 — Enrich URL metadata (source_url, journal_url, pdf_url, is_oa)
 
 **Task:** Populate the 5 URL/OA metadata fields added by WU-A1 in the validated xlsx and dataset-article mapping CSV, so downstream consumers (WU-B extraction, WU-C1 PDF download) have complete metadata.

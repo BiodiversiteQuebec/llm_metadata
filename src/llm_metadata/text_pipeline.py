@@ -18,7 +18,7 @@ from prefect.task_runners import ThreadPoolTaskRunner
 from pydantic import BaseModel, Field
 
 from llm_metadata.chunking import count_tokens
-from llm_metadata.gpt_classify import classify_abstract
+from llm_metadata.gpt_classify import classify_abstract, SYSTEM_MESSAGE
 from llm_metadata.schemas import DatasetAbstractMetadata
 
 
@@ -44,6 +44,7 @@ class TextClassificationConfig:
     max_output_tokens: int = 4096
     temperature: Optional[float] = None
     text_format: Type[BaseModel] = DatasetAbstractMetadata
+    system_message: str = field(default_factory=lambda: SYSTEM_MESSAGE)
     output_dir: Path = field(default_factory=lambda: Path("artifacts/text_results"))
     max_workers: int = 5
 
@@ -105,6 +106,7 @@ def classify_text_task(
     """
     result = classify_abstract(
         abstract=text,
+        system_message=config.system_message,
         text_format=config.text_format,
         model=config.model,
         reasoning=config.reasoning,
