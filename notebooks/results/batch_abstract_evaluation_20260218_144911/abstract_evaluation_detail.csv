@@ -1,0 +1,1513 @@
+record_id,field,true_value,pred_value,match,tp,fp,fn,tn,source
+160,data_type,,['distribution'],False,0,1,0,0,zenodo
+160,geospatial_info_dataset,,"['distribution', 'maps', 'administrative_units']",False,0,3,0,0,zenodo
+160,spatial_range_km2,560000.0,,False,0,0,1,0,zenodo
+160,temporal_range,,,True,0,0,0,1,zenodo
+160,temp_range_i,,,True,0,0,0,1,zenodo
+160,temp_range_f,,,True,0,0,0,1,zenodo
+160,species,"[""['Rangifer tarandus caribou']""]","['Rangifer tarandus caribou', 'Rangifer tarandus']",True,1,0,0,0,zenodo
+160,referred_dataset,,Leblond_etal_2014_Data_Biological_Conservation.xlsx,False,0,1,0,0,zenodo
+160,time_series,,,True,0,0,0,1,zenodo
+160,multispecies,,,True,0,0,0,1,zenodo
+160,threatened_species,,True,False,0,1,0,0,zenodo
+160,new_species_science,,,True,0,0,0,1,zenodo
+160,new_species_region,,,True,0,0,0,1,zenodo
+160,bias_north_south,,,True,0,0,0,1,zenodo
+171,data_type,,['genetic_analysis'],False,0,1,0,0,semantic_scholar
+171,geospatial_info_dataset,,"['site', 'geographic_features', 'administrative_units']",False,0,3,0,0,semantic_scholar
+171,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+171,temporal_range,,,True,0,0,0,1,semantic_scholar
+171,temp_range_i,,,True,0,0,0,1,semantic_scholar
+171,temp_range_f,,,True,0,0,0,1,semantic_scholar
+171,species,"[""['Salvelinus fontinalis'"", ""'Salvelinus alpinus']""]","['brook charr (Salvelinus fontinalis)', 'arctic charr (Salvelinus alpinus)', 'rainbow trout [Oncorhynchus mykiss]', 'Atlantic salmon [Salmo salar]']",False,1,2,1,0,semantic_scholar
+171,referred_dataset,,,True,0,0,0,1,semantic_scholar
+171,time_series,,,True,0,0,0,1,semantic_scholar
+171,multispecies,,True,False,0,1,0,0,semantic_scholar
+171,threatened_species,,,True,0,0,0,1,semantic_scholar
+171,new_species_science,,,True,0,0,0,1,semantic_scholar
+171,new_species_region,,,True,0,0,0,1,semantic_scholar
+171,bias_north_south,,,True,0,0,0,1,semantic_scholar
+172,data_type,,"['ecosystem_structure', 'ecosystem_function']",False,0,2,0,0,semantic_scholar
+172,geospatial_info_dataset,,"['maps', 'site']",False,0,2,0,0,semantic_scholar
+172,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+172,temporal_range,,2012; simulations over 70 years,False,0,1,0,0,semantic_scholar
+172,temp_range_i,,2012,False,0,1,0,0,semantic_scholar
+172,temp_range_f,,,True,0,0,0,1,semantic_scholar
+172,species,,,True,0,0,0,1,semantic_scholar
+172,referred_dataset,,,True,0,0,0,1,semantic_scholar
+172,time_series,,,True,0,0,0,1,semantic_scholar
+172,multispecies,,True,False,0,1,0,0,semantic_scholar
+172,threatened_species,,,True,0,0,0,1,semantic_scholar
+172,new_species_science,,,True,0,0,0,1,semantic_scholar
+172,new_species_region,,,True,0,0,0,1,semantic_scholar
+172,bias_north_south,,,True,0,0,0,1,semantic_scholar
+173,data_type,,"['abundance', 'time_series']",False,0,2,0,0,semantic_scholar
+173,geospatial_info_dataset,,"['site', 'administrative_units']",False,0,2,0,0,semantic_scholar
+173,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+173,temporal_range,,"1989-1991, 2000, 2004",False,0,1,0,0,semantic_scholar
+173,temp_range_i,,1989,False,0,1,0,0,semantic_scholar
+173,temp_range_f,,2004,False,0,1,0,0,semantic_scholar
+173,species,,"['sesiids', 'Synanthedon scitula', 'S. pyri', 'Podosesia syringae', 'S. acerrubri', 'S. fulvipes', 'S. exitiosa', 'S. acerni', 'Sesia tibialis', 'S. scitula/pyri complex']",False,0,10,0,0,semantic_scholar
+173,referred_dataset,,,True,0,0,0,1,semantic_scholar
+173,time_series,,True,False,0,1,0,0,semantic_scholar
+173,multispecies,,True,False,0,1,0,0,semantic_scholar
+173,threatened_species,,,True,0,0,0,1,semantic_scholar
+173,new_species_science,,,True,0,0,0,1,semantic_scholar
+173,new_species_region,,,True,0,0,0,1,semantic_scholar
+173,bias_north_south,,,True,0,0,0,1,semantic_scholar
+185,data_type,,"['presence-only', 'distribution']",False,0,2,0,0,semantic_scholar
+185,geospatial_info_dataset,,"['sample', 'site', 'administrative_units', 'maps']",False,0,4,0,0,semantic_scholar
+185,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+185,temporal_range,,7.VI.2007 to 2.VII.2008,False,0,1,0,0,semantic_scholar
+185,temp_range_i,,2007,False,0,1,0,0,semantic_scholar
+185,temp_range_f,,2008,False,0,1,0,0,semantic_scholar
+185,species,"[""['Arrenodes minutus']""]","['Brentidae', 'Arrenodes minutus (Drury', '1770)', 'Quercus spp.', 'Tilia americana L.', 'Juglans cinerea L.', 'Fraxinus americana L.', 'Ostrya virginiana (Mill.)Koch', 'Desmodium glutinosum (Muhl.)', 'Hystrix patula', 'oak timberworm']",False,1,10,0,0,semantic_scholar
+185,referred_dataset,,,True,0,0,0,1,semantic_scholar
+185,time_series,,,True,0,0,0,1,semantic_scholar
+185,multispecies,,,True,0,0,0,1,semantic_scholar
+185,threatened_species,,,True,0,0,0,1,semantic_scholar
+185,new_species_science,,,True,0,0,0,1,semantic_scholar
+185,new_species_region,,True,False,0,1,0,0,semantic_scholar
+185,bias_north_south,,,True,0,0,0,1,semantic_scholar
+187,data_type,,"['abundance', 'density', 'ecosystem_structure']",False,0,3,0,0,semantic_scholar
+187,geospatial_info_dataset,,"['site', 'administrative_units']",False,0,2,0,0,semantic_scholar
+187,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+187,temporal_range,,,True,0,0,0,1,semantic_scholar
+187,temp_range_i,,,True,0,0,0,1,semantic_scholar
+187,temp_range_f,,,True,0,0,0,1,semantic_scholar
+187,species,,"['trout', 'salmonids', 'fish']",False,0,3,0,0,semantic_scholar
+187,referred_dataset,,,True,0,0,0,1,semantic_scholar
+187,time_series,,,True,0,0,0,1,semantic_scholar
+187,multispecies,,True,False,0,1,0,0,semantic_scholar
+187,threatened_species,,,True,0,0,0,1,semantic_scholar
+187,new_species_science,,,True,0,0,0,1,semantic_scholar
+187,new_species_region,,,True,0,0,0,1,semantic_scholar
+187,bias_north_south,,,True,0,0,0,1,semantic_scholar
+188,data_type,,"['time_series', 'traits', 'distribution']",False,0,3,0,0,semantic_scholar
+188,geospatial_info_dataset,,"['site', 'administrative_units']",False,0,2,0,0,semantic_scholar
+188,spatial_range_km2,800000.0,,False,0,0,1,0,semantic_scholar
+188,temporal_range,2015-2018,2009-2018,False,0,1,1,0,semantic_scholar
+188,temp_range_i,,2009,False,0,1,0,0,semantic_scholar
+188,temp_range_f,,2018,False,0,1,0,0,semantic_scholar
+188,species,"[""['black spruce']""]",['black spruce'],True,1,0,0,0,semantic_scholar
+188,referred_dataset,,,True,0,0,0,1,semantic_scholar
+188,time_series,,True,False,0,1,0,0,semantic_scholar
+188,multispecies,,,True,0,0,0,1,semantic_scholar
+188,threatened_species,,,True,0,0,0,1,semantic_scholar
+188,new_species_science,,,True,0,0,0,1,semantic_scholar
+188,new_species_region,,,True,0,0,0,1,semantic_scholar
+188,bias_north_south,,,True,0,0,0,1,semantic_scholar
+189,data_type,,['abundance'],False,0,1,0,0,semantic_scholar
+189,geospatial_info_dataset,,['site'],False,0,1,0,0,semantic_scholar
+189,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+189,temporal_range,,1970-1987,False,0,1,0,0,semantic_scholar
+189,temp_range_i,,1970,False,0,1,0,0,semantic_scholar
+189,temp_range_f,,1987,False,0,1,0,0,semantic_scholar
+189,species,"[""['balsam fir']""]","['Balsam fir (Abiesbalsamea (L.) Mill.)', 'spruce budworm (Choristoneurafumiferana (Clem.))', 'conifers']",False,0,3,1,0,semantic_scholar
+189,referred_dataset,,,True,0,0,0,1,semantic_scholar
+189,time_series,,,True,0,0,0,1,semantic_scholar
+189,multispecies,,,True,0,0,0,1,semantic_scholar
+189,threatened_species,,,True,0,0,0,1,semantic_scholar
+189,new_species_science,,,True,0,0,0,1,semantic_scholar
+189,new_species_region,,,True,0,0,0,1,semantic_scholar
+189,bias_north_south,,,True,0,0,0,1,semantic_scholar
+190,data_type,,['ecosystem_function'],False,0,1,0,0,semantic_scholar
+190,geospatial_info_dataset,,"['site', 'administrative_units']",False,0,2,0,0,semantic_scholar
+190,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+190,temporal_range,km,one growing season,False,0,1,1,0,semantic_scholar
+190,temp_range_i,,,True,0,0,0,1,semantic_scholar
+190,temp_range_f,,,True,0,0,0,1,semantic_scholar
+190,species,"[""['>1']""]",['plant species'],False,0,1,1,0,semantic_scholar
+190,referred_dataset,,,True,0,0,0,1,semantic_scholar
+190,time_series,,False,False,0,1,0,0,semantic_scholar
+190,multispecies,,True,False,0,1,0,0,semantic_scholar
+190,threatened_species,,,True,0,0,0,1,semantic_scholar
+190,new_species_science,,,True,0,0,0,1,semantic_scholar
+190,new_species_region,,,True,0,0,0,1,semantic_scholar
+190,bias_north_south,,,True,0,0,0,1,semantic_scholar
+191,data_type,,"['abundance', 'species_richness']",False,0,2,0,0,semantic_scholar
+191,geospatial_info_dataset,,"['site', 'geographic_features']",False,0,2,0,0,semantic_scholar
+191,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+191,temporal_range,,,True,0,0,0,1,semantic_scholar
+191,temp_range_i,,,True,0,0,0,1,semantic_scholar
+191,temp_range_f,,,True,0,0,0,1,semantic_scholar
+191,species,,['birds'],False,0,1,0,0,semantic_scholar
+191,referred_dataset,,,True,0,0,0,1,semantic_scholar
+191,time_series,,,True,0,0,0,1,semantic_scholar
+191,multispecies,,True,False,0,1,0,0,semantic_scholar
+191,threatened_species,,,True,0,0,0,1,semantic_scholar
+191,new_species_science,,,True,0,0,0,1,semantic_scholar
+191,new_species_region,,,True,0,0,0,1,semantic_scholar
+191,bias_north_south,,,True,0,0,0,1,semantic_scholar
+192,data_type,,"['presence-absence', 'abundance', 'density', 'species_richness']",False,0,4,0,0,semantic_scholar
+192,geospatial_info_dataset,,['site'],False,0,1,0,0,semantic_scholar
+192,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+192,temporal_range,,winter and spring,False,0,1,0,0,semantic_scholar
+192,temp_range_i,,,True,0,0,0,1,semantic_scholar
+192,temp_range_f,,,True,0,0,0,1,semantic_scholar
+192,species,"[""['c.40 bird species']""]","['House Sparrow (Passer domesticus)', 'European Starling (Sturnus vulgaris)', 'European Blackbird (Turdus merula)', 'American Robin (Turdus migratorius)']",False,0,4,1,0,semantic_scholar
+192,referred_dataset,,,True,0,0,0,1,semantic_scholar
+192,time_series,,,True,0,0,0,1,semantic_scholar
+192,multispecies,,True,False,0,1,0,0,semantic_scholar
+192,threatened_species,,,True,0,0,0,1,semantic_scholar
+192,new_species_science,,,True,0,0,0,1,semantic_scholar
+192,new_species_region,,,True,0,0,0,1,semantic_scholar
+192,bias_north_south,,,True,0,0,0,1,semantic_scholar
+193,data_type,,"['abundance', 'species_richness', 'distribution']",False,0,3,0,0,semantic_scholar
+193,geospatial_info_dataset,,"['site', 'range', 'distribution']",False,0,3,0,0,semantic_scholar
+193,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+193,temporal_range,,,True,0,0,0,1,semantic_scholar
+193,temp_range_i,,,True,0,0,0,1,semantic_scholar
+193,temp_range_f,,,True,0,0,0,1,semantic_scholar
+193,species,"[""['c. 10 tree species'"", ""'c. 30 herbaceus species'"", ""'c.20 lichens and mosses']""]",,False,0,0,3,0,semantic_scholar
+193,referred_dataset,,,True,0,0,0,1,semantic_scholar
+193,time_series,,,True,0,0,0,1,semantic_scholar
+193,multispecies,,True,False,0,1,0,0,semantic_scholar
+193,threatened_species,,,True,0,0,0,1,semantic_scholar
+193,new_species_science,,,True,0,0,0,1,semantic_scholar
+193,new_species_region,,,True,0,0,0,1,semantic_scholar
+193,bias_north_south,,,True,0,0,0,1,semantic_scholar
+195,data_type,,"['traits', 'ecosystem_function', 'ecosystem_structure']",False,0,3,0,0,semantic_scholar
+195,geospatial_info_dataset,,['administrative_units'],False,0,1,0,0,semantic_scholar
+195,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+195,temporal_range,,,True,0,0,0,1,semantic_scholar
+195,temp_range_i,,,True,0,0,0,1,semantic_scholar
+195,temp_range_f,,,True,0,0,0,1,semantic_scholar
+195,species,"[""['11 tree species']""]","['Acer saccharum', 'sugar maple', 'hemlock', 'maple\t6birch', 'conifers', 'temperate hardwoods', 'boreal forests']",False,0,7,1,0,semantic_scholar
+195,referred_dataset,,,True,0,0,0,1,semantic_scholar
+195,time_series,,,True,0,0,0,1,semantic_scholar
+195,multispecies,,,True,0,0,0,1,semantic_scholar
+195,threatened_species,,,True,0,0,0,1,semantic_scholar
+195,new_species_science,,,True,0,0,0,1,semantic_scholar
+195,new_species_region,,,True,0,0,0,1,semantic_scholar
+195,bias_north_south,,,True,0,0,0,1,semantic_scholar
+196,data_type,,"['presence-only', 'traits', 'species_richness']",False,0,3,0,0,semantic_scholar
+196,geospatial_info_dataset,,"['site', 'sample']",False,0,2,0,0,semantic_scholar
+196,spatial_range_km2,,0.96,False,0,1,0,0,semantic_scholar
+196,temporal_range,,June to October 2011,False,0,1,0,0,semantic_scholar
+196,temp_range_i,,2011,False,0,1,0,0,semantic_scholar
+196,temp_range_f,,2011,False,0,1,0,0,semantic_scholar
+196,species,"[""['Carex ×cayouettei hybrid']""]","['Carex ×cayouettei A. Bergeron', 'hybr. nov.', 'Carex comosa', 'C. comosa Boott', 'Carex lupulina', 'C. lupulina', 'Carex pseudocyperus', 'C. pseudocyperus', 'Carex retrorsa', 'C. retrorsa', 'C. intumescens', 'C. lacustris', 'C. hystericina Muhl. ex Willd.', 'C. lurida Wahlenb.', 'C. utriculata Boott', 'C. vesicaria L.', 'C. acutiformis Ehrh.', 'C. gigantea Rudge', 'C. hyalinolepis Steud.', 'Carex (Cyperaceae)', 'Acer saccharum', 'Fagus grandifolia', 'Tilia americana', 'Acer saccharinum', 'Fraxinus pennsylvanica']",False,1,24,0,0,semantic_scholar
+196,referred_dataset,,,True,0,0,0,1,semantic_scholar
+196,time_series,,,True,0,0,0,1,semantic_scholar
+196,multispecies,,True,False,0,1,0,0,semantic_scholar
+196,threatened_species,,,True,0,0,0,1,semantic_scholar
+196,new_species_science,,,True,0,0,0,1,semantic_scholar
+196,new_species_region,,,True,0,0,0,1,semantic_scholar
+196,bias_north_south,,,True,0,0,0,1,semantic_scholar
+198,data_type,,"['presence-only', 'genetic_analysis', 'distribution']",False,0,3,0,0,semantic_scholar
+198,geospatial_info_dataset,,"['site', 'distribution', 'administrative_units', 'range']",False,0,4,0,0,semantic_scholar
+198,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+198,temporal_range,,,True,0,0,0,1,semantic_scholar
+198,temp_range_i,,,True,0,0,0,1,semantic_scholar
+198,temp_range_f,,,True,0,0,0,1,semantic_scholar
+198,species,"[""['Fraxinus americana']""]","['six species of ash (Fraxinus) and lilac (Syringa)', 'IJ other species growing in the vicinity of diseased ash in central New York State', 'two species in Zion National Park']",False,0,3,1,0,semantic_scholar
+198,referred_dataset,,,True,0,0,0,1,semantic_scholar
+198,time_series,,,True,0,0,0,1,semantic_scholar
+198,multispecies,,True,False,0,1,0,0,semantic_scholar
+198,threatened_species,,,True,0,0,0,1,semantic_scholar
+198,new_species_science,,,True,0,0,0,1,semantic_scholar
+198,new_species_region,,,True,0,0,0,1,semantic_scholar
+198,bias_north_south,,,True,0,0,0,1,semantic_scholar
+203,data_type,,"['genetic_analysis', 'ecosystem_function', 'abundance']",False,0,3,0,0,semantic_scholar
+203,geospatial_info_dataset,,"['sample', 'site']",False,0,2,0,0,semantic_scholar
+203,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+203,temporal_range,,,True,0,0,0,1,semantic_scholar
+203,temp_range_i,,,True,0,0,0,1,semantic_scholar
+203,temp_range_f,,,True,0,0,0,1,semantic_scholar
+203,species,"[""['cyanobacterias']""]","['Microcystis aeruginosa CPCC 299', 'Planktothrix agardhii NIVA-CYA 126', 'cyanobacteria']",False,1,2,0,0,semantic_scholar
+203,referred_dataset,,,True,0,0,0,1,semantic_scholar
+203,time_series,,True,False,0,1,0,0,semantic_scholar
+203,multispecies,,True,False,0,1,0,0,semantic_scholar
+203,threatened_species,,,True,0,0,0,1,semantic_scholar
+203,new_species_science,,,True,0,0,0,1,semantic_scholar
+203,new_species_region,,,True,0,0,0,1,semantic_scholar
+203,bias_north_south,,,True,0,0,0,1,semantic_scholar
+205,data_type,,['presence-only'],False,0,1,0,0,semantic_scholar
+205,geospatial_info_dataset,,"['administrative_units', 'distribution']",False,0,2,0,0,semantic_scholar
+205,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+205,temporal_range,,,True,0,0,0,1,semantic_scholar
+205,temp_range_i,,,True,0,0,0,1,semantic_scholar
+205,temp_range_f,,,True,0,0,0,1,semantic_scholar
+205,species,,"['Cuscuta indecora Choisy', 'Cuscuta coryli Engelm', 'numerous herbaceous and woody plants']",False,0,3,0,0,semantic_scholar
+205,referred_dataset,,,True,0,0,0,1,semantic_scholar
+205,time_series,,,True,0,0,0,1,semantic_scholar
+205,multispecies,,,True,0,0,0,1,semantic_scholar
+205,threatened_species,,,True,0,0,0,1,semantic_scholar
+205,new_species_science,,,True,0,0,0,1,semantic_scholar
+205,new_species_region,,True,False,0,1,0,0,semantic_scholar
+205,bias_north_south,,,True,0,0,0,1,semantic_scholar
+207,data_type,,"['abundance', 'genetic_analysis']",False,0,2,0,0,semantic_scholar
+207,geospatial_info_dataset,,"['site', 'administrative_units']",False,0,2,0,0,semantic_scholar
+207,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+207,temporal_range,,2009 to 2010,False,0,1,0,0,semantic_scholar
+207,temp_range_i,,2009,False,0,1,0,0,semantic_scholar
+207,temp_range_f,,2010,False,0,1,0,0,semantic_scholar
+207,species,"[""['Nosema apis'"", ""'Nosema ceranae']""]","['Nosema apis', 'Nosema ceranae', 'honeybee']",False,2,1,0,0,semantic_scholar
+207,referred_dataset,,,True,0,0,0,1,semantic_scholar
+207,time_series,,True,False,0,1,0,0,semantic_scholar
+207,multispecies,,True,False,0,1,0,0,semantic_scholar
+207,threatened_species,,,True,0,0,0,1,semantic_scholar
+207,new_species_science,,,True,0,0,0,1,semantic_scholar
+207,new_species_region,,,True,0,0,0,1,semantic_scholar
+207,bias_north_south,,,True,0,0,0,1,semantic_scholar
+210,data_type,,,True,0,0,0,1,semantic_scholar
+210,geospatial_info_dataset,,"['sample', 'administrative_units']",False,0,2,0,0,semantic_scholar
+210,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+210,temporal_range,,,True,0,0,0,1,semantic_scholar
+210,temp_range_i,,,True,0,0,0,1,semantic_scholar
+210,temp_range_f,,,True,0,0,0,1,semantic_scholar
+210,species,"[""['Cyanobacteria']""]","['Cyanobacteria', '5 Microcystis strains']",False,1,1,0,0,semantic_scholar
+210,referred_dataset,,,True,0,0,0,1,semantic_scholar
+210,time_series,,,True,0,0,0,1,semantic_scholar
+210,multispecies,,,True,0,0,0,1,semantic_scholar
+210,threatened_species,,,True,0,0,0,1,semantic_scholar
+210,new_species_science,,,True,0,0,0,1,semantic_scholar
+210,new_species_region,,,True,0,0,0,1,semantic_scholar
+210,bias_north_south,,,True,0,0,0,1,semantic_scholar
+211,data_type,,['ecosystem_structure'],False,0,1,0,0,semantic_scholar
+211,geospatial_info_dataset,,['site'],False,0,1,0,0,semantic_scholar
+211,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+211,temporal_range,,,True,0,0,0,1,semantic_scholar
+211,temp_range_i,,,True,0,0,0,1,semantic_scholar
+211,temp_range_f,,,True,0,0,0,1,semantic_scholar
+211,species,"[""['White spruce'"", ""'black spruce'"", ""'Eastern larch'"", ""'Jack pine'"", ""'Trembling aspen']""]",,False,0,0,5,0,semantic_scholar
+211,referred_dataset,,,True,0,0,0,1,semantic_scholar
+211,time_series,,,True,0,0,0,1,semantic_scholar
+211,multispecies,,,True,0,0,0,1,semantic_scholar
+211,threatened_species,,,True,0,0,0,1,semantic_scholar
+211,new_species_science,,,True,0,0,0,1,semantic_scholar
+211,new_species_region,,,True,0,0,0,1,semantic_scholar
+211,bias_north_south,,,True,0,0,0,1,semantic_scholar
+213,data_type,,"['abundance', 'distribution', 'species_richness', 'ecosystem_structure']",False,0,4,0,0,semantic_scholar
+213,geospatial_info_dataset,,"['sample', 'site', 'distribution']",False,0,3,0,0,semantic_scholar
+213,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+213,temporal_range,,"Stand ages sampled: 1 year, 20 years, 100 years, >200 years (naturally disturbed); logged landscapes: 20 years, 80 years.",False,0,1,0,0,semantic_scholar
+213,temp_range_i,,,True,0,0,0,1,semantic_scholar
+213,temp_range_f,,,True,0,0,0,1,semantic_scholar
+213,species,,"['cavity-nesting birds', 'primary cavity-nesting birds', 'secondary cavity-nesting birds', 'birds associated with dead wood']",False,0,4,0,0,semantic_scholar
+213,referred_dataset,,,True,0,0,0,1,semantic_scholar
+213,time_series,,,True,0,0,0,1,semantic_scholar
+213,multispecies,,True,False,0,1,0,0,semantic_scholar
+213,threatened_species,,,True,0,0,0,1,semantic_scholar
+213,new_species_science,,,True,0,0,0,1,semantic_scholar
+213,new_species_region,,,True,0,0,0,1,semantic_scholar
+213,bias_north_south,,,True,0,0,0,1,semantic_scholar
+215,data_type,,"['density', 'distribution', 'traits', 'abundance']",False,0,4,0,0,semantic_scholar
+215,geospatial_info_dataset,,['administrative_units'],False,0,1,0,0,semantic_scholar
+215,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+215,temporal_range,,,True,0,0,0,1,semantic_scholar
+215,temp_range_i,,,True,0,0,0,1,semantic_scholar
+215,temp_range_f,,,True,0,0,0,1,semantic_scholar
+215,species,,"['108 tree species', 'temperate forest trees']",False,0,2,0,0,semantic_scholar
+215,referred_dataset,,,True,0,0,0,1,semantic_scholar
+215,time_series,,,True,0,0,0,1,semantic_scholar
+215,multispecies,,True,False,0,1,0,0,semantic_scholar
+215,threatened_species,,,True,0,0,0,1,semantic_scholar
+215,new_species_science,,,True,0,0,0,1,semantic_scholar
+215,new_species_region,,,True,0,0,0,1,semantic_scholar
+215,bias_north_south,,,True,0,0,0,1,semantic_scholar
+218,data_type,,"['distribution', 'time_series']",False,0,2,0,0,semantic_scholar
+218,geospatial_info_dataset,,"['sample', 'distribution']",False,0,2,0,0,semantic_scholar
+218,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+218,temporal_range,,,True,0,0,0,1,semantic_scholar
+218,temp_range_i,,,True,0,0,0,1,semantic_scholar
+218,temp_range_f,,,True,0,0,0,1,semantic_scholar
+218,species,"[""['Lesser Yellowlegs']""]",['Lesser Yellowlegs (Tringa flavipes)'],True,1,0,0,0,semantic_scholar
+218,referred_dataset,,,True,0,0,0,1,semantic_scholar
+218,time_series,,True,False,0,1,0,0,semantic_scholar
+218,multispecies,,,True,0,0,0,1,semantic_scholar
+218,threatened_species,,,True,0,0,0,1,semantic_scholar
+218,new_species_science,,,True,0,0,0,1,semantic_scholar
+218,new_species_region,,,True,0,0,0,1,semantic_scholar
+218,bias_north_south,,,True,0,0,0,1,semantic_scholar
+219,data_type,,['presence-absence'],False,0,1,0,0,semantic_scholar
+219,geospatial_info_dataset,,"['sample', 'site', 'distribution', 'geographic_features']",False,0,4,0,0,semantic_scholar
+219,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+219,temporal_range,,,True,0,0,0,1,semantic_scholar
+219,temp_range_i,,,True,0,0,0,1,semantic_scholar
+219,temp_range_f,,,True,0,0,0,1,semantic_scholar
+219,species,"[""['Balsam fir'"", ""'Black spruce']""]","['balsam fir (Abies balsamea)', 'white birch (Betula papyrifera)', 'black spruce (Picea mariana)']",False,2,1,0,0,semantic_scholar
+219,referred_dataset,,,True,0,0,0,1,semantic_scholar
+219,time_series,,,True,0,0,0,1,semantic_scholar
+219,multispecies,,,True,0,0,0,1,semantic_scholar
+219,threatened_species,,,True,0,0,0,1,semantic_scholar
+219,new_species_science,,,True,0,0,0,1,semantic_scholar
+219,new_species_region,,,True,0,0,0,1,semantic_scholar
+219,bias_north_south,,,True,0,0,0,1,semantic_scholar
+222,data_type,,"['abundance', 'species_richness']",False,0,2,0,0,semantic_scholar
+222,geospatial_info_dataset,,"['site', 'administrative_units']",False,0,2,0,0,semantic_scholar
+222,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+222,temporal_range,,,True,0,0,0,1,semantic_scholar
+222,temp_range_i,,,True,0,0,0,1,semantic_scholar
+222,temp_range_f,,,True,0,0,0,1,semantic_scholar
+222,species,,,True,0,0,0,1,semantic_scholar
+222,referred_dataset,,,True,0,0,0,1,semantic_scholar
+222,time_series,,True,False,0,1,0,0,semantic_scholar
+222,multispecies,,True,False,0,1,0,0,semantic_scholar
+222,threatened_species,,,True,0,0,0,1,semantic_scholar
+222,new_species_science,,,True,0,0,0,1,semantic_scholar
+222,new_species_region,,,True,0,0,0,1,semantic_scholar
+222,bias_north_south,,,True,0,0,0,1,semantic_scholar
+224,data_type,,"['density', 'distribution', 'abundance', 'ecosystem_function', 'other']",False,0,5,0,0,semantic_scholar
+224,geospatial_info_dataset,,"['range', 'distribution', 'sample']",False,0,3,0,0,semantic_scholar
+224,spatial_range_km2,,42539.0,False,0,1,0,0,semantic_scholar
+224,temporal_range,,,True,0,0,0,1,semantic_scholar
+224,temp_range_i,,,True,0,0,0,1,semantic_scholar
+224,temp_range_f,,,True,0,0,0,1,semantic_scholar
+224,species,,"['Woodland caribou (Rangifer tarandus caribou)', 'wolves (Canis lupus)', 'other cervids', 'humans']",False,0,4,0,0,semantic_scholar
+224,referred_dataset,,,True,0,0,0,1,semantic_scholar
+224,time_series,,True,False,0,1,0,0,semantic_scholar
+224,multispecies,,,True,0,0,0,1,semantic_scholar
+224,threatened_species,,True,False,0,1,0,0,semantic_scholar
+224,new_species_science,,,True,0,0,0,1,semantic_scholar
+224,new_species_region,,,True,0,0,0,1,semantic_scholar
+224,bias_north_south,,,True,0,0,0,1,semantic_scholar
+226,data_type,,"['abundance', 'traits', 'species_richness']",False,0,3,0,0,semantic_scholar
+226,geospatial_info_dataset,,"['sample', 'site']",False,0,2,0,0,semantic_scholar
+226,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+226,temporal_range,,,True,0,0,0,1,semantic_scholar
+226,temp_range_i,,,True,0,0,0,1,semantic_scholar
+226,temp_range_f,,,True,0,0,0,1,semantic_scholar
+226,species,,"['spottail shiners ( Notropis hudsonius )', 'Neoechinorhynchus rutili (Acanthocephala)', 'Plagioporus sinitsini (Digenea)', 'nine parasite species (1+ fish)', '18 parasite species (2+ fish)']",False,0,5,0,0,semantic_scholar
+226,referred_dataset,,,True,0,0,0,1,semantic_scholar
+226,time_series,,,True,0,0,0,1,semantic_scholar
+226,multispecies,,True,False,0,1,0,0,semantic_scholar
+226,threatened_species,,,True,0,0,0,1,semantic_scholar
+226,new_species_science,,,True,0,0,0,1,semantic_scholar
+226,new_species_region,,,True,0,0,0,1,semantic_scholar
+226,bias_north_south,,,True,0,0,0,1,semantic_scholar
+227,data_type,,"['traits', 'ecosystem_function']",False,0,2,0,0,semantic_scholar
+227,geospatial_info_dataset,,['site'],False,0,1,0,0,semantic_scholar
+227,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+227,temporal_range,,,True,0,0,0,1,semantic_scholar
+227,temp_range_i,,,True,0,0,0,1,semantic_scholar
+227,temp_range_f,,,True,0,0,0,1,semantic_scholar
+227,species,"[""['Echinochloa crus-galli']""]",['Echinochloa crus-galli'],True,1,0,0,0,semantic_scholar
+227,referred_dataset,,,True,0,0,0,1,semantic_scholar
+227,time_series,,,True,0,0,0,1,semantic_scholar
+227,multispecies,,,True,0,0,0,1,semantic_scholar
+227,threatened_species,,,True,0,0,0,1,semantic_scholar
+227,new_species_science,,,True,0,0,0,1,semantic_scholar
+227,new_species_region,,,True,0,0,0,1,semantic_scholar
+227,bias_north_south,,,True,0,0,0,1,semantic_scholar
+231,data_type,,"['abundance', 'ecosystem_function']",False,0,2,0,0,semantic_scholar
+231,geospatial_info_dataset,,"['site', 'administrative_units']",False,0,2,0,0,semantic_scholar
+231,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+231,temporal_range,,,True,0,0,0,1,semantic_scholar
+231,temp_range_i,,,True,0,0,0,1,semantic_scholar
+231,temp_range_f,,,True,0,0,0,1,semantic_scholar
+231,species,"[""['Cyanobacterias']""]","['cyanobacteria', 'Microcystis', 'Anabaena']",False,1,2,0,0,semantic_scholar
+231,referred_dataset,,,True,0,0,0,1,semantic_scholar
+231,time_series,,,True,0,0,0,1,semantic_scholar
+231,multispecies,,True,False,0,1,0,0,semantic_scholar
+231,threatened_species,,,True,0,0,0,1,semantic_scholar
+231,new_species_science,,,True,0,0,0,1,semantic_scholar
+231,new_species_region,,,True,0,0,0,1,semantic_scholar
+231,bias_north_south,,,True,0,0,0,1,semantic_scholar
+233,data_type,,['distribution'],False,0,1,0,0,semantic_scholar
+233,geospatial_info_dataset,,"['site', 'distribution']",False,0,2,0,0,semantic_scholar
+233,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+233,temporal_range,,,True,0,0,0,1,semantic_scholar
+233,temp_range_i,,,True,0,0,0,1,semantic_scholar
+233,temp_range_f,,,True,0,0,0,1,semantic_scholar
+233,species,"[""['Honckenya pepbides'"", ""'Elymus mollis']""]","['Honckenya peploides', 'Elymus mollis']",True,2,0,0,0,semantic_scholar
+233,referred_dataset,,,True,0,0,0,1,semantic_scholar
+233,time_series,,,True,0,0,0,1,semantic_scholar
+233,multispecies,,True,False,0,1,0,0,semantic_scholar
+233,threatened_species,,,True,0,0,0,1,semantic_scholar
+233,new_species_science,,,True,0,0,0,1,semantic_scholar
+233,new_species_region,,,True,0,0,0,1,semantic_scholar
+233,bias_north_south,,,True,0,0,0,1,semantic_scholar
+235,data_type,,"['abundance', 'density', 'time_series']",False,0,3,0,0,semantic_scholar
+235,geospatial_info_dataset,,"['site', 'administrative_units']",False,0,2,0,0,semantic_scholar
+235,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+235,temporal_range,1994-2007,1994-2007,True,1,0,0,0,semantic_scholar
+235,temp_range_i,,1994,False,0,1,0,0,semantic_scholar
+235,temp_range_f,,2007,False,0,1,0,0,semantic_scholar
+235,species,"[""['Abies balsamea'"", ""'Picea glauca']""]","['balsam fir (Abies balsamea)', 'white spruce (Picea glauca)']",True,2,0,0,0,semantic_scholar
+235,referred_dataset,,,True,0,0,0,1,semantic_scholar
+235,time_series,,True,False,0,1,0,0,semantic_scholar
+235,multispecies,,True,False,0,1,0,0,semantic_scholar
+235,threatened_species,,,True,0,0,0,1,semantic_scholar
+235,new_species_science,,,True,0,0,0,1,semantic_scholar
+235,new_species_region,,,True,0,0,0,1,semantic_scholar
+235,bias_north_south,,,True,0,0,0,1,semantic_scholar
+236,data_type,,"['presence-absence', 'time_series']",False,0,2,0,0,semantic_scholar
+236,geospatial_info_dataset,,"['site', 'administrative_units']",False,0,2,0,0,semantic_scholar
+236,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+236,temporal_range,,2008-2009; hourly weather data from 1 January to lesion emergence for each season,False,0,1,0,0,semantic_scholar
+236,temp_range_i,,2008,False,0,1,0,0,semantic_scholar
+236,temp_range_f,,2009,False,0,1,0,0,semantic_scholar
+236,species,"[""['Plasmopara viticola']""]","['Plasmopara viticola', 'Vitis vinifera']",False,1,1,0,0,semantic_scholar
+236,referred_dataset,,,True,0,0,0,1,semantic_scholar
+236,time_series,,True,False,0,1,0,0,semantic_scholar
+236,multispecies,,,True,0,0,0,1,semantic_scholar
+236,threatened_species,,,True,0,0,0,1,semantic_scholar
+236,new_species_science,,,True,0,0,0,1,semantic_scholar
+236,new_species_region,,,True,0,0,0,1,semantic_scholar
+236,bias_north_south,,,True,0,0,0,1,semantic_scholar
+239,data_type,,"['presence-only', 'distribution']",False,0,2,0,0,semantic_scholar
+239,geospatial_info_dataset,,"['site', 'administrative_units', 'geographic_features', 'distribution', 'range']",False,0,5,0,0,semantic_scholar
+239,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+239,temporal_range,,Cretaceous Period (Mesozoic Era); Oligocene (~25 mya); after retreat of the Wisconsin glaciation,False,0,1,0,0,semantic_scholar
+239,temp_range_i,,,True,0,0,0,1,semantic_scholar
+239,temp_range_f,,,True,0,0,0,1,semantic_scholar
+239,species,"[""['milliped']""]","['Floridobolus', 'Floridobolus penneri Causey', '1957', 'Floridobolus orini n. sp.', 'tylobolinines', 'spirobolines', 'Floridobolinae', 'Floridobolini', 'Tylobolini', 'Spirobolinae', 'Spirobolini', 'Aztecolini', 'Hiltonius', 'Tylobolus Cook', '1904', 'Aztecolus Chamberlin', '1943', 'Chicobolus Chamberlin', '1947', 'Gobiulus Dzik', '1975', 'Spirobolus Brandt', '1833', 'Narceus Rafinesque', '1820', 'Narceus gordanus (Chamberlin', '1943)', 'Trigoniulus niger', 'Trigoniulus takahasii', 'Trigoniulus segmentatus']",False,0,30,1,0,semantic_scholar
+239,referred_dataset,,,True,0,0,0,1,semantic_scholar
+239,time_series,,,True,0,0,0,1,semantic_scholar
+239,multispecies,,True,False,0,1,0,0,semantic_scholar
+239,threatened_species,,,True,0,0,0,1,semantic_scholar
+239,new_species_science,,True,False,0,1,0,0,semantic_scholar
+239,new_species_region,,True,False,0,1,0,0,semantic_scholar
+239,bias_north_south,,,True,0,0,0,1,semantic_scholar
+243,data_type,,"['ecosystem_structure', 'abundance', 'presence-absence']",False,0,3,0,0,semantic_scholar
+243,geospatial_info_dataset,,"['site', 'maps']",False,0,2,0,0,semantic_scholar
+243,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+243,temporal_range,,,True,0,0,0,1,semantic_scholar
+243,temp_range_i,,,True,0,0,0,1,semantic_scholar
+243,temp_range_f,,,True,0,0,0,1,semantic_scholar
+243,species,,"['tree species (composition', 'unspecified)', 'lichens', 'mosses', 'ericaceous shrubs']",False,0,5,0,0,semantic_scholar
+243,referred_dataset,,,True,0,0,0,1,semantic_scholar
+243,time_series,,,True,0,0,0,1,semantic_scholar
+243,multispecies,,True,False,0,1,0,0,semantic_scholar
+243,threatened_species,,,True,0,0,0,1,semantic_scholar
+243,new_species_science,,,True,0,0,0,1,semantic_scholar
+243,new_species_region,,,True,0,0,0,1,semantic_scholar
+243,bias_north_south,,,True,0,0,0,1,semantic_scholar
+244,data_type,,['ecosystem_structure'],False,0,1,0,0,semantic_scholar
+244,geospatial_info_dataset,,"['sample', 'maps']",False,0,2,0,0,semantic_scholar
+244,spatial_range_km2,,66497.0,False,0,1,0,0,semantic_scholar
+244,temporal_range,,1800	6200,False,0,1,0,0,semantic_scholar
+244,temp_range_i,,1800,False,0,1,0,0,semantic_scholar
+244,temp_range_f,,2000,False,0,1,0,0,semantic_scholar
+244,species,,"['balsam fir (Abies balsamea (L.) P. Mill.)', 'black spruce (Picea mariana (Mill.) BSP)']",False,0,2,0,0,semantic_scholar
+244,referred_dataset,,,True,0,0,0,1,semantic_scholar
+244,time_series,,,True,0,0,0,1,semantic_scholar
+244,multispecies,,True,False,0,1,0,0,semantic_scholar
+244,threatened_species,,,True,0,0,0,1,semantic_scholar
+244,new_species_science,,,True,0,0,0,1,semantic_scholar
+244,new_species_region,,,True,0,0,0,1,semantic_scholar
+244,bias_north_south,,,True,0,0,0,1,semantic_scholar
+246,data_type,,"['presence-only', 'distribution']",False,0,2,0,0,semantic_scholar
+246,geospatial_info_dataset,,"['site', 'range', 'administrative_units', 'distribution']",False,0,4,0,0,semantic_scholar
+246,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+246,temporal_range,,1960s to 2009,False,0,1,0,0,semantic_scholar
+246,temp_range_i,,,True,0,0,0,1,semantic_scholar
+246,temp_range_f,,2009,False,0,1,0,0,semantic_scholar
+246,species,"[""['Neocrepidodera ferruginea']""]","['Neocrepidodera ferruginea (Scopoli', '1763)', 'European rusted flea beetle (common name suggested)', 'Altise ferrugineuse europeenne (French common name suggested)', 'Alopecurus pratense', 'Dactylis glomerata', 'Festuca rubra', 'Poa pratensis', 'Aster sp.', 'Aster novae-angliae', 'Ambrosia artemisiifolia', 'Echium vulgare', 'Nasturtium officinale', 'Melilotus alba', 'Hypericum perforatum', 'Lythrum salicaria', 'Ranunculus acris', 'Solidago spp.']",False,1,17,0,0,semantic_scholar
+246,referred_dataset,,,True,0,0,0,1,semantic_scholar
+246,time_series,,,True,0,0,0,1,semantic_scholar
+246,multispecies,,True,False,0,1,0,0,semantic_scholar
+246,threatened_species,,,True,0,0,0,1,semantic_scholar
+246,new_species_science,,,True,0,0,0,1,semantic_scholar
+246,new_species_region,,True,False,0,1,0,0,semantic_scholar
+246,bias_north_south,,,True,0,0,0,1,semantic_scholar
+251,data_type,,"['distribution', 'genetic_analysis', 'ecosystem_function']",False,0,3,0,0,semantic_scholar
+251,geospatial_info_dataset,,"['site', 'range', 'distribution']",False,0,3,0,0,semantic_scholar
+251,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+251,temporal_range,,"August 6-8, 1984",False,0,1,0,0,semantic_scholar
+251,temp_range_i,,1984,False,0,1,0,0,semantic_scholar
+251,temp_range_f,,1984,False,0,1,0,0,semantic_scholar
+251,species,,"['Frankia', 'Frankiae', 'actinorhizal plants', 'host plant genera']",False,0,4,0,0,semantic_scholar
+251,referred_dataset,,,True,0,0,0,1,semantic_scholar
+251,time_series,,,True,0,0,0,1,semantic_scholar
+251,multispecies,,True,False,0,1,0,0,semantic_scholar
+251,threatened_species,,,True,0,0,0,1,semantic_scholar
+251,new_species_science,,,True,0,0,0,1,semantic_scholar
+251,new_species_region,,,True,0,0,0,1,semantic_scholar
+251,bias_north_south,,,True,0,0,0,1,semantic_scholar
+252,data_type,,,True,0,0,0,1,semantic_scholar
+252,geospatial_info_dataset,,['administrative_units'],False,0,1,0,0,semantic_scholar
+252,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+252,temporal_range,,2014 to 2015,False,0,1,0,0,semantic_scholar
+252,temp_range_i,,2014,False,0,1,0,0,semantic_scholar
+252,temp_range_f,,2015,False,0,1,0,0,semantic_scholar
+252,species,,['spiny softshell turtle (Apalone spinifera)'],False,0,1,0,0,semantic_scholar
+252,referred_dataset,,,True,0,0,0,1,semantic_scholar
+252,time_series,,True,False,0,1,0,0,semantic_scholar
+252,multispecies,,,True,0,0,0,1,semantic_scholar
+252,threatened_species,,True,False,0,1,0,0,semantic_scholar
+252,new_species_science,,,True,0,0,0,1,semantic_scholar
+252,new_species_region,,,True,0,0,0,1,semantic_scholar
+252,bias_north_south,,,True,0,0,0,1,semantic_scholar
+256,data_type,,"['presence-only', 'distribution']",False,0,2,0,0,semantic_scholar
+256,geospatial_info_dataset,,"['distribution', 'range', 'administrative_units', 'site']",False,0,4,0,0,semantic_scholar
+256,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+256,temporal_range,,"February 27, 2006 (sighting); Feb 28–March 2, 2006 (online discussion)",False,0,1,0,0,semantic_scholar
+256,temp_range_i,,,True,0,0,0,1,semantic_scholar
+256,temp_range_f,,,True,0,0,0,1,semantic_scholar
+256,species,"[""['Tyto alba']""]","['Barn Owl (Tyto alba)', 'Meadow Voles (Microtus pennsylvanicus)', 'Deer Mice (Peromyscus maniculatus)', 'Rock Pigeons (Columba livia)', 'Great Horned Owl (Bubo virginianus)', 'Snowy Owls']",False,1,5,0,0,semantic_scholar
+256,referred_dataset,,,True,0,0,0,1,semantic_scholar
+256,time_series,,,True,0,0,0,1,semantic_scholar
+256,multispecies,,True,False,0,1,0,0,semantic_scholar
+256,threatened_species,,True,False,0,1,0,0,semantic_scholar
+256,new_species_science,,,True,0,0,0,1,semantic_scholar
+256,new_species_region,,,True,0,0,0,1,semantic_scholar
+256,bias_north_south,,,True,0,0,0,1,semantic_scholar
+265,data_type,,"['abundance', 'species_richness', 'time_series']",False,0,3,0,0,semantic_scholar
+265,geospatial_info_dataset,,"['sample', 'site']",False,0,2,0,0,semantic_scholar
+265,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+265,temporal_range,,weekly from June to September in 2006 and 2007,False,0,1,0,0,semantic_scholar
+265,temp_range_i,,2006,False,0,1,0,0,semantic_scholar
+265,temp_range_f,,2007,False,0,1,0,0,semantic_scholar
+265,species,,"['ground beetles', 'spiders', 'ladybeetles', 'active-searching predators', 'furtive predators', 'parasitoids', 'aphidophagous guilds', 'Coccinellidae', 'natural enemies', 'aphids']",False,0,10,0,0,semantic_scholar
+265,referred_dataset,,,True,0,0,0,1,semantic_scholar
+265,time_series,,True,False,0,1,0,0,semantic_scholar
+265,multispecies,,True,False,0,1,0,0,semantic_scholar
+265,threatened_species,,,True,0,0,0,1,semantic_scholar
+265,new_species_science,,,True,0,0,0,1,semantic_scholar
+265,new_species_region,,,True,0,0,0,1,semantic_scholar
+265,bias_north_south,,,True,0,0,0,1,semantic_scholar
+266,data_type,,"['time_series', 'ecosystem_function', 'traits', 'abundance']",False,0,4,0,0,semantic_scholar
+266,geospatial_info_dataset,,"['site', 'sample', 'site_ids']",False,0,3,0,0,semantic_scholar
+266,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+266,temporal_range,,Stratification periods (April–October) in 1999 and 2000,False,0,1,0,0,semantic_scholar
+266,temp_range_i,,1999,False,0,1,0,0,semantic_scholar
+266,temp_range_f,,2000,False,0,1,0,0,semantic_scholar
+266,species,"[""['Zooplankton']""]","['plankton', 'seston', 'zooplankton', 'phytoplankton', 'copepods', 'cladocerans', 'daphniids', 'Daphnia']",False,1,7,0,0,semantic_scholar
+266,referred_dataset,,,True,0,0,0,1,semantic_scholar
+266,time_series,,True,False,0,1,0,0,semantic_scholar
+266,multispecies,,True,False,0,1,0,0,semantic_scholar
+266,threatened_species,,,True,0,0,0,1,semantic_scholar
+266,new_species_science,,,True,0,0,0,1,semantic_scholar
+266,new_species_region,,,True,0,0,0,1,semantic_scholar
+266,bias_north_south,,,True,0,0,0,1,semantic_scholar
+268,data_type,,"['presence-absence', 'distribution']",False,0,2,0,0,semantic_scholar
+268,geospatial_info_dataset,,"['sample', 'maps', 'administrative_units']",False,0,3,0,0,semantic_scholar
+268,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+268,temporal_range,,,True,0,0,0,1,semantic_scholar
+268,temp_range_i,,,True,0,0,0,1,semantic_scholar
+268,temp_range_f,,,True,0,0,0,1,semantic_scholar
+268,species,"[""['Tennessee'"", ""'Cape May'"", ""'bay-breasted warbler']""]","['Tennessee warbler', 'Cape May warbler', 'bay-breasted warbler', 'spruce budworm', 'songbirds']",False,1,4,2,0,semantic_scholar
+268,referred_dataset,,,True,0,0,0,1,semantic_scholar
+268,time_series,,True,False,0,1,0,0,semantic_scholar
+268,multispecies,,True,False,0,1,0,0,semantic_scholar
+268,threatened_species,,,True,0,0,0,1,semantic_scholar
+268,new_species_science,,,True,0,0,0,1,semantic_scholar
+268,new_species_region,,,True,0,0,0,1,semantic_scholar
+268,bias_north_south,,,True,0,0,0,1,semantic_scholar
+270,data_type,,"['abundance', 'species_richness']",False,0,2,0,0,semantic_scholar
+270,geospatial_info_dataset,,"['site', 'sample']",False,0,2,0,0,semantic_scholar
+270,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+270,temporal_range,,,True,0,0,0,1,semantic_scholar
+270,temp_range_i,,,True,0,0,0,1,semantic_scholar
+270,temp_range_f,,,True,0,0,0,1,semantic_scholar
+270,species,"[""['plant communities']""]","['overstorey tree species', 'broad-leaf tree species', 'shrub species', 'herb species', 'bryophyte species', 'lichen species']",False,0,6,1,0,semantic_scholar
+270,referred_dataset,,,True,0,0,0,1,semantic_scholar
+270,time_series,,,True,0,0,0,1,semantic_scholar
+270,multispecies,,True,False,0,1,0,0,semantic_scholar
+270,threatened_species,,,True,0,0,0,1,semantic_scholar
+270,new_species_science,,,True,0,0,0,1,semantic_scholar
+270,new_species_region,,,True,0,0,0,1,semantic_scholar
+270,bias_north_south,,,True,0,0,0,1,semantic_scholar
+275,data_type,,"['abundance', 'species_richness', 'ecosystem_function', 'time_series', 'traits']",False,0,5,0,0,semantic_scholar
+275,geospatial_info_dataset,,"['site', 'administrative_units']",False,0,2,0,0,semantic_scholar
+275,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+275,temporal_range,,Measurements conducted for 8 years in the understory plots (exclosures established in 1998) and for 3 years in the canopy gaps (exclosures added in 2003).,False,0,1,0,0,semantic_scholar
+275,temp_range_i,,,True,0,0,0,1,semantic_scholar
+275,temp_range_f,,,True,0,0,0,1,semantic_scholar
+275,species,"[""['white-tailed deer'"", ""'plant communities']""]","['Trillium erectum', 'Erythronium americanum', 'Maianthemum canadense', 'Four herbaceous species were also monitored individually', 'tree seedlings', 'understory plants']",False,0,6,2,0,semantic_scholar
+275,referred_dataset,,,True,0,0,0,1,semantic_scholar
+275,time_series,,True,False,0,1,0,0,semantic_scholar
+275,multispecies,,True,False,0,1,0,0,semantic_scholar
+275,threatened_species,,,True,0,0,0,1,semantic_scholar
+275,new_species_science,,,True,0,0,0,1,semantic_scholar
+275,new_species_region,,,True,0,0,0,1,semantic_scholar
+275,bias_north_south,,,True,0,0,0,1,semantic_scholar
+278,data_type,,"['species_richness', 'traits', 'ecosystem_structure', 'ecosystem_function']",False,0,4,0,0,semantic_scholar
+278,geospatial_info_dataset,,['site'],False,0,1,0,0,semantic_scholar
+278,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+278,temporal_range,,Measurements compared 20 years after treatment; reference forests with no anthropogenic disturbance for at least 80 years.,False,0,1,0,0,semantic_scholar
+278,temp_range_i,,,True,0,0,0,1,semantic_scholar
+278,temp_range_f,,,True,0,0,0,1,semantic_scholar
+278,species,,"['Rubus idaeus', 'Prunus pensylvanica', 'Monotropa uniflora', 'Dryopteris spinulosa', 'vegetatively reproducing heliophilic plants', 'understory plant communities']",False,0,6,0,0,semantic_scholar
+278,referred_dataset,,,True,0,0,0,1,semantic_scholar
+278,time_series,,,True,0,0,0,1,semantic_scholar
+278,multispecies,,True,False,0,1,0,0,semantic_scholar
+278,threatened_species,,,True,0,0,0,1,semantic_scholar
+278,new_species_science,,,True,0,0,0,1,semantic_scholar
+278,new_species_region,,,True,0,0,0,1,semantic_scholar
+278,bias_north_south,,,True,0,0,0,1,semantic_scholar
+279,data_type,,"['traits', 'ecosystem_function']",False,0,2,0,0,semantic_scholar
+279,geospatial_info_dataset,,"['site', 'geographic_features', 'administrative_units']",False,0,3,0,0,semantic_scholar
+279,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+279,temporal_range,,,True,0,0,0,1,semantic_scholar
+279,temp_range_i,,,True,0,0,0,1,semantic_scholar
+279,temp_range_f,,,True,0,0,0,1,semantic_scholar
+279,species,,['Black spruce (Picea mariana (Mill.) BSP)'],False,0,1,0,0,semantic_scholar
+279,referred_dataset,,,True,0,0,0,1,semantic_scholar
+279,time_series,,,True,0,0,0,1,semantic_scholar
+279,multispecies,,,True,0,0,0,1,semantic_scholar
+279,threatened_species,,,True,0,0,0,1,semantic_scholar
+279,new_species_science,,,True,0,0,0,1,semantic_scholar
+279,new_species_region,,,True,0,0,0,1,semantic_scholar
+279,bias_north_south,,,True,0,0,0,1,semantic_scholar
+282,data_type,,"['abundance', 'time_series', 'species_richness', 'distribution']",False,0,4,0,0,semantic_scholar
+282,geospatial_info_dataset,,"['site', 'administrative_units', 'distribution']",False,0,3,0,0,semantic_scholar
+282,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+282,temporal_range,,from June to September during 2018 and 2019,False,0,1,0,0,semantic_scholar
+282,temp_range_i,,2018,False,0,1,0,0,semantic_scholar
+282,temp_range_f,,2019,False,0,1,0,0,semantic_scholar
+282,species,,"['Aedes (Ae.)', 'Anopheles (An.)', 'Culex (Cx.)', 'Culiseta (Cu.)', 'Coquillettidia (Cq.)', 'Ae. cinereus', 'Ae. japonicus']",False,0,7,0,0,semantic_scholar
+282,referred_dataset,,,True,0,0,0,1,semantic_scholar
+282,time_series,,True,False,0,1,0,0,semantic_scholar
+282,multispecies,,True,False,0,1,0,0,semantic_scholar
+282,threatened_species,,,True,0,0,0,1,semantic_scholar
+282,new_species_science,,,True,0,0,0,1,semantic_scholar
+282,new_species_region,,,True,0,0,0,1,semantic_scholar
+282,bias_north_south,,,True,0,0,0,1,semantic_scholar
+285,data_type,,"['presence-only', 'distribution']",False,0,2,0,0,semantic_scholar
+285,geospatial_info_dataset,,"['site', 'administrative_units', 'maps', 'distribution']",False,0,4,0,0,semantic_scholar
+285,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+285,temporal_range,,,True,0,0,0,1,semantic_scholar
+285,temp_range_i,,,True,0,0,0,1,semantic_scholar
+285,temp_range_f,,,True,0,0,0,1,semantic_scholar
+285,species,"[""['c. 10 insect species']""]","['grasshoppers', 'crickets and related insects', 'Orthoptera', 'six species of Orthoptera recently encountered in New Brunswick or on Prince Edward Island', '21 species that occur in neighbouring Maine and Quebec']",False,0,5,1,0,semantic_scholar
+285,referred_dataset,,Vickery and Kevan (1985); Scudder and Vickery (2010),False,0,1,0,0,semantic_scholar
+285,time_series,,,True,0,0,0,1,semantic_scholar
+285,multispecies,,True,False,0,1,0,0,semantic_scholar
+285,threatened_species,,,True,0,0,0,1,semantic_scholar
+285,new_species_science,,,True,0,0,0,1,semantic_scholar
+285,new_species_region,,True,False,0,1,0,0,semantic_scholar
+285,bias_north_south,,,True,0,0,0,1,semantic_scholar
+287,data_type,,['presence-absence'],False,0,1,0,0,semantic_scholar
+287,geospatial_info_dataset,,['administrative_units'],False,0,1,0,0,semantic_scholar
+287,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+287,temporal_range,,,True,0,0,0,1,semantic_scholar
+287,temp_range_i,,,True,0,0,0,1,semantic_scholar
+287,temp_range_f,,,True,0,0,0,1,semantic_scholar
+287,species,"[""['Plectrophenax nivalis']""]",['the snow bunting (Plectrophenax nivalis)'],True,1,0,0,0,semantic_scholar
+287,referred_dataset,,,True,0,0,0,1,semantic_scholar
+287,time_series,,,True,0,0,0,1,semantic_scholar
+287,multispecies,,,True,0,0,0,1,semantic_scholar
+287,threatened_species,,,True,0,0,0,1,semantic_scholar
+287,new_species_science,,,True,0,0,0,1,semantic_scholar
+287,new_species_region,,,True,0,0,0,1,semantic_scholar
+287,bias_north_south,,,True,0,0,0,1,semantic_scholar
+289,data_type,,"['distribution', 'presence-only']",False,0,2,0,0,semantic_scholar
+289,geospatial_info_dataset,,"['sample', 'site', 'distribution']",False,0,3,0,0,semantic_scholar
+289,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+289,temporal_range,,five years of field sampling,False,0,1,0,0,semantic_scholar
+289,temp_range_i,,,True,0,0,0,1,semantic_scholar
+289,temp_range_f,,,True,0,0,0,1,semantic_scholar
+289,species,"[""['c. 16 spp insect (genera Pityophthorus)']""]","['Pityophthorus Eichhoff', '1864', 'Pityophthorus puberulus (LeConte', '1868)', 'Pityophthorus pulchellus pulchellus Eichhoff', '1869', 'Pityophthorus pulicarius (Zimmermann', '1868)', 'Pityophthorus nitidus Swaine', '1917', 'Pityophthorus cariniceps LeConte&Horn', '1876', 'Pityophthorus consimilis LeConte', '1878', 'Pityophthorus intextus Swaine', '1917', 'Pityophthorus dentifrons Blackman', '1922', 'Pityophthorus ramiperda Swaine', '1917', 'Pityophthorus concavus Blackman', '1928', 'Pityophthorus biovalis Blackman', '1922', 'Pityophthorus murrayanae murrayanae Blackman', '1922']",False,0,21,1,0,semantic_scholar
+289,referred_dataset,,,True,0,0,0,1,semantic_scholar
+289,time_series,,,True,0,0,0,1,semantic_scholar
+289,multispecies,,True,False,0,1,0,0,semantic_scholar
+289,threatened_species,,,True,0,0,0,1,semantic_scholar
+289,new_species_science,,,True,0,0,0,1,semantic_scholar
+289,new_species_region,,True,False,0,1,0,0,semantic_scholar
+289,bias_north_south,,,True,0,0,0,1,semantic_scholar
+290,data_type,,"['abundance', 'presence-absence']",False,0,2,0,0,semantic_scholar
+290,geospatial_info_dataset,,"['site', 'geographic_features', 'administrative_units']",False,0,3,0,0,semantic_scholar
+290,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+290,temporal_range,,,True,0,0,0,1,semantic_scholar
+290,temp_range_i,,,True,0,0,0,1,semantic_scholar
+290,temp_range_f,,,True,0,0,0,1,semantic_scholar
+290,species,,"['Coptis trifolia (L.) Salisb.', 'Cornus canadensis L.', 'Linnaea borealis L.', 'Lysimachia borealis (Raf.) U.Manns & Anderb.', 'Maianthemum canadense Desf.']",False,0,5,0,0,semantic_scholar
+290,referred_dataset,,,True,0,0,0,1,semantic_scholar
+290,time_series,,,True,0,0,0,1,semantic_scholar
+290,multispecies,,True,False,0,1,0,0,semantic_scholar
+290,threatened_species,,,True,0,0,0,1,semantic_scholar
+290,new_species_science,,,True,0,0,0,1,semantic_scholar
+290,new_species_region,,,True,0,0,0,1,semantic_scholar
+290,bias_north_south,,,True,0,0,0,1,semantic_scholar
+291,data_type,,"['abundance', 'distribution']",False,0,2,0,0,semantic_scholar
+291,geospatial_info_dataset,,"['site', 'sample']",False,0,2,0,0,semantic_scholar
+291,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+291,temporal_range,,July and August (seasonal sampling: early to late in the growing season),False,0,1,0,0,semantic_scholar
+291,temp_range_i,,,True,0,0,0,1,semantic_scholar
+291,temp_range_f,,,True,0,0,0,1,semantic_scholar
+291,species,"[""['Trypoxylon politurn'"", ""'c.70 spider species']""]","['Chrysopa occulata Say', 'Sphaerophoria philanthus (Mg.)', 'Rhopalosiphum padi (L.)', 'Coleomegilla maculata lengi (Timberlake)', 'Hippodamia tredecimpunctata tibialis Say']",False,0,5,2,0,semantic_scholar
+291,referred_dataset,,,True,0,0,0,1,semantic_scholar
+291,time_series,,,True,0,0,0,1,semantic_scholar
+291,multispecies,,True,False,0,1,0,0,semantic_scholar
+291,threatened_species,,,True,0,0,0,1,semantic_scholar
+291,new_species_science,,,True,0,0,0,1,semantic_scholar
+291,new_species_region,,,True,0,0,0,1,semantic_scholar
+291,bias_north_south,,,True,0,0,0,1,semantic_scholar
+295,data_type,,['distribution'],False,0,1,0,0,semantic_scholar
+295,geospatial_info_dataset,,"['site', 'distribution', 'administrative_units', 'maps']",False,0,4,0,0,semantic_scholar
+295,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+295,temporal_range,,,True,0,0,0,1,semantic_scholar
+295,temp_range_i,,,True,0,0,0,1,semantic_scholar
+295,temp_range_f,,,True,0,0,0,1,semantic_scholar
+295,species,"[""['Frangula alnus']""]",['Glossy buckthorn (Frangula alnus Mill.)'],True,1,0,0,0,semantic_scholar
+295,referred_dataset,,,True,0,0,0,1,semantic_scholar
+295,time_series,,True,False,0,1,0,0,semantic_scholar
+295,multispecies,,,True,0,0,0,1,semantic_scholar
+295,threatened_species,,,True,0,0,0,1,semantic_scholar
+295,new_species_science,,,True,0,0,0,1,semantic_scholar
+295,new_species_region,,,True,0,0,0,1,semantic_scholar
+295,bias_north_south,,,True,0,0,0,1,semantic_scholar
+296,data_type,,"['species_richness', 'presence-absence', 'ecosystem_structure']",False,0,3,0,0,semantic_scholar
+296,geospatial_info_dataset,,"['site', 'administrative_units']",False,0,2,0,0,semantic_scholar
+296,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+296,temporal_range,,two surveys conducted over 50 years apart (over the last half-century),False,0,1,0,0,semantic_scholar
+296,temp_range_i,,,True,0,0,0,1,semantic_scholar
+296,temp_range_f,,,True,0,0,0,1,semantic_scholar
+296,species,,['vascular plants'],False,0,1,0,0,semantic_scholar
+296,referred_dataset,,,True,0,0,0,1,semantic_scholar
+296,time_series,,True,False,0,1,0,0,semantic_scholar
+296,multispecies,,True,False,0,1,0,0,semantic_scholar
+296,threatened_species,,True,False,0,1,0,0,semantic_scholar
+296,new_species_science,,,True,0,0,0,1,semantic_scholar
+296,new_species_region,,,True,0,0,0,1,semantic_scholar
+296,bias_north_south,,,True,0,0,0,1,semantic_scholar
+299,data_type,,"['species_richness', 'presence-absence']",False,0,2,0,0,semantic_scholar
+299,geospatial_info_dataset,,"['site', 'sample', 'administrative_units']",False,0,3,0,0,semantic_scholar
+299,spatial_range_km2,,3.0625,False,0,1,0,0,semantic_scholar
+299,temporal_range,,,True,0,0,0,1,semantic_scholar
+299,temp_range_i,,,True,0,0,0,1,semantic_scholar
+299,temp_range_f,,,True,0,0,0,1,semantic_scholar
+299,species,,"['Black-capped Chickadees (Poecile atricapillus)', 'Black-throated Blue Warblers (Dendroica caerulescens)', 'Ovenbirds (Seiurus aurocapillus)']",False,0,3,0,0,semantic_scholar
+299,referred_dataset,,,True,0,0,0,1,semantic_scholar
+299,time_series,,,True,0,0,0,1,semantic_scholar
+299,multispecies,,True,False,0,1,0,0,semantic_scholar
+299,threatened_species,,,True,0,0,0,1,semantic_scholar
+299,new_species_science,,,True,0,0,0,1,semantic_scholar
+299,new_species_region,,,True,0,0,0,1,semantic_scholar
+299,bias_north_south,,,True,0,0,0,1,semantic_scholar
+304,data_type,,"['distribution', 'abundance', 'genetic_analysis']",False,0,3,0,0,semantic_scholar
+304,geospatial_info_dataset,,"['range', 'distribution']",False,0,2,0,0,semantic_scholar
+304,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+304,temporal_range,,1960s (emergence of more virulent strain); 25 years following the initial 1967 report (~1967-1992),False,0,1,0,0,semantic_scholar
+304,temp_range_i,,1967,False,0,1,0,0,semantic_scholar
+304,temp_range_f,,1992,False,0,1,0,0,semantic_scholar
+304,species,"[""['Ophiognomonia clavigignenti-juglandacearum']""]","['butternut (Juglans cinerea)', 'Ophiognomonia clavigignenti-juglandacearum', 'Juglans', 'Carya']",False,1,3,0,0,semantic_scholar
+304,referred_dataset,,,True,0,0,0,1,semantic_scholar
+304,time_series,,,True,0,0,0,1,semantic_scholar
+304,multispecies,,True,False,0,1,0,0,semantic_scholar
+304,threatened_species,,True,False,0,1,0,0,semantic_scholar
+304,new_species_science,,,True,0,0,0,1,semantic_scholar
+304,new_species_region,,,True,0,0,0,1,semantic_scholar
+304,bias_north_south,,,True,0,0,0,1,semantic_scholar
+305,data_type,,"['presence-absence', 'abundance']",False,0,2,0,0,semantic_scholar
+305,geospatial_info_dataset,,['administrative_units'],False,0,1,0,0,semantic_scholar
+305,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+305,temporal_range,,,True,0,0,0,1,semantic_scholar
+305,temp_range_i,,,True,0,0,0,1,semantic_scholar
+305,temp_range_f,,,True,0,0,0,1,semantic_scholar
+305,species,,['stenohaline freshwater fishes'],False,0,1,0,0,semantic_scholar
+305,referred_dataset,,,True,0,0,0,1,semantic_scholar
+305,time_series,,,True,0,0,0,1,semantic_scholar
+305,multispecies,,True,False,0,1,0,0,semantic_scholar
+305,threatened_species,,,True,0,0,0,1,semantic_scholar
+305,new_species_science,,,True,0,0,0,1,semantic_scholar
+305,new_species_region,,,True,0,0,0,1,semantic_scholar
+305,bias_north_south,,,True,0,0,0,1,semantic_scholar
+309,data_type,,"['abundance', 'density', 'ecosystem_structure']",False,0,3,0,0,semantic_scholar
+309,geospatial_info_dataset,,"['sample', 'site']",False,0,2,0,0,semantic_scholar
+309,spatial_range_km2,,54.0,False,0,1,0,0,semantic_scholar
+309,temporal_range,,after 1999,False,0,1,0,0,semantic_scholar
+309,temp_range_i,,1999,False,0,1,0,0,semantic_scholar
+309,temp_range_f,,,True,0,0,0,1,semantic_scholar
+309,species,"[""['Betula glandulosa'"", ""'Salix planifolia']""]","['Betula glandulosa', 'Salix planifolia', 'Salix glauca', 'Rivi\x00e8re-aux-Feuilles migratory caribou herd']",False,2,2,0,0,semantic_scholar
+309,referred_dataset,,,True,0,0,0,1,semantic_scholar
+309,time_series,,,True,0,0,0,1,semantic_scholar
+309,multispecies,,True,False,0,1,0,0,semantic_scholar
+309,threatened_species,,,True,0,0,0,1,semantic_scholar
+309,new_species_science,,,True,0,0,0,1,semantic_scholar
+309,new_species_region,,,True,0,0,0,1,semantic_scholar
+309,bias_north_south,,,True,0,0,0,1,semantic_scholar
+310,data_type,,"['abundance', 'time_series']",False,0,2,0,0,semantic_scholar
+310,geospatial_info_dataset,,"['site', 'geographic_features', 'administrative_units']",False,0,3,0,0,semantic_scholar
+310,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+310,temporal_range,,May to October 2016 and 2017,False,0,1,0,0,semantic_scholar
+310,temp_range_i,,2016,False,0,1,0,0,semantic_scholar
+310,temp_range_f,,2017,False,0,1,0,0,semantic_scholar
+310,species,"[""['Notophthalmus viridescens']""]","['Eastern Newt (Notophthalmus viridescens)', 'Eastern Newt efts']",False,1,1,0,0,semantic_scholar
+310,referred_dataset,,,True,0,0,0,1,semantic_scholar
+310,time_series,,True,False,0,1,0,0,semantic_scholar
+310,multispecies,,,True,0,0,0,1,semantic_scholar
+310,threatened_species,,,True,0,0,0,1,semantic_scholar
+310,new_species_science,,,True,0,0,0,1,semantic_scholar
+310,new_species_region,,,True,0,0,0,1,semantic_scholar
+310,bias_north_south,,,True,0,0,0,1,semantic_scholar
+312,data_type,,['ecosystem_structure'],False,0,1,0,0,semantic_scholar
+312,geospatial_info_dataset,,"['site', 'administrative_units']",False,0,2,0,0,semantic_scholar
+312,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+312,temporal_range,,winter of 2001–2002 and 2002–2003 (late November to mid-April),False,0,1,0,0,semantic_scholar
+312,temp_range_i,,2001,False,0,1,0,0,semantic_scholar
+312,temp_range_f,,2003,False,0,1,0,0,semantic_scholar
+312,species,,['Ruffed grouse (Bonasa umbellus)'],False,0,1,0,0,semantic_scholar
+312,referred_dataset,,,True,0,0,0,1,semantic_scholar
+312,time_series,,True,False,0,1,0,0,semantic_scholar
+312,multispecies,,,True,0,0,0,1,semantic_scholar
+312,threatened_species,,,True,0,0,0,1,semantic_scholar
+312,new_species_science,,,True,0,0,0,1,semantic_scholar
+312,new_species_region,,,True,0,0,0,1,semantic_scholar
+312,bias_north_south,,,True,0,0,0,1,semantic_scholar
+313,data_type,,"['abundance', 'presence-absence', 'time_series', 'distribution', 'traits']",False,0,5,0,0,semantic_scholar
+313,geospatial_info_dataset,,"['site', 'sample', 'distribution']",False,0,3,0,0,semantic_scholar
+313,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+313,temporal_range,,late 1980s to 2014 (over 25 years),False,0,1,0,0,semantic_scholar
+313,temp_range_i,,,True,0,0,0,1,semantic_scholar
+313,temp_range_f,,,True,0,0,0,1,semantic_scholar
+313,species,"[""['Didymosphenia geminate']""]","['Didymosphenia geminata', 'didymo']",False,1,1,0,0,semantic_scholar
+313,referred_dataset,,,True,0,0,0,1,semantic_scholar
+313,time_series,,True,False,0,1,0,0,semantic_scholar
+313,multispecies,,True,False,0,1,0,0,semantic_scholar
+313,threatened_species,,,True,0,0,0,1,semantic_scholar
+313,new_species_science,,,True,0,0,0,1,semantic_scholar
+313,new_species_region,,,True,0,0,0,1,semantic_scholar
+313,bias_north_south,,,True,0,0,0,1,semantic_scholar
+316,data_type,,"['abundance', 'time_series']",False,0,2,0,0,semantic_scholar
+316,geospatial_info_dataset,,['site'],False,0,1,0,0,semantic_scholar
+316,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+316,temporal_range,,Surveys conducted 2 years before and 2 years after logging,False,0,1,0,0,semantic_scholar
+316,temp_range_i,,,True,0,0,0,1,semantic_scholar
+316,temp_range_f,,,True,0,0,0,1,semantic_scholar
+316,species,"[""['12 tree species']""]","['12 wildlife species', 'small mammals', 'spruce grouse', 'Falcipennis canadensis Linne', 'snowshoe hare', 'Lepus americanus Erxleben', 'marten', 'Martes americana Turton', 'moose', 'Alces alces Linne', 'telemetry data on four species']",False,0,11,1,0,semantic_scholar
+316,referred_dataset,,,True,0,0,0,1,semantic_scholar
+316,time_series,,True,False,0,1,0,0,semantic_scholar
+316,multispecies,,True,False,0,1,0,0,semantic_scholar
+316,threatened_species,,,True,0,0,0,1,semantic_scholar
+316,new_species_science,,,True,0,0,0,1,semantic_scholar
+316,new_species_region,,,True,0,0,0,1,semantic_scholar
+316,bias_north_south,,,True,0,0,0,1,semantic_scholar
+317,data_type,,"['abundance', 'traits', 'species_richness']",False,0,3,0,0,semantic_scholar
+317,geospatial_info_dataset,,"['site', 'administrative_units']",False,0,2,0,0,semantic_scholar
+317,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+317,temporal_range,,2002-2003,False,0,1,0,0,semantic_scholar
+317,temp_range_i,,2002,False,0,1,0,0,semantic_scholar
+317,temp_range_f,,2003,False,0,1,0,0,semantic_scholar
+317,species,"[""['Aphis glycines']""]","['Aphis glycines Matsumura', 'Harmonia axyridis Pallas', 'Propylea quatuordecimpunctata L.', 'Coleomegilla maculata lengi Timberlake', 'Coccinellidae']",False,0,5,1,0,semantic_scholar
+317,referred_dataset,,,True,0,0,0,1,semantic_scholar
+317,time_series,,True,False,0,1,0,0,semantic_scholar
+317,multispecies,,True,False,0,1,0,0,semantic_scholar
+317,threatened_species,,,True,0,0,0,1,semantic_scholar
+317,new_species_science,,,True,0,0,0,1,semantic_scholar
+317,new_species_region,,,True,0,0,0,1,semantic_scholar
+317,bias_north_south,,,True,0,0,0,1,semantic_scholar
+318,data_type,,"['presence-absence', 'genetic_analysis', 'traits', 'distribution']",False,0,4,0,0,semantic_scholar
+318,geospatial_info_dataset,,"['sample', 'site', 'administrative_units', 'distribution']",False,0,4,0,0,semantic_scholar
+318,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+318,temporal_range,,,True,0,0,0,1,semantic_scholar
+318,temp_range_i,,,True,0,0,0,1,semantic_scholar
+318,temp_range_f,,,True,0,0,0,1,semantic_scholar
+318,species,"[""['Impatiens pallida'"", ""'Impatiens capensis']""]","['Impatiens pallida', 'I. capensis']",False,1,1,1,0,semantic_scholar
+318,referred_dataset,,,True,0,0,0,1,semantic_scholar
+318,time_series,,,True,0,0,0,1,semantic_scholar
+318,multispecies,,True,False,0,1,0,0,semantic_scholar
+318,threatened_species,,,True,0,0,0,1,semantic_scholar
+318,new_species_science,,,True,0,0,0,1,semantic_scholar
+318,new_species_region,,,True,0,0,0,1,semantic_scholar
+318,bias_north_south,,,True,0,0,0,1,semantic_scholar
+322,data_type,,['traits'],False,0,1,0,0,semantic_scholar
+322,geospatial_info_dataset,,['site'],False,0,1,0,0,semantic_scholar
+322,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+322,temporal_range,,,True,0,0,0,1,semantic_scholar
+322,temp_range_i,,,True,0,0,0,1,semantic_scholar
+322,temp_range_f,,,True,0,0,0,1,semantic_scholar
+322,species,"[""['Esox lucius'"", ""'Perca flavescens']""]","['northern pike', 'Esox lucius', 'yellow perch', 'Perca flavescens']",False,2,2,0,0,semantic_scholar
+322,referred_dataset,,,True,0,0,0,1,semantic_scholar
+322,time_series,,,True,0,0,0,1,semantic_scholar
+322,multispecies,,True,False,0,1,0,0,semantic_scholar
+322,threatened_species,,,True,0,0,0,1,semantic_scholar
+322,new_species_science,,,True,0,0,0,1,semantic_scholar
+322,new_species_region,,,True,0,0,0,1,semantic_scholar
+322,bias_north_south,,,True,0,0,0,1,semantic_scholar
+323,data_type,,"['ecosystem_structure', 'presence-absence', 'distribution']",False,0,3,0,0,semantic_scholar
+323,geospatial_info_dataset,,"['site', 'administrative_units']",False,0,2,0,0,semantic_scholar
+323,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+323,temporal_range,,,True,0,0,0,1,semantic_scholar
+323,temp_range_i,,,True,0,0,0,1,semantic_scholar
+323,temp_range_f,,,True,0,0,0,1,semantic_scholar
+323,species,"[""['c.8 tree species']""]","['Thuja occidentalis', 'Picea mariana', 'Abies balsamea', 'Picea glauca']",False,0,4,1,0,semantic_scholar
+323,referred_dataset,,,True,0,0,0,1,semantic_scholar
+323,time_series,,,True,0,0,0,1,semantic_scholar
+323,multispecies,,True,False,0,1,0,0,semantic_scholar
+323,threatened_species,,,True,0,0,0,1,semantic_scholar
+323,new_species_science,,,True,0,0,0,1,semantic_scholar
+323,new_species_region,,,True,0,0,0,1,semantic_scholar
+323,bias_north_south,,,True,0,0,0,1,semantic_scholar
+326,data_type,,"['traits', 'distribution', 'abundance']",False,0,3,0,0,semantic_scholar
+326,geospatial_info_dataset,,"['distribution', 'administrative_units']",False,0,2,0,0,semantic_scholar
+326,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+326,temporal_range,,,True,0,0,0,1,semantic_scholar
+326,temp_range_i,,,True,0,0,0,1,semantic_scholar
+326,temp_range_f,,,True,0,0,0,1,semantic_scholar
+326,species,"[""['Setaria glauca'"", ""'Setaria verticillata']""]","['Setaria glauca (L.) Beauv.', 'yellow foxtail', 'S. verticillata (L.) Beauv.', 'bristly foxtail']",False,0,4,2,0,semantic_scholar
+326,referred_dataset,,,True,0,0,0,1,semantic_scholar
+326,time_series,,,True,0,0,0,1,semantic_scholar
+326,multispecies,,True,False,0,1,0,0,semantic_scholar
+326,threatened_species,,,True,0,0,0,1,semantic_scholar
+326,new_species_science,,,True,0,0,0,1,semantic_scholar
+326,new_species_region,,,True,0,0,0,1,semantic_scholar
+326,bias_north_south,,,True,0,0,0,1,semantic_scholar
+329,data_type,,"['distribution', 'traits']",False,0,2,0,0,semantic_scholar
+329,geospatial_info_dataset,,"['range', 'administrative_units']",False,0,2,0,0,semantic_scholar
+329,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+329,temporal_range,,,True,0,0,0,1,semantic_scholar
+329,temp_range_i,,,True,0,0,0,1,semantic_scholar
+329,temp_range_f,,,True,0,0,0,1,semantic_scholar
+329,species,,"['The eastern oyster (Crassostrea virginica)', 'oysters']",False,0,2,0,0,semantic_scholar
+329,referred_dataset,,,True,0,0,0,1,semantic_scholar
+329,time_series,,,True,0,0,0,1,semantic_scholar
+329,multispecies,,,True,0,0,0,1,semantic_scholar
+329,threatened_species,,,True,0,0,0,1,semantic_scholar
+329,new_species_science,,,True,0,0,0,1,semantic_scholar
+329,new_species_region,,,True,0,0,0,1,semantic_scholar
+329,bias_north_south,,,True,0,0,0,1,semantic_scholar
+330,data_type,,"['abundance', 'density', 'ecosystem_structure', 'traits', 'time_series']",False,0,5,0,0,semantic_scholar
+330,geospatial_info_dataset,,"['site', 'geographic_features', 'administrative_units']",False,0,3,0,0,semantic_scholar
+330,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+330,temporal_range,,Quantitative evaluations made at weekly intervals; observations reported up to eight weeks of immersion.,False,0,1,0,0,semantic_scholar
+330,temp_range_i,,,True,0,0,0,1,semantic_scholar
+330,temp_range_f,,,True,0,0,0,1,semantic_scholar
+330,species,,"['Navicula spp.', 'Melosira', 'Fragilaria', 'Berkeleya', 'Nitzschia', 'Cocconeis', 'Synedra', 'Gomphonema']",False,0,8,0,0,semantic_scholar
+330,referred_dataset,,,True,0,0,0,1,semantic_scholar
+330,time_series,,True,False,0,1,0,0,semantic_scholar
+330,multispecies,,True,False,0,1,0,0,semantic_scholar
+330,threatened_species,,,True,0,0,0,1,semantic_scholar
+330,new_species_science,,,True,0,0,0,1,semantic_scholar
+330,new_species_region,,,True,0,0,0,1,semantic_scholar
+330,bias_north_south,,,True,0,0,0,1,semantic_scholar
+335,data_type,,"['abundance', 'distribution']",False,0,2,0,0,semantic_scholar
+335,geospatial_info_dataset,,"['distribution', 'maps']",False,0,2,0,0,semantic_scholar
+335,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+335,temporal_range,,2006-2010,False,0,1,0,0,semantic_scholar
+335,temp_range_i,,2006,False,0,1,0,0,semantic_scholar
+335,temp_range_f,,2010,False,0,1,0,0,semantic_scholar
+335,species,,['American Black Duck (Anas rubripes)'],False,0,1,0,0,semantic_scholar
+335,referred_dataset,,,True,0,0,0,1,semantic_scholar
+335,time_series,,True,False,0,1,0,0,semantic_scholar
+335,multispecies,,,True,0,0,0,1,semantic_scholar
+335,threatened_species,,,True,0,0,0,1,semantic_scholar
+335,new_species_science,,,True,0,0,0,1,semantic_scholar
+335,new_species_region,,,True,0,0,0,1,semantic_scholar
+335,bias_north_south,,,True,0,0,0,1,semantic_scholar
+343,data_type,,"['abundance', 'distribution', 'species_richness']",False,0,3,0,0,semantic_scholar
+343,geospatial_info_dataset,,"['distribution', 'maps', 'geographic_features']",False,0,3,0,0,semantic_scholar
+343,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+343,temporal_range,,,True,0,0,0,1,semantic_scholar
+343,temp_range_i,,,True,0,0,0,1,semantic_scholar
+343,temp_range_f,,,True,0,0,0,1,semantic_scholar
+343,species,"[""['c.30 bird species']""]",['resident bird species'],False,0,1,1,0,semantic_scholar
+343,referred_dataset,,,True,0,0,0,1,semantic_scholar
+343,time_series,,,True,0,0,0,1,semantic_scholar
+343,multispecies,True,True,True,1,0,0,0,semantic_scholar
+343,threatened_species,,,True,0,0,0,1,semantic_scholar
+343,new_species_science,,,True,0,0,0,1,semantic_scholar
+343,new_species_region,,,True,0,0,0,1,semantic_scholar
+343,bias_north_south,True,,False,0,0,1,0,semantic_scholar
+345,data_type,,['species_richness'],False,0,1,0,0,semantic_scholar
+345,geospatial_info_dataset,,"['sample', 'site']",False,0,2,0,0,semantic_scholar
+345,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+345,temporal_range,,,True,0,0,0,1,semantic_scholar
+345,temp_range_i,,,True,0,0,0,1,semantic_scholar
+345,temp_range_f,,,True,0,0,0,1,semantic_scholar
+345,species,,"['birds', 'avian species']",False,0,2,0,0,semantic_scholar
+345,referred_dataset,,,True,0,0,0,1,semantic_scholar
+345,time_series,,,True,0,0,0,1,semantic_scholar
+345,multispecies,,True,False,0,1,0,0,semantic_scholar
+345,threatened_species,,,True,0,0,0,1,semantic_scholar
+345,new_species_science,,,True,0,0,0,1,semantic_scholar
+345,new_species_region,,,True,0,0,0,1,semantic_scholar
+345,bias_north_south,,,True,0,0,0,1,semantic_scholar
+346,data_type,,"['presence-only', 'distribution']",False,0,2,0,0,semantic_scholar
+346,geospatial_info_dataset,,"['range', 'administrative_units', 'distribution']",False,0,3,0,0,semantic_scholar
+346,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+346,temporal_range,,,True,0,0,0,1,semantic_scholar
+346,temp_range_i,,,True,0,0,0,1,semantic_scholar
+346,temp_range_f,,,True,0,0,0,1,semantic_scholar
+346,species,,"['Uvularia', 'U. sessilifolia L.', 'U. grandiflora Smith']",False,0,3,0,0,semantic_scholar
+346,referred_dataset,,,True,0,0,0,1,semantic_scholar
+346,time_series,,,True,0,0,0,1,semantic_scholar
+346,multispecies,,,True,0,0,0,1,semantic_scholar
+346,threatened_species,,,True,0,0,0,1,semantic_scholar
+346,new_species_science,,,True,0,0,0,1,semantic_scholar
+346,new_species_region,,True,False,0,1,0,0,semantic_scholar
+346,bias_north_south,,,True,0,0,0,1,semantic_scholar
+349,data_type,,['ecosystem_structure'],False,0,1,0,0,semantic_scholar
+349,geospatial_info_dataset,,['site'],False,0,1,0,0,semantic_scholar
+349,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+349,temporal_range,,,True,0,0,0,1,semantic_scholar
+349,temp_range_i,,,True,0,0,0,1,semantic_scholar
+349,temp_range_f,,,True,0,0,0,1,semantic_scholar
+349,species,"[""['vegetation community']""]","['plant species assemblages', 'mosses', 'lichens', 'vascular plants']",False,0,4,1,0,semantic_scholar
+349,referred_dataset,,,True,0,0,0,1,semantic_scholar
+349,time_series,,,True,0,0,0,1,semantic_scholar
+349,multispecies,,True,False,0,1,0,0,semantic_scholar
+349,threatened_species,,,True,0,0,0,1,semantic_scholar
+349,new_species_science,,,True,0,0,0,1,semantic_scholar
+349,new_species_region,,,True,0,0,0,1,semantic_scholar
+349,bias_north_south,,,True,0,0,0,1,semantic_scholar
+350,data_type,,"['distribution', 'density']",False,0,2,0,0,semantic_scholar
+350,geospatial_info_dataset,,"['distribution', 'administrative_units', 'maps']",False,0,3,0,0,semantic_scholar
+350,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+350,temporal_range,,,True,0,0,0,1,semantic_scholar
+350,temp_range_i,,,True,0,0,0,1,semantic_scholar
+350,temp_range_f,,,True,0,0,0,1,semantic_scholar
+350,species,"[""['Pinus strobus']""]","['Pinus strobus L.', 'eastern white pine']",False,1,1,0,0,semantic_scholar
+350,referred_dataset,,Canada's Forest Inventory,False,0,1,0,0,semantic_scholar
+350,time_series,,,True,0,0,0,1,semantic_scholar
+350,multispecies,,,True,0,0,0,1,semantic_scholar
+350,threatened_species,,,True,0,0,0,1,semantic_scholar
+350,new_species_science,,,True,0,0,0,1,semantic_scholar
+350,new_species_region,,,True,0,0,0,1,semantic_scholar
+350,bias_north_south,,,True,0,0,0,1,semantic_scholar
+352,data_type,,"['abundance', 'presence-absence', 'distribution', 'species_richness']",False,0,4,0,0,semantic_scholar
+352,geospatial_info_dataset,,"['administrative_units', 'distribution']",False,0,2,0,0,semantic_scholar
+352,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+352,temporal_range,,,True,0,0,0,1,semantic_scholar
+352,temp_range_i,,,True,0,0,0,1,semantic_scholar
+352,temp_range_f,,,True,0,0,0,1,semantic_scholar
+352,species,,"['Ixodes scapularis', 'Ixodes affinis', 'Ixodes auritulus', 'Ixodes spinipalpis', 'Ixodes dentatus', 'Ixodes angustus', 'Ixodes pacificus', 'Borrelia burgdorferi s.l.', 'song sparrow', ""Swainson's thrush"", 'blackpoll warbler', 'Nashville warbler', 'chipping sparrow', 'house wren', 'indigo bunting', ""Bewick's wren"", 'common yellowthroat', 'dark-eyed junco', 'Oregon junco', 'red-winged blackbird', 'swamp sparrow', 'white-throated sparrow', 'songbirds (42 species/subspecies)', '12 species and 3 undetermined ticks']",False,0,24,0,0,semantic_scholar
+352,referred_dataset,,,True,0,0,0,1,semantic_scholar
+352,time_series,,,True,0,0,0,1,semantic_scholar
+352,multispecies,,True,False,0,1,0,0,semantic_scholar
+352,threatened_species,,,True,0,0,0,1,semantic_scholar
+352,new_species_science,,,True,0,0,0,1,semantic_scholar
+352,new_species_region,,True,False,0,1,0,0,semantic_scholar
+352,bias_north_south,,,True,0,0,0,1,semantic_scholar
+353,data_type,,"['distribution', 'presence-only', 'species_richness']",False,0,3,0,0,semantic_scholar
+353,geospatial_info_dataset,,"['administrative_units', 'sample', 'distribution', 'geographic_features']",False,0,4,0,0,semantic_scholar
+353,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+353,temporal_range,,"2002, 2004, 2006 and 2008",False,0,1,0,0,semantic_scholar
+353,temp_range_i,,2002,False,0,1,0,0,semantic_scholar
+353,temp_range_f,,2008,False,0,1,0,0,semantic_scholar
+353,species,"[""['8 plant species (genus Latuca)']""]","['L. serriola', 'L. saligna', 'L. virosa', 'L. canadensis', 'L. biennis', 'L. floridana', 'L. ludoviciana', 'L. canadensis × L. ludoviciana (interspecific hybrid)', 'undetermined Lactuca species']",False,0,9,1,0,semantic_scholar
+353,referred_dataset,,,True,0,0,0,1,semantic_scholar
+353,time_series,,,True,0,0,0,1,semantic_scholar
+353,multispecies,,True,False,0,1,0,0,semantic_scholar
+353,threatened_species,,,True,0,0,0,1,semantic_scholar
+353,new_species_science,,,True,0,0,0,1,semantic_scholar
+353,new_species_region,,,True,0,0,0,1,semantic_scholar
+353,bias_north_south,,,True,0,0,0,1,semantic_scholar
+354,data_type,,"['species_richness', 'traits', 'distribution']",False,0,3,0,0,semantic_scholar
+354,geospatial_info_dataset,,"['site', 'administrative_units']",False,0,2,0,0,semantic_scholar
+354,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+354,temporal_range,,,True,0,0,0,1,semantic_scholar
+354,temp_range_i,,,True,0,0,0,1,semantic_scholar
+354,temp_range_f,,,True,0,0,0,1,semantic_scholar
+354,species,"[""['zooplankton community']""]","['crustacean zooplankton', 'phytoplankton spectral groups', 'cyanobacteria', 'diatoms', 'chrysophytes']",False,0,5,1,0,semantic_scholar
+354,referred_dataset,,,True,0,0,0,1,semantic_scholar
+354,time_series,,,True,0,0,0,1,semantic_scholar
+354,multispecies,,True,False,0,1,0,0,semantic_scholar
+354,threatened_species,,,True,0,0,0,1,semantic_scholar
+354,new_species_science,,,True,0,0,0,1,semantic_scholar
+354,new_species_region,,,True,0,0,0,1,semantic_scholar
+354,bias_north_south,,,True,0,0,0,1,semantic_scholar
+355,data_type,,,True,0,0,0,1,semantic_scholar
+355,geospatial_info_dataset,,,True,0,0,0,1,semantic_scholar
+355,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+355,temporal_range,,,True,0,0,0,1,semantic_scholar
+355,temp_range_i,,,True,0,0,0,1,semantic_scholar
+355,temp_range_f,,,True,0,0,0,1,semantic_scholar
+355,species,,,True,0,0,0,1,semantic_scholar
+355,referred_dataset,,,True,0,0,0,1,semantic_scholar
+355,time_series,,,True,0,0,0,1,semantic_scholar
+355,multispecies,,,True,0,0,0,1,semantic_scholar
+355,threatened_species,,,True,0,0,0,1,semantic_scholar
+355,new_species_science,,,True,0,0,0,1,semantic_scholar
+355,new_species_region,,,True,0,0,0,1,semantic_scholar
+355,bias_north_south,,,True,0,0,0,1,semantic_scholar
+358,data_type,,"['presence-absence', 'time_series', 'species_richness']",False,0,3,0,0,semantic_scholar
+358,geospatial_info_dataset,,"['site', 'sample']",False,0,2,0,0,semantic_scholar
+358,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+358,temporal_range,,mid-June 2019 to beginning of November 2019 (day 0 to day 141),False,0,1,0,0,semantic_scholar
+358,temp_range_i,,2019,False,0,1,0,0,semantic_scholar
+358,temp_range_f,,2019,False,0,1,0,0,semantic_scholar
+358,species,,"['Calliphora livida', 'C. vomitoria', 'Lucilia illustris', 'Phormia regina', 'Protophormia terraenovae', 'Coleoptera', 'Necrophila americana', 'Silphidae', 'Carnicops pumilio', 'Histeridae', 'blow fly (Diptera: Calliphoridae)']",False,0,11,0,0,semantic_scholar
+358,referred_dataset,,,True,0,0,0,1,semantic_scholar
+358,time_series,,True,False,0,1,0,0,semantic_scholar
+358,multispecies,,True,False,0,1,0,0,semantic_scholar
+358,threatened_species,,,True,0,0,0,1,semantic_scholar
+358,new_species_science,,,True,0,0,0,1,semantic_scholar
+358,new_species_region,,,True,0,0,0,1,semantic_scholar
+358,bias_north_south,,,True,0,0,0,1,semantic_scholar
+359,data_type,,['traits'],False,0,1,0,0,semantic_scholar
+359,geospatial_info_dataset,,['site'],False,0,1,0,0,semantic_scholar
+359,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+359,temporal_range,,"sampling months: June, August, October, February",False,0,1,0,0,semantic_scholar
+359,temp_range_i,,,True,0,0,0,1,semantic_scholar
+359,temp_range_f,,,True,0,0,0,1,semantic_scholar
+359,species,,['Salix planifolia Pursh ssp. planifolia'],False,0,1,0,0,semantic_scholar
+359,referred_dataset,,,True,0,0,0,1,semantic_scholar
+359,time_series,,,True,0,0,0,1,semantic_scholar
+359,multispecies,,False,False,0,1,0,0,semantic_scholar
+359,threatened_species,,,True,0,0,0,1,semantic_scholar
+359,new_species_science,,,True,0,0,0,1,semantic_scholar
+359,new_species_region,,,True,0,0,0,1,semantic_scholar
+359,bias_north_south,,,True,0,0,0,1,semantic_scholar
+361,data_type,,['distribution'],False,0,1,0,0,semantic_scholar
+361,geospatial_info_dataset,,['administrative_units'],False,0,1,0,0,semantic_scholar
+361,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+361,temporal_range,,,True,0,0,0,1,semantic_scholar
+361,temp_range_i,,,True,0,0,0,1,semantic_scholar
+361,temp_range_f,,,True,0,0,0,1,semantic_scholar
+361,species,,"['Vanhornia eucnemidarum Crawford', 'Vanhorniidae']",False,0,2,0,0,semantic_scholar
+361,referred_dataset,,,True,0,0,0,1,semantic_scholar
+361,time_series,,,True,0,0,0,1,semantic_scholar
+361,multispecies,,,True,0,0,0,1,semantic_scholar
+361,threatened_species,,,True,0,0,0,1,semantic_scholar
+361,new_species_science,,,True,0,0,0,1,semantic_scholar
+361,new_species_region,,True,False,0,1,0,0,semantic_scholar
+361,bias_north_south,,,True,0,0,0,1,semantic_scholar
+362,data_type,,"['traits', 'time_series']",False,0,2,0,0,semantic_scholar
+362,geospatial_info_dataset,,"['site', 'administrative_units']",False,0,2,0,0,semantic_scholar
+362,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+362,temporal_range,,2013-2014 (modern specimens); herbarium specimens (dates not specified),False,0,1,0,0,semantic_scholar
+362,temp_range_i,,,True,0,0,0,1,semantic_scholar
+362,temp_range_f,,,True,0,0,0,1,semantic_scholar
+362,species,,"['White trillium (Trillium grandiflorum (Michaux) Salisbury)', 'white-tailed deer (Odocoileus virginianus Zimmermann)']",False,0,2,0,0,semantic_scholar
+362,referred_dataset,,,True,0,0,0,1,semantic_scholar
+362,time_series,,,True,0,0,0,1,semantic_scholar
+362,multispecies,,,True,0,0,0,1,semantic_scholar
+362,threatened_species,,,True,0,0,0,1,semantic_scholar
+362,new_species_science,,,True,0,0,0,1,semantic_scholar
+362,new_species_region,,,True,0,0,0,1,semantic_scholar
+362,bias_north_south,,,True,0,0,0,1,semantic_scholar
+368,data_type,,"['abundance', 'species_richness', 'distribution']",False,0,3,0,0,semantic_scholar
+368,geospatial_info_dataset,,"['sample', 'geographic_features', 'administrative_units']",False,0,3,0,0,semantic_scholar
+368,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+368,temporal_range,,early Llandovery (Early Silurian),False,0,1,0,0,semantic_scholar
+368,temp_range_i,,,True,0,0,0,1,semantic_scholar
+368,temp_range_f,,,True,0,0,0,1,semantic_scholar
+368,species,,"['Icriodella dicrana', 'Oulodus sigmoideus', 'Ozarkodina strena', 'Pterospathodus? originalis', 'Ozarkodina', 'Oulodus', 'Rexroadus', 'Oulodus jeannae (new)', 'Oulodus panuarensis (new)', 'Ozarkodina hassi (new)', 'Ozarkodina strena (new)', 'Ozarkodina clavula (new)', 'Ozarkodina aldridgei (new)', 'Pterospathodus celloni', 'Pterospathodus amorphognathoides', 'drepanodontiform elements', '28 species']",False,0,17,0,0,semantic_scholar
+368,referred_dataset,,,True,0,0,0,1,semantic_scholar
+368,time_series,,,True,0,0,0,1,semantic_scholar
+368,multispecies,,True,False,0,1,0,0,semantic_scholar
+368,threatened_species,,,True,0,0,0,1,semantic_scholar
+368,new_species_science,,True,False,0,1,0,0,semantic_scholar
+368,new_species_region,,,True,0,0,0,1,semantic_scholar
+368,bias_north_south,,,True,0,0,0,1,semantic_scholar
+369,data_type,,"['presence-only', 'distribution']",False,0,2,0,0,semantic_scholar
+369,geospatial_info_dataset,,"['site', 'administrative_units']",False,0,2,0,0,semantic_scholar
+369,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+369,temporal_range,,summer of 2020,False,0,1,0,0,semantic_scholar
+369,temp_range_i,,2020,False,0,1,0,0,semantic_scholar
+369,temp_range_f,,2020,False,0,1,0,0,semantic_scholar
+369,species,,"['elm zigzag sawfly', 'Aproceros leucopoda Takeuchi (Hymenoptera: Argidae)']",False,0,2,0,0,semantic_scholar
+369,referred_dataset,,,True,0,0,0,1,semantic_scholar
+369,time_series,,,True,0,0,0,1,semantic_scholar
+369,multispecies,,,True,0,0,0,1,semantic_scholar
+369,threatened_species,,,True,0,0,0,1,semantic_scholar
+369,new_species_science,,,True,0,0,0,1,semantic_scholar
+369,new_species_region,,True,False,0,1,0,0,semantic_scholar
+369,bias_north_south,,,True,0,0,0,1,semantic_scholar
+373,data_type,,"['abundance', 'species_richness', 'distribution']",False,0,3,0,0,semantic_scholar
+373,geospatial_info_dataset,,"['sample', 'site', 'geographic_features', 'distribution']",False,0,4,0,0,semantic_scholar
+373,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+373,temporal_range,,Middle and Upper Ordovician,False,0,1,0,0,semantic_scholar
+373,temp_range_i,,,True,0,0,0,1,semantic_scholar
+373,temp_range_f,,,True,0,0,0,1,semantic_scholar
+373,species,,"['Eurychilina subradiata', 'Foramenella phippsi', 'Warthinia nodosa', 'Phelobythocypris cylindrica', 'Tetradella quadrilirata']",False,0,5,0,0,semantic_scholar
+373,referred_dataset,,Carter Collection (existing collection of ostracodes from the St. Lawrence Lowlands),False,0,1,0,0,semantic_scholar
+373,time_series,,,True,0,0,0,1,semantic_scholar
+373,multispecies,,True,False,0,1,0,0,semantic_scholar
+373,threatened_species,,,True,0,0,0,1,semantic_scholar
+373,new_species_science,,False,False,0,1,0,0,semantic_scholar
+373,new_species_region,,,True,0,0,0,1,semantic_scholar
+373,bias_north_south,,,True,0,0,0,1,semantic_scholar
+376,data_type,,"['genetic_analysis', 'distribution']",False,0,2,0,0,semantic_scholar
+376,geospatial_info_dataset,,"['range', 'distribution', 'administrative_units']",False,0,3,0,0,semantic_scholar
+376,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+376,temporal_range,,,True,0,0,0,1,semantic_scholar
+376,temp_range_i,,,True,0,0,0,1,semantic_scholar
+376,temp_range_f,,,True,0,0,0,1,semantic_scholar
+376,species,,"['rabies viruses', 'Canadian big brown bats (Eptesicus fuscus)']",False,0,2,0,0,semantic_scholar
+376,referred_dataset,,,True,0,0,0,1,semantic_scholar
+376,time_series,,,True,0,0,0,1,semantic_scholar
+376,multispecies,,,True,0,0,0,1,semantic_scholar
+376,threatened_species,,,True,0,0,0,1,semantic_scholar
+376,new_species_science,,,True,0,0,0,1,semantic_scholar
+376,new_species_region,,,True,0,0,0,1,semantic_scholar
+376,bias_north_south,,,True,0,0,0,1,semantic_scholar
+383,data_type,,"['genetic_analysis', 'distribution', 'abundance']",False,0,3,0,0,semantic_scholar
+383,geospatial_info_dataset,,"['site', 'sample', 'range', 'administrative_units', 'distribution']",False,0,5,0,0,semantic_scholar
+383,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+383,temporal_range,,over a 3-year period,False,0,1,0,0,semantic_scholar
+383,temp_range_i,,,True,0,0,0,1,semantic_scholar
+383,temp_range_f,,,True,0,0,0,1,semantic_scholar
+383,species,,"['Chondrostereum purpureum (Pers. Ex Fr.) Pouzar', 'paper birch', 'aspen', 'pin cherry', 'native hardwoods', '14 different host species']",False,0,6,0,0,semantic_scholar
+383,referred_dataset,,,True,0,0,0,1,semantic_scholar
+383,time_series,,,True,0,0,0,1,semantic_scholar
+383,multispecies,,True,False,0,1,0,0,semantic_scholar
+383,threatened_species,,,True,0,0,0,1,semantic_scholar
+383,new_species_science,,,True,0,0,0,1,semantic_scholar
+383,new_species_region,,,True,0,0,0,1,semantic_scholar
+383,bias_north_south,,,True,0,0,0,1,semantic_scholar
+394,data_type,,"['abundance', 'density']",False,0,2,0,0,semantic_scholar
+394,geospatial_info_dataset,,['site'],False,0,1,0,0,semantic_scholar
+394,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+394,temporal_range,,,True,0,0,0,1,semantic_scholar
+394,temp_range_i,,,True,0,0,0,1,semantic_scholar
+394,temp_range_f,,,True,0,0,0,1,semantic_scholar
+394,species,,"['Mindarus abietinus Koch (Hemiptera: Aphididae)', 'Abies Miller (Pinaceae)', 'balsam twig aphid']",False,0,3,0,0,semantic_scholar
+394,referred_dataset,,,True,0,0,0,1,semantic_scholar
+394,time_series,,,True,0,0,0,1,semantic_scholar
+394,multispecies,,,True,0,0,0,1,semantic_scholar
+394,threatened_species,,,True,0,0,0,1,semantic_scholar
+394,new_species_science,,,True,0,0,0,1,semantic_scholar
+394,new_species_region,,,True,0,0,0,1,semantic_scholar
+394,bias_north_south,,,True,0,0,0,1,semantic_scholar
+395,data_type,,['genetic_analysis'],False,0,1,0,0,semantic_scholar
+395,geospatial_info_dataset,,"['sample', 'administrative_units', 'distribution']",False,0,3,0,0,semantic_scholar
+395,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+395,temporal_range,,From 1998 to 2011,False,0,1,0,0,semantic_scholar
+395,temp_range_i,,1998,False,0,1,0,0,semantic_scholar
+395,temp_range_f,,2011,False,0,1,0,0,semantic_scholar
+395,species,,"['Francisella tularensis', 'F. tularensis subsp. tularensis AI', 'F. tularensis subsp. holarctica', 'human', 'hare', 'muskrat']",False,0,6,0,0,semantic_scholar
+395,referred_dataset,,,True,0,0,0,1,semantic_scholar
+395,time_series,,,True,0,0,0,1,semantic_scholar
+395,multispecies,,True,False,0,1,0,0,semantic_scholar
+395,threatened_species,,,True,0,0,0,1,semantic_scholar
+395,new_species_science,,,True,0,0,0,1,semantic_scholar
+395,new_species_region,,,True,0,0,0,1,semantic_scholar
+395,bias_north_south,,,True,0,0,0,1,semantic_scholar
+397,data_type,,['ecosystem_structure'],False,0,1,0,0,semantic_scholar
+397,geospatial_info_dataset,,"['sample', 'site', 'administrative_units']",False,0,3,0,0,semantic_scholar
+397,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+397,temporal_range,,after the last SBW outbreak (1968â€“1992),False,0,1,0,0,semantic_scholar
+397,temp_range_i,,,True,0,0,0,1,semantic_scholar
+397,temp_range_f,,,True,0,0,0,1,semantic_scholar
+397,species,,"['woodland caribou', 'spruce budworm', 'balsam fir', 'understory plant species', 'moose', 'wolves']",False,0,6,0,0,semantic_scholar
+397,referred_dataset,,,True,0,0,0,1,semantic_scholar
+397,time_series,,,True,0,0,0,1,semantic_scholar
+397,multispecies,,True,False,0,1,0,0,semantic_scholar
+397,threatened_species,,,True,0,0,0,1,semantic_scholar
+397,new_species_science,,,True,0,0,0,1,semantic_scholar
+397,new_species_region,,,True,0,0,0,1,semantic_scholar
+397,bias_north_south,,,True,0,0,0,1,semantic_scholar
+398,data_type,,"['abundance', 'density']",False,0,2,0,0,semantic_scholar
+398,geospatial_info_dataset,,"['site', 'sample']",False,0,2,0,0,semantic_scholar
+398,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+398,temporal_range,,July and August,False,0,1,0,0,semantic_scholar
+398,temp_range_i,,,True,0,0,0,1,semantic_scholar
+398,temp_range_f,,,True,0,0,0,1,semantic_scholar
+398,species,,['Common ragweed (Ambrosia artemisiifolia L.)'],False,0,1,0,0,semantic_scholar
+398,referred_dataset,,,True,0,0,0,1,semantic_scholar
+398,time_series,,,True,0,0,0,1,semantic_scholar
+398,multispecies,,,True,0,0,0,1,semantic_scholar
+398,threatened_species,,,True,0,0,0,1,semantic_scholar
+398,new_species_science,,,True,0,0,0,1,semantic_scholar
+398,new_species_region,,,True,0,0,0,1,semantic_scholar
+398,bias_north_south,,,True,0,0,0,1,semantic_scholar
+400,data_type,,"['density', 'abundance', 'presence-absence']",False,0,3,0,0,semantic_scholar
+400,geospatial_info_dataset,,['sample'],False,0,1,0,0,semantic_scholar
+400,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+400,temporal_range,,spring of 1998 and 1999,False,0,1,0,0,semantic_scholar
+400,temp_range_i,,1998,False,0,1,0,0,semantic_scholar
+400,temp_range_f,,1999,False,0,1,0,0,semantic_scholar
+400,species,,"['American black duck (Anas rubripes)', 'mallard (Anas platyrhynchos)', 'breeding waterfowl']",False,0,3,0,0,semantic_scholar
+400,referred_dataset,,,True,0,0,0,1,semantic_scholar
+400,time_series,,,True,0,0,0,1,semantic_scholar
+400,multispecies,,True,False,0,1,0,0,semantic_scholar
+400,threatened_species,,,True,0,0,0,1,semantic_scholar
+400,new_species_science,,,True,0,0,0,1,semantic_scholar
+400,new_species_region,,,True,0,0,0,1,semantic_scholar
+400,bias_north_south,,,True,0,0,0,1,semantic_scholar
+405,data_type,,"['abundance', 'density', 'traits']",False,0,3,0,0,semantic_scholar
+405,geospatial_info_dataset,,"['site', 'administrative_units']",False,0,2,0,0,semantic_scholar
+405,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+405,temporal_range,,3 to 5 years after logging (short term),False,0,1,0,0,semantic_scholar
+405,temp_range_i,,,True,0,0,0,1,semantic_scholar
+405,temp_range_f,,,True,0,0,0,1,semantic_scholar
+405,species,,"['red squirrel (Tamiasciurus hudsonicus Erxleben)', 'northern flying squirrel (Glaucomys sabrinus Shaw)', 'eastern chipmunk (Tamias striatus L.)']",False,0,3,0,0,semantic_scholar
+405,referred_dataset,,,True,0,0,0,1,semantic_scholar
+405,time_series,,,True,0,0,0,1,semantic_scholar
+405,multispecies,,True,False,0,1,0,0,semantic_scholar
+405,threatened_species,,,True,0,0,0,1,semantic_scholar
+405,new_species_science,,,True,0,0,0,1,semantic_scholar
+405,new_species_region,,,True,0,0,0,1,semantic_scholar
+405,bias_north_south,,,True,0,0,0,1,semantic_scholar
+406,data_type,,"['density', 'distribution', 'time_series']",False,0,3,0,0,semantic_scholar
+406,geospatial_info_dataset,,"['site', 'geographic_features']",False,0,2,0,0,semantic_scholar
+406,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+406,temporal_range,,approximately 7-day flooding cycles,False,0,1,0,0,semantic_scholar
+406,temp_range_i,,,True,0,0,0,1,semantic_scholar
+406,temp_range_f,,,True,0,0,0,1,semantic_scholar
+406,species,,['three species of sticklebacks'],False,0,1,0,0,semantic_scholar
+406,referred_dataset,,,True,0,0,0,1,semantic_scholar
+406,time_series,,True,False,0,1,0,0,semantic_scholar
+406,multispecies,,True,False,0,1,0,0,semantic_scholar
+406,threatened_species,,,True,0,0,0,1,semantic_scholar
+406,new_species_science,,,True,0,0,0,1,semantic_scholar
+406,new_species_region,,,True,0,0,0,1,semantic_scholar
+406,bias_north_south,,,True,0,0,0,1,semantic_scholar
+407,data_type,,"['density', 'distribution', 'ecosystem_function']",False,0,3,0,0,semantic_scholar
+407,geospatial_info_dataset,,"['range', 'distribution', 'administrative_units']",False,0,3,0,0,semantic_scholar
+407,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+407,temporal_range,,,True,0,0,0,1,semantic_scholar
+407,temp_range_i,,,True,0,0,0,1,semantic_scholar
+407,temp_range_f,,,True,0,0,0,1,semantic_scholar
+407,species,,['sugar maple (Acer saccharum)'],False,0,1,0,0,semantic_scholar
+407,referred_dataset,,,True,0,0,0,1,semantic_scholar
+407,time_series,,,True,0,0,0,1,semantic_scholar
+407,multispecies,,,True,0,0,0,1,semantic_scholar
+407,threatened_species,,,True,0,0,0,1,semantic_scholar
+407,new_species_science,,,True,0,0,0,1,semantic_scholar
+407,new_species_region,,,True,0,0,0,1,semantic_scholar
+407,bias_north_south,,,True,0,0,0,1,semantic_scholar
+408,data_type,,"['density', 'distribution', 'presence-absence']",False,0,3,0,0,semantic_scholar
+408,geospatial_info_dataset,,"['sample', 'site', 'administrative_units']",False,0,3,0,0,semantic_scholar
+408,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+408,temporal_range,,1978,False,0,1,0,0,semantic_scholar
+408,temp_range_i,,1978,False,0,1,0,0,semantic_scholar
+408,temp_range_f,,1978,False,0,1,0,0,semantic_scholar
+408,species,,"['plant-parasitic nematodes (species in eight genera)', 'Pratylenchus', 'Paratylenchus', 'Xiphinema', 'Pratylenchus penetrans', 'Pratylenchus crenatus', 'Xiphinema americanum', 'Malus robusta']",False,0,8,0,0,semantic_scholar
+408,referred_dataset,,,True,0,0,0,1,semantic_scholar
+408,time_series,,,True,0,0,0,1,semantic_scholar
+408,multispecies,,True,False,0,1,0,0,semantic_scholar
+408,threatened_species,,,True,0,0,0,1,semantic_scholar
+408,new_species_science,,,True,0,0,0,1,semantic_scholar
+408,new_species_region,,,True,0,0,0,1,semantic_scholar
+408,bias_north_south,,,True,0,0,0,1,semantic_scholar
+409,data_type,,"['density', 'time_series']",False,0,2,0,0,semantic_scholar
+409,geospatial_info_dataset,,['site'],False,0,1,0,0,semantic_scholar
+409,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+409,temporal_range,,3 years; seasonal (spring and summer),False,0,1,0,0,semantic_scholar
+409,temp_range_i,,,True,0,0,0,1,semantic_scholar
+409,temp_range_f,,,True,0,0,0,1,semantic_scholar
+409,species,,"['Lygus lineolaris (Palisot de Beauvois)', 'Lygocoris communis (Knight)', 'Campylomma verbasci (Meyer)', 'Lygidea mendax Reuter', 'Heterocordylus malinus Reuter']",False,0,5,0,0,semantic_scholar
+409,referred_dataset,,,True,0,0,0,1,semantic_scholar
+409,time_series,,True,False,0,1,0,0,semantic_scholar
+409,multispecies,,True,False,0,1,0,0,semantic_scholar
+409,threatened_species,,,True,0,0,0,1,semantic_scholar
+409,new_species_science,,,True,0,0,0,1,semantic_scholar
+409,new_species_region,,,True,0,0,0,1,semantic_scholar
+409,bias_north_south,,,True,0,0,0,1,semantic_scholar
+410,data_type,,"['density', 'ecosystem_structure', 'ecosystem_function']",False,0,3,0,0,semantic_scholar
+410,geospatial_info_dataset,,['site'],False,0,1,0,0,semantic_scholar
+410,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+410,temporal_range,,,True,0,0,0,1,semantic_scholar
+410,temp_range_i,,,True,0,0,0,1,semantic_scholar
+410,temp_range_f,,,True,0,0,0,1,semantic_scholar
+410,species,,"['white-tailed deer (Odocoileus virginianus)', 'insects', 'birds']",False,0,3,0,0,semantic_scholar
+410,referred_dataset,,,True,0,0,0,1,semantic_scholar
+410,time_series,,,True,0,0,0,1,semantic_scholar
+410,multispecies,,True,False,0,1,0,0,semantic_scholar
+410,threatened_species,,,True,0,0,0,1,semantic_scholar
+410,new_species_science,,,True,0,0,0,1,semantic_scholar
+410,new_species_region,,,True,0,0,0,1,semantic_scholar
+410,bias_north_south,,,True,0,0,0,1,semantic_scholar
+411,data_type,,"['density', 'ecosystem_structure', 'time_series']",False,0,3,0,0,semantic_scholar
+411,geospatial_info_dataset,,"['site', 'administrative_units']",False,0,2,0,0,semantic_scholar
+411,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+411,temporal_range,,2005 to 2007,False,0,1,0,0,semantic_scholar
+411,temp_range_i,,2005,False,0,1,0,0,semantic_scholar
+411,temp_range_f,,2007,False,0,1,0,0,semantic_scholar
+411,species,,"['Black spruce (Picea mariana (Mill.))', 'jack pine (Pinus banksiana (Lamb.))']",False,0,2,0,0,semantic_scholar
+411,referred_dataset,,,True,0,0,0,1,semantic_scholar
+411,time_series,,True,False,0,1,0,0,semantic_scholar
+411,multispecies,,True,False,0,1,0,0,semantic_scholar
+411,threatened_species,,,True,0,0,0,1,semantic_scholar
+411,new_species_science,,,True,0,0,0,1,semantic_scholar
+411,new_species_region,,,True,0,0,0,1,semantic_scholar
+411,bias_north_south,,,True,0,0,0,1,semantic_scholar
+412,data_type,,"['presence-absence', 'density', 'species_richness']",False,0,3,0,0,semantic_scholar
+412,geospatial_info_dataset,,"['sample', 'site']",False,0,2,0,0,semantic_scholar
+412,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+412,temporal_range,,,True,0,0,0,1,semantic_scholar
+412,temp_range_i,,,True,0,0,0,1,semantic_scholar
+412,temp_range_f,,,True,0,0,0,1,semantic_scholar
+412,species,,"['arbuscular mycorrhizal fungi (AMF)', 'ten AM fungus species', 'Glomus mosseae', 'G. macrocarpum', 'G. constrictum', 'Sclerocystis rubiformis']",False,0,6,0,0,semantic_scholar
+412,referred_dataset,,,True,0,0,0,1,semantic_scholar
+412,time_series,,,True,0,0,0,1,semantic_scholar
+412,multispecies,,True,False,0,1,0,0,semantic_scholar
+412,threatened_species,,,True,0,0,0,1,semantic_scholar
+412,new_species_science,,,True,0,0,0,1,semantic_scholar
+412,new_species_region,,,True,0,0,0,1,semantic_scholar
+412,bias_north_south,,,True,0,0,0,1,semantic_scholar
+415,data_type,,['density'],False,0,1,0,0,semantic_scholar
+415,geospatial_info_dataset,,['site'],False,0,1,0,0,semantic_scholar
+415,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+415,temporal_range,,,True,0,0,0,1,semantic_scholar
+415,temp_range_i,,,True,0,0,0,1,semantic_scholar
+415,temp_range_f,,,True,0,0,0,1,semantic_scholar
+415,species,,"['Populus tremuloides Michx.', 'Pinus banksiana Lamb.', 'Picea mariana (Mill.) BSP']",False,0,3,0,0,semantic_scholar
+415,referred_dataset,,,True,0,0,0,1,semantic_scholar
+415,time_series,,,True,0,0,0,1,semantic_scholar
+415,multispecies,,True,False,0,1,0,0,semantic_scholar
+415,threatened_species,,,True,0,0,0,1,semantic_scholar
+415,new_species_science,,,True,0,0,0,1,semantic_scholar
+415,new_species_region,,,True,0,0,0,1,semantic_scholar
+415,bias_north_south,,,True,0,0,0,1,semantic_scholar
+416,data_type,,['density'],False,0,1,0,0,semantic_scholar
+416,geospatial_info_dataset,,"['site', 'administrative_units']",False,0,2,0,0,semantic_scholar
+416,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+416,temporal_range,,,True,0,0,0,1,semantic_scholar
+416,temp_range_i,,,True,0,0,0,1,semantic_scholar
+416,temp_range_f,,,True,0,0,0,1,semantic_scholar
+416,species,,"['Pinus banksiana', 'Picea mariana', 'Populus tremuloides']",False,0,3,0,0,semantic_scholar
+416,referred_dataset,,,True,0,0,0,1,semantic_scholar
+416,time_series,,,True,0,0,0,1,semantic_scholar
+416,multispecies,,True,False,0,1,0,0,semantic_scholar
+416,threatened_species,,,True,0,0,0,1,semantic_scholar
+416,new_species_science,,,True,0,0,0,1,semantic_scholar
+416,new_species_region,,,True,0,0,0,1,semantic_scholar
+416,bias_north_south,,,True,0,0,0,1,semantic_scholar
+417,data_type,,"['abundance', 'time_series', 'distribution']",False,0,3,0,0,semantic_scholar
+417,geospatial_info_dataset,,"['range', 'distribution', 'geographic_features', 'administrative_units']",False,0,4,0,0,semantic_scholar
+417,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+417,temporal_range,,last thirty years,False,0,1,0,0,semantic_scholar
+417,temp_range_i,,,True,0,0,0,1,semantic_scholar
+417,temp_range_f,,,True,0,0,0,1,semantic_scholar
+417,species,,"['small mammals', 'vole predators', 'voles', 'red-backed vole (Clethrionomys gapperi)', 'boreal owls (Aegolius funereus)', 'northern hawk owl (Surnia ulula)', 'great gray owl (Strix nebulosa)']",False,0,7,0,0,semantic_scholar
+417,referred_dataset,,,True,0,0,0,1,semantic_scholar
+417,time_series,,True,False,0,1,0,0,semantic_scholar
+417,multispecies,,True,False,0,1,0,0,semantic_scholar
+417,threatened_species,,,True,0,0,0,1,semantic_scholar
+417,new_species_science,,,True,0,0,0,1,semantic_scholar
+417,new_species_region,,,True,0,0,0,1,semantic_scholar
+417,bias_north_south,,,True,0,0,0,1,semantic_scholar
+419,data_type,,"['time_series', 'traits']",False,0,2,0,0,semantic_scholar
+419,geospatial_info_dataset,,"['site', 'geographic_features', 'administrative_units']",False,0,3,0,0,semantic_scholar
+419,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+419,temporal_range,,over 8 years following clear-cutting and deer management,False,0,1,0,0,semantic_scholar
+419,temp_range_i,,,True,0,0,0,1,semantic_scholar
+419,temp_range_f,,,True,0,0,0,1,semantic_scholar
+419,species,,"['Abies balsamea (L.) Mill.', 'Picea glauca (Moench) Voss', 'herbaceous plant communities']",False,0,3,0,0,semantic_scholar
+419,referred_dataset,,,True,0,0,0,1,semantic_scholar
+419,time_series,,True,False,0,1,0,0,semantic_scholar
+419,multispecies,,True,False,0,1,0,0,semantic_scholar
+419,threatened_species,,,True,0,0,0,1,semantic_scholar
+419,new_species_science,,,True,0,0,0,1,semantic_scholar
+419,new_species_region,,,True,0,0,0,1,semantic_scholar
+419,bias_north_south,,,True,0,0,0,1,semantic_scholar
+420,data_type,,,True,0,0,0,1,semantic_scholar
+420,geospatial_info_dataset,,"['site', 'administrative_units']",False,0,2,0,0,semantic_scholar
+420,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+420,temporal_range,,,True,0,0,0,1,semantic_scholar
+420,temp_range_i,,,True,0,0,0,1,semantic_scholar
+420,temp_range_f,,,True,0,0,0,1,semantic_scholar
+420,species,,"['white-tailed deer (Odocoileus virginianianus (Zimmermann', '1780))', 'coyote (Canis latrans Say', '1823)']",False,0,4,0,0,semantic_scholar
+420,referred_dataset,,,True,0,0,0,1,semantic_scholar
+420,time_series,,,True,0,0,0,1,semantic_scholar
+420,multispecies,,True,False,0,1,0,0,semantic_scholar
+420,threatened_species,,,True,0,0,0,1,semantic_scholar
+420,new_species_science,,,True,0,0,0,1,semantic_scholar
+420,new_species_region,,,True,0,0,0,1,semantic_scholar
+420,bias_north_south,,,True,0,0,0,1,semantic_scholar
+421,data_type,,"['abundance', 'density', 'time_series']",False,0,3,0,0,semantic_scholar
+421,geospatial_info_dataset,,"['site', 'administrative_units']",False,0,2,0,0,semantic_scholar
+421,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+421,temporal_range,,1999 and 2000,False,0,1,0,0,semantic_scholar
+421,temp_range_i,,1999,False,0,1,0,0,semantic_scholar
+421,temp_range_f,,2000,False,0,1,0,0,semantic_scholar
+421,species,,"['spruce budworm', 'Choristoneura fumiferana (Clem.) (Lepidoptera: Tortricidae)', 'Trichogramma minutum Riley (Hymenoptera: Trichogrammatidae)']",False,0,3,0,0,semantic_scholar
+421,referred_dataset,,,True,0,0,0,1,semantic_scholar
+421,time_series,,True,False,0,1,0,0,semantic_scholar
+421,multispecies,,True,False,0,1,0,0,semantic_scholar
+421,threatened_species,,,True,0,0,0,1,semantic_scholar
+421,new_species_science,,,True,0,0,0,1,semantic_scholar
+421,new_species_region,,,True,0,0,0,1,semantic_scholar
+421,bias_north_south,,,True,0,0,0,1,semantic_scholar
+423,data_type,,['density'],False,0,1,0,0,semantic_scholar
+423,geospatial_info_dataset,,['administrative_units'],False,0,1,0,0,semantic_scholar
+423,spatial_range_km2,,,True,0,0,0,1,semantic_scholar
+423,temporal_range,,,True,0,0,0,1,semantic_scholar
+423,temp_range_i,,,True,0,0,0,1,semantic_scholar
+423,temp_range_f,,,True,0,0,0,1,semantic_scholar
+423,species,,['ruffed grouse (Bonasa umbellus)'],False,0,1,0,0,semantic_scholar
+423,referred_dataset,,,True,0,0,0,1,semantic_scholar
+423,time_series,,,True,0,0,0,1,semantic_scholar
+423,multispecies,,,True,0,0,0,1,semantic_scholar
+423,threatened_species,,,True,0,0,0,1,semantic_scholar
+423,new_species_science,,,True,0,0,0,1,semantic_scholar
+423,new_species_region,,,True,0,0,0,1,semantic_scholar
+423,bias_north_south,,,True,0,0,0,1,semantic_scholar

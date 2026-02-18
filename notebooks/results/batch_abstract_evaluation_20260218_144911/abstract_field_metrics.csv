@@ -1,0 +1,15 @@
+field,group,precision,recall,f1,tp,fp,fn,exact_match_rate
+data_type,core,0.0,0.0,0.0,0,249,0,0.037
+geospatial_info_dataset,core,0.0,0.0,0.0,0,247,0,0.009
+spatial_range_km2,core,0.0,0.0,0.0,0,5,2,0.935
+temporal_range,core,0.018,0.333,0.034,1,54,2,0.5
+temp_range_i,core,0.0,0.0,0.0,0,29,0,0.731
+temp_range_f,core,0.0,0.0,0.0,0,28,0,0.741
+species,core,0.069,0.5,0.121,34,461,34,0.102
+referred_dataset,core,0.0,0.0,0.0,0,4,0,0.963
+time_series,modulator,0.0,0.0,0.0,0,32,0,0.704
+multispecies,modulator,0.013,1.0,0.026,1,75,0,0.306
+threatened_species,modulator,0.0,0.0,0.0,0,6,0,0.944
+new_species_science,modulator,0.0,0.0,0.0,0,3,0,0.972
+new_species_region,modulator,0.0,0.0,0.0,0,10,0,0.907
+bias_north_south,modulator,0.0,0.0,0.0,0,0,1,0.991
