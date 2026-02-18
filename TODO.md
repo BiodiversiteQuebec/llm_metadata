@@ -20,15 +20,16 @@ This prevents duplicate work across parallel sessions.
 >
 > 5 deliverables: (1) SS data in pipeline, (2) modulator features, (3) abstract-only eval, (4) OA full-text eval, (5) section-based eval
 
-### WU-A1: Extend schema — modulators + DataSource `opus`
+### WU-A1: Extend schema — modulators + DataSource `opus` ✅
 
-- [ ] Add 6 `Optional[bool]` modulator fields to `DatasetFeatures`: `time_series`, `multispecies`, `threatened_species`, `new_species_science`, `new_species_region`, `bias_north_south`
-- [ ] Add `DataSource(str, Enum)` with `dryad`, `zenodo`, `semantic_scholar`
-- [ ] Add `source: Optional[DataSource]` field
-- [ ] Add boolean coercion validator in `DatasetFeaturesNormalized`
-- [ ] Update system prompts in `gpt_classify.py` for modulator extraction
-- [ ] Update tests for new fields + boolean coercion edge cases
-- **Tag:** `CLOUD` | **Deps:** none | **Files:** `schemas/fuster_features.py`, `gpt_classify.py`, `tests/`
+- [x] Add 6 `Optional[bool]` modulator fields to `DatasetFeatures`: `time_series`, `multispecies`, `threatened_species`, `new_species_science`, `new_species_region`, `bias_north_south`
+- [x] Add `DataSource(str, Enum)` with `dryad`, `zenodo`, `semantic_scholar`, `referenced`
+- [x] Add `source: Optional[DataSource]` field
+- [x] Add boolean coercion validator in `DatasetFeaturesNormalized`
+- [x] Update system prompts in `gpt_classify.py` for modulator extraction (all 3: SYSTEM_MESSAGE, SECTION_SYSTEM_MESSAGE, PDF_SYSTEM_MESSAGE)
+- [x] Update `schemas/__init__.py` exports (`DatasetFeaturesNormalized`, `DataSource`)
+- [x] Update tests for new fields + boolean coercion edge cases (`tests/test_schema_modulators.py`, 27 new tests)
+- **Tag:** `CLOUD` | **Deps:** none | **Files:** `schemas/fuster_features.py`, `schemas/__init__.py`, `gpt_classify.py`, `tests/test_schema_modulators.py`
 
 ### WU-A2: Validate all-source ground truth `sonnet`
 
@@ -217,4 +218,4 @@ This prevents duplicate work across parallel sessions.
 
 | Branch | Task ID | Description | Model | Finished |
 |---|---|---|---|---|
-| | | *(none yet)* | | |
+| `claude/wu-a1-dlX7N` | WU-A1 | Extend schema — modulators + DataSource | opus | 2026-02-18 |
