@@ -18,17 +18,17 @@ This folder contains analysis and validation notebooks for ecological dataset ch
   - **Cell A3.5** (new): Updates `data/dataset_article_mapping.csv` with 3 new columns and appends SS records.
   - **Export cell updated**: Added coverage summary for 5 enriched fields.
 
-**Results:**
+**Results — Coverage by source (valid records only, n=299):**
 
-| Field | Coverage |
-|---|---|
-| `source_url` | 279/299 (93.3%) |
-| `cited_article_doi` | 250/299 (83.6%) |
-| `is_oa` | 194/299 (64.9%) |
-| `pdf_url` | 103/299 (34.4%) |
-| `journal_url` | 98/299 (32.8%) |
+| source | n | has_abstract | source_url | cited_article_doi | journal_url | pdf_url | is_oa |
+|---|---|---|---|---|---|---|---|
+| dryad | 37 | 36/37 (97%) | 37/37 (100%) | 37/37 (100%) | 25/37 (68%) | 34/37 (92%) | 36/37 (97%) |
+| zenodo | 67 | 67/67 (100%) | 67/67 (100%) | 38/67 (57%) | 27/67 (40%) | 33/67 (49%) | 36/67 (54%) |
+| semantic_scholar | 192 | 186/192 (97%) | 175/192 (91%) | 175/192 (91%) | 46/192 (24%) | 122/192 (64%) | 122/192 (64%) |
+| referenced | 3 | 0/3 (0%) | 0/3 (0%) | 0/3 (0%) | 0/3 (0%) | 0/3 (0%) | 0/3 (0%) |
+| **TOTAL** | **299** | **289/299 (97%)** | **279/299 (93%)** | **250/299 (84%)** | **98/299 (33%)** | **189/299 (63%)** | **194/299 (65%)** |
 
-`dataset_article_mapping.csv` extended: 301 rows (original Dryad+Zenodo rows + 204 new SS rows), 9 columns (original 6 + `journal_url`, `pdf_url`, `is_oa`).
+`dataset_article_mapping.csv` extended: 305 rows (original Dryad+Zenodo rows + SS rows), 9 columns (original 6 + `journal_url`, `pdf_url`, `is_oa`).
 
 **Key Issues Identified:**
 - `id` and `title` are not schema fields so are absent from `valid_rows_to_dataframe()` output — recovered from `raw_df` via shared DataFrame index.
