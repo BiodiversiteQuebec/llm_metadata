@@ -31,13 +31,15 @@ This prevents duplicate work across parallel sessions.
 - [x] Update tests for new fields + boolean coercion edge cases (`tests/test_schema_modulators.py`, 27 new tests)
 - **Tag:** `CLOUD` | **Deps:** none | **Files:** `schemas/fuster_features.py`, `schemas/__init__.py`, `gpt_classify.py`, `tests/test_schema_modulators.py`
 
-### WU-A2: Validate all-source ground truth `sonnet`
+### WU-A2: Validate all-source ground truth (includes SS Task 3.1) `sonnet`
 
-- [ ] Load `data/dataset_092624.xlsx`, validate all 418 records through updated schema
+- [ ] Edit `notebooks/fuster_annotations_validation.ipynb` (do NOT create a new notebook)
+- [ ] Load `data/dataset_092624.xlsx`, validate all records (Dryad+Zenodo+SS) through updated schema
+- [ ] Parse URL fields for SS records (journal URLs vs search URLs)
 - [ ] Filter to valid records (~491 across Dryad+Zenodo+SS)
 - [ ] Compute coverage stats by source (records, abstracts, DOIs, cited_articles)
-- [ ] Export `data/dataset_092624_all_sources_validated.xlsx`
-- **Tag:** `CLOUD` | **Deps:** WU-A1 | **Files:** `data/dataset_092624.xlsx`, notebook
+- [ ] Overwrite `data/dataset_092624_validated.xlsx` with all-source validated output
+- **Tag:** `CLOUD` | **Deps:** WU-A1 | **Files:** `data/dataset_092624.xlsx`, `notebooks/fuster_annotations_validation.ipynb`
 
 ### WU-B: Abstract-only extraction + evaluation `sonnet`
 
@@ -95,7 +97,8 @@ This prevents duplicate work across parallel sessions.
 > **Plan:** [`plans/integrate_semantic_scholar/semantic_scholar_implementation_guide.md`](plans/integrate_semantic_scholar/semantic_scholar_implementation_guide.md)
 > **Overview:** [`plans/integrate_semantic_scholar/README.md`](plans/integrate_semantic_scholar/README.md)
 >
-> Phase 1 (audit) is COMPLETE. Presentation WU-* covers tasks 2.1 (partial), 3.1, 4.1, 5.1–5.3.
+> Phase 1 (audit) is COMPLETE. Presentation WU-* covers tasks 2.1 (partial), 4.1, 5.1–5.3.
+> **Task 3.1 merged into WU-A2** (validate all-source ground truth in `fuster_annotations_validation.ipynb`).
 > Remaining tasks below are deferred until after the presentation.
 
 ### SS-2.1b: URL field extensions `sonnet`

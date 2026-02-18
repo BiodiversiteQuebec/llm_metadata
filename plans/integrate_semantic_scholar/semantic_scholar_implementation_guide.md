@@ -241,48 +241,43 @@ This document provides detailed, task-by-task guidance for implementing Semantic
 
 ### Task 3.1: Parse and Validate Semantic Scholar Records from xlsx
 
+> **Merged with:** Presentation work plan WU-A2 ("Validate All-Source Ground Truth Data").
+> This task is now executed as part of WU-A2. The implementation edits the existing
+> `notebooks/fuster_annotations_validation.ipynb` instead of creating a new notebook.
+
 **Agent Type:** `general-purpose`
 
-**Objective:** Load Semantic Scholar data from the Excel file and validate against updated schemas.
+**Objective:** Load all data (Dryad+Zenodo+SS) from the Excel file and validate against updated schemas. SS-specific concerns (URL parsing, source filtering) are handled within the same notebook.
 
 **Inputs:**
 - `data/dataset_092624.xlsx`
-- Updated schemas from Phase 2
-- Notebooks pattern: `notebooks/fuster_annotations_validation.ipynb`
+- Updated schemas from Phase 2 / WU-A1
+- Existing notebook: `notebooks/fuster_annotations_validation.ipynb`
 
 **Tasks:**
-1. Create `notebooks/semantic_scholar_data_integration.ipynb`
-2. Load and filter Semantic Scholar records:
-   ```python
-   df = pd.read_excel('data/dataset_092624.xlsx')
-   ss_df = df[df['source'] == 'semantic_scholar'].copy()
-   ```
-3. Parse URL fields:
+1. Edit `notebooks/fuster_annotations_validation.ipynb` (do NOT create a new notebook)
+2. Load and validate ALL records (Dryad+Zenodo+SS) through updated `DatasetFeaturesNormalized`
+3. Parse URL fields for SS records:
    - Extract journal URLs vs Semantic Scholar search URLs
    - Map to appropriate schema fields
    - Handle empty/malformed URLs
-4. Validate against `DatasetFeatures` schema
-5. Generate statistics:
-   - Total records
-   - Valid records
-   - Records with abstracts
-   - Records with cited_articles
-   - Validation error breakdown
-6. Export validated records:
-   - `data/dataset_092624_semantic_scholar_validated.xlsx`
+4. Filter to valid records (~491 across all sources)
+5. Compute coverage stats by source: records, with abstracts, with DOIs, with `cited_articles`
+6. Validation error breakdown by source
+7. Export: `data/dataset_092624_validated.xlsx`
 
 **Outputs:**
-- Notebook: `notebooks/semantic_scholar_data_integration.ipynb`
-- Validated data: `data/dataset_092624_semantic_scholar_validated.xlsx`
+- Updated notebook: `notebooks/fuster_annotations_validation.ipynb`
+- Validated data: `data/dataset_092624_validated.xlsx`
 - Statistics report (in notebook output)
 - Log entry in `notebooks/README.md`
 
 **Acceptance Criteria:**
-- ✅ All 254 Semantic Scholar records processed
-- ✅ Validation errors clearly documented
-- ✅ URL fields correctly mapped
-- ✅ Statistics show ≥80% have abstracts
-- ✅ Notebook is well-documented and reproducible
+- ✅ All records processed (Dryad+Zenodo+SS, including 254 SS records)
+- ✅ Validation errors clearly documented, broken down by source
+- ✅ URL fields correctly mapped for SS records
+- ✅ Statistics show ≥80% of SS records have abstracts
+- ✅ Existing notebook extended (not a new notebook)
 
 ---
 

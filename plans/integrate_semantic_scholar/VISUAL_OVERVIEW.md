@@ -132,8 +132,8 @@ Week 1-2:
 Day 3-4  │ PHASE 3: Pipeline Integration                      │ 8h
          │         ┌────────────────┐                          │
          │         │ Task 3.1       │                          │
-         │         │ Parse & Valid. │                          │
-         │         │ (3h)           │                          │
+         │         │ (merged into   │                          │
+         │         │  WU-A2)        │                          │
          │         └────────┬───────┘                          │
          │                  ▼                                  │
          │ ┌────────────────┴────────────────┐                │
@@ -194,7 +194,7 @@ Total: ~31h sequential, ~18-20h with optimal parallelization
 │   Task 2.3                general-purpose      Low           │
 │                                                               │
 │ Phase 3: Pipeline         general-purpose      Medium        │
-│   Task 3.1                general-purpose      Medium        │
+│   Task 3.1                merged into WU-A2     —             │
 │   Task 3.2                general-purpose      Medium        │
 │   Task 3.3                general-purpose      Medium        │
 │                                                               │
@@ -252,8 +252,8 @@ Legend:
          ▼
    ┌──────────┐
    │ Task 3.1 │
-   │ Parse &  │
-   │ Validate │
+   │ (merged  │
+   │ → WU-A2) │
    └────┬─────┘
         │
         └────────┬────────────┐

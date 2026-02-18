@@ -95,7 +95,7 @@ Pipeline: Same 4-stage, extended for multi-source support
 **Can start immediately:** Tasks 2.1 and 2.2 can run in parallel
 
 ### ⏸️ Phase 3: Pipeline Integration (Blocked by Phase 2)
-- Parse and validate 254 Semantic Scholar records from Excel
+- Task 3.1 **merged into WU-A2**: validate all-source records in `fuster_annotations_validation.ipynb`, overwrite `data/dataset_092624_validated.xlsx`
 - Implement cited article retrieval via API
 
 ### ⏸️ Phase 4: Coverage Analysis (Blocked by Phase 3)
@@ -215,13 +215,13 @@ Pipeline: Same 4-stage, extended for multi-source support
 - [ ] `tests/test_semantic_scholar.py` (new)
 
 ### Notebooks
-- [ ] `notebooks/semantic_scholar_data_integration.ipynb` (new)
+- [ ] `notebooks/fuster_annotations_validation.ipynb` (updated — SS validation merged into WU-A2)
 - [ ] `notebooks/data_coverage_analysis.ipynb` (new/updated)
 - [ ] `notebooks/fuster_test_extraction_evaluation.ipynb` (updated)
 - [ ] `notebooks/fulltext_extraction_evaluation.ipynb` (updated)
 
 ### Data Files
-- [ ] `data/dataset_092624_semantic_scholar_validated.xlsx`
+- [ ] `data/dataset_092624_validated.xlsx` (overwritten with all-source validated output)
 - [ ] `data/semantic_scholar_cited_articles.csv`
 - [ ] `notebooks/results/semantic_scholar_evaluation_[date]/`
 - [ ] `notebooks/results/data_coverage_summary_[date]/`

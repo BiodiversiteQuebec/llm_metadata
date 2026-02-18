@@ -78,7 +78,7 @@ graph TD
     A --> E[2.2 Create SS API]
     
     D --> F[2.3 Update Modules]
-    F --> H[3.1 Parse & Validate]
+    F --> H[3.1 Parse & Validate<br/>merged into WU-A2]
     
     E --> I[3.2 Cited Articles]
     H --> I
@@ -128,7 +128,7 @@ graph TD
 ### Phase 3: Pipeline Integration
 | Task | Agent Type | Complexity | Priority |
 |------|-----------|------------|----------|
-| 3.1 | `general-purpose` | Medium | 🔴 Critical |
+| 3.1 | Merged into WU-A2 | — | — |
 | 3.2 | `general-purpose` | Medium | 🟡 High |
 | 3.3 | `general-purpose` | Medium | 🟡 High |
 
@@ -211,13 +211,13 @@ All can run in parallel
 - [ ] `tests/test_semantic_scholar.py` - New test file
 
 ### Notebooks
-- [ ] `notebooks/semantic_scholar_data_integration.ipynb` - Data parsing and validation
+- [ ] `notebooks/fuster_annotations_validation.ipynb` - Updated with all-source validation (SS merged into WU-A2)
 - [ ] Updated: `notebooks/fuster_test_extraction_evaluation.ipynb`
 - [ ] Updated: `notebooks/fulltext_extraction_evaluation.ipynb`
 - [ ] New/updated: Data coverage analysis notebook
 
 ### Data Files
-- [ ] `data/dataset_092624_semantic_scholar_validated.xlsx`
+- [ ] `data/dataset_092624_validated.xlsx` (overwritten with all-source validated output)
 - [ ] `data/semantic_scholar_cited_articles.csv`
 - [ ] `notebooks/results/semantic_scholar_evaluation_[date]/`
 - [ ] `notebooks/results/data_coverage_summary_[date]/`
@@ -242,8 +242,8 @@ After each phase, verify:
 - [ ] No regressions
 
 ### Phase 3 ✓
-- [ ] 254 Semantic Scholar records loaded
-- [ ] Validation reports generated
+- [ ] 254 Semantic Scholar records loaded (via WU-A2, in `fuster_annotations_validation.ipynb`)
+- [ ] Validation reports generated (output: `data/dataset_092624_validated.xlsx`)
 - [ ] Cited articles retrieved
 - [ ] PDF downloads integrated
 - [ ] Success rates tracked
