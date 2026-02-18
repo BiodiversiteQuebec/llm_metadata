@@ -1,12 +1,18 @@
-# GBIF Species Matching & Evaluation Matcher Refactor
+# GBIF Species Matching — Enrichment-Based Evaluation
 
 ## Context
 
-The `species` field in our extraction/evaluation pipeline is a `list[str]` containing a mix of scientific binomials, common names, and count+group descriptions. Evaluation currently relies on string comparison (exact, fuzzy, or enhanced heuristic) which cannot recognize that "wood turtle" and "Glyptemys insculpta" refer to the same taxon. Adding GBIF backbone resolution enables semantic species comparison by taxon key.
+The `species` field in our extraction/evaluation pipeline is a `list[str]` containing a mix of scientific binomials, common names, and count+group descriptions. Evaluation currently relies on string comparison (exact, fuzzy, or enhanced heuristic) which cannot recognize that "wood turtle" and "Glyptemys insculpta" refer to the same taxon.
 
-This also addresses accumulated tech debt: `compare_models()` in `groundtruth_eval.py` has 3 matching strategies with duplicated TP/FP/FN logic and an orphaned `EnhancedSpeciesMatchConfig` class. Adding a 4th strategy (GBIF) without refactoring would make it worse.
+**Approach:** Rather than refactoring the evaluation matcher abstraction, we add GBIF resolution as a **preprocessing enrichment step** that populates a new `gbif_keys: list[int]` field on the model — following the precedent of the existing source-tracking fields (`source`, `source_url`, `is_oa`, etc. at `fuster_features.py:254-278`) which are on the model but not extracted by the LLM.
 
-**Outcome:** GBIF-based species matching as a new evaluation strategy, cleanly integrated via a strategy pattern that simplifies the existing code.
+The existing evaluation framework handles both fields independently in a single run:
+- `species` → enhanced species string matching (existing, unchanged)
+- `gbif_keys` → simple set comparison on integer taxon IDs (trivial, no new matching logic)
+
+Strategy comparison is just `report.metrics_for("species")` vs `report.metrics_for("gbif_keys")`.
+
+**Outcome:** GBIF-based species evaluation as a new field alongside existing string-based evaluation, with zero changes to the evaluation framework internals.
 
 ---
 
@@ -25,68 +31,31 @@ Extract and extend `_extract_species_parts()` from `groundtruth_eval.py` into a 
 - Preprocessing pipeline:
   1. Strip leading count via `r'^\d+\s+'` (capture count as int)
   2. Strip trailing noise words: "mock species", "species" suffix
-  3. Parenthetical split: `"wood turtle (Glyptemys insculpta)"` -> scientific + vernacular
-  4. Scientific detection via `looks_scientific()` heuristic (existing logic)
+  3. Parenthetical split: `"wood turtle (Glyptemys insculpta)"` → scientific + vernacular
+  4. Scientific detection via `looks_scientific()` heuristic (existing logic from `groundtruth_eval.py:727-734`)
   5. Set `is_group_description=True` when count was present or name is a broad group term
 - Top-level function `parse_species_string(raw: str) -> dict` used by the validator
 
 **Files to modify:**
-- `groundtruth_eval.py` — replace `_extract_species_parts()` calls with `ParsedTaxon` import
+- `groundtruth_eval.py` — replace `_extract_species_parts()` calls (line 791, 792) with `ParsedTaxon` import
 - `schemas/__init__.py` — export `ParsedTaxon`
 
 **Tests:** `tests/test_species_parsing.py`
-- Scientific binomials: `"Tamias striatus"` -> scientific
-- Common names: `"caribou"` -> vernacular
+- Scientific binomials: `"Tamias striatus"` → scientific
+- Common names: `"caribou"` → vernacular
 - Parenthetical both orders: `"wood turtle (Glyptemys insculpta)"`, `"Glyptemys insculpta (wood turtle)"`
-- Count+group: `"41 fish mock species"` -> count=41, vernacular="fish", is_group=True
-- Multi-word groups: `"ground-dwelling beetles"` -> vernacular
+- Count+group: `"41 fish mock species"` → count=41, vernacular="fish", is_group=True
+- Multi-word groups: `"ground-dwelling beetles"` → vernacular
 - Edge cases: empty string, None-like values
 
 ---
 
-### WU-2: Refactor evaluation matchers to strategy pattern
-`model: sonnet` | deps: WU-1
-
-Refactor `compare_models()` in `groundtruth_eval.py` to eliminate duplicated set-comparison logic.
-
-**New type:**
-```python
-MatchStrategy = Callable[[list[str], list[str]], tuple[set[str], set[str]]]
-```
-
-**Changes to `EvaluationConfig`:**
-- Add `field_matchers: dict[str, MatchStrategy]` (default empty)
-- Keep `fuzzy_match_fields`, `enhanced_species_matching`, `enhanced_species_threshold` as backward-compatible shorthands
-- Internal resolution order: `field_matchers[field]` > `enhanced_species_matching` (if field=="species") > `fuzzy_match_fields[field]` > standard normalization
-
-**Matcher factories (in `groundtruth_eval.py`):**
-```python
-def fuzzy_matcher(threshold: int = 80) -> MatchStrategy
-def enhanced_species_matcher(threshold: int = 70) -> MatchStrategy
-```
-
-**Refactor `compare_models()`:**
-- Extract shared set-comparison -> FieldResult construction into `_compare_sets()` helper
-- Single code path for all list-field matching: resolve strategy -> call it -> `_compare_sets()`
-- Delete orphaned `EnhancedSpeciesMatchConfig` (line 870)
-
-**Files:**
-- `groundtruth_eval.py` — refactor internals, add factories, update imports
-- Export `MatchStrategy`, `fuzzy_matcher`, `enhanced_species_matcher` from module
-
-**Tests:** Update `tests/test_evaluation_fuzzy.py`
-- Existing tests pass unchanged (backward compat via shorthand flags)
-- New tests using `field_matchers={"species": enhanced_species_matcher(70)}` produce identical results
-- Test `_compare_sets()` helper directly
-
----
-
-### WU-3: `gbif.py` — GBIF Species Match API wrapper
+### WU-2: `gbif.py` — GBIF Species Match API wrapper
 `model: sonnet` | deps: WU-1
 
 **New file:** `src/llm_metadata/gbif.py`
 
-Follow `semantic_scholar.py` patterns: module docstring, `requests`, `joblib.Memory` cache, logging.
+Follow `semantic_scholar.py` patterns: module docstring, `requests`, `joblib.Memory` cache, logging, `_get()` with polite delay.
 
 **Core types:**
 ```python
@@ -99,7 +68,6 @@ class GBIFMatch:
     confidence: int
     match_type: str  # EXACT, FUZZY, HIGHERRANK, NONE
     kingdom: str | None
-    # ... higher taxonomy fields
 ```
 
 **Functions:**
@@ -117,65 +85,96 @@ class GBIFMatch:
 
 **Tests:** `tests/test_gbif.py`
 - Mock `requests.get` responses for EXACT, FUZZY, HIGHERRANK, NONE matchTypes
-- Test `ParsedTaxon` -> GBIF routing (scientific preferred over vernacular)
+- Test `ParsedTaxon` → GBIF routing (scientific preferred over vernacular)
 - Test confidence threshold filtering
 - Test caching behavior
 
 ---
 
-### WU-4: `gbif_matcher()` — evaluation strategy + integration
-`model: sonnet` | deps: WU-2, WU-3
+### WU-3: Schema field + enrichment function
+`model: sonnet` | deps: WU-2
 
-Wire GBIF matching into the evaluation framework via the strategy pattern.
+Add `gbif_keys` field to `DatasetFeatures` and an enrichment function that populates it.
 
-**New factory in `gbif.py`:**
+**Schema change in `schemas/fuster_features.py`:**
 ```python
-def gbif_matcher(confidence_threshold: int = 80, accept_higherrank: bool = True) -> MatchStrategy:
-```
-
-**Logic:**
-1. Resolve both `true_items` and `pred_items` via `resolve_species_list()`
-2. Build normalized sets using GBIF keys as canonical identifiers (e.g., `"gbif:8024251"`)
-3. Items that fail GBIF resolution: fall back to lowercase string (existing behavior)
-4. Return `(true_set, pred_set)` for standard set intersection
-
-**Usage:**
-```python
-config = EvaluationConfig(
-    field_matchers={"species": gbif_matcher(confidence_threshold=80)}
+# Alongside existing source-tracking fields (line ~278)
+gbif_keys: Optional[list[int]] = Field(
+    None,
+    description="GBIF backbone taxon keys resolved from species field. "
+                "Populated by preprocessing, not extracted by LLM."
 )
 ```
 
-**Files:**
-- `gbif.py` — add `gbif_matcher` factory
-- `schemas/__init__.py` — export `gbif_matcher`
+**Enrichment function in `gbif.py`:**
+```python
+def enrich_with_gbif(
+    model: DatasetFeatures,
+    confidence_threshold: int = 80,
+    accept_higherrank: bool = True,
+) -> DatasetFeatures:
+    """Resolve species strings to GBIF keys and return enriched copy."""
+    if not model.species:
+        return model.model_copy(update={"gbif_keys": None})
+    resolved = resolve_species_list(
+        model.species, confidence_threshold, accept_higherrank
+    )
+    keys = [r.gbif_match.gbif_key for r in resolved if r.gbif_match]
+    return model.model_copy(update={"gbif_keys": keys or None})
+```
 
-**Tests:** `tests/test_evaluation_gbif.py`
-- Mock GBIF: "wood turtle" -> key 8024251, "Glyptemys insculpta" -> key 8024251 -> TP
-- Mock GBIF: "Tamias striatus" -> key 2437752, no match for "caribou" -> falls back to string
-- "41 fish mock species" -> HIGHERRANK to Actinopterygii (accepted)
-- Test alongside other field matchers (GBIF for species, fuzzy for data_type)
+**Notebook usage pattern:**
+```python
+# Preprocess both sides
+true_enriched = {doi: enrich_with_gbif(m) for doi, m in true_by_id.items()}
+pred_enriched = {doi: enrich_with_gbif(m) for doi, m in pred_by_id.items()}
+
+# Single evaluation run — both fields evaluated independently
+report = evaluate_indexed(
+    true_by_id=true_enriched,
+    pred_by_id=pred_enriched,
+    fields=["species", "gbif_keys", ...],
+    config=EvaluationConfig(enhanced_species_matching=True),
+)
+
+# Compare strategies
+report.metrics_for("species")     # enhanced string matching P/R/F1
+report.metrics_for("gbif_keys")   # set comparison on taxon IDs P/R/F1
+```
+
+**Files:**
+- `schemas/fuster_features.py` — add `gbif_keys` field
+- `gbif.py` — add `enrich_with_gbif()` function
+- `schemas/__init__.py` — ensure exports are updated
+
+**Tests:** `tests/test_gbif_enrichment.py`
+- Enrich model with known species → gbif_keys populated
+- Enrich model with None species → gbif_keys stays None
+- Enrich model with unmatchable species → gbif_keys empty/None
+- End-to-end: enrich both sides, run `evaluate_indexed`, verify `gbif_keys` metrics exist
 
 ---
 
 ## Execution Rounds
 
 ```
-Round 1:  WU-1 (species_parsing)     <- no deps, start immediately
+Round 1:  WU-1 (species_parsing)        ← no deps, start immediately
           model: sonnet
 
-Round 2:  WU-2 (matcher refactor)  ||  WU-3 (gbif.py)    <- both depend on WU-1 only
-          model: sonnet                model: sonnet        <- run in parallel
+Round 2:  WU-2 (gbif.py)               ← depends on WU-1
+          model: sonnet
 
-Round 3:  WU-4 (gbif_matcher integration)                  <- depends on WU-2 + WU-3
+Round 3:  WU-3 (schema + enrichment)    ← depends on WU-2
           model: sonnet
 ```
 
+Note: WU-2 and WU-3 could be a single WU, but separating them allows the GBIF API wrapper to be tested in isolation before wiring into the schema/evaluation.
+
 ## Verification
 
-1. `python -m pytest tests/test_species_parsing.py` — parsing logic
-2. `python -m pytest tests/test_evaluation.py tests/test_evaluation_fuzzy.py` — backward compat (existing tests pass unchanged)
-3. `python -m pytest tests/test_gbif.py` — GBIF wrapper with mocked API
-4. `python -m pytest tests/test_evaluation_gbif.py` — GBIF matcher integration
-5. `python -m pytest tests/` — full suite green
-6. Notebook smoke test: run GBIF matcher on a few real species strings against live API to validate end-to-end
+1. `uv run --env-file .env python -m pytest tests/test_species_parsing.py` — parsing logic
+2. `uv run --env-file .env python -m pytest tests/test_gbif.py` — GBIF wrapper with mocked API
+3. `uv run --env-file .env python -m pytest tests/test_gbif_enrichment.py` — enrichment + eval integration
+4. `uv run --env-file .env python -m pytest tests/test_evaluation.py tests/test_evaluation_fuzzy.py` — existing tests unchanged (backward compat)
+5. `uv run --env-file .env python -m pytest tests/` — full suite green
+6. Notebook smoke test: enrich a few real records via live GBIF API, run evaluation, compare `species` vs `gbif_keys` metrics

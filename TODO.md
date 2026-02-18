@@ -167,15 +167,17 @@ This prevents duplicate work across parallel sessions.
 > **Plan:** [`plans/gbif_species_matching.md`](plans/gbif_species_matching.md)
 
 - [ ] WU-1: `species_parsing.py` — ParsedTaxon model + shared preprocessing
-- [ ] WU-2: Refactor evaluation matchers to strategy pattern
-- [ ] WU-3: `gbif.py` — GBIF Species Match API wrapper
-- [ ] WU-4: `gbif_matcher()` — evaluation strategy integration
+- [ ] WU-2: `gbif.py` — GBIF Species Match API wrapper
+- [ ] WU-3: Schema `gbif_keys` field + enrichment function
 
 ### Backlog
 
 - [ ] Geographic information model incl GADM level, protected areas, ecosystem
 - [ ] Taxonomic information model incl species, paraphyletic groups
 - [ ] Taxonomic & geographic referencing pipeline
+- [ ] `ExtractedTaxon` structured schema — LLM extracts `{name, type, count}` instead of flat `list[str]` (improves GBIF preprocessing, requires prompt + ground truth changes)
+- [ ] Evaluation matcher refactor — strategy pattern to eliminate 3x duplicated TP/FP/FN logic in `compare_models()` + delete orphaned `EnhancedSpeciesMatchConfig`
+- [ ] Pipeline enrichment — use `gbif_keys` beyond evaluation for data gap analysis with real taxon IDs
 
 ---
 
