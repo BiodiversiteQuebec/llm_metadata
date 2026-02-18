@@ -10,7 +10,7 @@ This prevents duplicate work across parallel sessions.
 
 | Branch | Task ID | Description | Model | Started |
 |---|---|---|---|---|
-| `claude/wu-a1-dlX7N` | WU-A1 | Extend schema — modulators + DataSource | opus | 2026-02-18 |
+| | | *(no active sessions)* | | |
 
 ---
 
@@ -218,4 +218,4 @@ This prevents duplicate work across parallel sessions.
 
 | Branch | Task ID | Description | Model | Finished |
 |---|---|---|---|---|
-| | | *(none yet)* | | |
+| `claude/wu-a1-dlX7N` | WU-A1 | Extend schema — modulators + DataSource | opus | 2026-02-18 |
