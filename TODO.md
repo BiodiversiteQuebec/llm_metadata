@@ -64,13 +64,14 @@ This prevents duplicate work across parallel sessions.
 - **Tag:** `CLOUD` | **Deps:** WU-A2 | **Files:** `text_pipeline.py`, `gpt_classify.py`, `groundtruth_eval.py`, notebook
 - **Note:** Notebook created; needs execution (OpenAI API key required). Cache lands at `{PROJECT_ROOT}/cache/` (not gitignored — committable and syncable).
 
-### WU-C1: Download all PDFs (Dryad + Zenodo + SS) `sonnet`
+### WU-C1: Download all PDFs (Dryad + Zenodo + SS) `sonnet` ✅
 
-- [ ] Refactor `notebooks/download_all_fuster_pdfs.ipynb` — load from `dataset_092624_validated.xlsx` (all sources, already enriched with `pdf_url`/`is_oa` by WU-A3), not `dataset_article_mapping.csv`
-- [ ] Download **all** records with `cited_article_doi`, regardless of OA status, using existing fallback chain (OpenAlex URL → Unpaywall → EZproxy → Sci-Hub)
-- [ ] Store all PDFs in `data/pdfs/fuster/` (no separate SS folder)
-- [ ] Save manifest CSV; end with synthesis cell segmented by source (Dryad / Zenodo / SS)
+- [x] Refactor `notebooks/download_all_fuster_pdfs.ipynb` — load from `dataset_092624_validated.xlsx` (all sources, already enriched with `pdf_url`/`is_oa` by WU-A3), not `dataset_article_mapping.csv`
+- [x] Download **all** records with `cited_article_doi`, regardless of OA status, using existing fallback chain (OpenAlex URL → Unpaywall → EZproxy → Sci-Hub)
+- [x] Store all PDFs in `data/pdfs/fuster/` (no separate SS folder)
+- [x] Save manifest CSV; end with synthesis cell segmented by source (Dryad / Zenodo / SS)
 - **Tag:** `LOCAL` | **Deps:** WU-A3 | **Files:** `pdf_download.py`, `openalex.py`, notebook
+- **Result:** 182/250 PDFs downloaded (72.8% success rate)
 
 ### WU-C2: GROBID-parse new PDFs `haiku`
 
@@ -135,10 +136,10 @@ This prevents duplicate work across parallel sessions.
 - [x] Update `article_retrieval.py` for SS support
 - **Deps:** WU-A1 | **Ref:** Task 2.3
 
-### SS-3.2: Cited article retrieval workflow `sonnet`
+### SS-3.2: Cited article retrieval workflow `sonnet` ✅
 
-- [ ] Use SS API to retrieve citing papers for datasets
-- [ ] Generate mapping CSV (`data/semantic_scholar_cited_articles.csv`)
+- [x] Use SS API to retrieve citing papers for datasets
+- [x] Generate mapping CSV (`data/semantic_scholar_cited_articles.csv`)
 - **Deps:** SS-2.2, WU-A2 | **Ref:** Task 3.2
 
 ### SS-4.2: Validate coverage goals `haiku`
@@ -162,6 +163,14 @@ This prevents duplicate work across parallel sessions.
 - [ ] Unit tests for `semantic_scholar.py`, integration tests for multi-source validation
 - [ ] Full suite passes, ≥80% coverage on new code
 - **Deps:** SS-2.2, SS-2.3 | **Ref:** Task 6.3
+
+### SS-6.5: Semantic Scholar overview notebook `sonnet`
+
+- [ ] Create `notebooks/data_semantic_scholar.ipynb` demonstrating semantic_scholar.py with real Fuster records
+- [ ] Show `get_paper_by_doi`, `get_paper_by_title`, `get_paper_citations`, `get_paper_references` in action
+- [ ] Summary table: per Fuster record — paper found, citation count, reference count, OA PDF URL
+- [ ] Highlight rate limiting, caching, env-driven base URL features
+- **Deps:** SS-2.2 | **Ref:** Task 6.5
 
 ---
 
