@@ -16,6 +16,7 @@ qdrant_storage/
 artifacts/
 data/_runtime_pdfs/
 src/llm_metadata/gpt_classify.py
+cache/
 */cache/*
 *tmpclaude-*
 uv.lock
