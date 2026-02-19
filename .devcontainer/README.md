@@ -162,6 +162,13 @@ healthcheck:
   retries: 3
 ```
 
+**Healthcheck compatibility note (base services):**
+- `grobid` and `qdrant` healthchecks are defined in root `docker-compose.yml`.
+- Their upstream images do not ship with `curl`/`wget`, so HTTP healthchecks using those binaries fail with `executable file not found`.
+- Use shell TCP probes instead:
+  - `bash -c '</dev/tcp/127.0.0.1/8070'` for GROBID
+  - `bash -c '</dev/tcp/127.0.0.1/6333'` for Qdrant
+
 ---
 
 ### VS Code Configuration (`devcontainer.json`)
