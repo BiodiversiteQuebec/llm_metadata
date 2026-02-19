@@ -1,23 +1,32 @@
+## Environment and editor
 *.env
 *.vscode
-.claude/
-documents/*
-notebooks/data/*
-scratch/*
 .venv/*
+uv.lock
+
+## Temporary and local scratch files
+scratch/*
+*tmpclaude-*
+
+## Python bytecode and packaging artifacts
 *__pycache__*
-presentation/*
 *.egg-info*
 build/*
 dist/*
+
+## Notebook/Jupyter artifacts
 .ipynb_checkpoints/
-qdrant_storage/
-*/pdfs/*
-artifacts/
-data/_runtime_pdfs/
-src/llm_metadata/gpt_classify.py
+.jupyter_ystore.db
+
+## Caches
 cache/
 */cache/*
-*tmpclaude-*
-uv.lock
-.jupyter_ystore.db
+
+## Data, documents, and generated content
+documents/*
+notebooks/data/*
+presentation/*
+*/pdfs/*
+data/_runtime_pdfs/
+artifacts/
+qdrant_storage/

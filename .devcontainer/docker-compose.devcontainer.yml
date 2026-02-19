@@ -33,11 +33,10 @@ services:
       - claude-dev-network
       - default
     volumes:
-      # Named volume for entire workspace (git clone target)
-      - workspace:/workspace
+      # # Named volume for entire workspace (git clone target)
+      # - workspace:/workspace
       # Host bind mount only for untracked runtime PDF data persistence
       - ./data/_runtime_pdfs:/workspace/data/pdfs
-      - ./.claude:/workspace/.claude
       # Named volumes for caches
       - uv-cache:/home/devuser/.cache/uv
       - command-history:/commandhistory
@@ -69,6 +68,6 @@ services:
       retries: 3
 
 volumes:
-  workspace:    # Git repo, source, .venv, builds
+  # workspace:    # Git repo, source, .venv, builds
   uv-cache:
   command-history:
