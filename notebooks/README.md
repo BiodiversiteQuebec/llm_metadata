@@ -4,6 +4,41 @@ This folder contains analysis and validation notebooks for ecological dataset ch
 
 ## Recent Activity
 
+### 2026-02-19: Phase 1 eval hardening — field_strategies_eval_demo notebook
+
+**Task:** Demonstrate the new `FieldEvalStrategy` / `DEFAULT_FIELD_STRATEGIES` API (WU-EH1–EH4) against the existing 288-record batch-abstract predictions. No new LLM inference — all scenarios re-use the detail CSV from `batch_abstract_evaluation_20260218_145142`.
+
+**Work Performed:**
+- **`notebooks/field_strategies_eval_demo.ipynb`** (new): 4-demo notebook covering all new API surfaces:
+  - **Load:** Pivots `true_value` and `pred_value` from detail CSV → `DatasetFeaturesNormalized` (GT) and `DatasetFeatures` (pred); no xlsx or API dependency.
+  - **Demo A — Full registry:** `EvaluationConfig(field_strategies=DEFAULT_FIELD_STRATEGIES)` — evaluates exactly 12 fields with no `fields=` argument; shows comparison vs old 14-field approach.
+  - **Demo B — Two-field focus:** `fields=["data_type", "species"]` intersection with registry; shows mismatches for each.
+  - **Demo C — Strategy impact:** Swaps `species` algorithm across exact / enhanced_species / fuzzy(t=70) / fuzzy(t=85) to show per-field strategy control.
+  - **Demo D — Backward compat:** Legacy `enhanced_species_matching=True` (empty `field_strategies`) vs new-equivalent `field_strategies` config; confirms identical F1 for all three fields.
+- **`src/llm_metadata/groundtruth_eval.py`**: Fixed `geospatial_info` → `geospatial_info_dataset` in `DEFAULT_FIELD_STRATEGIES` (field name typo from plan).
+- **`tests/test_evaluation_field_strategies.py`**: Updated `test_contains_all_expected_fields` and `test_vocab_fields_use_exact` to use corrected field name.
+
+**Results — 288 records, model: gpt-5-mini (cached predictions):**
+
+| Demo | Fields | Micro F1 | Macro F1 | Notes |
+|---|---|---|---|---|
+| Old API (14 fields) | 14 | 0.212 | 0.205 | `temporal_range` + `referred_dataset` included |
+| A — DEFAULT_FIELD_STRATEGIES | 12 | 0.212 | 0.205 | Dropped noisy fields; signal unchanged |
+| B — data_type + species only | 2 | 0.235 | 0.224 | Focused two-field eval |
+| C — species(exact) | 1 | 0.115 | 0.115 | Strict; penalises synonym mismatches |
+| C — species(enhanced_species) | 1 | 0.256 | 0.256 | Default; best F1 |
+| C — species(fuzzy t=70) | 1 | 0.200 | 0.200 | Mid; catches typos, no semantics |
+| C — species(fuzzy t=85) | 1 | 0.135 | 0.135 | Strict fuzzy |
+
+**Key findings:**
+- Dropping `temporal_range` and `referred_dataset` does not change aggregate metrics — their contribution was noise.
+- `enhanced_species` matching gives 2× better F1 vs exact for the species field (0.256 vs 0.115); confirms this as the right default.
+- Demo D: backward compat is exact — no regressions on existing notebooks.
+
+**Report link:** `notebooks/results/field_strategies_eval_demo.html`
+
+---
+
 ### 2026-02-18: WU-B — Abstract-only extraction + evaluation notebook
 
 **Task:** Create `notebooks/batch_abstract_evaluation.ipynb` to run GPT-5-mini abstract classification on all 299 valid records (Dryad + Zenodo + Semantic Scholar) and evaluate against ground truth. Per-field P/R/F1 for 14 fields: 8 core EBV + 6 modulators.

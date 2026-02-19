@@ -62,7 +62,7 @@ class TestDefaultFieldStrategies:
     def test_contains_all_expected_fields(self):
         expected = {
             "temp_range_i", "temp_range_f", "spatial_range_km2",
-            "data_type", "geospatial_info",
+            "data_type", "geospatial_info_dataset",
             "species",
             "time_series", "multispecies", "threatened_species",
             "new_species_science", "new_species_region", "bias_north_south",
@@ -86,7 +86,7 @@ class TestDefaultFieldStrategies:
 
     def test_vocab_fields_use_exact(self):
         assert DEFAULT_FIELD_STRATEGIES["data_type"].match == "exact"
-        assert DEFAULT_FIELD_STRATEGIES["geospatial_info"].match == "exact"
+        assert DEFAULT_FIELD_STRATEGIES["geospatial_info_dataset"].match == "exact"
 
 
 # ---------------------------------------------------------------------------
