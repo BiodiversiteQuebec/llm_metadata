@@ -130,8 +130,8 @@ DEFAULT_FIELD_STRATEGIES: dict[str, FieldEvalStrategy] = {
 	"spatial_range_km2":   FieldEvalStrategy(match="exact"),  # audit: numeric tolerance TBD
 
 	# Controlled vocabulary — exact (enums handle synonyms via Pydantic validators)
-	"data_type":           FieldEvalStrategy(match="exact"),
-	"geospatial_info":     FieldEvalStrategy(match="exact"),  # audit: enum coverage of GT vocab
+	"data_type":                FieldEvalStrategy(match="exact"),
+	"geospatial_info_dataset":  FieldEvalStrategy(match="exact"),  # audit: enum coverage of GT vocab
 
 	# Free-text list — enhanced species matching
 	"species":             FieldEvalStrategy(match="enhanced_species", threshold=70),

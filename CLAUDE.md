@@ -192,7 +192,7 @@ When `field_strategies` is populated on `EvaluationConfig`:
 | `temp_range_f` | exact | Numeric year |
 | `spatial_range_km2` | exact | Numeric; tolerance TBD from audit |
 | `data_type` | exact | Enum; Pydantic validators normalize synonyms |
-| `geospatial_info` | exact | Enum; audit for GT vocab coverage |
+| `geospatial_info_dataset` | exact | Enum; audit for GT vocab coverage |
 | `species` | enhanced_species (threshold=70) | Vernacular/scientific name awareness |
 | `time_series` | exact | Boolean |
 | `multispecies` | exact | Boolean |
