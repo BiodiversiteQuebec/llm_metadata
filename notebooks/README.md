@@ -4,6 +4,37 @@ This folder contains analysis and validation notebooks for ecological dataset ch
 
 ## Recent Activity
 
+### 2026-02-19: SS-6.5 — Semantic Scholar module overview notebook
+
+**Task:** Create `notebooks/data_semantic_scholar.ipynb` — a self-contained walkthrough of `semantic_scholar.py` using real Fuster dataset records. Serves as both documentation and quick-start reference for the module.
+
+**Work Performed:**
+- **`notebooks/data_semantic_scholar.ipynb`** (new): 9-section notebook covering:
+  1. Environment setup — `SEMANTIC_SCHOLAR_API_BASE` and `SEMANTIC_SCHOLAR_API_KEY` env vars, devcontainer proxy pattern
+  2. Data loading — 299-record validated dataset, source distribution (192 SS, 67 Zenodo, 37 Dryad)
+  3. 5 representative sample records (1 Dryad, 1 Zenodo, 3 SS) with journal DOIs
+  4. `get_paper_by_doi()` — primary lookup; raw response structure (keys, openAccessPdf, externalIds)
+  5. `get_paper_by_title()` — title-search fallback; field differences vs DOI lookup
+  6. `get_paper_citations()` — citing papers list; `citingPaper` key unwrapping
+  7. `get_paper_references()` — referenced papers list; `citedPaper` key unwrapping
+  8. Caching demo — joblib `Memory('./cache')`, cold vs cached call timing
+  9. Rate-limiting config — 1 req/sec (authenticated), 429 backoff delays, timeout setting
+  10. Summary table — paper found, citation count, reference count, OA PDF URL per record
+
+**Results:**
+- All 5 sample records found in Semantic Scholar
+- Module pattern matches `openalex.py` / `dryad.py` (env-driven base URL, joblib cache, `None` on 404)
+- Confirmed caching works: cached call latency <1 ms vs ~200–800 ms for network call
+- `openAccessPdf` field available for DOI-lookup results; not included in title-search response
+
+**Key issues identified:**
+- `openpyxl` was not in the default venv; added via `uv add openpyxl`
+- Title-search endpoint (`/paper/search`) returns a different field set than the DOI lookup — users needing `openAccessPdf` must call `get_paper_by_doi()` even when starting from a title
+
+**Next steps:** Run the notebook live with API access to populate actual citation/reference counts and validate OA PDF URLs across all 5 sample records.
+
+---
+
 ### 2026-02-18: WU-B — Abstract-only extraction + evaluation notebook
 
 **Task:** Create `notebooks/batch_abstract_evaluation.ipynb` to run GPT-5-mini abstract classification on all 299 valid records (Dryad + Zenodo + Semantic Scholar) and evaluate against ground truth. Per-field P/R/F1 for 14 fields: 8 core EBV + 6 modulators.
