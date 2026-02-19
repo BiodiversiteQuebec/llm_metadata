@@ -251,6 +251,107 @@ After Thursday, the SS plan continues with API client (Task 2.2), URL fields, ci
 
 ---
 
+## Notebooks
+
+*Sidebar navigation guide — hop through these notebooks in presentation order. Each entry notes how completely the notebook covers its presentation element and whether it reflects the current state of `src/llm_metadata/`.*
+
+### Quick reference
+
+| # | Presentation element | Notebook | Scope | Currency |
+|---|---|---|---|---|
+| 1 | Data sources & ground truth | `notebooks/fuster_annotations_validation.ipynb` | ✓ Good | ✓ Current |
+| 2 | PDF download coverage | `notebooks/download_all_fuster_pdfs.ipynb` | ✓ Good | ✓ Current |
+| 3 | Abstract-only extraction & eval | `notebooks/batch_abstract_evaluation.ipynb` | ✓ Good | ~ Minor gap |
+| 4 | Field evaluation strategy | `notebooks/field_strategies_eval_demo.ipynb` | ~ Partial | ✓ Current |
+| 5 | PDF File API extraction | `notebooks/batch_pdf_file_evaluation.ipynb` | ~ Partial | ✗ Stale |
+| 6 | Section-based extraction | `notebooks/batch_fulltext_evaluation.ipynb` | ~ Partial | ✗ Stale |
+| 7 | Species field deep dive | `notebooks/species_recall_improvement.ipynb` | ✓ Good | ✓ Current |
+| 8 | Evidence / confidence cost | `notebooks/single_doi_extraction_with_evidence.ipynb` | ~ Partial | ✗ Stale |
+
+---
+
+### 1. `notebooks/fuster_annotations_validation.ipynb`
+**Presentation element:** Data pipeline — sources, ground truth cleaning, coverage stats.
+
+**Scope:** Covers the full annotation validation flow: load raw xlsx (418 records), Pydantic validation via `DataFrameValidator`, filter to 299 valid records, OpenAlex enrichment (`journal_url`, `pdf_url`, `is_oa`), export `dataset_092624_validated.xlsx`. Output includes per-source coverage table (cited DOI 83.6%, pdf_url 63.2%, OA 64.9%) — ready to present as-is.
+
+**Currency:** Current. Imports `article_retrieval`, `schemas.fuster_features`, `schemas.validation` — all match current src layout. Was the final notebook run for WU-A2/WU-A3; outputs on disk are fresh.
+
+---
+
+### 2. `notebooks/download_all_fuster_pdfs.ipynb`
+**Presentation element:** PDF acquisition — coverage by source, fallback chain effectiveness.
+
+**Scope:** Covers the 4-tier fallback chain (`pdf_url` → Unpaywall → EZproxy → Sci-Hub) for all 250 records with a cited DOI. Results segmented by source: Dryad 97.3%, Zenodo 86.8%, SS 64.6%, overall 72.8% (182/250). Good for a "how we got the data" slide. Does not include GROBID parsing (WU-C2 incomplete).
+
+**Currency:** Current. Uses `pdf_download.download_pdf_with_fallback` and `ezproxy` — both exist unchanged. Minor note: notebook still references the older `dataset_article_mapping.csv` source in early cells before being refactored to use xlsx (WU-C1); double-check the top cells before presenting.
+
+---
+
+### 3. `notebooks/batch_abstract_evaluation.ipynb`
+**Presentation element:** Abstract-only extraction — main results table, per-field P/R/F1, cross-source comparison.
+
+**Scope:** Good coverage of the core deliverable. 288 records (36 Dryad + 67 Zenodo + 185 SS), gpt-5-mini, $1.91 total. Per-field table for 14 fields (8 core + 6 modulators). Cross-source Micro F1: Dryad 0.259, Zenodo 0.273, SS 0.148. Mismatch examples present. This is the primary results notebook for the presentation.
+
+**Currency:** Minor gap. Imports `text_pipeline`, `gpt_classify.SYSTEM_MESSAGE`, `DatasetFeaturesNormalized`, `groundtruth_eval` — all current. However it uses the older `EvaluationConfig(fuzzy_match_fields=...)` API rather than `DEFAULT_FIELD_STRATEGIES` from `groundtruth_eval.py`. The 12-field registry (dropping `temporal_range` and `referred_dataset`) established in `field_strategies_eval_demo.ipynb` is not reflected here. Metrics are slightly different as a result (14 fields vs 12). Not a blocker for the presentation, but note the discrepancy if showing both notebooks.
+
+---
+
+### 4. `notebooks/field_strategies_eval_demo.ipynb`
+**Presentation element:** Evaluation methodology — FieldEvalStrategy registry, species matching comparison.
+
+**Scope:** Partial — this is a methodology/infrastructure demo, not a results notebook. It documents the `DEFAULT_FIELD_STRATEGIES` API, explains why `temporal_range` and `referred_dataset` were dropped, and shows the species strategy comparison (exact F1=0.115, enhanced_species F1=0.256, fuzzy F1=0.200). Useful as a "how we measure" slide, not a "here are the results" slide.
+
+**Currency:** Most up-to-date evaluation notebook. Imports only `groundtruth_eval.DEFAULT_FIELD_STRATEGIES` and `DatasetFeaturesNormalized` — both current. Was the last notebook committed after WU-EH5.
+
+---
+
+### 5. `notebooks/batch_pdf_file_evaluation.ipynb`
+**Presentation element:** PDF File API extraction — full-text results, comparison to abstract-only.
+
+**Scope:** Partial. Covers 38 OA records (Dryad + Zenodo only — no SS). Evaluates 7 core fields (pre-modulator schema, missing the 6 boolean modulators). Micro F1 0.357 vs abstract-only 0.202 shows meaningful gain. Good for a comparison slide if you scope it clearly as "existing Dryad+Zenodo OA subset." WU-C3 (extending to SS OA PDFs + modulator fields) is not done.
+
+**Currency:** Stale on two fronts. (1) Schema: predates WU-A1 — evaluates only 7 of 14 fields; modulator booleans missing. (2) Scope: 38 records only, SS not included. The `pdf_pipeline` and `gpt_classify.PDF_SYSTEM_MESSAGE` imports are current, but the evaluation config uses the old API. Presenting raw outputs risks confusion about field count mismatch with WU-B results.
+
+---
+
+### 6. `notebooks/batch_fulltext_evaluation.ipynb`
+**Presentation element:** Section-based extraction — GROBID pipeline results, section selection strategy.
+
+**Scope:** Partial. Covers 45 Dryad records using GROBID-parsed sections via `section_pipeline`. Includes section selection stats (avg 14.1 sections, avg 7,778 tokens vs 315 for abstract). Micro F1 0.289 / Macro F1 0.407 on 7 fields. Good for showing the pipeline architecture, but narrower than the final deliverable. WU-C4 (extending to SS + modulator schema) not done.
+
+**Currency:** Stale on the same two axes as `batch_pdf_file_evaluation.ipynb`. (1) Schema: pre-WU-A1, 7 fields only. (2) Scope: 45 Dryad records only. `section_pipeline`, `pdf_parsing`, `section_normalize`, `chunk_metadata` imports are all current modules. The evaluation config uses old API. Same presenting caveat as notebook 5.
+
+---
+
+### 7. `notebooks/species_recall_improvement.ipynb`
+**Presentation element:** Species field deep dive — prompt vs matching strategy comparison.
+
+**Scope:** Good, focused experiment. 10 OA Dryad PDFs, 2×2 grid: {baseline, improved prompt} × {basic fuzzy, enhanced species matching}. Best config: improved prompt + enhanced matching — F1=0.824, recall=0.933. Shows the value of both prompt tuning and smarter matching. Self-contained result, does not depend on incomplete WU work.
+
+**Currency:** Current. Uses `pdf_pipeline`, `gpt_classify.PDF_SYSTEM_MESSAGE`, `groundtruth_eval`, `DatasetFeaturesNormalized` — all present in current src. The `enhanced_species` matching aligns with `DEFAULT_FIELD_STRATEGIES` (threshold=70). Only caveat: `PDF_SYSTEM_MESSAGE` has been updated since this ran (WU-A1 added modulator guidance), so a re-run would use the newer prompt.
+
+---
+
+### 8. `notebooks/single_doi_extraction_with_evidence.ipynb`
+**Presentation element:** Evidence tracking — cost-benefit analysis, confidence calibration failure.
+
+**Scope:** Partial. Single-DOI case study (`10.5061/dryad.3nh72`). Key finding: evidence tracking costs 4–5x more in output tokens, and confidence scores are uniformly miscalibrated (all = 5 regardless of prompt instructions). Good for a "what we tried and why we ruled it out" slide. Not a full evaluation.
+
+**Currency:** Stale. Imports `llm_metadata.schemas.evidence` (the `add_evidence_field()` function) — this module is **not listed** in current src. It was likely experimental and removed or never committed. Before using this notebook in a live session, verify the import resolves or skip to presenting the conclusions from the output cells only.
+
+---
+
+### Not recommended for live presentation
+
+| Notebook | Reason |
+|---|---|
+| `fuster_test_extraction_evaluation.ipynb` | Early 5-record POC predating `text_pipeline`; uses `classify_abstract()` directly and old `DataFrameValidator` import path. Stale. |
+| `fulltext_extraction_evaluation.ipynb` | Single-DOI feasibility stub; imports `DatasetFeatureExtraction` (old model name). Stale, inconclusive. |
+| `prompt_eval_results.ipynb` | Utility viewer template; no outputs populated — `results/baseline_abstract.json` not present. |
+
+---
+
 ## Critical Files
 
 | File | Work Units | Changes |
