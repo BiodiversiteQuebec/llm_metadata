@@ -320,7 +320,7 @@ class DatasetFeaturesNormalized(DatasetFeatures):
             return data
         
         null_placeholders = {
-            "not given", "not_given", "no",
+            "not given", "not_given",
             "na", "n/a", "nan", "none",
             "", " ",
         }
