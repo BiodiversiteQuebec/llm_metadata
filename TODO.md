@@ -14,6 +14,26 @@ This prevents duplicate work across parallel sessions.
 
 ---
 
+## Prompt Engineering — Phase 2 ✅
+
+> **Plan:** [`plans/prompt-engineering-flow.md`](plans/prompt-engineering-flow.md)
+>
+> Phase 1 eval hardening (WU-EH1, WU-EH2) and Phase 2 prompt infrastructure complete.
+
+- [x] WU-EH1: `FieldEvalStrategy` + `field_strategies` + `DEFAULT_FIELD_STRATEGIES` added to `groundtruth_eval.py`
+- [x] WU-EH2: `compare_models` dispatches by `field_strategies` when populated; backward compat preserved
+- [x] WU-2.1: `src/llm_metadata/prompts/` package — `common.py`, `abstract.py`, `section.py`, `pdf_file.py`; `gpt_classify.py` now imports from prompts
+- [x] WU-2.2: `EvaluationConfig.to_dict/from_dict/to_json/from_json` + `EvaluationReport.save/load` methods
+- [x] WU-2.3: `src/llm_metadata/prompt_eval.py` — `run_eval()` Python API + CLI (`python -m llm_metadata.prompt_eval --help`)
+- [x] WU-2.4: `configs/eval_default.json`, `configs/eval_fuzzy_species.json`, `configs/eval_strict.json`
+- [x] WU-2.5: `data/dev_subset.csv` — 30 curated records (10/source: Dryad/Zenodo/SS); covers time_series, threatened_species, bias_north_south positives
+- [x] WU-2.6: `notebooks/prompt_eval_results.ipynb` viewer + `src/llm_metadata/app_eval_viewer.py` Streamlit app
+- [x] WU-2.7: "Prompt Engineering Workflow" section added to `CLAUDE.md`
+
+**Next:** Phase 3 — Per-Field Prompt Iteration (WU-3.1 baseline run requires API key)
+
+---
+
 ## Presentation Deliverables (Thursday 2026-02-19)
 
 > **Plan:** [`plans/presentation_20260219_work_plan.md`](plans/presentation_20260219_work_plan.md)
@@ -274,3 +294,4 @@ This prevents duplicate work across parallel sessions.
 | `claude/implement-wu-b-classification-Knvz2` | WU-B | Abstract-only extraction + evaluation notebook | sonnet | 2026-02-18 |
 | `claude/implement-gbif-key-enrichment-9mcv1` | GBIF WU-1,2,3 | GBIF species matching enrichment | sonnet | 2026-02-18 |
 | `claude/prompt-engineering-phase-1-8IeHD` | WU-EH1,EH2,EH3,EH4 | Phase 1 eval hardening (FieldEvalStrategy, DEFAULT_FIELD_STRATEGIES, dispatch, tests, CLAUDE.md) | sonnet | 2026-02-19 |
+| `claude/phase-2-prompt-engineering-0fwQc` | Phase 2 (EH1,EH2,2.1-2.7) | Prompt infra: prompts/ pkg, prompt_eval, eval configs, dev subset, visualization | sonnet | 2026-02-19 |

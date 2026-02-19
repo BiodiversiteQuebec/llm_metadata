@@ -22,8 +22,8 @@ from llm_metadata.chunking import count_tokens
 from llm_metadata.gpt_classify import (
     classify_abstract,
     classify_pdf_file,
-    PDF_SYSTEM_MESSAGE,
 )
+from llm_metadata.prompts.pdf_file import SYSTEM_MESSAGE as PDF_SYSTEM_MESSAGE
 from llm_metadata.schemas import DatasetAbstractMetadata
 
 
@@ -144,7 +144,7 @@ def classify_pdf_text_task(
     Returns:
         Classification result dict
     """
-    from llm_metadata.gpt_classify import SYSTEM_MESSAGE
+    from llm_metadata.prompts.abstract import SYSTEM_MESSAGE
 
     system_message = config.system_message or SYSTEM_MESSAGE
     result = classify_abstract(
