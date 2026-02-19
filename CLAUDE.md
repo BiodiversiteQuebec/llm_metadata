@@ -104,6 +104,12 @@ Data Ingestion → Schema & Prompt Engineering → LLM Inference → Evaluation 
 - **[Stage 1]** `article_retrieval.py` — DOI matching between data papers (Dryad) and scientific articles (for ground truth preparation)
 - **[Stage 1]** `unpaywall.py` — Open access PDF discovery API
 - **[Stage 1]** `semantic_scholar.py` — Semantic Scholar Graph API client for paper search, citations, and references
+  - Key functions: `get_paper_by_doi()`, `get_paper_by_title()`, `get_paper_citations()`, `get_paper_references()`, `get_open_access_pdf_url()`
+  - Env-driven base URL (`SEMANTIC_SCHOLAR_API_BASE`) + optional API key (`SEMANTIC_SCHOLAR_API_KEY`)
+  - Unauthenticated: shared public pool; authenticated: 1 req/sec proactive throttle with 429 backoff
+  - Joblib caching (`./cache`) — cached calls are sub-millisecond vs 200–800 ms network
+  - Returns `None` on 404, `[]` for empty citation/reference lists; raises on server errors
+  - `openAccessPdf` field only available via DOI lookup, not title search
 - **[Stage 1]** `registry.py` — SQLite-based document tracking database for processing status and chunk management
 
 **Key Pattern:** All batch operations (search, download, parsing) use **Prefect** for parallelization, monitoring, and retry logic.
@@ -176,6 +182,16 @@ Data Ingestion → Schema & Prompt Engineering → LLM Inference → Evaluation 
 
 **Structured Preprocessing Models**: When a raw field (e.g., `species: list[str]`) needs structured parsing for downstream consumers, use a Pydantic model with `model_validator(mode='before')` that accepts the raw type (e.g., `ParsedTaxon("41 fish mock species")` → structured fields). This keeps the storage format unchanged while providing structured access when needed.
 
+**Multi-Source Architecture**: Ground truth data spans three sources (Dryad, Zenodo, Semantic Scholar), each tracked by `DataSource` enum in `DatasetFeatures`. Source-specific URL fields are:
+- `source`: `DataSource` enum — `"dryad"`, `"zenodo"`, or `"semantic_scholar"`
+- `source_url`: Original search/repository URL for the dataset
+- `journal_url`: Direct journal article page (often the DOI URL)
+- `pdf_url`: Direct PDF download link (from `openAccessPdf` in Semantic Scholar API)
+- `is_oa`: Boolean open access flag (populated from OpenAlex/Semantic Scholar)
+- `cited_article_doi`: Clean DOI of the related journal article
+
+All three sources share the same extraction pipeline — the pipeline receives a DOI and abstract regardless of origin. Evaluation notebooks segment results by `source` for cross-source comparison.
+
 **External Service IO**: Modules that call external APIs (OpenAI, Semantic Scholar, etc.) must support base URL swapping via environment variable so they can run either directly against the provider or through a reverse proxy that injects secrets.
 
 - **Env var convention**: `{SERVICE}_API_BASE` for the base URL the app code uses, `{SERVICE}_API_KEY` for the auth credential. Examples: `OPENAI_API_BASE`, `SEMANTIC_SCHOLAR_API_BASE`.
@@ -187,9 +203,26 @@ Data Ingestion → Schema & Prompt Engineering → LLM Inference → Evaluation 
 
 ## Data Files
 
-- **`data/dataset_092624.xlsx`**: Raw manual annotations from Fuster et al. (418 records)
-- **`data/dataset_092624_validated.xlsx`**: Cleaned annotations (100% schema compliance)
+- **`data/dataset_092624.xlsx`**: Raw manual annotations from Fuster et al. (418 records across Dryad, Zenodo, Semantic Scholar)
+- **`data/dataset_092624_validated.xlsx`**: Cleaned annotations (299 valid records, 100% schema compliance)
+- **`data/dataset_article_mapping.csv`**: DOI mapping between datasets and their cited journal articles
+- **`data/semantic_scholar_cited_articles.csv`**: Citing paper metadata retrieved via Semantic Scholar API
 - **`notebooks/results/`**: Evaluation reports (HTML) with side-by-side comparisons
+
+## Troubleshooting
+
+### Semantic Scholar API
+
+- **Rate limiting (429)**: Authenticated users get 1 req/sec proactively enforced in `semantic_scholar.py`; the module retries with 2s/4s/8s backoff on 429. Set `SEMANTIC_SCHOLAR_API_KEY` for a dedicated rate limit pool.
+- **`openAccessPdf` missing**: This field is only returned by the DOI lookup endpoint (`/paper/{DOI:...}`), not by `/paper/search`. Use `get_paper_by_doi()` when PDF URLs are needed.
+- **Stale cache**: Joblib stores responses in `./cache/`. Delete the cache directory to force fresh API calls: `rm -rf ./cache/`
+- **Base URL mismatch**: In the devcontainer the proxy sets `SEMANTIC_SCHOLAR_API_BASE`. Locally, the module defaults to `https://api.semanticscholar.org/graph/v1` with no env var needed.
+
+### Schema Validation
+
+- **Boolean coercion**: Modulator fields (`time_series`, `multispecies`, etc.) coerce "yes"/"no"/"true"/"false"/"1"/"0" via `DatasetFeaturesNormalized.coerce_bool()`. The model_validator `convert_nan_to_none` does **not** treat "no" as a null — it passes through to `coerce_bool` as `False`.
+- **Source enum**: `DatasetFeaturesNormalized.coerce_source()` normalizes "Dryad" → "dryad", etc. Invalid values raise `ValidationError`.
+- **URL fields**: `source_url`, `journal_url`, `pdf_url` are plain `Optional[str]` — no strict URL validation. Empty strings and "NA"/"nan" are cleaned to `None` by `convert_nan_to_none`.
 
 ## Research Context
 

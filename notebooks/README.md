@@ -4,6 +4,63 @@ This folder contains analysis and validation notebooks for ecological dataset ch
 
 ## Recent Activity
 
+### 2026-02-19: SS-4.2, SS-6.1, SS-6.3 — Coverage validation, CLAUDE.md, integration tests
+
+**Task:** Complete remaining Semantic Scholar integration tasks: validate coverage goals (SS-4.2), update project docs (SS-6.1), add multi-source integration tests (SS-6.3), and fix boolean coercion bug.
+
+**Work Performed:**
+- **`tests/test_multisource_integration.py`** (new, 39 tests): End-to-end integration tests covering realistic Dryad, Zenodo, and Semantic Scholar records through `DatasetFeaturesNormalized`. Tests verify source tracking, boolean coercion ("no" → False), comma-separated data types, URL field preservation, null placeholder handling, and cross-source edge cases. Also verifies `DataSource` enum round-trips correctly through the schema.
+- **Boolean coercion bugfix** in `schemas/fuster_features.py`: Removed `"no"` from `null_placeholders` in `convert_nan_to_none` model validator. "no" was being converted to `None` before `coerce_bool` could map it to `False` for modulator fields. Fix restores 4 failing tests in `test_schema_modulators.py`.
+- **`CLAUDE.md`** updated: expanded `semantic_scholar.py` module description (key functions, rate limiting, caching, field availability notes), added Multi-Source Architecture design pattern (DataSource enum, URL field conventions), added Troubleshooting section (SS API, schema validation).
+- **SS-4.2 coverage validation** (see Results below).
+
+**Results — Coverage goals validation (from `data/dataset_092624_validated.xlsx`, 299 records):**
+
+| Source | Total | Has Abstract | Has Article DOI | Has PDF URL | Is OA |
+|--------|-------|-------------|----------------|-------------|-------|
+| Semantic Scholar | 192 | 186 (96.9%) ✅ | 175 (91.1%) | 51 (26.6%) | 46 (24.0%) |
+| Dryad | 37 | 36 (97.3%) ✅ | 37 (100%) | 25 (67.6%) | 25 (67.6%) |
+| Zenodo | 67 | 67 (100%) ✅ | 38 (56.7%) | 27 (40.3%) | 27 (40.3%) |
+
+OA proportion among records **with a PDF URL** (the correct denominator):
+
+| Source | OA / has PDF URL | OA % |
+|--------|------------------|------|
+| Semantic Scholar | 42/51 | **82.4%** ✅ |
+| Dryad | 25/25 | **100%** ✅ |
+| Zenodo | 25/27 | **92.6%** ✅ |
+
+**Goal outcomes:**
+- ≥80% abstract coverage: ✅ All sources exceed 96%
+- ≥80% OA proportion among available PDFs: ✅ All sources exceed 82%
+- Gap: Only 26.6% of SS records have a PDF URL (vs 67.6% Dryad). The article DOI coverage is high (91.1%), but many articles are not OA or PDF URL not retrievable via OpenAlex/Unpaywall chain.
+
+**Key issues identified:**
+- Boolean "no" was treated as null placeholder before coerce_bool ran — fixed by removing "no" from null_placeholders set.
+
+**Next steps:** WU-C2 (GROBID parse), WU-C3 (PDF File API eval), WU-C4 (section-based eval).
+
+---
+
+### 2026-02-18: SS Integration — schema, API client, URL enrichment
+
+**Task:** Implement core Semantic Scholar integration: extend schema for multi-source support (WU-A1), validate all-source ground truth (WU-A2), enrich URL metadata (WU-A3), create SS API client (SS-2.2), add DataSource tests (SS-2.3/test_datasource_schema.py).
+
+**Work Performed:**
+- **WU-A1** (`schemas/fuster_features.py`): Added `DataSource` enum (`dryad`, `zenodo`, `semantic_scholar`), 6 boolean modulator fields (`time_series`, `multispecies`, `threatened_species`, `new_species_science`, `new_species_region`, `bias_north_south`), URL tracking fields (`source_url`, `journal_url`, `pdf_url`, `is_oa`, `cited_article_doi`), boolean coercion validator in `DatasetFeaturesNormalized`, 27 new tests in `test_schema_modulators.py`.
+- **WU-A2** (`notebooks/fuster_annotations_validation.ipynb`): Extended to validate all 3 sources; 299 valid records across Dryad (37) + Zenodo (67) + SS (192) + referenced (3); exported `data/dataset_092624_validated.xlsx`.
+- **WU-A3** (`article_retrieval.py`, validation notebook): Enriched `journal_url`, `pdf_url`, `is_oa` via OpenAlex for records with article DOI; created `data/dataset_article_mapping.csv`.
+- **SS-2.2** (`src/llm_metadata/semantic_scholar.py`): New module with `get_paper_by_doi()`, `get_paper_by_title()`, `get_paper_citations()`, `get_paper_references()`, `get_open_access_pdf_url()`; env-driven base URL, joblib cache, 1 req/sec throttle, 429 backoff.
+- **`tests/test_semantic_scholar.py`** (22 tests): Full mock-based coverage of all functions, error cases, DOI cleaning.
+- **`tests/test_datasource_schema.py`** (18 tests): DataSource enum values, new field validation, backward compatibility.
+
+**Results:**
+- 299 valid records validated (100% schema compliance)
+- 22 semantic_scholar.py unit tests — all pass
+- 18 datasource schema tests — all pass
+
+---
+
 ### 2026-02-19: SS-6.5 — Semantic Scholar module overview notebook
 
 **Task:** Create `notebooks/data_semantic_scholar.ipynb` — a self-contained walkthrough of `semantic_scholar.py` using real Fuster dataset records. Serves as both documentation and quick-start reference for the module.
