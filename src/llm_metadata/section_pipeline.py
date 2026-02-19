@@ -25,7 +25,8 @@ from prefect.task_runners import ThreadPoolTaskRunner
 from pydantic import BaseModel, Field
 
 from llm_metadata.chunking import count_tokens
-from llm_metadata.gpt_classify import classify_abstract, SECTION_SYSTEM_MESSAGE
+from llm_metadata.gpt_classify import classify_abstract
+from llm_metadata.prompts.section import SYSTEM_MESSAGE as SECTION_SYSTEM_MESSAGE
 from llm_metadata.pdf_parsing import ParsedDocument, Section, process_pdf
 from llm_metadata.schemas.chunk_metadata import SectionType
 from llm_metadata.schemas import DatasetAbstractMetadata

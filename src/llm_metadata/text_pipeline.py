@@ -18,7 +18,8 @@ from prefect.task_runners import ThreadPoolTaskRunner
 from pydantic import BaseModel, Field
 
 from llm_metadata.chunking import count_tokens
-from llm_metadata.gpt_classify import classify_abstract, SYSTEM_MESSAGE
+from llm_metadata.gpt_classify import classify_abstract
+from llm_metadata.prompts.abstract import SYSTEM_MESSAGE
 from llm_metadata.schemas import DatasetAbstractMetadata
 
 

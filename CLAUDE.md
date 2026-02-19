@@ -244,6 +244,96 @@ This creates a research journal that documents the evolution of the project's me
 - **Reasoning Parameter**: GPT-5 series models use `reasoning={"effort": "low"}` instead of `temperature` for inference control
 - **Structured Output**: All extraction uses OpenAI's `responses.parse()` API with Pydantic `text_format` for guaranteed schema compliance
 
+## Prompt Engineering Workflow
+
+The prompt engineering loop uses the infrastructure built in Phase 2 to iterate on extraction quality field by field.
+
+### Roles
+
+| Role | Model | Responsibility |
+|------|-------|----------------|
+| Runner | haiku / sonnet | Execute `prompt_eval` on dev subset, collect metrics |
+| Analyst | opus | Inspect mismatches, diagnose root causes, propose prompt edits |
+| Approver | human | Review proposals, approve/reject, steer priority |
+
+### Inner Loop (Runner)
+
+```bash
+# Run extraction + evaluation on dev subset
+uv run python -m llm_metadata.prompt_eval \
+  --prompt prompts.abstract \
+  --subset data/dev_subset.csv \
+  --config configs/eval_default.json \
+  --fields species,data_type,time_series \
+  --output results/abstract_20260219_01.json
+```
+
+Or from a notebook:
+
+```python
+from llm_metadata.prompt_eval import run_eval
+
+report = run_eval(
+    prompt_module="prompts.abstract",
+    subset_path="data/dev_subset.csv",
+    config_path="configs/eval_default.json",
+)
+report.save("results/abstract_20260219_01.json",
+            prompt_module="prompts.abstract", model="gpt-5-mini")
+```
+
+Results are cached via joblib — re-running the same prompt+DOI is free. Only changed prompts trigger API calls.
+
+### Analyst Protocol — What to Read for Diagnosis
+
+| Source | Path | What it tells you |
+|--------|------|-------------------|
+| Ground truth | `data/dataset_092624_validated.xlsx` | Original human annotations, annotator's intent |
+| Raw abstract | Extracted from xlsx `abstract` column | What text the LLM saw |
+| Parsed PDF | `artifacts/tei/{doi}.md` or GROBID output | Full-text context — was information available? |
+| Extraction output | `results/{run_id}.json` → `field_results` | What the LLM produced |
+
+**Analyst guidelines:**
+- Read raw data (xlsx, parsed PDFs) to diagnose — don't rely solely on metrics
+- Orchestrate haiku sub-agents for mechanical tasks: "grep all dev-subset abstracts for 'simulation'", "count GT records with `bias_north_south=True`"
+- Flag GT ambiguity explicitly — when GT annotation is questionable, note it rather than optimizing toward a possibly-wrong target
+- Attempt to understand annotator intent from human annotation patterns (consistent choices, systematic biases)
+- Escalate to human when: proposed changes affect >2 fields, or F1 drops on any field, or GT quality is in question
+
+### Observation Log Format (per-field, after each eval run)
+
+Add to `notebooks/README.md` under a dated session header:
+
+```markdown
+### field_name (F1=X.XX, P=X.XX, R=X.XX)
+- **Pattern:** [systematic observation about mismatches]
+- **Root cause:** prompt | eval | GT noise | vocab gap
+- **Recommendation:** [specific action]
+```
+
+### Prompt Iteration Protocol
+
+1. **Baseline first** — never modify prompts before establishing a baseline run on `dev_subset.csv`
+2. **One change at a time** — isolate prompt changes to a single block (VOCABULARY, SCOPING, etc.)
+3. **Field scope** — state upfront which fields the change is expected to affect
+4. **Compare to baseline** — use `EvaluationReport.load()` + side-by-side comparison; never judge by feel
+5. **Commit winning prompts** — when F1 improves on target fields without regressing others
+
+### Key Files
+
+| File | Purpose |
+|------|---------|
+| `src/llm_metadata/prompts/common.py` | Shared blocks: PERSONA, PHILOSOPHY, SCOPING, VOCABULARY, MODULATOR_FIELDS, OUTPUT_FORMAT |
+| `src/llm_metadata/prompts/abstract.py` | Abstract extraction prompt + `build_prompt_override()` |
+| `src/llm_metadata/prompts/section.py` | Section/chunk extraction prompt |
+| `src/llm_metadata/prompts/pdf_file.py` | PDF File API extraction prompt |
+| `src/llm_metadata/prompt_eval.py` | `run_eval()` Python API + CLI entry point |
+| `configs/eval_default.json` | DEFAULT_FIELD_STRATEGIES + standard normalization |
+| `configs/eval_fuzzy_species.json` | Fuzzy species matching variant |
+| `configs/eval_strict.json` | Exact-only matching baseline |
+| `data/dev_subset.csv` | 30-record curated evaluation subset (stable — don't change without bumping version) |
+| `results/` | `prompt_eval` JSON outputs (gitignored except baselines) |
+
 ## Task Management & Session Coordination
 
 ### Session Start
