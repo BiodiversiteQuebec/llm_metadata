@@ -1,0 +1,23 @@
+{
+  "casefold_strings": true,
+  "strip_strings": true,
+  "collapse_whitespace": true,
+  "treat_lists_as_sets": true,
+  "enhanced_species_matching": false,
+  "enhanced_species_threshold": 70,
+  "fuzzy_match_fields": {},
+  "field_strategies": {
+    "temp_range_i":        {"match": "exact", "threshold": 80},
+    "temp_range_f":        {"match": "exact", "threshold": 80},
+    "spatial_range_km2":   {"match": "exact", "threshold": 80},
+    "data_type":           {"match": "exact", "threshold": 80},
+    "geospatial_info":     {"match": "exact", "threshold": 80},
+    "species":             {"match": "fuzzy", "threshold": 70},
+    "time_series":         {"match": "exact", "threshold": 80},
+    "multispecies":        {"match": "exact", "threshold": 80},
+    "threatened_species":  {"match": "exact", "threshold": 80},
+    "new_species_science": {"match": "exact", "threshold": 80},
+    "new_species_region":  {"match": "exact", "threshold": 80},
+    "bias_north_south":    {"match": "exact", "threshold": 80}
+  }
+}

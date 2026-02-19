@@ -87,14 +87,6 @@ class EvaluationConfig:
 			Used when enhanced_species_matching=True. Lower values are more permissive.
 			Default: 70.
 
-		field_strategies: Per-field strategy registry mapping field name to FieldEvalStrategy.
-			When non-empty, this takes precedence over the legacy `fuzzy_match_fields` and
-			`enhanced_species_matching` parameters for fields listed in the registry.
-			- Registry keys define the default field list (replaces model-field intersection).
-			- The `fields` parameter to compare_models/evaluate_* still restricts further.
-			- Unregistered fields fall back to legacy behavior.
-			Default: {} (empty — legacy behavior unchanged).
-
 	Examples:
 		Basic evaluation with case-insensitive set comparison:
 		>>> config = EvaluationConfig()
@@ -111,6 +103,7 @@ class EvaluationConfig:
 		...     enhanced_species_threshold=70
 		... )
 		>>> # "Glyptemys insculpta" now matches "wood turtle (Glyptemys insculpta)"
+		field_strategies: Per-field matching strategies (overrides global fuzzy_match).
 	"""
 
 	casefold_strings: bool = True
@@ -122,16 +115,72 @@ class EvaluationConfig:
 	enhanced_species_threshold: int = 70
 	field_strategies: dict[str, FieldEvalStrategy] = field(default_factory=dict)
 
+	def to_dict(self) -> dict:
+		"""Serialize config to a plain dict (JSON-compatible)."""
+		d = {
+			"casefold_strings": self.casefold_strings,
+			"strip_strings": self.strip_strings,
+			"collapse_whitespace": self.collapse_whitespace,
+			"treat_lists_as_sets": self.treat_lists_as_sets,
+			"enhanced_species_matching": self.enhanced_species_matching,
+			"enhanced_species_threshold": self.enhanced_species_threshold,
+			"fuzzy_match_fields": {
+				k: {"threshold": v.threshold}
+				for k, v in self.fuzzy_match_fields.items()
+			},
+			"field_strategies": {
+				k: {"match": v.match, "threshold": v.threshold}
+				for k, v in self.field_strategies.items()
+			},
+		}
+		return d
+
+	@classmethod
+	def from_dict(cls, d: dict) -> "EvaluationConfig":
+		"""Reconstruct config from a plain dict."""
+		fuzzy_match_fields = {
+			k: FuzzyMatchConfig(threshold=v["threshold"])
+			for k, v in d.get("fuzzy_match_fields", {}).items()
+		}
+		field_strategies = {
+			k: FieldEvalStrategy(match=v["match"], threshold=v.get("threshold", 80))
+			for k, v in d.get("field_strategies", {}).items()
+		}
+		return cls(
+			casefold_strings=d.get("casefold_strings", True),
+			strip_strings=d.get("strip_strings", True),
+			collapse_whitespace=d.get("collapse_whitespace", True),
+			treat_lists_as_sets=d.get("treat_lists_as_sets", True),
+			enhanced_species_matching=d.get("enhanced_species_matching", False),
+			enhanced_species_threshold=d.get("enhanced_species_threshold", 70),
+			fuzzy_match_fields=fuzzy_match_fields,
+			field_strategies=field_strategies,
+		)
+
+	def to_json(self, path) -> None:
+		"""Write config to a JSON file."""
+		import json
+		from pathlib import Path
+		Path(path).write_text(json.dumps(self.to_dict(), indent=2))
+
+	@classmethod
+	def from_json(cls, path) -> "EvaluationConfig":
+		"""Load config from a JSON file."""
+		import json
+		from pathlib import Path
+		d = json.loads(Path(path).read_text())
+		return cls.from_dict(d)
+
 
 DEFAULT_FIELD_STRATEGIES: dict[str, FieldEvalStrategy] = {
 	# Numeric — exact
 	"temp_range_i":        FieldEvalStrategy(match="exact"),
 	"temp_range_f":        FieldEvalStrategy(match="exact"),
-	"spatial_range_km2":   FieldEvalStrategy(match="exact"),  # audit: numeric tolerance TBD
+	"spatial_range_km2":   FieldEvalStrategy(match="exact"),
 
 	# Controlled vocabulary — exact (enums handle synonyms via Pydantic validators)
-	"data_type":                FieldEvalStrategy(match="exact"),
-	"geospatial_info_dataset":  FieldEvalStrategy(match="exact"),  # audit: enum coverage of GT vocab
+	"data_type":           FieldEvalStrategy(match="exact"),
+	"geospatial_info_dataset":  FieldEvalStrategy(match="exact"),
 
 	# Free-text list — enhanced species matching
 	"species":             FieldEvalStrategy(match="enhanced_species", threshold=70),
@@ -142,10 +191,10 @@ DEFAULT_FIELD_STRATEGIES: dict[str, FieldEvalStrategy] = {
 	"threatened_species":  FieldEvalStrategy(match="exact"),
 	"new_species_science": FieldEvalStrategy(match="exact"),
 	"new_species_region":  FieldEvalStrategy(match="exact"),
-	"bias_north_south":    FieldEvalStrategy(match="exact"),  # audit: positive example count
-	# temporal_range: DROPPED — redundant with temp_range_i/temp_range_f
-	# referred_dataset: DROPPED — too rare in GT, noisy annotations
+	"bias_north_south":    FieldEvalStrategy(match="exact"),
 }
+# temporal_range: DROPPED — redundant with temp_range_i/temp_range_f
+# referred_dataset: DROPPED — too rare in GT, noisy annotations
 
 
 @dataclass
@@ -277,6 +326,98 @@ class EvaluationReport:
 			by="field"
 		)
 
+	def save(self, path, **run_metadata) -> None:
+		"""Save report to JSON with optional run metadata.
+
+		Args:
+			path: File path to write (str or Path).
+			**run_metadata: Optional run-level metadata, e.g.:
+				run_id="abstract_20260219_01",
+				prompt_module="prompts.abstract",
+				model="gpt-5-mini",
+				subset="data/dev_subset.csv",
+				cost_usd=0.12
+		"""
+		import json
+		from datetime import datetime, timezone
+		from pathlib import Path
+
+		def _make_serializable(v):
+			"""Recursively convert sets and other non-JSON types."""
+			if isinstance(v, set):
+				return sorted(str(x) for x in v)
+			if isinstance(v, list):
+				return [_make_serializable(x) for x in v]
+			if isinstance(v, dict):
+				return {k: _make_serializable(val) for k, val in v.items()}
+			return v
+
+		doc = {
+			**run_metadata,
+			"timestamp": datetime.now(timezone.utc).isoformat(),
+			"config": self.config.to_dict(),
+			"field_metrics": {
+				fname: {
+					"tp": m.tp, "fp": m.fp, "fn": m.fn, "tn": m.tn, "n": m.n,
+					"precision": m.precision, "recall": m.recall, "f1": m.f1,
+				}
+				for fname, m in self.field_metrics.items()
+			},
+			"field_results": [
+				{
+					"record_id": str(r.record_id),
+					"field": r.field,
+					"true_value": _make_serializable(r.true_value),
+					"pred_value": _make_serializable(r.pred_value),
+					"match": r.match,
+					"tp": r.tp, "fp": r.fp, "fn": r.fn, "tn": r.tn,
+				}
+				for r in self.field_results
+			],
+		}
+		Path(path).parent.mkdir(parents=True, exist_ok=True)
+		Path(path).write_text(json.dumps(doc, indent=2))
+
+	@classmethod
+	def load(cls, path) -> "EvaluationReport":
+		"""Load a report from a JSON file saved by save().
+
+		Returns an EvaluationReport reconstructed from the persisted data.
+		Run metadata (run_id, model, etc.) is available by re-reading the JSON
+		directly; it is not stored on the report object.
+		"""
+		import json
+		from pathlib import Path
+
+		doc = json.loads(Path(path).read_text())
+		config = EvaluationConfig.from_dict(doc.get("config", {}))
+
+		field_results = []
+		for r in doc.get("field_results", []):
+			field_results.append(FieldResult(
+				record_id=r["record_id"],
+				field=r["field"],
+				true_value=r.get("true_value"),
+				pred_value=r.get("pred_value"),
+				match=r["match"],
+				tp=r.get("tp", 0),
+				fp=r.get("fp", 0),
+				fn=r.get("fn", 0),
+				tn=r.get("tn", 0),
+			))
+
+		field_metrics = {}
+		for fname, m in doc.get("field_metrics", {}).items():
+			fm = FieldMetrics(field=fname)
+			fm.tp = m.get("tp", 0)
+			fm.fp = m.get("fp", 0)
+			fm.fn = m.get("fn", 0)
+			fm.tn = m.get("tn", 0)
+			fm.n = m.get("n", 0)
+			field_metrics[fname] = fm
+
+		return cls(field_results=field_results, field_metrics=field_metrics, config=config)
+
 
 def _fuzzy_match_strings(s1: str, s2: str, threshold: int) -> bool:
 	"""Check if two strings match within fuzzy threshold."""
@@ -398,76 +539,240 @@ def compare_models(
 	true_data = true_model.model_dump(mode="python")
 	pred_data = pred_model.model_dump(mode="python")
 
-	# Determine the effective field list.
-	# When field_strategies is populated it defines the canonical set of evaluated fields.
 	if config.field_strategies:
-		registry_keys = set(config.field_strategies.keys())
+		# Strategy-registry mode: use registry keys as the canonical field list.
+		registry_keys = list(config.field_strategies.keys())
 		if fields is None:
 			fields = sorted(registry_keys)
 		else:
-			fields = sorted(set(fields) & registry_keys)
-	elif fields is None:
-		# Legacy: compare common fields only to avoid accidental mismatch across schemas.
-		fields = sorted(set(true_data.keys()) & set(pred_data.keys()))
+			fields = sorted(set(fields) & set(registry_keys))
+	else:
+		if fields is None:
+			# Compare common fields only to avoid accidental mismatch across schemas.
+			fields = sorted(set(true_data.keys()) & set(pred_data.keys()))
 
 	results: list[FieldResult] = []
 	for field in fields:
 		true_raw = true_data.get(field)
 		pred_raw = pred_data.get(field)
 
-		# --- Registry-based dispatch (WU-EH2) ---
-		strategy = config.field_strategies.get(field) if config.field_strategies else None
-		if strategy is not None:
+		# --- Strategy-registry dispatch (takes priority when field_strategies is populated) ---
+		if config.field_strategies:
+			strategy = config.field_strategies[field]
+
 			if strategy.match == "enhanced_species":
 				if isinstance(true_raw, (list, tuple)) or isinstance(pred_raw, (list, tuple)):
 					true_list = list(true_raw) if true_raw else []
 					pred_list = list(pred_raw) if pred_raw else []
+
 					true_set, pred_set = _enhanced_species_match_lists(
 						[str(x) for x in true_list],
 						[str(x) for x in pred_list],
 						strategy.threshold,
 					)
+
 					tp = len(true_set & pred_set)
 					fp = len(pred_set - true_set)
 					fn = len(true_set - pred_set)
-					results.append(FieldResult(
-						record_id=record_id, field=field,
-						true_value=true_raw, pred_value=pred_raw,
-						match=(fp == 0 and fn == 0), tp=tp, fp=fp, fn=fn, tn=0,
-					))
+					match = fp == 0 and fn == 0
+
+					results.append(
+						FieldResult(
+							record_id=record_id,
+							field=field,
+							true_value=true_raw,
+							pred_value=pred_raw,
+							match=match,
+							tp=tp,
+							fp=fp,
+							fn=fn,
+							tn=0,
+						)
+					)
 					continue
+
+				# Scalar fallback for enhanced_species: treat as exact
+				true_norm = _normalize_value(true_raw, config)
+				pred_norm = _normalize_value(pred_raw, config)
+				# (falls through to scalar comparison below — handled by shared scalar block)
 
 			elif strategy.match == "fuzzy":
 				if isinstance(true_raw, (list, tuple)) or isinstance(pred_raw, (list, tuple)):
 					true_list = list(true_raw) if true_raw else []
 					pred_list = list(pred_raw) if pred_raw else []
+
 					true_set, pred_set = _fuzzy_match_lists(
 						[str(x) for x in true_list],
 						[str(x) for x in pred_list],
 						strategy.threshold,
 					)
+
 					tp = len(true_set & pred_set)
 					fp = len(pred_set - true_set)
 					fn = len(true_set - pred_set)
-					results.append(FieldResult(
-						record_id=record_id, field=field,
-						true_value=true_raw, pred_value=pred_raw,
-						match=(fp == 0 and fn == 0), tp=tp, fp=fp, fn=fn, tn=0,
-					))
-					continue
-				if isinstance(true_raw, str) and isinstance(pred_raw, str):
-					matched = _fuzzy_match_strings(true_raw, pred_raw, strategy.threshold)
-					results.append(FieldResult(
-						record_id=record_id, field=field,
-						true_value=true_raw, pred_value=pred_raw,
-						match=matched, tp=int(matched), fp=int(not matched), fn=int(not matched), tn=0,
-					))
-					continue
-			# strategy.match == "exact" falls through to standard normalization below
+					match = fp == 0 and fn == 0
 
-		# --- Legacy dispatch (backward compat when field_strategies is empty) ---
+					results.append(
+						FieldResult(
+							record_id=record_id,
+							field=field,
+							true_value=true_raw,
+							pred_value=pred_raw,
+							match=match,
+							tp=tp,
+							fp=fp,
+							fn=fn,
+							tn=0,
+						)
+					)
+					continue
+
+				if isinstance(true_raw, str) and isinstance(pred_raw, str):
+					if _fuzzy_match_strings(true_raw, pred_raw, strategy.threshold):
+						results.append(
+							FieldResult(
+								record_id=record_id,
+								field=field,
+								true_value=true_raw,
+								pred_value=pred_raw,
+								match=True,
+								tp=1,
+								fp=0,
+								fn=0,
+								tn=0,
+							)
+						)
+					else:
+						results.append(
+							FieldResult(
+								record_id=record_id,
+								field=field,
+								true_value=true_raw,
+								pred_value=pred_raw,
+								match=False,
+								tp=0,
+								fp=1,
+								fn=1,
+								tn=0,
+							)
+						)
+					continue
+
+				# Non-string scalar fallback: treat as exact
+				true_norm = _normalize_value(true_raw, config)
+				pred_norm = _normalize_value(pred_raw, config)
+
+			else:
+				# strategy.match == "exact" (or any unrecognised value)
+				true_norm = _normalize_value(true_raw, config)
+				pred_norm = _normalize_value(pred_raw, config)
+
+			# Shared scalar/set comparison for strategy-dispatch paths that reach here.
+			if _is_set_like(true_norm) or _is_set_like(pred_norm):
+				true_set_n = true_norm if _is_set_like(true_norm) else (set() if true_norm is None else {true_norm})
+				pred_set_n = pred_norm if _is_set_like(pred_norm) else (set() if pred_norm is None else {pred_norm})
+
+				tp = len(true_set_n & pred_set_n)
+				fp = len(pred_set_n - true_set_n)
+				fn = len(true_set_n - pred_set_n)
+				match = fp == 0 and fn == 0
+
+				results.append(
+					FieldResult(
+						record_id=record_id,
+						field=field,
+						true_value=true_raw,
+						pred_value=pred_raw,
+						match=match,
+						tp=tp,
+						fp=fp,
+						fn=fn,
+						tn=0,
+					)
+				)
+				continue
+
+			if true_norm is None and pred_norm is None:
+				results.append(
+					FieldResult(
+						record_id=record_id,
+						field=field,
+						true_value=true_raw,
+						pred_value=pred_raw,
+						match=True,
+						tp=0,
+						fp=0,
+						fn=0,
+						tn=1,
+					)
+				)
+				continue
+
+			if true_norm is None and pred_norm is not None:
+				results.append(
+					FieldResult(
+						record_id=record_id,
+						field=field,
+						true_value=true_raw,
+						pred_value=pred_raw,
+						match=False,
+						tp=0,
+						fp=1,
+						fn=0,
+						tn=0,
+					)
+				)
+				continue
+
+			if true_norm is not None and pred_norm is None:
+				results.append(
+					FieldResult(
+						record_id=record_id,
+						field=field,
+						true_value=true_raw,
+						pred_value=pred_raw,
+						match=False,
+						tp=0,
+						fp=0,
+						fn=1,
+						tn=0,
+					)
+				)
+				continue
+
+			if true_norm == pred_norm:
+				results.append(
+					FieldResult(
+						record_id=record_id,
+						field=field,
+						true_value=true_raw,
+						pred_value=pred_raw,
+						match=True,
+						tp=1,
+						fp=0,
+						fn=0,
+						tn=0,
+					)
+				)
+			else:
+				results.append(
+					FieldResult(
+						record_id=record_id,
+						field=field,
+						true_value=true_raw,
+						pred_value=pred_raw,
+						match=False,
+						tp=0,
+						fp=1,
+						fn=1,
+						tn=0,
+					)
+				)
+			continue
+		# --- End strategy-registry dispatch ---
+
 		# Apply enhanced species matching for species field if configured
-		if field == "species" and config.enhanced_species_matching and not strategy:
+		if field == "species" and config.enhanced_species_matching:
 			if isinstance(true_raw, (list, tuple)) or isinstance(pred_raw, (list, tuple)):
 				true_list = list(true_raw) if true_raw else []
 				pred_list = list(pred_raw) if pred_raw else []
@@ -499,24 +804,24 @@ def compare_models(
 				continue
 
 		# Apply fuzzy matching BEFORE general normalization if configured
-		fuzzy_config = config.fuzzy_match_fields.get(field) if not strategy else None
+		fuzzy_config = config.fuzzy_match_fields.get(field)
 		if fuzzy_config:
 			# Handle fuzzy matching for lists
 			if isinstance(true_raw, (list, tuple)) or isinstance(pred_raw, (list, tuple)):
 				true_list = list(true_raw) if true_raw else []
 				pred_list = list(pred_raw) if pred_raw else []
-
+				
 				true_set, pred_set = _fuzzy_match_lists(
 					[str(x) for x in true_list],
 					[str(x) for x in pred_list],
 					fuzzy_config.threshold
 				)
-
+				
 				tp = len(true_set & pred_set)
 				fp = len(pred_set - true_set)
 				fn = len(true_set - pred_set)
 				match = (fp == 0 and fn == 0)
-
+				
 				results.append(
 					FieldResult(
 						record_id=record_id,
@@ -531,7 +836,7 @@ def compare_models(
 					)
 				)
 				continue
-
+			
 			# Handle fuzzy matching for scalars
 			if isinstance(true_raw, str) and isinstance(pred_raw, str):
 				if _fuzzy_match_strings(true_raw, pred_raw, fuzzy_config.threshold):
