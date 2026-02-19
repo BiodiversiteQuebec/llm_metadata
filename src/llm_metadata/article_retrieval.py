@@ -4,14 +4,23 @@ Article DOI retrieval from Dryad/Zenodo datasets.
 This module implements the recommended workflow for retrieving article DOIs:
 1. Check cited_articles column in Excel (fast, primary method)
 2. Query repository API if cited_articles is empty (fallback method)
+3. Use Semantic Scholar API to retrieve citing papers for any dataset (SS-3.2)
 """
 
+import logging
 import pandas as pd
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 from llm_metadata.dryad import get_dataset
 from llm_metadata.zenodo import get_record_by_doi
 from llm_metadata.openalex import get_work_by_doi
-from llm_metadata.semantic_scholar import get_open_access_pdf_url
+from llm_metadata.semantic_scholar import (
+    get_open_access_pdf_url,
+    get_paper_by_doi,
+    get_paper_by_title,
+    get_paper_citations,
+)
+
+logger = logging.getLogger(__name__)
 
 
 def extract_doi_from_url(url: str) -> str:
@@ -177,6 +186,175 @@ def enrich_article_metadata(article_doi: str) -> Dict[str, Any]:
         result['pdf_url'] = get_open_access_pdf_url(article_doi)
 
     return result
+
+
+def get_cited_articles_for_dataset(
+    dataset_title: str,
+    dataset_doi: Optional[str] = None,
+    citation_limit: int = 100,
+) -> List[Dict[str, Any]]:
+    """Retrieve articles that cite a dataset using the Semantic Scholar API.
+
+    Searches for the dataset in Semantic Scholar by DOI (preferred) or title,
+    then retrieves the list of papers that cite it.  Each returned entry
+    includes the citing paper's Semantic Scholar ID, title, abstract, year,
+    DOI (if available), and the method used to locate the dataset.
+
+    Args:
+        dataset_title: Title of the dataset (used as fallback when DOI lookup fails)
+        dataset_doi: Dataset DOI (with or without https://doi.org/ prefix)
+        citation_limit: Maximum number of citing papers to retrieve
+
+    Returns:
+        List of dicts, each with keys:
+            - citing_paper_id: Semantic Scholar paper ID
+            - citing_paper_doi: DOI of citing paper (may be None)
+            - citing_paper_title: Title of citing paper
+            - citing_paper_abstract: Abstract of citing paper (may be None)
+            - citing_paper_year: Publication year (may be None)
+            - retrieval_method: "by_doi" | "by_title" | "not_found"
+
+    Example:
+        >>> articles = get_cited_articles_for_dataset(
+        ...     "Camera trap dataset for mammal biodiversity",
+        ...     dataset_doi="10.5061/dryad.abc123"
+        ... )
+        >>> print(f"Found {len(articles)} citing articles")
+    """
+    ss_paper = None
+    retrieval_method = "not_found"
+
+    # Step 1: lookup by DOI (most reliable)
+    if dataset_doi:
+        try:
+            ss_paper = get_paper_by_doi(dataset_doi)
+            if ss_paper:
+                retrieval_method = "by_doi"
+                logger.debug("Found dataset in SS by DOI: %s", dataset_doi)
+        except Exception as exc:
+            logger.warning("SS DOI lookup failed for %s: %s", dataset_doi, exc)
+
+    # Step 2: fallback to title search
+    if ss_paper is None and dataset_title:
+        try:
+            ss_paper = get_paper_by_title(dataset_title)
+            if ss_paper:
+                retrieval_method = "by_title"
+                logger.debug("Found dataset in SS by title: %s", dataset_title[:60])
+        except Exception as exc:
+            logger.warning("SS title search failed for '%s': %s", dataset_title[:60], exc)
+
+    if ss_paper is None:
+        logger.debug("Dataset not found in Semantic Scholar: %s", dataset_title[:60])
+        return []
+
+    # Step 3: retrieve citing papers
+    paper_id = ss_paper.get("paperId")
+    if not paper_id:
+        return []
+
+    try:
+        citing_papers = get_paper_citations(paper_id, limit=citation_limit)
+    except Exception as exc:
+        logger.warning("SS citation lookup failed for paper %s: %s", paper_id, exc)
+        return []
+
+    results: List[Dict[str, Any]] = []
+    for paper in citing_papers:
+        external_ids = paper.get("externalIds") or {}
+        doi = external_ids.get("DOI")
+        results.append(
+            {
+                "citing_paper_id": paper.get("paperId"),
+                "citing_paper_doi": doi,
+                "citing_paper_title": paper.get("title"),
+                "citing_paper_abstract": paper.get("abstract"),
+                "citing_paper_year": paper.get("year"),
+                "retrieval_method": retrieval_method,
+            }
+        )
+
+    return results
+
+
+def generate_cited_articles_csv(
+    validated_xlsx: str,
+    output_csv: str = "data/semantic_scholar_cited_articles.csv",
+    citation_limit: int = 100,
+) -> pd.DataFrame:
+    """Use Semantic Scholar API to retrieve citing articles for all valid datasets.
+
+    For each valid record in the validated Excel file, searches Semantic Scholar
+    by dataset DOI (if available) or title, then retrieves citing papers.  The
+    results are stored as a flat CSV with one row per citing-paper/dataset pair,
+    following the same conventions as ``dataset_article_mapping.csv``.
+
+    Only processes records that do **not** already have a ``cited_article_doi``
+    set, so this supplements (rather than replaces) the Excel-based retrieval.
+
+    Args:
+        validated_xlsx: Path to the validated Excel file (dataset_092624_validated.xlsx)
+        output_csv: Destination path for the output CSV
+        citation_limit: Maximum citing papers to retrieve per dataset
+
+    Returns:
+        DataFrame written to ``output_csv``
+    """
+    df = pd.read_excel(validated_xlsx)
+    valid_df = df[df["valid_yn"] == "yes"].copy()
+
+    logger.info("Processing %d valid records for SS citation retrieval", len(valid_df))
+
+    rows: List[Dict[str, Any]] = []
+    not_found = 0
+    found = 0
+
+    for _, row in valid_df.iterrows():
+        dataset_doi = row.get("source_url") or row.get("url")
+        if pd.notna(dataset_doi):
+            dataset_doi = str(dataset_doi).strip()
+            # Only treat it as a DOI if it looks like one (contains doi.org or starts with 10.)
+            if "doi.org/" in dataset_doi:
+                dataset_doi = dataset_doi.split("doi.org/")[-1]
+            elif dataset_doi.startswith("10."):
+                pass  # already clean
+            else:
+                dataset_doi = None  # not a resolvable DOI
+        else:
+            dataset_doi = None
+
+        title = row.get("title") or ""
+        citing_articles = get_cited_articles_for_dataset(
+            dataset_title=str(title),
+            dataset_doi=dataset_doi,
+            citation_limit=citation_limit,
+        )
+
+        if citing_articles:
+            found += 1
+            for article in citing_articles:
+                rows.append(
+                    {
+                        "dataset_id": row.get("id"),
+                        "dataset_doi": dataset_doi,
+                        "dataset_title": title,
+                        "dataset_source": row.get("source"),
+                        **article,
+                    }
+                )
+        else:
+            not_found += 1
+
+    logger.info(
+        "SS citation retrieval complete: %d datasets with results, %d not found",
+        found,
+        not_found,
+    )
+
+    result_df = pd.DataFrame(rows)
+    result_df.to_csv(output_csv, index=False)
+    logger.info("Saved %d citing-article rows to %s", len(result_df), output_csv)
+    return result_df
 
 
 def process_dataset(excel_path: str, output_csv: str = 'data/dataset_article_mapping.csv'):

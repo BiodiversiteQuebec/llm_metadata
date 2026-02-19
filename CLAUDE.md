@@ -101,9 +101,9 @@ Data Ingestion → Schema & Prompt Engineering → LLM Inference → Evaluation 
   3. EZproxy (institutional access via `ezproxy.py`)
   4. Sci-Hub (last resort via `scihub.py`)
 - **[Stage 1]** `pdf_parsing.py` — GROBID-based full-text extraction, TEI XML parsing, hierarchical section structure
-- **[Stage 1]** `article_retrieval.py` — DOI matching between data papers (Dryad) and scientific articles (for ground truth preparation)
+- **[Stage 1]** `article_retrieval.py` — Multi-source article DOI retrieval: Excel lookup → Dryad/Zenodo API → Semantic Scholar citation API. Key functions: `retrieve_article_doi()`, `enrich_article_metadata()`, `get_cited_articles_for_dataset()` (SS-3.2: retrieves papers citing a dataset via SS API), `generate_cited_articles_csv()` (batch CSV generation)
 - **[Stage 1]** `unpaywall.py` — Open access PDF discovery API
-- **[Stage 1]** `semantic_scholar.py` — Semantic Scholar Graph API client for paper search, citations, and references
+- **[Stage 1]** `semantic_scholar.py` — Semantic Scholar Graph API client. Functions: `get_paper_by_doi()`, `get_paper_by_title()`, `get_paper_citations()`, `get_paper_references()`, `get_open_access_pdf_url()`. Env-driven base URL (`SEMANTIC_SCHOLAR_API_BASE`), optional API key (`SEMANTIC_SCHOLAR_API_KEY`), joblib caching, 429-backoff retry logic
 - **[Stage 1]** `registry.py` — SQLite-based document tracking database for processing status and chunk management
 
 **Key Pattern:** All batch operations (search, download, parsing) use **Prefect** for parallelization, monitoring, and retry logic.
@@ -188,7 +188,10 @@ Data Ingestion → Schema & Prompt Engineering → LLM Inference → Evaluation 
 ## Data Files
 
 - **`data/dataset_092624.xlsx`**: Raw manual annotations from Fuster et al. (418 records)
-- **`data/dataset_092624_validated.xlsx`**: Cleaned annotations (100% schema compliance)
+- **`data/dataset_092624_validated.xlsx`**: Cleaned annotations (299 valid records across Dryad, Zenodo, Semantic Scholar, referenced)
+- **`data/dataset_article_mapping.csv`**: Dataset-to-article DOI mapping (retrieval method tracked)
+- **`data/semantic_scholar_cited_articles.csv`**: Citing articles retrieved via SS API for Dryad datasets (SS-3.2 output; 1040 rows for 37 Dryad records)
+- **`data/pdfs/fuster/`**: Downloaded article PDFs (182/250 records); `manifest.csv` tracks success/failure per source
 - **`notebooks/results/`**: Evaluation reports (HTML) with side-by-side comparisons
 
 ## Research Context

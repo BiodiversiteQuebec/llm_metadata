@@ -26,7 +26,7 @@ class TestDataSourceEnum(unittest.TestCase):
 
     def test_datasource_all_members(self):
         members = {m.value for m in DataSource}
-        self.assertEqual(members, {"dryad", "zenodo", "semantic_scholar"})
+        self.assertEqual(members, {"dryad", "zenodo", "semantic_scholar", "referenced"})
 
     def test_datasource_is_string_subclass(self):
         self.assertIsInstance(DataSource.DRYAD, str)

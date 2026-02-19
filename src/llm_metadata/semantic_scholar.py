@@ -34,8 +34,8 @@ _last_request_time: float = 0.0
 # Default fields to retrieve for paper lookups
 DEFAULT_PAPER_FIELDS = "paperId,title,abstract,year,authors,openAccessPdf,externalIds"
 DEFAULT_SEARCH_FIELDS = "paperId,title,abstract,year,authors"
-DEFAULT_CITATION_FIELDS = "paperId,title,abstract"
-DEFAULT_REFERENCE_FIELDS = "paperId,title,abstract"
+DEFAULT_CITATION_FIELDS = "paperId,title,abstract,year,externalIds"
+DEFAULT_REFERENCE_FIELDS = "paperId,title,abstract,year,externalIds"
 
 
 def _build_headers() -> Dict[str, str]:
