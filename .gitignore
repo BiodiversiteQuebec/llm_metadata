@@ -2,7 +2,6 @@
 *.env
 .vscode/
 .venv/
-uv.lock
 
 ## Temporary and local scratch files
 scratch/
