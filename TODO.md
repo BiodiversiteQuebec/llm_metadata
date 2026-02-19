@@ -10,7 +10,7 @@ This prevents duplicate work across parallel sessions.
 
 | Branch | Task ID | Description | Model | Started |
 |---|---|---|---|---|
-| `claude/semantic-scholar-tasks-2YL7r` | SS-3.2,4.2,6.1,6.2,6.3 | Semantic Scholar remaining tasks | sonnet | 2026-02-19 |
+| | | *(no active sessions)* | | |
 
 ---
 
@@ -281,3 +281,4 @@ This prevents duplicate work across parallel sessions.
 | `claude/implement-wu-a3-Y1iX9` | WU-A3 | Enrich URL metadata (source_url, journal_url, pdf_url, is_oa) | sonnet | 2026-02-18 |
 | `claude/implement-wu-b-classification-Knvz2` | WU-B | Abstract-only extraction + evaluation notebook | sonnet | 2026-02-18 |
 | `claude/implement-gbif-key-enrichment-9mcv1` | GBIF WU-1,2,3 | GBIF species matching enrichment | sonnet | 2026-02-18 |
+| `claude/semantic-scholar-tasks-2YL7r` | SS-3.2,4.2,6.1,6.2,6.3 | Semantic Scholar remaining tasks | sonnet | 2026-02-19 |
