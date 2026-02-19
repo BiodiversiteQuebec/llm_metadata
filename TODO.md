@@ -289,3 +289,4 @@ This prevents duplicate work across parallel sessions.
 | `claude/implement-gbif-key-enrichment-9mcv1` | GBIF WU-1,2,3 | GBIF species matching enrichment | sonnet | 2026-02-18 |
 | `claude/semantic-scholar-implementation-Kjlq1` | SS-6.5, WU-C1✅, SS-3.2✅ | SS overview notebook + mark completed tasks | haiku | 2026-02-19 |
 | `claude/implement-semantic-scholar-Kwa4C` | SS-4.2, SS-6.1, SS-6.2, SS-6.3 | Coverage validation, CLAUDE.md, lab logs, 39 integration tests, bugfix boolean coercion | sonnet | 2026-02-19 |
+| `claude/prompt-engineering-phase-1-8IeHD` | WU-EH1,EH2,EH3,EH4 | Phase 1 eval hardening (FieldEvalStrategy, DEFAULT_FIELD_STRATEGIES, dispatch, tests, CLAUDE.md) | sonnet | 2026-02-19 |
