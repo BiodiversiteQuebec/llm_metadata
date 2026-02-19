@@ -44,6 +44,7 @@ Goal : Automated metadata extraction from scientific documents using LLMs, compa
         * Only valid : Not evaluating performance on irrelevant data (e.g. non-biodiversity datasets, etc), for which records were returned by the search engine query, but were deemed irrelevant - Another step could be to have a small extraction doing this classification
 
 * Extraction
+    * Model used - context 
     * Basic extraction demo using pydantic + openai API calls
     * Abstract only approach (Goal 299 records)
     * PDF files (Goal 48 oa records out of 73 valid records with pdfs) - TODO : Confirm number of valid records with pdfs, and oa proportion
