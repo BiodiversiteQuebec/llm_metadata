@@ -256,6 +256,21 @@ This creates a research journal that documents the evolution of the project's me
 - `TODO.md` references plans; plans hold the detail
 - Keep plans concise — prefer actionable work units over prose
 - Do not create multiple files for a single initiative (no separate "agent plan", "visual overview", "execution guide")
+- **Progressive elaboration**: fully spec Phase 1 before detailing later phases — earlier work always changes what later phases need
+- **Measure before optimizing**: when pipeline output looks bad, harden evaluation first; unreliable metrics make prompt/model changes uninterpretable
+
+### Work Unit Format
+
+Standard notation for a work unit in a plan file:
+
+```
+#### WU-ID: Title `model`
+
+**deps:** WU-X, WU-Y | **files:** `path/to/file.py`, `other/file.py`
+
+- bullet deliverable 1
+- bullet deliverable 2
+```
 
 ### Task Parallelization & Flow
 - Plan files should declare **dependencies** between work units so independent tasks can run in parallel
