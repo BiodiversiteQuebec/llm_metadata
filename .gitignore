@@ -1,18 +1,18 @@
 ## Environment and editor
 *.env
-*.vscode
-.venv/*
+.vscode/
+.venv/
 uv.lock
 
 ## Temporary and local scratch files
-scratch/*
+scratch/
 *tmpclaude-*
 
 ## Python bytecode and packaging artifacts
-*__pycache__*
-*.egg-info*
-build/*
-dist/*
+__pycache__/
+*.egg-info/
+build/
+dist/
 
 ## Notebook/Jupyter artifacts
 .ipynb_checkpoints/
@@ -23,9 +23,9 @@ cache/
 */cache/*
 
 ## Data, documents, and generated content
-documents/*
-notebooks/data/*
-presentation/*
+documents/
+notebooks/data/
+presentation/
 */pdfs/*
 data/_runtime_pdfs/
 artifacts/

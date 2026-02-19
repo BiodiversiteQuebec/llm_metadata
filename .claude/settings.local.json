@@ -47,7 +47,8 @@
       "Bash(MSYS_NO_PATHCONV=1 docker exec:*)",
       "Bash(docker cp:*)",
       "mcp__jupyter__connect_to_jupyter",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "mcp__jupyter__execute_code"
     ]
   }
 }
