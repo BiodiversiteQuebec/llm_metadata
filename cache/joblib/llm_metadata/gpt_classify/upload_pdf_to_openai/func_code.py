@@ -23,7 +23,7 @@ def upload_pdf_to_openai(
     # Do NOT persistently cache uploads.
     # OpenAI file IDs can expire or be deleted (e.g., via cleanup_file=True),
     # and persisting them across runs causes flaky 404s when reused.
-    client = OpenAI()
+    client = get_openai_client()
     with open(str(pdf_path), "rb") as f:
         file = client.files.create(file=f, purpose=purpose)
     return file.id

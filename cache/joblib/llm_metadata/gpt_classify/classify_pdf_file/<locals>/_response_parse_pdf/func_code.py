@@ -1,7 +1,7 @@
 # first line: 465
     @memory.cache
     def _response_parse_pdf(parameters_json_dump: str, file_id: str) -> dict:
-        client = OpenAI()
+        client = get_openai_client()
         response = client.responses.parse(
             model=model,
             input=[
