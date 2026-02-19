@@ -730,6 +730,48 @@ PDF acquisition for Semantic Scholar records does **not** require modifying `pdf
 
 ---
 
+### Task 6.5: Create Semantic Scholar Overview Notebook
+
+**Agent Type:** `general-purpose`
+**Model recommendation:** `sonnet`
+**Deps:** SS-2.2
+
+**Objective:** Create a notebook `notebooks/data_semantic_scholar.ipynb` that demonstrates the `semantic_scholar.py` API client in context of actual Fuster dataset records, serving as both documentation and a quick-start example for the module.
+
+**Inputs:**
+- `src/llm_metadata/semantic_scholar.py`
+- `data/dataset_092624_validated.xlsx`
+- Semantic Scholar API access (via env-driven base URL or direct)
+
+**Tasks:**
+1. Load 3-5 representative Fuster records from `data/dataset_092624_validated.xlsx`, selecting records that span Dryad, Zenodo, and Semantic Scholar sources
+2. For each record, demonstrate the `semantic_scholar.py` functions in action:
+   - `get_paper_by_doi()` — look up the dataset's `cited_article_doi`
+   - `get_paper_by_title()` — search by dataset title as fallback
+   - `get_paper_citations()` — retrieve citing papers for the article
+   - `get_paper_references()` — retrieve references cited by the article
+3. Show the raw API response structure (fields returned, how they map to the schema)
+4. Highlight the rate limiting, caching, and env-driven base URL features:
+   - Show joblib cache behavior (first call vs cached call)
+   - Document `SEMANTIC_SCHOLAR_API_BASE` and `SEMANTIC_SCHOLAR_API_KEY` env vars
+   - Demonstrate polite 1 req/sec rate limiting
+5. Build a brief summary table: for each Fuster record, what Semantic Scholar returned (paper found?, citation count, reference count, openAccessPdf URL if any)
+
+**Outputs:**
+- New notebook: `notebooks/data_semantic_scholar.ipynb`
+- Summary table showing SS API results per Fuster record
+- Lab log entry in `notebooks/README.md`
+
+**Acceptance Criteria:**
+- ✅ Notebook runs end-to-end with 3-5 Fuster records from mixed sources
+- ✅ All four `semantic_scholar.py` functions demonstrated with real data
+- ✅ Raw API response structure shown and explained
+- ✅ Rate limiting, caching, and base URL configuration highlighted
+- ✅ Summary table present with columns: record title/DOI, paper found, citation count, reference count, OA PDF URL
+- ✅ Lab log entry added to `notebooks/README.md`
+
+---
+
 ## Agent Delegation Guidelines
 
 ### Recommended Agent Types by Phase
