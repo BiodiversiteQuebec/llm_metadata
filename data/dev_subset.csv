@@ -1,31 +1,31 @@
 id,doi,source,notes
-19,https://doi.org/10.1093/jhered/esw073,dryad,time_series=True; has_species
-31,https://doi.org/10.1111/eva.12028,dryad,time_series=True; vernacular_species
-39,https://doi.org/10.1098/rspb.2014.0649,dryad,time_series=True; has_species
-27,https://doi.org/10.1111/ddi.12496,dryad,threatened_species=True; vernacular_species; multi_species_list; gt_ambiguity(1_null_bools)
-30,https://doi.org/10.1186/s40462-016-0079-4,dryad,threatened_species=True; bias_north_south=True; has_species; gt_ambiguity(1_null_bools)
-91,https://doi.org/10.1002/ece3.1266,dryad,threatened_species=True; has_species; gt_ambiguity(1_null_bools)
-16,https://doi.org/10.1111/mec.14361,dryad,bias_north_south=True; has_species; gt_ambiguity(1_null_bools)
-29,https://doi.org/10.1002/ece3.1476,dryad,bias_north_south=True; multi_species_list; gt_ambiguity(1_null_bools)
 9,https://doi.org/10.1371/journal.pone.0128238,dryad,vernacular_species; multi_species_list; gt_ambiguity(1_null_bools)
+19,https://doi.org/10.1093/jhered/esw073,dryad,time_series=True; has_species
+27,https://doi.org/10.1111/ddi.12496,dryad,threatened_species=True; vernacular_species; multi_species_list; gt_ambiguity(1_null_bools)
+29,https://doi.org/10.1002/ece3.1476,dryad,bias_north_south=True; multi_species_list; gt_ambiguity(1_null_bools)
+30,https://doi.org/10.1186/s40462-016-0079-4,dryad,threatened_species=True; bias_north_south=True; has_species; gt_ambiguity(1_null_bools)
+31,https://doi.org/10.1111/eva.12028,dryad,time_series=True; vernacular_species
 37,https://doi.org/10.1002/ece3.1029,dryad,vernacular_species; multi_species_list; gt_ambiguity(1_null_bools)
-4,https://doi.org/10.5281/zenodo.5898699,zenodo,time_series=True; has_species
-11,https://doi.org/10.1371/journal.pone.0073695,zenodo,time_series=True; threatened_species=True; vernacular_species
-28,https://doi.org/10.5061/dryad.3xsj3txdp,zenodo,time_series=True; multispecies=True; has_species; gt_ambiguity(1_null_bools)
-5,https://doi.org/10.1093/jhered/esx103,zenodo,threatened_species=True; has_species; gt_ambiguity(1_null_bools)
-12,https://doi.org/10.1002/ece3.4685,zenodo,threatened_species=True; vernacular_species; gt_ambiguity(1_null_bools)
-25,https://doi.org/10.1111/mec.12142,zenodo,threatened_species=True; has_species; gt_ambiguity(1_null_bools)
-20,https://doi.org/10.5061/dryad.2v6wwpzqx,zenodo,bias_north_south=True; vernacular_species; multi_species_list; gt_ambiguity(1_null_bools)
-24,https://doi.org/10.1002/ece3.3906,zenodo,bias_north_south=True; has_species; gt_ambiguity(1_null_bools)
-10,https://doi.org/10.5061/dryad.1c59zw3zf,zenodo,vernacular_species; gt_ambiguity(1_null_bools)
-47,https://doi.org/10.1111/1365-2656.12645,zenodo,threatened_species=True; bias_north_south=True; vernacular_species; gt_ambiguity(1_null_bools)
-262,10.1111/j.1365-2486.2009.01945.x,semantic_scholar,threatened_species=True; bias_north_south=True; has_species; gt_ambiguity(1_null_bools)
-276,10.1111/J.1439-0426.2011.01727.X,semantic_scholar,threatened_species=True; has_species; gt_ambiguity(1_null_bools)
-371,https://www.semanticscholar.org/paper/90a78ba88736ee342c7130b714e01c2c608b7372,semantic_scholar,threatened_species=True; has_species; gt_ambiguity(1_null_bools)
-208,10.3389/fmars.2021.637546,semantic_scholar,bias_north_south=True; multispecies=True; has_species; gt_ambiguity(2_null_bools)
-253,10.1111/eva.13248,semantic_scholar,bias_north_south=True; has_species; gt_ambiguity(1_null_bools)
+39,https://doi.org/10.1098/rspb.2014.0649,dryad,time_series=True; has_species
+91,https://doi.org/10.1002/ece3.1266,dryad,threatened_species=True; has_species; gt_ambiguity(1_null_bools)
+123,https://doi.org/10.5061/dryad.qn1cj,dryad,threatened_species=True; bias_north_south=True; has_species
 175,10.5558/TFC76653-4,semantic_scholar,vernacular_species; multi_species_list; gt_ambiguity(1_null_bools)
-179,10.1139/X88-250,semantic_scholar,vernacular_species; multi_species_list; all_bools_null
-176,10.1139/B86-122,semantic_scholar,multi_species_list; gt_ambiguity(2_null_bools)
 201,10.1086/671900,semantic_scholar,multi_species_list; gt_ambiguity(1_null_bools)
-177,,semantic_scholar,multispecies=True; has_species; gt_ambiguity(1_null_bools)
+208,10.3389/fmars.2021.637546,semantic_scholar,bias_north_south=True; multispecies=True; has_species; gt_ambiguity(2_null_bools)
+225,https://doi.org/10.1371/journal.pone.0109261,semantic_scholar,multispecies=True; has_species
+253,10.1111/eva.13248,semantic_scholar,bias_north_south=True; has_species; gt_ambiguity(1_null_bools)
+258,https://doi.org/10.1111/ECOG.00997,semantic_scholar,multispecies=True; has_species
+271,https://doi.org/10.1603/0013-8746%282006%2999%5B536%3AIOPMIQ%5D2.0.CO%3B2,semantic_scholar,multispecies=True; new_species_region=True; has_species
+315,https://doi.org/10.1603/EN10045,semantic_scholar,multispecies=True; has_species
+343,https://doi.org/10.3390/ijgi7090335,semantic_scholar,bias_north_south=True; multispecies=True; has_species
+351,https://doi.org/10.1603/0013-8746%282005%29098%5B0565%3AWCCDAA%5D2.0.CO%3B2,semantic_scholar,multispecies=True; has_species
+5,https://doi.org/10.1093/jhered/esx103,zenodo,threatened_species=True; has_species; gt_ambiguity(1_null_bools)
+11,https://doi.org/10.1371/journal.pone.0073695,zenodo,time_series=True; threatened_species=True; vernacular_species
+12,https://doi.org/10.1002/ece3.4685,zenodo,threatened_species=True; vernacular_species; gt_ambiguity(1_null_bools)
+24,https://doi.org/10.1002/ece3.3906,zenodo,bias_north_south=True; has_species; gt_ambiguity(1_null_bools)
+38,https://doi.org/10.5061/dryad.679s1dt,zenodo,bias_north_south=True; multispecies=True; has_species
+56,https://doi.org/10.5061/dryad.87jb3,zenodo,time_series=True; has_species
+71,https://doi.org/10.5061/dryad.b46k4,zenodo,multispecies=True; has_species
+89,https://doi.org/10.5061/dryad.h65f4,zenodo,threatened_species=True; bias_north_south=True; has_species
+101,https://doi.org/10.5061/dryad.n3c2f,zenodo,threatened_species=True; bias_north_south=True; has_species
+104,https://doi.org/10.5061/dryad.n726pq6,zenodo,threatened_species=True; has_species
