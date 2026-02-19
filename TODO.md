@@ -53,7 +53,7 @@ This prevents duplicate work across parallel sessions.
 - [x] Re-export `dataset_092624_validated.xlsx` with all fields populated
 - **Tag:** `CLOUD` | **Deps:** WU-A2 | **Files:** `article_retrieval.py`, `fuster_annotations_validation.ipynb`
 
-### WU-B: Abstract-only extraction + evaluation `sonnet`
+### WU-B: Abstract-only extraction + evaluation `sonnet` ✅
 
 - [x] Notebook: `notebooks/batch_abstract_evaluation.ipynb` (mirrors `batch_fulltext_evaluation.ipynb` / `batch_pdf_file_evaluation.ipynb`)
 - [x] Steps 1–8: load → configure → extract → prep → evaluate → analysis → cost → export
@@ -164,13 +164,14 @@ This prevents duplicate work across parallel sessions.
 - [ ] Full suite passes, ≥80% coverage on new code
 - **Deps:** SS-2.2, SS-2.3 | **Ref:** Task 6.3
 
-### SS-6.5: Semantic Scholar overview notebook `sonnet`
+### SS-6.5: Semantic Scholar overview notebook `sonnet` ✅
 
-- [ ] Create `notebooks/data_semantic_scholar.ipynb` demonstrating semantic_scholar.py with real Fuster records
-- [ ] Show `get_paper_by_doi`, `get_paper_by_title`, `get_paper_citations`, `get_paper_references` in action
-- [ ] Summary table: per Fuster record — paper found, citation count, reference count, OA PDF URL
-- [ ] Highlight rate limiting, caching, env-driven base URL features
+- [x] Create `notebooks/data_semantic_scholar.ipynb` demonstrating semantic_scholar.py with real Fuster records
+- [x] Show `get_paper_by_doi`, `get_paper_by_title`, `get_paper_citations`, `get_paper_references` in action
+- [x] Summary table: per Fuster record — paper found, citation count, reference count, OA PDF URL
+- [x] Highlight rate limiting, caching, env-driven base URL features
 - **Deps:** SS-2.2 | **Ref:** Task 6.5
+- **Result:** 5/5 papers found (100%), 4/5 with OA PDF, avg 11.6 citations, avg 45.6 references
 
 ---
 
@@ -282,3 +283,4 @@ This prevents duplicate work across parallel sessions.
 | `claude/implement-wu-a3-Y1iX9` | WU-A3 | Enrich URL metadata (source_url, journal_url, pdf_url, is_oa) | sonnet | 2026-02-18 |
 | `claude/implement-wu-b-classification-Knvz2` | WU-B | Abstract-only extraction + evaluation notebook | sonnet | 2026-02-18 |
 | `claude/implement-gbif-key-enrichment-9mcv1` | GBIF WU-1,2,3 | GBIF species matching enrichment | sonnet | 2026-02-18 |
+| `claude/semantic-scholar-implementation-Kjlq1` | SS-6.5, WU-C1✅, SS-3.2✅ | SS overview notebook + mark completed tasks | haiku | 2026-02-19 |
