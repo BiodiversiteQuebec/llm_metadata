@@ -191,7 +191,7 @@ def get_paper_citations(paper_id: str, limit: int = 100) -> List[Dict[str, Any]]
 
     # Citations endpoint wraps each entry under a "citingPaper" key
     citations = []
-    for item in data.get("data", []):
+    for item in data.get("data") or []:
         citing_paper = item.get("citingPaper")
         if citing_paper:
             citations.append(citing_paper)
@@ -230,7 +230,7 @@ def get_paper_references(paper_id: str, limit: int = 100) -> List[Dict[str, Any]
 
     # References endpoint wraps each entry under a "citedPaper" key
     references = []
-    for item in data.get("data", []):
+    for item in data.get("data") or []:
         cited_paper = item.get("citedPaper")
         if cited_paper:
             references.append(cited_paper)
