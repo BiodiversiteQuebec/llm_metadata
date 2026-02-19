@@ -156,11 +156,59 @@ Data Ingestion → Schema & Prompt Engineering → LLM Inference → Evaluation 
   - `DataFrameValidator` for batch validation of annotated datasets
 - **[Stage 4]** `groundtruth_eval.py` — Evaluation framework for precision/recall/F1 computation
   - Configurable normalization: case-folding, whitespace collapse, set-based list comparison
+  - Per-field strategy registry: `FieldEvalStrategy`, `DEFAULT_FIELD_STRATEGIES` (12 fields)
   - Fuzzy matching support: `FuzzyMatchConfig` with threshold-based string matching
-  - Classes: `EvaluationConfig`, `FieldResult`, `FieldMetrics`, `EvaluationReport`
+  - Classes: `EvaluationConfig`, `FieldEvalStrategy`, `FieldResult`, `FieldMetrics`, `EvaluationReport`
   - Key functions: `evaluate_indexed()`, `micro_average()`, `macro_f1()`
 
 **Key Pattern:** Vocabulary normalization happens in Pydantic validators (single source of truth), fuzzy matching in evaluation config (experiment-friendly).
+
+#### Field Eval Registry
+
+`DEFAULT_FIELD_STRATEGIES` in `groundtruth_eval.py` is the **source of truth** for which fields are evaluated and how:
+
+```python
+from llm_metadata.groundtruth_eval import DEFAULT_FIELD_STRATEGIES, EvaluationConfig
+
+config = EvaluationConfig(field_strategies=DEFAULT_FIELD_STRATEGIES)
+```
+
+When `field_strategies` is populated on `EvaluationConfig`:
+- Registry keys define the evaluated field list (no need to pass `fields=` to `evaluate_indexed`)
+- `fields=` parameter still restricts further when provided (intersection with registry keys)
+- Each field dispatches to its declared algorithm: `"exact"`, `"fuzzy"`, or `"enhanced_species"`
+
+**Evaluated fields (12 total):**
+
+| Field | Algorithm | Notes |
+|---|---|---|
+| `temp_range_i` | exact | Numeric year |
+| `temp_range_f` | exact | Numeric year |
+| `spatial_range_km2` | exact | Numeric; tolerance TBD from audit |
+| `data_type` | exact | Enum; Pydantic validators normalize synonyms |
+| `geospatial_info` | exact | Enum; audit for GT vocab coverage |
+| `species` | enhanced_species (threshold=70) | Vernacular/scientific name awareness |
+| `time_series` | exact | Boolean |
+| `multispecies` | exact | Boolean |
+| `threatened_species` | exact | Boolean |
+| `new_species_science` | exact | Boolean |
+| `new_species_region` | exact | Boolean |
+| `bias_north_south` | exact | Boolean; audit: low positive count |
+
+**Dropped fields** (not in registry):
+- `temporal_range` — redundant with `temp_range_i`/`temp_range_f` (same information, different format)
+- `referred_dataset` — too rare in GT, noisy annotations; not evaluatable reliably
+
+**Backward compatibility:** The old `EvaluationConfig` parameters (`fuzzy_match_fields`, `enhanced_species_matching`, `enhanced_species_threshold`) continue to work when `field_strategies` is empty (`{}`). New code should use `field_strategies`.
+
+**Per-field observation protocol** — after each eval run, log field-level analysis in `notebooks/README.md`:
+
+```markdown
+### field_name (F1=X.XX, P=X.XX, R=X.XX)
+- **Pattern:** [systematic observation about mismatches]
+- **Root cause:** prompt | eval | GT noise | vocab gap
+- **Recommendation:** [specific action for prompt engineering phase]
+```
 
 ### Key Design Patterns
 
