@@ -4,6 +4,33 @@ This folder contains analysis and validation notebooks for ecological dataset ch
 
 ## Recent Activity
 
+### 2026-02-19: WU-C2 — GROBID parsing of all downloaded PDFs
+
+**Task:** Parse all 182 downloaded PDFs (Dryad + Zenodo + Semantic Scholar) through GROBID to produce TEI XML for section-based extraction.
+
+**Work Performed:**
+- Added Section 5 (GROBID Parsing) to `notebooks/download_all_fuster_pdfs.ipynb`: markdown cell + code cell that calls `call_grobid()` on all downloaded PDFs from the manifest
+- `call_grobid()` is idempotent — already-parsed files are skipped on re-runs
+- GROBID crashed mid-run (OOM); restarted Docker container and re-ran (idempotent, no data loss)
+- 1 PDF skipped due to Windows MAX_PATH limit (filename contains multiple concatenated URLs/DOIs)
+
+**Results:**
+
+| Source | Downloaded PDFs | TEI Parsed | Notes |
+|--------|-----------------|------------|-------|
+| Dryad | 36 | 36 | 21 pre-existing + 15 new |
+| Zenodo | 33 | 33 | 24 pre-existing + 9 new |
+| Semantic Scholar | 113 | 110 | 1 pre-existing + 109 new, 3 errors |
+| **Total** | **182** | **179** | 45 pre-existing → 179 total |
+
+**Key Issues:**
+- GROBID (Docker, `lfoppiano/grobid:0.8.0`) crashes under sustained load (~70 PDFs/run); restart is sufficient, run is idempotent
+- 1 Dryad PDF has a MAX_PATH-exceeding filename; TEI output path fails silently with error
+
+**Next Step:** WU-C4 (section-based extraction) can now proceed using `artifacts/tei/` (179 TEI files)
+
+---
+
 ### 2026-02-19: SS-4.2, SS-6.1, SS-6.3 — Coverage validation, CLAUDE.md, integration tests
 
 **Task:** Complete remaining Semantic Scholar integration tasks: validate coverage goals (SS-4.2), update project docs (SS-6.1), add multi-source integration tests (SS-6.3), and fix boolean coercion bug.

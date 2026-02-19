@@ -73,12 +73,13 @@ This prevents duplicate work across parallel sessions.
 - **Tag:** `LOCAL` | **Deps:** WU-A3 | **Files:** `pdf_download.py`, `openalex.py`, notebook
 - **Result:** 182/250 PDFs downloaded (72.8% success rate)
 
-### WU-C2: GROBID-parse new PDFs `haiku`
+### WU-C2: GROBID-parse new PDFs `haiku` ✅
 
-- [ ] Extend GROBID parsing cells in `notebooks/download_all_fuster_pdfs.ipynb` (or add new cells there)
-- [ ] Parse SS PDFs through GROBID via `pdf_parsing.py`
-- [ ] Confirm existing Dryad+Zenodo PDFs (~45) already parsed
+- [x] Extend GROBID parsing cells in `notebooks/download_all_fuster_pdfs.ipynb` (Section 5 added)
+- [x] Parse all downloaded PDFs through GROBID via `pdf_parsing.py` (idempotent; restarted GROBID once)
+- [x] Confirmed existing Dryad+Zenodo TEIs (45 pre-existing); total now 179 TEI files
 - **Tag:** `LOCAL` | **Deps:** WU-C1 | **Files:** `pdf_parsing.py`, `artifacts/tei/`
+- **Result:** 179/182 downloaded PDFs parsed (98.9%); 1 skipped (MAX_PATH), 2 GROBID errors on SS PDFs
 
 ### WU-C3: Full-text extraction (PDF File API) + eval `sonnet`
 
