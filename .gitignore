@@ -21,6 +21,7 @@ dist/
 cache/
 */cache/*
 
+
 ## Data, documents, and generated content
 documents/
 notebooks/data/
@@ -29,3 +30,8 @@ presentation/
 data/_runtime_pdfs/
 artifacts/
 qdrant_storage/
+# prompt_eval result JSONs stored in data/ (commit baselines with git add -f)
+data/*.json
+*tmpclaude-*
+uv.lock
+.jupyter_ystore.db

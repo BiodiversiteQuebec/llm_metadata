@@ -25,13 +25,20 @@
 
 * Fuster Valentin workflow : Feature + modulator -> classification -> evaluation
 * Proposed workflow : LLM based feature extraction
+* Litterature review : LLMs for metadata extraction, LLMs for scientific document processing, etc
 
-Goal : Automated metadata extraction from scientific documents using LLMs, comparing abstract-only vs full-text approaches, and evaluating against manual annotations for precision/recall/F1.
+Goal : 
+
+* Automated metadata extraction from scientific documents using LLMs, comparing abstract-only vs full-text approaches, and evaluating against manual annotations for precision/recall/F1.
+* Performance for relevancy classification
+
+* Scope : We do the same thing than Fuster & Valentin (2024) but with LLMs instead of NLP classification.
+
 
 ## Methods
 
 * Data
-    * Fuster approaches synthesis (based on *_location feature values)
+    * Fuster manual annotations (based on *_location feature values)
         * Annotation from abstract only (TBD n rows)
         * Annotation including full text (TBD n rows)
         * Annotation including from dataset (xlsx, etc) (TBD n rows)
@@ -44,8 +51,8 @@ Goal : Automated metadata extraction from scientific documents using LLMs, compa
         * Only valid : Not evaluating performance on irrelevant data (e.g. non-biodiversity datasets, etc), for which records were returned by the search engine query, but were deemed irrelevant - Another step could be to have a small extraction doing this classification
 
 * Extraction
-    * Model used - context 
-    * Basic extraction demo using pydantic + openai API calls
+    * Schematic representation of the extraction process (e.g., data flow diagram)
+        * Basic extraction demo/representation using pydantic + openai API calls
     * Abstract only approach (Goal 299 records)
     * PDF files (Goal 48 oa records out of 73 valid records with pdfs) - TODO : Confirm number of valid records with pdfs, and oa proportion
     * Section based (Goal all oa records with pdfs)
@@ -62,10 +69,25 @@ Goal : Automated metadata extraction from scientific documents using LLMs, compa
 
 ## Results
 
-* Approaches comparison
+* Benefits of prompt engineering (Baseline vs improved prompt)
+
+* Approaches comparison (Abstract-only vs Full-text vs Section-based)
     * Precision/Recall/F1 for each approach
+    * Repetition analysis
     * Token usage and cost analysis for each approach
     * Example extractions illustrating differences in output quality
     * Field specific performance (e.g., better location extraction with full text)
 
+* Performance on relevancy classification
+    * Segmantized by field (e.g., location, species, etc)
+    * Overall performance metrics
+
 * Demo front-end showcasing extraction results and allowing user testing
+
+## Discussion
+
+* Field-base performance insights (e.g., location vs species extraction)
+* Trade-offs between abstract-only and full-text approaches (e.g., cost vs accuracy)
+* Performance comparison with NLP classification (Fuster & Valentin, 2024)
+* Techniques to improve benchmark database and feature extraction performance
+* Benefits, limitations and perspectives/futures/dreams for LLM-based extraction for Biodiversité Québec

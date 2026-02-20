@@ -4,6 +4,7 @@ This folder contains analysis and validation notebooks for ecological dataset ch
 
 ## Recent Activity
 
+<<<<<<< HEAD
 ### 2026-02-19: WU-C2 — GROBID parsing of all downloaded PDFs
 
 **Task:** Parse all 182 downloaded PDFs (Dryad + Zenodo + Semantic Scholar) through GROBID to produce TEI XML for section-based extraction.
@@ -116,6 +117,105 @@ OA proportion among records **with a PDF URL** (the correct denominator):
 - Title-search endpoint (`/paper/search`) returns a different field set than the DOI lookup — users needing `openAccessPdf` must call `get_paper_by_doi()` even when starting from a title
 
 **Next steps:** Run the notebook live with API access to populate actual citation/reference counts and validate OA PDF URLs across all 5 sample records.
+
+---
+
+### 2026-02-19: Prompt eval infrastructure — baselines (abstract + full PDF)
+
+**Task:** Wire up the `prompt_eval` loop end-to-end: fix the results viewer notebook, add PDF extraction mode to `prompt_eval.py`, run abstract and full-PDF baselines on `dev_subset.csv`.
+
+**Work Performed:**
+
+- **`notebooks/prompt_eval_results.ipynb`** (repaired):
+  - CWD fix: replaced `Path("results")` with a `pyproject.toml` walk-up anchor (`ROOT / "data"`), so the notebook works whether Jupyter starts from the project root or from `notebooks/`.
+  - Directory: switched from `./results/` to `./data/` for result JSONs (aligns with existing `data/` convention).
+  - "File not found" cells now print the exact CLI command to generate the baseline.
+
+- **`.gitignore`**: Added `data/*.json` to suppress result files; commit baselines with `git add -f`.
+
+- **`CLAUDE.md`**: Updated all `results/` path references to `data/`.
+
+- **`src/llm_metadata/prompt_eval.py`** — PDF mode added:
+  - New helpers: `_strip_doi_prefix()`, `_doi_to_pdf_path()` (DOI→filename via `/`→`_`), `_build_doi_by_id()`.
+  - `run_eval()` now accepts `pdf_dir: Optional[str]`; when set, calls `classify_pdf_file()` instead of `classify_abstract()`.
+  - `prompt_module` defaults to `"prompts.pdf_file"` when `pdf_dir` is set, `"prompts.abstract"` otherwise.
+  - CLI: new `--pdf-dir` flag; `--prompt` is now nullable with smart default.
+
+- **Baselines produced:**
+  - `data/baseline_abstract.json` — abstract mode, 30 records, $0.13
+  - `data/baseline_pdf.json` — PDF File API mode, 23 records (7 Dryad dataset DOIs skipped — no matching PDF), $0.15
+
+**Results — dev subset, gpt-5-mini, `DEFAULT_FIELD_STRATEGIES` (12 fields):**
+
+| Field | Abstract P | Abstract R | Abstract F1 | PDF P | PDF R | PDF F1 | Δ F1 |
+|---|---|---|---|---|---|---|---|
+| `temp_range_i` | 1.000 | 0.625 | **0.769** | 0.250 | 0.250 | 0.250 | -0.519 |
+| `temp_range_f` | 1.000 | 0.625 | **0.769** | 0.250 | 0.250 | 0.250 | -0.519 |
+| `multispecies` | 0.800 | 0.706 | **0.750** | 0.778 | 0.412 | 0.538 | -0.212 |
+| `threatened_species` | 1.000 | 0.250 | **0.400** | 0.500 | 0.125 | 0.200 | -0.200 |
+| `species` | 0.206 | 0.438 | **0.280** | 0.055 | 0.312 | 0.093 | -0.187 |
+| `time_series` | 0.143 | 1.000 | 0.250 | 0.000 | 0.000 | N/A | — |
+| `data_type` | 0.189 | 0.350 | 0.246 | 0.233 | 0.350 | **0.280** | +0.034 |
+| `new_species_region` | 0.500 | 0.111 | 0.182 | 0.500 | 0.222 | **0.308** | +0.126 |
+| `geospatial_info_dataset` | 0.105 | 0.500 | **0.174** | 0.097 | 0.375 | 0.154 | -0.020 |
+| `new_species_science` | N/A | 0.000 | N/A | 0.333 | 0.111 | **0.167** | — |
+| `spatial_range_km2` | N/A | 0.000 | N/A | 0.333 | 0.083 | **0.133** | — |
+| `bias_north_south` | N/A | 0.000 | N/A | N/A | 0.000 | N/A | — |
+
+**Abstract wins overall.** PDF gains only on `new_species_region` (+0.126), `new_species_science` (was zero), `spatial_range_km2` (was zero), and `data_type` (+0.034).
+
+**Per-field observations (abstract baseline):**
+
+#### `temp_range_i` / `temp_range_f` (F1=0.769, P=1.000, R=0.625)
+- **Pattern:** Perfect precision — no false positives. Missing ~38% of true values (FN).
+- **Root cause:** Conservative prompt suppresses extraction when years aren't explicit; abstract may not state them.
+- **Recommendation:** Acceptable baseline. Low priority for prompt work; gains will come from full-text.
+
+#### `multispecies` (F1=0.750, P=0.800, R=0.706)
+- **Pattern:** Good overall. Some FP (model asserts multispecies when annotation says single-species) and FN.
+- **Root cause:** "Multispecies" definition is ambiguous in GT (some annotators may count incidental species differently).
+- **Recommendation:** GT audit recommended before prompt changes.
+
+#### `time_series` (F1=0.250, P=0.143, R=1.000)
+- **Pattern:** Perfect recall but terrible precision — nearly every abstract triggers `time_series=True`.
+- **Root cause:** Prompt too broad; any mention of repeated sampling or monitoring gets flagged.
+- **Recommendation:** Sharpen scoping: require explicit repeated-measurement language or time intervals.
+
+#### `threatened_species` (F1=0.400, P=1.000, R=0.250)
+- **Pattern:** Perfect precision, low recall. Model is conservative — misses many true positives.
+- **Root cause:** Abstract may not mention IUCN/threatened status explicitly; model won't infer.
+- **Recommendation:** Consider adding common synonyms ("at-risk", "endangered", "vulnerable") to VOCABULARY block.
+
+#### `species` (F1=0.280, P=0.206, R=0.438)
+- **Pattern:** Moderate recall, low precision. Many FP — model over-extracts species names.
+- **Root cause:** Abstract often mentions focal + incidental species; model doesn't discriminate.
+- **Recommendation:** Apply improved species prompt (from 2026-01-15 experiment). PDF mode makes it worse (F1=0.093), likely due to longer text amplifying over-extraction.
+
+#### `data_type` (F1=0.246, P=0.189, R=0.350)
+- **Pattern:** Low precision, moderate recall. Systematic over-extraction.
+- **Root cause:** Vocabulary gap / annotator conservatism — GT often has 1 value; model infers 2–3.
+- **Recommendation:** Review vocabulary block; consider explicit "pick the primary data type" instruction.
+
+#### `geospatial_info_dataset` (F1=0.174, P=0.105, R=0.500)
+- **Pattern:** Very low precision (high FP). Recall is decent.
+- **Root cause:** Model interprets any spatial mention as a `geospatial_info_dataset` value; annotators were more selective.
+- **Recommendation:** SCOPING block needs tighter spatial-info definition.
+
+#### `spatial_range_km2` / `new_species_science` / `bias_north_south` (F1=N/A, R=0.000)
+- **Pattern:** Zero recall — model never extracts these in abstract mode.
+- **Root cause:** These fields are rarely stated explicitly in abstracts; bias and novelty claims may require methods/results sections.
+- **Recommendation:** These are primary motivation for full-text; no abstract prompt fix will meaningfully help.
+
+**Key Issues Identified:**
+- Record id=343 (`10.3390/ijgi7090335`) failed PDF extraction — JSON truncated at `max_output_tokens=4096`. Long paper; needs higher token limit or truncation strategy.
+- 7 Dryad records in dev_subset use dataset DOIs (`10.5061/dryad.*`) as their `source_url` — no article PDF exists for these in `data/pdfs/fuster/`. PDF baseline evaluates only 23 of 30 records.
+- Pydantic serializer warnings (`PydanticSerializationUnexpectedValue`) are cosmetic noise from `ParsedResponse.model_dump()` — pre-existing, not introduced here.
+
+**Next Steps:**
+- Prompt iteration on `time_series` (precision) and `threatened_species` (recall) — highest-leverage fixes
+- Apply improved species prompt from 2026-01-15 to abstract mode
+- Investigate `max_output_tokens` truncation for long PDFs (record 343)
+- PDF baseline coverage gap: look up `cited_article_doi` for Dryad-DOI records in dev_subset to find the actual article PDFs
 
 ---
 

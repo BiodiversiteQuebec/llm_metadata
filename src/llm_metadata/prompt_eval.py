@@ -211,6 +211,44 @@ def _load_subset_dois(subset_path: str) -> set[str]:
     return set(subset_df["doi"].dropna().str.strip().tolist())
 
 
+def _strip_doi_prefix(doi: str) -> str:
+    """Strip https://doi.org/ or http://doi.org/ prefix from a DOI string."""
+    return (
+        doi.replace("https://doi.org/", "")
+        .replace("http://doi.org/", "")
+        .strip()
+    )
+
+
+def _doi_to_pdf_path(doi: str, pdf_dir: str) -> Optional[Path]:
+    """Return Path to the PDF for *doi* under *pdf_dir*, or None if not found.
+
+    Convention: DOI slashes are replaced with underscores to form the filename,
+    e.g. ``10.1371/journal.pone.0128238`` → ``10.1371_journal.pone.0128238.pdf``.
+    """
+    bare = _strip_doi_prefix(doi)
+    filename = bare.replace("/", "_") + ".pdf"
+    path = Path(pdf_dir) / filename
+    return path if path.exists() else None
+
+
+def _build_doi_by_id(df: "pd.DataFrame") -> "dict[str, str]":  # type: ignore[name-defined]
+    """Return record_id -> bare DOI from the GT dataframe's source_url column."""
+    result: dict[str, str] = {}
+    for _, row in df.iterrows():
+        source_url = str(row.get("source_url", "") or "")
+        if not source_url:
+            continue
+        doi = _strip_doi_prefix(source_url)
+        try:
+            record_id = str(int(row["id"]))
+        except (ValueError, TypeError):
+            continue
+        if doi:
+            result[record_id] = doi
+    return result
+
+
 # ---------------------------------------------------------------------------
 # Public Python API
 # ---------------------------------------------------------------------------
@@ -218,7 +256,7 @@ def _load_subset_dois(subset_path: str) -> set[str]:
 
 def run_eval(
     *,
-    prompt_module: str = "prompts.abstract",
+    prompt_module: Optional[str] = None,
     subset_path: Optional[str] = None,
     config: Optional[EvaluationConfig] = None,
     config_path: Optional[str] = None,
@@ -227,13 +265,16 @@ def run_eval(
     gt_path: str = "data/dataset_092624_validated.xlsx",
     raw_path: str = _DEFAULT_RAW_PATH,
     run_id: Optional[str] = None,
+    pdf_dir: Optional[str] = None,
 ) -> EvaluationReport:
     """Run extraction + evaluation on a subset of records.
 
     Args:
         prompt_module: Dotted module path (relative to llm_metadata) for the
-            prompt, e.g. "prompts.abstract".  The module must expose a
-            SYSTEM_MESSAGE string.
+            prompt, e.g. "prompts.abstract" or "prompts.pdf_file".  The module
+            must expose a SYSTEM_MESSAGE string.  Defaults to
+            "prompts.pdf_file" when *pdf_dir* is set, "prompts.abstract"
+            otherwise.
         subset_path: Path to dev_subset.csv (doi, source, notes). If None,
             uses all records from gt_path that have an abstract.
         config: EvaluationConfig to use. Takes precedence over config_path.
@@ -245,14 +286,21 @@ def run_eval(
         gt_path: Path to validated ground truth XLSX.
         raw_path: Path to the raw XLSX containing the abstract/full_text column.
             Defaults to ``data/dataset_092624.xlsx`` alongside gt_path.
+<<<<<<< HEAD
         run_id: Optional run identifier stored in the report JSON when saved.
             If None, callers may set one when calling report.save().
+        pdf_dir: Directory containing PDFs named ``{doi_with_slashes_as_underscores}.pdf``.
+            When set, extraction uses the OpenAI File API (classify_pdf_file)
+            instead of abstract text.  Records without a matching PDF are skipped.
 
     Returns:
         EvaluationReport with per-field metrics and per-record results.
         The report has ``abstracts`` (dict[record_id, abstract_text]) and
         ``total_cost_usd`` (float) attributes populated after evaluation.
     """
+    # Default prompt module based on extraction mode
+    if prompt_module is None:
+        prompt_module = "prompts.pdf_file" if pdf_dir is not None else "prompts.abstract"
     # 1. Resolve evaluation config
     if config is not None:
         eval_config = config
@@ -295,46 +343,97 @@ def run_eval(
         )
 
     # 7. Run extraction for each GT record
-    from llm_metadata.gpt_classify import classify_abstract  # local import to avoid cost at import time
-
     pred_by_id: dict[str, DatasetFeatures] = {}
     results: list[dict] = []
 
-    # Build id -> abstract mapping from the dataframe
-    if "abstract" in df.columns:
-        abstract_by_id = {
-            str(int(row["id"])): str(row["abstract"])
-            for _, row in df.iterrows()
-            if not _is_nan(row.get("abstract"))
-            and row.get("abstract") is not None
-            and str(int(row["id"])) in true_by_id
-        }
+    if pdf_dir is not None:
+        # --- PDF mode: use OpenAI File API ---
+        from llm_metadata.gpt_classify import classify_pdf_file  # local import
+
+        doi_by_id = _build_doi_by_id(df)
+        skipped_no_doi = 0
+        skipped_no_pdf = 0
+
+        for record_id, _true_model in true_by_id.items():
+            doi = doi_by_id.get(record_id)
+            if doi is None:
+                skipped_no_doi += 1
+                print(
+                    f"Warning: no source DOI for id={record_id}, skipping.",
+                    file=sys.stderr,
+                )
+                continue
+
+            pdf_path = _doi_to_pdf_path(doi, pdf_dir)
+            if pdf_path is None:
+                skipped_no_pdf += 1
+                print(
+                    f"Warning: PDF not found for doi={doi} in {pdf_dir}, skipping.",
+                    file=sys.stderr,
+                )
+                continue
+
+            try:
+                result = classify_pdf_file(
+                    pdf_path=pdf_path,
+                    system_message=system_message,
+                    model=model,
+                    text_format=DatasetFeatures,
+                )
+                pred_by_id[record_id] = result["output"]
+                results.append(result)
+            except Exception as exc:
+                print(
+                    f"Warning: extraction failed for id={record_id} ({doi}): {exc}",
+                    file=sys.stderr,
+                )
+
+        if skipped_no_doi or skipped_no_pdf:
+            print(
+                f"PDF mode: skipped {skipped_no_doi} records (no DOI), "
+                f"{skipped_no_pdf} records (no PDF found).",
+                file=sys.stderr,
+            )
+
     else:
-        abstract_by_id = {}
+        # --- Abstract mode ---
+        from llm_metadata.gpt_classify import classify_abstract  # local import
 
-    for record_id, true_model in true_by_id.items():
-        abstract = abstract_by_id.get(record_id)
-        if abstract is None:
-            print(
-                f"Warning: no abstract for record id={record_id}, skipping extraction.",
-                file=sys.stderr,
-            )
-            continue
+        # Build id -> abstract mapping from the dataframe
+        if "abstract" in df.columns:
+            abstract_by_id = {
+                str(int(row["id"])): str(row["abstract"])
+                for _, row in df.iterrows()
+                if not _is_nan(row.get("abstract"))
+                and row.get("abstract") is not None
+                and str(int(row["id"])) in true_by_id
+            }
+        else:
+            abstract_by_id = {}
 
-        try:
-            result = classify_abstract(
-                abstract=abstract,
-                system_message=system_message,
-                model=model,
-                text_format=DatasetFeatures,
-            )
-            pred_by_id[record_id] = result["output"]
-            results.append(result)
-        except Exception as exc:
-            print(
-                f"Warning: extraction failed for id={record_id}: {exc}",
-                file=sys.stderr,
-            )
+        for record_id, _true_model in true_by_id.items():
+            abstract = abstract_by_id.get(record_id)
+            if abstract is None:
+                print(
+                    f"Warning: no abstract for record id={record_id}, skipping extraction.",
+                    file=sys.stderr,
+                )
+                continue
+
+            try:
+                result = classify_abstract(
+                    abstract=abstract,
+                    system_message=system_message,
+                    model=model,
+                    text_format=DatasetFeatures,
+                )
+                pred_by_id[record_id] = result["output"]
+                results.append(result)
+            except Exception as exc:
+                print(
+                    f"Warning: extraction failed for id={record_id}: {exc}",
+                    file=sys.stderr,
+                )
 
     # 8. Evaluate
     report = evaluate_indexed(
@@ -397,8 +496,21 @@ def main() -> None:
     )
     parser.add_argument(
         "--prompt",
-        default="prompts.abstract",
-        help="Prompt module path relative to llm_metadata (e.g. prompts.abstract).",
+        default=None,
+        help=(
+            "Prompt module path relative to llm_metadata "
+            "(e.g. prompts.abstract, prompts.pdf_file). "
+            "Defaults to prompts.pdf_file when --pdf-dir is set, prompts.abstract otherwise."
+        ),
+    )
+    parser.add_argument(
+        "--pdf-dir",
+        default=None,
+        dest="pdf_dir",
+        help=(
+            "Directory containing PDFs named {doi_with_slashes_as_underscores}.pdf. "
+            "When set, switches to PDF extraction mode using the OpenAI File API."
+        ),
     )
     parser.add_argument(
         "--subset",
@@ -456,15 +568,20 @@ def main() -> None:
         model=args.model,
         gt_path=args.gt,
         run_id=run_id,
+        pdf_dir=args.pdf_dir,
     )
 
     _print_metrics_table(report)
 
     if args.output:
+        # Resolve the effective prompt module name for metadata
+        effective_prompt = args.prompt or (
+            "prompts.pdf_file" if args.pdf_dir else "prompts.abstract"
+        )
         report.save(
             args.output,
             run_id=run_id,
-            prompt_module=args.prompt,
+            prompt_module=effective_prompt,
             model=args.model,
             subset=args.subset,
             cost_usd=getattr(report, "total_cost_usd", None),

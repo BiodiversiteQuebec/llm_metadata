@@ -346,7 +346,7 @@ uv run python -m llm_metadata.prompt_eval \
   --subset data/dev_subset.csv \
   --config configs/eval_default.json \
   --fields species,data_type,time_series \
-  --output results/abstract_20260219_01.json
+  --output data/abstract_20260219_01.json
 ```
 
 Or from a notebook:
@@ -359,7 +359,7 @@ report = run_eval(
     subset_path="data/dev_subset.csv",
     config_path="configs/eval_default.json",
 )
-report.save("results/abstract_20260219_01.json",
+report.save("data/abstract_20260219_01.json",
             prompt_module="prompts.abstract", model="gpt-5-mini")
 ```
 
@@ -413,7 +413,7 @@ Add to `notebooks/README.md` under a dated session header:
 | `configs/eval_fuzzy_species.json` | Fuzzy species matching variant |
 | `configs/eval_strict.json` | Exact-only matching baseline |
 | `data/dev_subset.csv` | 30-record curated evaluation subset (stable — don't change without bumping version) |
-| `results/` | `prompt_eval` JSON outputs (gitignored except baselines) |
+| `data/*.json` | `prompt_eval` JSON outputs (gitignored except baselines committed with `git add -f`) |
 
 ## Task Management & Session Coordination
 

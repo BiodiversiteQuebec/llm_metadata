@@ -265,6 +265,8 @@ This prevents duplicate work across parallel sessions.
 ## Production Readiness
 
 - [ ] Streamline artifacts, manifests, data storage
+- [ ] Standardize logging, error handling across modules
+- [ ] Harden pipelines io using manifest with BaseModel and classes serialization
 - [ ] Workflow orchestration with Prefect
 - [ ] Full DB model (articles, datasets, features, runs, evaluations) + Postgres
 - [ ] Refactor tests to reflect pipeline structure

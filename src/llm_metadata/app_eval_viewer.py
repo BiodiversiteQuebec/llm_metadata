@@ -11,7 +11,7 @@ import streamlit as st
 
 from llm_metadata.groundtruth_eval import EvaluationReport
 
-RESULTS_DIR = Path("results")
+RESULTS_DIR = Path("data")
 
 st.set_page_config(page_title="Prompt Eval Viewer", layout="wide")
 st.title("Prompt Eval Results Viewer")
@@ -121,12 +121,33 @@ if selected_field:
         f"P={_fmt_pct(m.precision)} R={_fmt_pct(m.recall)} F1={_fmt_pct(m.f1)}"
     )
 
-    page_size = 10
-    n_pages = max(1, (len(errors) + page_size - 1) // page_size)
-    page = st.number_input("Page", min_value=1, max_value=n_pages, value=1, step=1) - 1
+    if errors:
+        error_rows = [
+            {
+                "record_id": r.record_id,
+                "true_value": str(r.true_value),
+                "pred_value": str(r.pred_value),
+                "tp": r.tp,
+                "fp": r.fp,
+                "fn": r.fn,
+            }
+            for r in errors
+        ]
+        error_df = pd.DataFrame(error_rows)
 
-    for r in errors[page * page_size : (page + 1) * page_size]:
-        with st.expander(f"Record: {r.record_id} | TP={r.tp} FP={r.fp} FN={r.fn}"):
+        event = st.dataframe(
+            error_df,
+            use_container_width=True,
+            selection_mode="single-row",
+            on_select="rerun",
+            key=f"mismatch_table_{selected_field}",
+        )
+
+        selected_rows = event.selection.rows if event and event.selection else []
+        if selected_rows:
+            idx = selected_rows[0]
+            r = errors[idx]
+            st.subheader(f"Record: {r.record_id}")
             col1, col2 = st.columns(2)
             with col1:
                 st.write("**True value:**")
@@ -138,6 +159,8 @@ if selected_field:
             if abstract:
                 with st.expander("Abstract"):
                     st.write(abstract)
+    else:
+        st.success("No mismatches for this field.")
 
 # ---------------------------------------------------------------------------
 # Mismatch explorer (Run B, shown when two runs are selected)
