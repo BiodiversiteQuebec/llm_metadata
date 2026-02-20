@@ -325,6 +325,49 @@ This creates a research journal that documents the evolution of the project's me
 - **Reasoning Parameter**: GPT-5 series models use `reasoning={"effort": "low"}` instead of `temperature` for inference control
 - **Structured Output**: All extraction uses OpenAI's `responses.parse()` API with Pydantic `text_format` for guaranteed schema compliance
 
+## Eval Viewer App
+
+`src/llm_metadata/app_eval_viewer.py` — Streamlit app for interactive exploration of `prompt_eval` results.
+
+```bash
+uv run streamlit run src/llm_metadata/app_eval_viewer.py
+```
+
+### Tabs
+
+| Tab | Purpose |
+|-----|---------|
+| Overview | Run metadata, foldable GT dataset table, foldable rendered system prompt |
+| Detailed Metrics | Per-field F1/P/R table (multi-row select); mismatch table (multi-row select) |
+| Dataset Results | Paper selector → metadata + abstract + field results (multi-row select) |
+| Compare Runs | Delta table for two runs, sorted by Δ F1 ascending (multi-row select) |
+| Notes | Rich text editor for per-run analyst notes, save to disk, open in VS Code |
+
+All dataframes in tabs 2–4 support multi-row selection. The CSV/Markdown export buttons export only selected rows when a selection exists, otherwise the full table. Each export shows a caption with the source table name and row count.
+
+### Data dependencies
+
+| File | Required | Purpose |
+|------|----------|---------|
+| `data/*.json` | **Yes** — app stops if none | `EvaluationReport` results from `prompt_eval` (preferred source for records + prompt text) |
+| `data/dataset_092624_validated.xlsx` | Optional (fallback only) | Paper title, DOI, links, validity metadata for older JSON files |
+| `data/dataset_092624.xlsx` | Optional (fallback only) | Abstract text (`full_text` column) for older JSON files |
+| `data/{run}_notes.md` | Optional (created on first save/open) | Per-run analyst notes |
+
+### Notes files
+
+Notes are stored as `data/{run_stem}_notes.md`. On first creation (via Save or Open in VS Code), the file is seeded with a metadata header:
+
+```markdown
+# Notes — {run_name}
+
+**Prompt:** `prompts.abstract` · **Model:** gpt-5-mini · **Cost:** $0.1266 · **Timestamp:** 2026-02-19T18:47:37+00:00 · **Run file:** `data/{run_name}`
+
+---
+```
+
+The Notes tab uses `streamlit_lexical` for rich text editing. The "Open in Windows" button uses `os.startfile()` on Windows (default `.md` handler) or `code` CLI on other platforms.
+
 ## Prompt Engineering Workflow
 
 The prompt engineering loop uses the infrastructure built in Phase 2 to iterate on extraction quality field by field.
@@ -346,7 +389,7 @@ uv run python -m llm_metadata.prompt_eval \
   --subset data/dev_subset.csv \
   --config configs/eval_default.json \
   --fields species,data_type,time_series \
-  --output data/abstract_20260219_01.json
+  --name abstract_20260219_01
 ```
 
 Or from a notebook:
@@ -358,10 +401,11 @@ report = run_eval(
     prompt_module="prompts.abstract",
     subset_path="data/dev_subset.csv",
     config_path="configs/eval_default.json",
+    name="abstract_20260219_01",
 )
-report.save("data/abstract_20260219_01.json",
-            prompt_module="prompts.abstract", model="gpt-5-mini")
 ```
+
+`prompt_eval` saves run-level metadata in JSON including `prompt_module`, `model`, `cost_usd`, `subset_path`, `records`, and `system_message`.
 
 Results are cached via joblib — re-running the same prompt+DOI is free. Only changed prompts trigger API calls.
 
@@ -372,7 +416,8 @@ Results are cached via joblib — re-running the same prompt+DOI is free. Only c
 | Ground truth | `data/dataset_092624_validated.xlsx` | Original human annotations, annotator's intent |
 | Raw abstract | Extracted from xlsx `abstract` column | What text the LLM saw |
 | Parsed PDF | `artifacts/tei/{doi}.md` or GROBID output | Full-text context — was information available? |
-| Extraction output | `results/{run_id}.json` → `field_results` | What the LLM produced |
+| Extraction output | `data/{run}.json` → `field_results` | What the LLM produced |
+| Analyst notes | `data/{run}_notes.md` | Prior observations, field-level analysis |
 
 **Analyst guidelines:**
 - Read raw data (xlsx, parsed PDFs) to diagnose — don't rely solely on metrics
@@ -381,9 +426,20 @@ Results are cached via joblib — re-running the same prompt+DOI is free. Only c
 - Attempt to understand annotator intent from human annotation patterns (consistent choices, systematic biases)
 - Escalate to human when: proposed changes affect >2 fields, or F1 drops on any field, or GT quality is in question
 
+### Notes Workflow for Agents
+
+When an agent (Analyst role) analyzes prompt eval results, it **must** write observations to the run's notes file:
+
+1. **Check for existing notes** — read `data/{run}_notes.md` if it exists
+2. **Create if missing** — use the Eval Viewer app's Notes tab (which seeds the metadata header), or create manually with the header format documented in the Eval Viewer section above
+3. **Write per-field observations** using the format below, appending under the `---` separator
+4. **Save** — either via the Eval Viewer's Save button or by writing the file directly
+
+The notes file is the persistent record of analysis. `notebooks/README.md` is for session-level lab logging (what was done, high-level results). The notes file is for field-level diagnosis tied to a specific run.
+
 ### Observation Log Format (per-field, after each eval run)
 
-Add to `notebooks/README.md` under a dated session header:
+Add to the run's notes file (`data/{run}_notes.md`) under the metadata header:
 
 ```markdown
 ### field_name (F1=X.XX, P=X.XX, R=X.XX)
@@ -391,6 +447,8 @@ Add to `notebooks/README.md` under a dated session header:
 - **Root cause:** prompt | eval | GT noise | vocab gap
 - **Recommendation:** [specific action]
 ```
+
+Also add a summary to `notebooks/README.md` under a dated session header per the Lab Logging Protocol.
 
 ### Prompt Iteration Protocol
 

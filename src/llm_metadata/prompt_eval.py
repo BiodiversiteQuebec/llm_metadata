@@ -18,7 +18,7 @@ Usage (CLI):
         --prompt prompts.abstract \\
         --subset data/dev_subset.csv \\
         --fields data_type,species,time_series \\
-        --output results/run_01.json
+        --name run_01
 """
 
 from __future__ import annotations
@@ -48,6 +48,13 @@ _LIST_COLS = ["data_type", "geospatial_info_dataset", "species"]
 
 # Raw XLSX with abstract / full_text column (sibling of gt_path by default)
 _DEFAULT_RAW_PATH = "data/dataset_092624.xlsx"
+
+# Per-record metadata bundled into saved JSON for self-contained viewer runs
+_RECORD_META_COLS = [
+    "title", "source_url", "journal_url", "pdf_url",
+    "is_oa", "cited_article_doi", "source",
+    "valid_yn", "reason_not_valid", "has_abstract",
+]
 
 
 # ---------------------------------------------------------------------------
@@ -249,6 +256,57 @@ def _build_doi_by_id(df: "pd.DataFrame") -> "dict[str, str]":  # type: ignore[na
     return result
 
 
+def _record_meta_value(val):
+    """Convert DataFrame scalar values to JSON-safe metadata values."""
+    if val is None:
+        return None
+    if hasattr(val, "item") and callable(val.item):
+        try:
+            val = val.item()
+        except Exception:
+            pass
+    try:
+        import pandas as pd  # type: ignore
+        if pd.isna(val):
+            return None
+    except Exception:
+        pass
+    return val
+
+
+def _build_records_dict(
+    df: "pd.DataFrame",  # type: ignore[name-defined]
+    record_ids: set[str],
+) -> dict[str, dict]:
+    """Build record_id -> metadata dict used by the eval viewer."""
+    records: dict[str, dict] = {}
+    available_meta = [c for c in _RECORD_META_COLS if c in df.columns]
+
+    for _, row in df.iterrows():
+        try:
+            record_id = str(int(row["id"]))
+        except (ValueError, TypeError):
+            continue
+        if record_id not in record_ids:
+            continue
+
+        record_meta = {
+            col: _record_meta_value(row.get(col))
+            for col in available_meta
+        }
+        record_meta["abstract"] = _record_meta_value(row.get("abstract"))
+        records[record_id] = record_meta
+
+    for record_id in record_ids:
+        if record_id not in records:
+            records[record_id] = {
+                col: None for col in _RECORD_META_COLS
+            }
+            records[record_id]["abstract"] = None
+
+    return records
+
+
 # ---------------------------------------------------------------------------
 # Public Python API
 # ---------------------------------------------------------------------------
@@ -264,8 +322,8 @@ def run_eval(
     model: str = "gpt-5-mini",
     gt_path: str = "data/dataset_092624_validated.xlsx",
     raw_path: str = _DEFAULT_RAW_PATH,
-    run_id: Optional[str] = None,
     pdf_dir: Optional[str] = None,
+    name: Optional[str] = None,
 ) -> EvaluationReport:
     """Run extraction + evaluation on a subset of records.
 
@@ -286,17 +344,15 @@ def run_eval(
         gt_path: Path to validated ground truth XLSX.
         raw_path: Path to the raw XLSX containing the abstract/full_text column.
             Defaults to ``data/dataset_092624.xlsx`` alongside gt_path.
-<<<<<<< HEAD
-        run_id: Optional run identifier stored in the report JSON when saved.
-            If None, callers may set one when calling report.save().
         pdf_dir: Directory containing PDFs named ``{doi_with_slashes_as_underscores}.pdf``.
             When set, extraction uses the OpenAI File API (classify_pdf_file)
             instead of abstract text.  Records without a matching PDF are skipped.
+        name: Optional run name. When provided, auto-saves to ``data/{name}.json``.
 
     Returns:
         EvaluationReport with per-field metrics and per-record results.
-        The report has ``abstracts`` (dict[record_id, abstract_text]) and
-        ``total_cost_usd`` (float) attributes populated after evaluation.
+        The report has an extra ``total_cost_usd`` float attribute with the
+        cumulative API cost for the run.
     """
     # Default prompt module based on extraction mode
     if prompt_module is None:
@@ -443,17 +499,32 @@ def run_eval(
         config=eval_config,
     )
 
-    # 9. Attach total cost and run metadata as simple attributes
+    # 9. Attach total cost as a simple attribute
     total_cost = sum(
         (r.get("usage_cost") or {}).get("total_cost", 0) or 0
         for r in results
     )
     report.total_cost_usd = total_cost  # type: ignore[attr-defined]
 
-    # 10. Store abstract text on the report for viewer drill-down
-    report.abstracts = abstract_by_id  # type: ignore[attr-defined]
-    if run_id is not None:
-        report.run_id = run_id  # type: ignore[attr-defined]
+    # 10. Attach self-contained run metadata for downstream save calls
+    records_dict = _build_records_dict(df, set(true_by_id.keys()))
+    report.records = records_dict  # type: ignore[attr-defined]
+    report.system_message = system_message  # type: ignore[attr-defined]
+    report.subset_path = subset_path  # type: ignore[attr-defined]
+
+    if name:
+        save_path = Path("data") / f"{name}.json"
+        report.save(
+            save_path,
+            name=name,
+            prompt_module=prompt_module,
+            model=model,
+            cost_usd=total_cost,
+            records=records_dict,
+            system_message=system_message,
+            subset_path=subset_path,
+        )
+        report.saved_path = str(save_path)  # type: ignore[attr-defined]
 
     return report
 
@@ -535,6 +606,11 @@ def main() -> None:
         help="Path to save the EvaluationReport as JSON.",
     )
     parser.add_argument(
+        "--name",
+        default=None,
+        help="Run name. Auto-saves to data/{name}.json. --output takes precedence.",
+    )
+    parser.add_argument(
         "--model",
         default="gpt-5-mini",
         help="OpenAI model name (default: gpt-5-mini).",
@@ -544,21 +620,9 @@ def main() -> None:
         default="data/dataset_092624_validated.xlsx",
         help="Path to the validated ground truth XLSX.",
     )
-    parser.add_argument(
-        "--run-id",
-        default=None,
-        dest="run_id",
-        help="Human-readable run identifier stored in the saved JSON. "
-             "Defaults to the stem of --output if not specified.",
-    )
     args = parser.parse_args()
 
     fields = [f.strip() for f in args.fields.split(",")] if args.fields else None
-
-    # Derive run_id: explicit arg > output filename stem > None
-    run_id = args.run_id
-    if run_id is None and args.output:
-        run_id = Path(args.output).stem
 
     report = run_eval(
         prompt_module=args.prompt,
@@ -567,8 +631,8 @@ def main() -> None:
         fields=fields,
         model=args.model,
         gt_path=args.gt,
-        run_id=run_id,
         pdf_dir=args.pdf_dir,
+        name=args.name if not args.output else None,
     )
 
     _print_metrics_table(report)
@@ -580,13 +644,18 @@ def main() -> None:
         )
         report.save(
             args.output,
-            run_id=run_id,
+            name=args.name,
             prompt_module=effective_prompt,
             model=args.model,
-            subset=args.subset,
             cost_usd=getattr(report, "total_cost_usd", None),
+            records=getattr(report, "records", None),
+            system_message=getattr(report, "system_message", None),
+            subset_path=args.subset,
         )
         print(f"\nReport saved to: {args.output}")
+    elif args.name:
+        saved_path = getattr(report, "saved_path", f"data/{args.name}.json")
+        print(f"\nReport saved to: {saved_path}")
 
 
 if __name__ == "__main__":

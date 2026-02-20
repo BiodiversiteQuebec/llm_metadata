@@ -4,7 +4,6 @@ This folder contains analysis and validation notebooks for ecological dataset ch
 
 ## Recent Activity
 
-<<<<<<< HEAD
 ### 2026-02-19: WU-C2 — GROBID parsing of all downloaded PDFs
 
 **Task:** Parse all 182 downloaded PDFs (Dryad + Zenodo + Semantic Scholar) through GROBID to produce TEI XML for section-based extraction.
