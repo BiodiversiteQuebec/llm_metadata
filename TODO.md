@@ -1,19 +1,5 @@
 # TODO
 
-## Active Claude Sessions
-
-<!--
-HOW TO USE: When a Claude session starts a task, add a row below.
-When done, move the row to the "Completed Sessions" table at the bottom.
-This prevents duplicate work across parallel sessions.
--->
-
-| Branch | Task ID | Description | Model | Started |
-|---|---|---|---|---|
-| | | *(no active sessions)* | | |
-
----
-
 ## Prompt Engineering — Phase 2 ✅
 
 > **Plan:** [`plans/prompt-engineering-flow.md`](plans/prompt-engineering-flow.md)
