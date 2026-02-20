@@ -337,7 +337,7 @@ uv run streamlit run src/llm_metadata/app_eval_viewer.py
 
 | Tab | Purpose |
 |-----|---------|
-| Overview | Run metadata, foldable GT dataset table, foldable rendered system prompt |
+| Overview | Run metadata + run counts, foldable GT dataset table, foldable rendered system prompt, foldable run logs |
 | Detailed Metrics | Per-field F1/P/R table (multi-row select); mismatch table (multi-row select) |
 | Dataset Results | Paper selector → metadata + abstract + field results (multi-row select) |
 | Compare Runs | Delta table for two runs, sorted by Δ F1 ascending (multi-row select) |
@@ -350,6 +350,7 @@ All dataframes in tabs 2–4 support multi-row selection. The CSV/Markdown expor
 | File | Required | Purpose |
 |------|----------|---------|
 | `data/*.json` | **Yes** — app stops if none | `EvaluationReport` results from `prompt_eval` (preferred source for records + prompt text) |
+| `data/*.log` | Optional | Run logs shown in Overview → Logs |
 | `data/dataset_092624_validated.xlsx` | Optional (fallback only) | Paper title, DOI, links, validity metadata for older JSON files |
 | `data/dataset_092624.xlsx` | Optional (fallback only) | Abstract text (`full_text` column) for older JSON files |
 | `data/{run}_notes.md` | Optional (created on first save/open) | Per-run analyst notes |
@@ -389,7 +390,8 @@ uv run python -m llm_metadata.prompt_eval \
   --subset data/dev_subset.csv \
   --config configs/eval_default.json \
   --fields species,data_type,time_series \
-  --name abstract_20260219_01
+  --name abstract_20260219_01 \
+  --skip-cache
 ```
 
 Or from a notebook:
@@ -407,7 +409,14 @@ report = run_eval(
 
 `prompt_eval` saves run-level metadata in JSON including `prompt_module`, `model`, `cost_usd`, `subset_path`, `records`, and `system_message`.
 
-Results are cached via joblib — re-running the same prompt+DOI is free. Only changed prompts trigger API calls.
+CLI output/log behavior:
+- `--name run_id` writes `data/run_id.json` and `data/run_id.log`
+- `--output some_name.json` (bare filename) writes `data/{timestamp}_some_name.json` and matching `.log`
+- `--output path/to/file.json` (explicit directory) writes exactly there and uses the same stem for `.log`
+
+Cache behavior:
+- default: extraction calls use joblib cache
+- `--skip-cache`: bypass cache and force fresh API calls (requires valid OpenAI credentials)
 
 ### Analyst Protocol — What to Read for Diagnosis
 

@@ -47,6 +47,11 @@ def _notes_path(run_name: str) -> Path:
     return RESULTS_DIR / run_name.replace(".json", "_notes.md")
 
 
+def _log_path(run_name: str) -> Path:
+    """Return path for the run log file: same folder as run JSON, .log extension."""
+    return RESULTS_DIR / run_name.replace(".json", ".log")
+
+
 def _notes_header(run_name: str, meta: dict) -> str:
     """Build a markdown header with run metadata for a new notes file."""
     prompt = meta.get("prompt_module", "—")
@@ -165,6 +170,7 @@ def load_report(name: str) -> tuple[EvaluationReport, dict]:
 _GT_META_COLS = [
     "id", "title", "source_url", "journal_url", "pdf_url",
     "is_oa", "cited_article_doi", "source", "valid_yn", "reason_not_valid", "has_abstract",
+    "extraction_success",
 ]
 
 
@@ -190,6 +196,7 @@ def _records_from_meta(meta: dict) -> Optional[pd.DataFrame]:
             "valid_yn": rec.get("valid_yn"),
             "reason_not_valid": rec.get("reason_not_valid"),
             "has_abstract": rec.get("has_abstract"),
+            "extraction_success": rec.get("extraction_success"),
         })
 
     if not rows:
@@ -235,6 +242,25 @@ def _system_message_from_meta(meta: dict) -> Optional[str]:
         return system_message
     return None
 
+
+def _chosen_eval_config_summary(meta: dict) -> str:
+    """Build a compact one-line summary of the active eval config."""
+    config = meta.get("config")
+    if not isinstance(config, dict) or not config:
+        return "No eval config recorded."
+
+    field_strategies = config.get("field_strategies")
+    if isinstance(field_strategies, dict) and field_strategies:
+        strategy_names = sorted({
+            str(v.get("match", "exact"))
+            for v in field_strategies.values()
+            if isinstance(v, dict)
+        })
+        strategy_part = ", ".join(strategy_names) if strategy_names else "exact"
+        return f"{len(field_strategies)} fields; match strategies: {strategy_part}"
+
+    return "Config present, but no field strategies found."
+
 @st.cache_data
 def load_gt_index() -> Optional[pd.DataFrame]:
     """Load id → full metadata lookup from validated XLSX."""
@@ -279,16 +305,50 @@ tab_overview, tab_metrics, tab_records, tab_compare, tab_notes = st.tabs(
 # TAB 1 — Overview
 # ════════════════════════════════════════════════════════════════════════════
 with tab_overview:
-    # Run metadata summary bar
-    summary_fields = ["prompt_module", "model", "timestamp", "cost_usd"]
-    cols = st.columns(len(summary_fields))
-    labels = {"prompt_module": "Prompt", "model": "Model",
-               "timestamp": "Timestamp", "cost_usd": "Cost (USD)"}
-    for col, key in zip(cols, summary_fields):
-        val = meta_a.get(key, "—")
-        if key == "cost_usd" and val != "—":
-            val = f"${val:.4f}"
-        col.metric(labels[key], val)
+    timestamp = meta_a.get("timestamp", "—")
+    st.markdown(f"**Run:** `{run_a_name}`  |  **Timestamp:** `{timestamp}`")
+    st.markdown(f"**Chosen eval config:** {_chosen_eval_config_summary(meta_a)}")
+
+    details_cols = st.columns(3)
+    details_cols[0].metric("Prompt", meta_a.get("prompt_module", "—"))
+    details_cols[1].metric("Model", meta_a.get("model", "—"))
+    cost_val = meta_a.get("cost_usd", "—")
+    if cost_val != "—":
+        cost_val = f"${cost_val:.4f}"
+    details_cols[2].metric("Cost (USD)", cost_val)
+
+    evaluated_record_ids = {str(r.record_id) for r in report_a.field_results}
+    total_evaluated = len(evaluated_record_ids)
+    dataset_rows = (
+        gt_index.loc[gt_index.index.isin(evaluated_record_ids)]
+        if gt_index is not None else pd.DataFrame()
+    )
+
+    if not dataset_rows.empty:
+        source_series = dataset_rows["source"].fillna("").astype(str).str.strip().str.lower()
+        source_dryad = int((source_series == "dryad").sum())
+        source_zenodo = int((source_series == "zenodo").sum())
+        source_semantic = int(source_series.str.contains("semantic", regex=False).sum())
+
+        is_oa_series = dataset_rows["is_oa"].fillna("").astype(str).str.strip().str.lower()
+        is_oa_yes = int(is_oa_series.isin({"1", "1.0", "true", "yes"}).sum())
+
+        has_pdf_series = dataset_rows["pdf_url"].fillna("").astype(str).str.strip()
+        has_pdf = int((has_pdf_series != "").sum())
+    else:
+        source_dryad = 0
+        source_zenodo = 0
+        source_semantic = 0
+        is_oa_yes = 0
+        has_pdf = 0
+
+    count_cols = st.columns(6)
+    count_cols[0].metric("Records evaluated", total_evaluated)
+    count_cols[1].metric("From Dryad", source_dryad)
+    count_cols[2].metric("From Zenodo", source_zenodo)
+    count_cols[3].metric("From Semantic Scholar", source_semantic)
+    count_cols[4].metric("is_oa", is_oa_yes)
+    count_cols[5].metric("Has PDF", has_pdf)
 
     st.divider()
 
@@ -296,6 +356,9 @@ with tab_overview:
     with st.expander("Ground truth dataset", expanded=False):
         if gt_index is not None:
             _gt_df = gt_index.reset_index()
+            if "extraction_success" in _gt_df.columns:
+                success_norm = _gt_df["extraction_success"].fillna(False).astype(str).str.strip().str.lower()
+                _gt_df["success"] = success_norm.isin({"1", "1.0", "true", "yes"}).map(lambda ok: "✅" if ok else "❌")
             st.dataframe(_gt_df, use_container_width=True)
             _export_buttons(_gt_df, "gt_index", "Ground truth dataset")
         else:
@@ -320,6 +383,33 @@ with tab_overview:
                     st.error(f"Could not import `{prompt_module_path}`: {exc}")
             else:
                 st.info("No prompt metadata recorded in this run.")
+
+    # Evaluation config (foldable, full serialized config)
+    with st.expander("Evaluation config", expanded=False):
+        full_config = meta_a.get("config")
+        if isinstance(full_config, dict) and full_config:
+            st.code(json.dumps(full_config, indent=2), language="json")
+        else:
+            st.info("No eval config metadata recorded in this run.")
+
+    # Run logs (foldable)
+    with st.expander("Logs", expanded=False):
+        log_file = _log_path(run_a_name)
+        if log_file.exists():
+            try:
+                log_text = log_file.read_text(encoding="utf-8")
+            except Exception as exc:
+                st.error(f"Could not read log file `{log_file}`: {exc}")
+            else:
+                st.text_area(
+                    "Run log",
+                    value=log_text,
+                    height=320,
+                    disabled=True,
+                    key=f"run_log_{run_a_name}",
+                )
+        else:
+            st.caption(f"No log file found for this run at `{log_file}`.")
 
 
 # ════════════════════════════════════════════════════════════════════════════
@@ -368,9 +458,19 @@ with tab_metrics:
         st.subheader(f"Mismatches — {selected_field} ({len(errors)} mismatches)")
 
     if errors:
+        def _error_doi(record_id) -> str:
+            rid = str(record_id)
+            if gt_index is None or rid not in gt_index.index:
+                return rid
+            row = gt_index.loc[rid]
+            doi_val = row["doi"].iloc[0] if hasattr(row["doi"], "iloc") else row["doi"]
+            if pd.notna(doi_val) and str(doi_val).strip():
+                return str(doi_val).strip()
+            return rid
+
         error_rows = [
             {
-                "record_id": r.record_id,
+                "doi": _error_doi(r.record_id),
                 "true_value": str(r.true_value),
                 "pred_value": str(r.pred_value),
                 "tp": r.tp,
@@ -470,7 +570,7 @@ with tab_records:
                 st.markdown("  ·  ".join(links))
 
             # Metadata chips row
-            chip_cols = st.columns(5)
+            chip_cols = st.columns(4)
             chip_cols[0].metric("Source", _scalar("source") or "—")
             is_oa_val = _raw("is_oa")
             is_oa_yes = str(is_oa_val).strip().lower() in {"1", "1.0", "true", "yes"}
@@ -480,7 +580,12 @@ with tab_records:
             has_abs_yes = str(has_abs_val).strip().lower() in {"1", "1.0", "true", "yes"}
             chip_cols[3].metric("Has abstract", "Yes" if has_abs_yes else "No")
             doi_str = _scalar("doi")
-            chip_cols[4].metric("DOI", doi_str[:28] + "…" if len(doi_str) > 28 else doi_str or "—")
+            st.text_input(
+                "DOI",
+                value=doi_str or "—",
+                disabled=True,
+                key=f"doi_display_{selected_record_id}",
+            )
 
             if reason := _scalar("reason_not_valid"):
                 st.caption(f"Exclusion reason: {reason}")

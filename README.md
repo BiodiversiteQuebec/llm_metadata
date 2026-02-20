@@ -296,6 +296,37 @@ print(f"Recall: {micro_metrics['recall']:.3f}")
 print(f"F1: {micro_metrics['f1']:.3f}")
 ```
 
+**Run prompt evaluation from CLI**
+
+```bash
+# Abstract mode on dev subset (cached by default)
+uv run python -m llm_metadata.prompt_eval \
+  --subset data/dev_subset.csv \
+  --name dev_subset_abstract_20260220_01
+
+# Force fresh API calls (skip joblib cache)
+uv run python -m llm_metadata.prompt_eval \
+  --subset data/dev_subset.csv \
+  --name dev_subset_abstract_20260220_02 \
+  --skip-cache
+```
+
+Output conventions:
+- `--name run_id` saves `data/run_id.json` and `data/run_id.log`
+- `--output run.json` (bare filename) saves to `data/{timestamp}_run.json` and matching `.log`
+- `--output path/to/run.json` keeps the explicit directory and writes `path/to/run.log`
+
+**Inspect runs in the Streamlit Eval Viewer**
+
+```bash
+uv run streamlit run src/llm_metadata/app_eval_viewer.py
+```
+
+In `Overview`, expand:
+- `Ground truth dataset` for source data table
+- `Prompt` for serialized system prompt used in the run
+- `Logs` to view `data/{run}.log` content directly in the app
+
 ## Project Context
 
 This work is part of ongoing research to support biodiversity observation networks like **Biodiversité Québec** in implementing the **Kunming-Montreal Global Biodiversity Framework**. The project aims to:

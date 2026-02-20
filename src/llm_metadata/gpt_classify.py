@@ -73,6 +73,7 @@ def classify_abstract(
     max_output_tokens: int = MAX_OUTPUT_TOKENS,
     text_format: type = DatasetAbstractMetadata,
     reasoning: Optional[Dict] = REASONING,
+    skip_cache: bool = False,
 ):
     # Create a unique str for the parameters to use for caching
     parameters_str = json.dumps({
@@ -101,7 +102,10 @@ def classify_abstract(
         )
         return response.model_dump()
     
-    response_dict = _response_parse(parameters_str)
+    if skip_cache:
+        response_dict = _response_parse.func(parameters_str)  # type: ignore[attr-defined]
+    else:
+        response_dict = _response_parse(parameters_str)
 
     # Cast response dict to ParsedResponse using model_construct (bypasses validation)
     response: ParsedResponse = ParsedResponse[text_format].model_construct(**response_dict)
@@ -248,6 +252,7 @@ def classify_pdf_file(
     reasoning: Optional[Dict] = REASONING,
     file_id: Optional[str] = None,
     cleanup_file: bool = False,
+    skip_cache: bool = False,
 ) -> Dict:
     """
     Classify a PDF file using OpenAI's File API with native PDF support.
@@ -330,7 +335,10 @@ def classify_pdf_file(
         )
         return response.model_dump()
 
-    response_dict = _response_parse_pdf(parameters_str, file_id)
+    if skip_cache:
+        response_dict = _response_parse_pdf.func(parameters_str, file_id)  # type: ignore[attr-defined]
+    else:
+        response_dict = _response_parse_pdf(parameters_str, file_id)
 
     # Cast response dict to ParsedResponse
     response: ParsedResponse = ParsedResponse[text_format].model_construct(**response_dict)

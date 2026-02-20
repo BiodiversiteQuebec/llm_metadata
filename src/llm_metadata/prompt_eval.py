@@ -24,6 +24,8 @@ Usage (CLI):
 from __future__ import annotations
 
 import ast
+import contextlib
+from datetime import datetime
 import importlib
 import sys
 import warnings
@@ -53,7 +55,7 @@ _DEFAULT_RAW_PATH = "data/dataset_092624.xlsx"
 _RECORD_META_COLS = [
     "title", "source_url", "journal_url", "pdf_url",
     "is_oa", "cited_article_doi", "source",
-    "valid_yn", "reason_not_valid", "has_abstract",
+    "valid_yn", "reason_not_valid", "has_abstract", "extraction_success",
 ]
 
 
@@ -135,7 +137,7 @@ def _build_true_by_id(
 ) -> dict[str, DatasetFeaturesNormalized]:
     """Validate GT rows through DatasetFeaturesNormalized and return id-keyed dict.
 
-    Record ID is ``str(int(row.id))``.  Rows without an abstract are skipped.
+    Record ID is ``str(int(row.id))``.
     If subset_dois is provided, only matching source_url DOIs are kept.
     """
     try:
@@ -158,20 +160,22 @@ def _build_true_by_id(
     true_by_id: dict[str, DatasetFeaturesNormalized] = {}
 
     for _, row in df.iterrows():
-        # Skip rows without abstract
-        abstract_val = row.get("abstract") if "abstract" in df.columns else None
-        if abstract_val is None or (hasattr(abstract_val, "__float__") and _is_nan(abstract_val)):
-            print(
-                f"Warning: skipping record id={row.get('id', '?')} — no abstract text.",
-                file=sys.stderr,
-            )
-            continue
-
         # Apply DOI filter if subset provided
         if subset_dois is not None:
-            source_url = str(row.get("source_url", "") or "")
-            doi = source_url.replace("https://doi.org/", "").strip()
-            if doi not in subset_dois and source_url not in subset_dois:
+            source_url_raw = str(row.get("source_url", "") or "")
+            source_url_norm = source_url_raw.strip().lower()
+            source_doi_norm = _strip_doi_prefix(source_url_raw).lower()
+
+            cited_raw = str(row.get("cited_article_doi", "") or "")
+            cited_norm = cited_raw.strip().lower()
+            cited_doi_norm = _strip_doi_prefix(cited_raw).lower()
+
+            if (
+                source_doi_norm not in subset_dois
+                and source_url_norm not in subset_dois
+                and cited_doi_norm not in subset_dois
+                and cited_norm not in subset_dois
+            ):
                 continue
 
         record_id = str(int(row["id"]))
@@ -199,10 +203,10 @@ def _is_nan(val) -> bool:
 
 
 def _load_subset_dois(subset_path: str) -> set[str]:
-    """Load DOIs from a dev_subset.csv file.
+    """Load normalized DOIs from a dev_subset.csv file.
 
     The CSV must have a 'doi' column; other columns (source, notes) are ignored.
-    Returns a set of DOI strings (bare, without https://doi.org/ prefix).
+    Returns lowercase bare DOI strings (without https://doi.org/ prefix).
     """
     try:
         import pandas as pd  # type: ignore
@@ -215,7 +219,11 @@ def _load_subset_dois(subset_path: str) -> set[str]:
             f"dev_subset CSV at '{subset_path}' must have a 'doi' column; "
             f"found columns: {subset_df.columns.tolist()}"
         )
-    return set(subset_df["doi"].dropna().str.strip().tolist())
+    return {
+        _strip_doi_prefix(str(v)).lower()
+        for v in subset_df["doi"].dropna().tolist()
+        if str(v).strip()
+    }
 
 
 def _strip_doi_prefix(doi: str) -> str:
@@ -237,6 +245,35 @@ def _doi_to_pdf_path(doi: str, pdf_dir: str) -> Optional[Path]:
     filename = bare.replace("/", "_") + ".pdf"
     path = Path(pdf_dir) / filename
     return path if path.exists() else None
+
+
+def _record_ids_from_subset(
+    df: "pd.DataFrame",  # type: ignore[name-defined]
+    subset_dois: set[str],
+) -> set[str]:
+    """Return record IDs whose source or cited DOI matches subset_dois."""
+    ids: set[str] = set()
+    for _, row in df.iterrows():
+        source_url_raw = str(row.get("source_url", "") or "")
+        source_url_norm = source_url_raw.strip().lower()
+        source_doi_norm = _strip_doi_prefix(source_url_raw).lower()
+
+        cited_raw = str(row.get("cited_article_doi", "") or "")
+        cited_norm = cited_raw.strip().lower()
+        cited_doi_norm = _strip_doi_prefix(cited_raw).lower()
+
+        if (
+            source_doi_norm not in subset_dois
+            and source_url_norm not in subset_dois
+            and cited_doi_norm not in subset_dois
+            and cited_norm not in subset_dois
+        ):
+            continue
+        try:
+            ids.add(str(int(row["id"])))
+        except (ValueError, TypeError):
+            continue
+    return ids
 
 
 def _build_doi_by_id(df: "pd.DataFrame") -> "dict[str, str]":  # type: ignore[name-defined]
@@ -277,6 +314,7 @@ def _record_meta_value(val):
 def _build_records_dict(
     df: "pd.DataFrame",  # type: ignore[name-defined]
     record_ids: set[str],
+    success_ids: Optional[set[str]] = None,
 ) -> dict[str, dict]:
     """Build record_id -> metadata dict used by the eval viewer."""
     records: dict[str, dict] = {}
@@ -295,6 +333,7 @@ def _build_records_dict(
             for col in available_meta
         }
         record_meta["abstract"] = _record_meta_value(row.get("abstract"))
+        record_meta["extraction_success"] = bool(success_ids and record_id in success_ids)
         records[record_id] = record_meta
 
     for record_id in record_ids:
@@ -303,6 +342,7 @@ def _build_records_dict(
                 col: None for col in _RECORD_META_COLS
             }
             records[record_id]["abstract"] = None
+            records[record_id]["extraction_success"] = bool(success_ids and record_id in success_ids)
 
     return records
 
@@ -324,6 +364,7 @@ def run_eval(
     raw_path: str = _DEFAULT_RAW_PATH,
     pdf_dir: Optional[str] = None,
     name: Optional[str] = None,
+    skip_cache: bool = False,
 ) -> EvaluationReport:
     """Run extraction + evaluation on a subset of records.
 
@@ -348,6 +389,7 @@ def run_eval(
             When set, extraction uses the OpenAI File API (classify_pdf_file)
             instead of abstract text.  Records without a matching PDF are skipped.
         name: Optional run name. When provided, auto-saves to ``data/{name}.json``.
+        skip_cache: If True, bypass joblib cache for extraction API calls.
 
     Returns:
         EvaluationReport with per-field metrics and per-record results.
@@ -435,6 +477,7 @@ def run_eval(
                     system_message=system_message,
                     model=model,
                     text_format=DatasetFeatures,
+                    skip_cache=skip_cache,
                 )
                 pred_by_id[record_id] = result["output"]
                 results.append(result)
@@ -482,6 +525,7 @@ def run_eval(
                     system_message=system_message,
                     model=model,
                     text_format=DatasetFeatures,
+                    skip_cache=skip_cache,
                 )
                 pred_by_id[record_id] = result["output"]
                 results.append(result)
@@ -507,7 +551,15 @@ def run_eval(
     report.total_cost_usd = total_cost  # type: ignore[attr-defined]
 
     # 10. Attach self-contained run metadata for downstream save calls
-    records_dict = _build_records_dict(df, set(true_by_id.keys()))
+    record_ids_for_metadata = set(true_by_id.keys())
+    if subset_dois is not None:
+        record_ids_for_metadata |= _record_ids_from_subset(df, subset_dois)
+
+    records_dict = _build_records_dict(
+        df,
+        record_ids_for_metadata,
+        success_ids=set(pred_by_id.keys()),
+    )
     report.records = records_dict  # type: ignore[attr-defined]
     report.system_message = system_message  # type: ignore[attr-defined]
     report.subset_path = subset_path  # type: ignore[attr-defined]
@@ -551,6 +603,34 @@ def _print_metrics_table(report: EvaluationReport) -> None:
     total_cost = getattr(report, "total_cost_usd", None)
     if total_cost is not None:
         print(f"\nTotal API cost: ${total_cost:.4f}")
+
+
+class _TeeStream:
+    """Write stream content to multiple underlying streams."""
+
+    def __init__(self, *streams):
+        self._streams = streams
+
+    def write(self, data: str) -> int:
+        for stream in self._streams:
+            stream.write(data)
+        return len(data)
+
+    def flush(self) -> None:
+        for stream in self._streams:
+            stream.flush()
+
+
+@contextlib.contextmanager
+def _tee_console_to_log(log_path: Path):
+    """Mirror stdout/stderr to a log file while preserving console output."""
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    with log_path.open("w", encoding="utf-8") as log_file:
+        out = _TeeStream(sys.__stdout__, log_file)
+        err = _TeeStream(sys.__stderr__, log_file)
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            print(f"Logging to: {log_path}")
+            yield
 
 
 # ---------------------------------------------------------------------------
@@ -603,7 +683,10 @@ def main() -> None:
     parser.add_argument(
         "--output",
         default=None,
-        help="Path to save the EvaluationReport as JSON.",
+        help=(
+            "Path to save the EvaluationReport as JSON. "
+            "If only a filename is provided, it is saved under data/ with a timestamp prefix."
+        ),
     )
     parser.add_argument(
         "--name",
@@ -620,42 +703,65 @@ def main() -> None:
         default="data/dataset_092624_validated.xlsx",
         help="Path to the validated ground truth XLSX.",
     )
+    parser.add_argument(
+        "--skip-cache",
+        action="store_true",
+        help="Bypass extraction cache and force fresh API calls.",
+    )
     args = parser.parse_args()
 
     fields = [f.strip() for f in args.fields.split(",")] if args.fields else None
 
-    report = run_eval(
-        prompt_module=args.prompt,
-        subset_path=args.subset,
-        config_path=args.config,
-        fields=fields,
-        model=args.model,
-        gt_path=args.gt,
-        pdf_dir=args.pdf_dir,
-        name=args.name if not args.output else None,
-    )
-
-    _print_metrics_table(report)
-
+    effective_output: Optional[Path] = None
     if args.output:
-        # Resolve the effective prompt module name for metadata
-        effective_prompt = args.prompt or (
-            "prompts.pdf_file" if args.pdf_dir else "prompts.abstract"
+        raw_output = Path(args.output)
+        effective_output = (
+            Path("data") / f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{raw_output.name}"
+            if raw_output.parent == Path(".")
+            else raw_output
         )
-        report.save(
-            args.output,
-            name=args.name,
-            prompt_module=effective_prompt,
-            model=args.model,
-            cost_usd=getattr(report, "total_cost_usd", None),
-            records=getattr(report, "records", None),
-            system_message=getattr(report, "system_message", None),
-            subset_path=args.subset,
-        )
-        print(f"\nReport saved to: {args.output}")
+
+    log_path: Optional[Path] = None
+    if effective_output is not None:
+        log_path = effective_output.with_suffix(".log")
     elif args.name:
-        saved_path = getattr(report, "saved_path", f"data/{args.name}.json")
-        print(f"\nReport saved to: {saved_path}")
+        log_path = Path("data") / f"{args.name}.log"
+
+    log_context = _tee_console_to_log(log_path) if log_path else contextlib.nullcontext()
+    with log_context:
+        report = run_eval(
+            prompt_module=args.prompt,
+            subset_path=args.subset,
+            config_path=args.config,
+            fields=fields,
+            model=args.model,
+            gt_path=args.gt,
+            pdf_dir=args.pdf_dir,
+            name=args.name if effective_output is None else None,
+            skip_cache=args.skip_cache,
+        )
+
+        _print_metrics_table(report)
+
+        if effective_output is not None:
+            # Resolve the effective prompt module name for metadata
+            effective_prompt = args.prompt or (
+                "prompts.pdf_file" if args.pdf_dir else "prompts.abstract"
+            )
+            report.save(
+                effective_output,
+                name=args.name,
+                prompt_module=effective_prompt,
+                model=args.model,
+                cost_usd=getattr(report, "total_cost_usd", None),
+                records=getattr(report, "records", None),
+                system_message=getattr(report, "system_message", None),
+                subset_path=args.subset,
+            )
+            print(f"\nReport saved to: {effective_output}")
+        elif args.name:
+            saved_path = getattr(report, "saved_path", f"data/{args.name}.json")
+            print(f"\nReport saved to: {saved_path}")
 
 
 if __name__ == "__main__":
