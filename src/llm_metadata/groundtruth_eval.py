@@ -287,6 +287,9 @@ class EvaluationReport:
 	field_results: list[FieldResult]
 	field_metrics: dict[str, FieldMetrics]
 	config: EvaluationConfig
+	abstracts: dict[str, str] = field(default_factory=dict)
+	"""Mapping of record_id -> abstract text.  Populated by prompt_eval.run_eval();
+	empty for reports loaded from files produced before this feature was added."""
 
 	def fields(self) -> list[str]:
 		return sorted(self.field_metrics.keys())
@@ -356,6 +359,7 @@ class EvaluationReport:
 			**run_metadata,
 			"timestamp": datetime.now(timezone.utc).isoformat(),
 			"config": self.config.to_dict(),
+			"abstracts": self.abstracts,
 			"field_metrics": {
 				fname: {
 					"tp": m.tp, "fp": m.fp, "fn": m.fn, "tn": m.tn, "n": m.n,
@@ -416,7 +420,12 @@ class EvaluationReport:
 			fm.n = m.get("n", 0)
 			field_metrics[fname] = fm
 
-		return cls(field_results=field_results, field_metrics=field_metrics, config=config)
+		return cls(
+			field_results=field_results,
+			field_metrics=field_metrics,
+			config=config,
+			abstracts=doc.get("abstracts", {}),
+		)
 
 
 def _fuzzy_match_strings(s1: str, s2: str, threshold: int) -> bool:

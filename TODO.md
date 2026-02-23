@@ -34,6 +34,19 @@ This prevents duplicate work across parallel sessions.
 
 ---
 
+## Prompt-Eval & Viewer Improvements
+
+> **Plan:** [`plans/prompt-eval-viewer-improvements.md`](plans/prompt-eval-viewer-improvements.md)
+
+- [x] Phase 1: `EvaluationReport.abstracts` field; `run_id` in `run_eval()` + CLI; abstracts persisted in JSON
+- [x] Phase 2: `app_eval_viewer.py` bug fixes — `0.0→N/A` display; abstract text in mismatch expanders
+- [x] Phase 3: F1 bar chart; Run B mismatch explorer; Run B metadata sidebar
+- [x] Phase 4: Record Explorer — all field results for a selected record
+- [ ] Phase 5: Re-evaluate from saved predictions (`--pred-from`) — WU-5.1, 5.2, 5.3
+- [ ] Phase 6: Multi-run comparison (`compare` CLI subcommand) — WU-6.1, 6.2
+
+---
+
 ## Presentation Deliverables (Thursday 2026-02-19)
 
 > **Plan:** [`plans/presentation_20260219_work_plan.md`](plans/presentation_20260219_work_plan.md)

@@ -226,6 +226,7 @@ def run_eval(
     model: str = "gpt-5-mini",
     gt_path: str = "data/dataset_092624_validated.xlsx",
     raw_path: str = _DEFAULT_RAW_PATH,
+    run_id: Optional[str] = None,
 ) -> EvaluationReport:
     """Run extraction + evaluation on a subset of records.
 
@@ -244,11 +245,13 @@ def run_eval(
         gt_path: Path to validated ground truth XLSX.
         raw_path: Path to the raw XLSX containing the abstract/full_text column.
             Defaults to ``data/dataset_092624.xlsx`` alongside gt_path.
+        run_id: Optional run identifier stored in the report JSON when saved.
+            If None, callers may set one when calling report.save().
 
     Returns:
         EvaluationReport with per-field metrics and per-record results.
-        The report has an extra ``total_cost_usd`` float attribute with the
-        cumulative API cost for the run.
+        The report has ``abstracts`` (dict[record_id, abstract_text]) and
+        ``total_cost_usd`` (float) attributes populated after evaluation.
     """
     # 1. Resolve evaluation config
     if config is not None:
@@ -341,12 +344,17 @@ def run_eval(
         config=eval_config,
     )
 
-    # 9. Attach total cost as a simple attribute
+    # 9. Attach total cost and run metadata as simple attributes
     total_cost = sum(
         (r.get("usage_cost") or {}).get("total_cost", 0) or 0
         for r in results
     )
     report.total_cost_usd = total_cost  # type: ignore[attr-defined]
+
+    # 10. Store abstract text on the report for viewer drill-down
+    report.abstracts = abstract_by_id  # type: ignore[attr-defined]
+    if run_id is not None:
+        report.run_id = run_id  # type: ignore[attr-defined]
 
     return report
 
@@ -424,9 +432,21 @@ def main() -> None:
         default="data/dataset_092624_validated.xlsx",
         help="Path to the validated ground truth XLSX.",
     )
+    parser.add_argument(
+        "--run-id",
+        default=None,
+        dest="run_id",
+        help="Human-readable run identifier stored in the saved JSON. "
+             "Defaults to the stem of --output if not specified.",
+    )
     args = parser.parse_args()
 
     fields = [f.strip() for f in args.fields.split(",")] if args.fields else None
+
+    # Derive run_id: explicit arg > output filename stem > None
+    run_id = args.run_id
+    if run_id is None and args.output:
+        run_id = Path(args.output).stem
 
     report = run_eval(
         prompt_module=args.prompt,
@@ -435,6 +455,7 @@ def main() -> None:
         fields=fields,
         model=args.model,
         gt_path=args.gt,
+        run_id=run_id,
     )
 
     _print_metrics_table(report)
@@ -442,8 +463,10 @@ def main() -> None:
     if args.output:
         report.save(
             args.output,
+            run_id=run_id,
             prompt_module=args.prompt,
             model=args.model,
+            subset=args.subset,
             cost_usd=getattr(report, "total_cost_usd", None),
         )
         print(f"\nReport saved to: {args.output}")
