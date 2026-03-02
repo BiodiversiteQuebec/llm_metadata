@@ -1,0 +1,2804 @@
+{
+  "prompt_module": "prompts.pdf_file",
+  "model": "gpt-5-mini",
+  "cost_usd": 0.1484,
+  "timestamp": "2026-02-19T18:58:52.547634+00:00",
+  "config": {
+    "casefold_strings": true,
+    "strip_strings": true,
+    "collapse_whitespace": true,
+    "treat_lists_as_sets": true,
+    "enhanced_species_matching": false,
+    "enhanced_species_threshold": 70,
+    "fuzzy_match_fields": {},
+    "field_strategies": {
+      "temp_range_i": {
+        "match": "exact",
+        "threshold": 80
+      },
+      "temp_range_f": {
+        "match": "exact",
+        "threshold": 80
+      },
+      "spatial_range_km2": {
+        "match": "exact",
+        "threshold": 80
+      },
+      "data_type": {
+        "match": "exact",
+        "threshold": 80
+      },
+      "geospatial_info_dataset": {
+        "match": "exact",
+        "threshold": 80
+      },
+      "species": {
+        "match": "enhanced_species",
+        "threshold": 70
+      },
+      "time_series": {
+        "match": "exact",
+        "threshold": 80
+      },
+      "multispecies": {
+        "match": "exact",
+        "threshold": 80
+      },
+      "threatened_species": {
+        "match": "exact",
+        "threshold": 80
+      },
+      "new_species_science": {
+        "match": "exact",
+        "threshold": 80
+      },
+      "new_species_region": {
+        "match": "exact",
+        "threshold": 80
+      },
+      "bias_north_south": {
+        "match": "exact",
+        "threshold": 80
+      }
+    }
+  },
+  "field_metrics": {
+    "bias_north_south": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 17,
+      "tn": 0,
+      "n": 17,
+      "precision": null,
+      "recall": 0.0,
+      "f1": null
+    },
+    "data_type": {
+      "tp": 7,
+      "fp": 23,
+      "fn": 13,
+      "tn": 1,
+      "n": 17,
+      "precision": 0.23333333333333334,
+      "recall": 0.35,
+      "f1": 0.28
+    },
+    "geospatial_info_dataset": {
+      "tp": 3,
+      "fp": 28,
+      "fn": 5,
+      "tn": 3,
+      "n": 17,
+      "precision": 0.0967741935483871,
+      "recall": 0.375,
+      "f1": 0.15384615384615383
+    },
+    "multispecies": {
+      "tp": 7,
+      "fp": 2,
+      "fn": 10,
+      "tn": 0,
+      "n": 17,
+      "precision": 0.7777777777777778,
+      "recall": 0.4117647058823529,
+      "f1": 0.5384615384615384
+    },
+    "new_species_region": {
+      "tp": 2,
+      "fp": 2,
+      "fn": 7,
+      "tn": 6,
+      "n": 17,
+      "precision": 0.5,
+      "recall": 0.2222222222222222,
+      "f1": 0.30769230769230765
+    },
+    "new_species_science": {
+      "tp": 1,
+      "fp": 2,
+      "fn": 8,
+      "tn": 6,
+      "n": 17,
+      "precision": 0.3333333333333333,
+      "recall": 0.1111111111111111,
+      "f1": 0.16666666666666666
+    },
+    "spatial_range_km2": {
+      "tp": 1,
+      "fp": 2,
+      "fn": 11,
+      "tn": 4,
+      "n": 17,
+      "precision": 0.3333333333333333,
+      "recall": 0.08333333333333333,
+      "f1": 0.13333333333333333
+    },
+    "species": {
+      "tp": 10,
+      "fp": 172,
+      "fn": 22,
+      "tn": 0,
+      "n": 17,
+      "precision": 0.054945054945054944,
+      "recall": 0.3125,
+      "f1": 0.09345794392523364
+    },
+    "temp_range_f": {
+      "tp": 2,
+      "fp": 6,
+      "fn": 6,
+      "tn": 3,
+      "n": 17,
+      "precision": 0.25,
+      "recall": 0.25,
+      "f1": 0.25
+    },
+    "temp_range_i": {
+      "tp": 2,
+      "fp": 6,
+      "fn": 6,
+      "tn": 3,
+      "n": 17,
+      "precision": 0.25,
+      "recall": 0.25,
+      "f1": 0.25
+    },
+    "threatened_species": {
+      "tp": 1,
+      "fp": 1,
+      "fn": 7,
+      "tn": 8,
+      "n": 17,
+      "precision": 0.5,
+      "recall": 0.125,
+      "f1": 0.2
+    },
+    "time_series": {
+      "tp": 0,
+      "fp": 9,
+      "fn": 1,
+      "tn": 7,
+      "n": 17,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": null
+    }
+  },
+  "field_results": [
+    {
+      "record_id": "101",
+      "field": "bias_north_south",
+      "true_value": true,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "101",
+      "field": "data_type",
+      "true_value": [
+        "other"
+      ],
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "101",
+      "field": "geospatial_info_dataset",
+      "true_value": null,
+      "pred_value": null,
+      "match": true,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 1
+    },
+    {
+      "record_id": "101",
+      "field": "multispecies",
+      "true_value": false,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "101",
+      "field": "new_species_region",
+      "true_value": false,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "101",
+      "field": "new_species_science",
+      "true_value": false,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "101",
+      "field": "spatial_range_km2",
+      "true_value": 31000.0,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "101",
+      "field": "species",
+      "true_value": [
+        "caribou"
+      ],
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "101",
+      "field": "temp_range_f",
+      "true_value": 2010,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "101",
+      "field": "temp_range_i",
+      "true_value": 2004,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "101",
+      "field": "threatened_species",
+      "true_value": true,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "101",
+      "field": "time_series",
+      "true_value": null,
+      "pred_value": null,
+      "match": true,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 1
+    },
+    {
+      "record_id": "104",
+      "field": "bias_north_south",
+      "true_value": false,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "104",
+      "field": "data_type",
+      "true_value": [
+        "distribution"
+      ],
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "104",
+      "field": "geospatial_info_dataset",
+      "true_value": [
+        "distribution"
+      ],
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "104",
+      "field": "multispecies",
+      "true_value": false,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "104",
+      "field": "new_species_region",
+      "true_value": false,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "104",
+      "field": "new_species_science",
+      "true_value": false,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "104",
+      "field": "spatial_range_km2",
+      "true_value": 25000.0,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "104",
+      "field": "species",
+      "true_value": [
+        "caribou"
+      ],
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "104",
+      "field": "temp_range_f",
+      "true_value": 2014,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "104",
+      "field": "temp_range_i",
+      "true_value": 1998,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "104",
+      "field": "threatened_species",
+      "true_value": true,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "104",
+      "field": "time_series",
+      "true_value": null,
+      "pred_value": null,
+      "match": true,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 1
+    },
+    {
+      "record_id": "123",
+      "field": "bias_north_south",
+      "true_value": true,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "123",
+      "field": "data_type",
+      "true_value": [
+        "presence-only",
+        "genetic_analysis"
+      ],
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 2,
+      "tn": 0
+    },
+    {
+      "record_id": "123",
+      "field": "geospatial_info_dataset",
+      "true_value": [
+        "sample"
+      ],
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "123",
+      "field": "multispecies",
+      "true_value": false,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "123",
+      "field": "new_species_region",
+      "true_value": false,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "123",
+      "field": "new_species_science",
+      "true_value": false,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "123",
+      "field": "spatial_range_km2",
+      "true_value": 1365000.0,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "123",
+      "field": "species",
+      "true_value": [
+        "Caribou"
+      ],
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "123",
+      "field": "temp_range_f",
+      "true_value": null,
+      "pred_value": null,
+      "match": true,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 1
+    },
+    {
+      "record_id": "123",
+      "field": "temp_range_i",
+      "true_value": null,
+      "pred_value": null,
+      "match": true,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 1
+    },
+    {
+      "record_id": "123",
+      "field": "threatened_species",
+      "true_value": true,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "123",
+      "field": "time_series",
+      "true_value": null,
+      "pred_value": null,
+      "match": true,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 1
+    },
+    {
+      "record_id": "175",
+      "field": "bias_north_south",
+      "true_value": false,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "175",
+      "field": "data_type",
+      "true_value": [
+        "density"
+      ],
+      "pred_value": [
+        "abundance",
+        "density"
+      ],
+      "match": false,
+      "tp": 1,
+      "fp": 1,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "175",
+      "field": "geospatial_info_dataset",
+      "true_value": null,
+      "pred_value": [
+        "site",
+        "sample",
+        "administrative_units"
+      ],
+      "match": false,
+      "tp": 0,
+      "fp": 3,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "175",
+      "field": "multispecies",
+      "true_value": false,
+      "pred_value": true,
+      "match": false,
+      "tp": 0,
+      "fp": 1,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "175",
+      "field": "new_species_region",
+      "true_value": false,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "175",
+      "field": "new_species_science",
+      "true_value": false,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "175",
+      "field": "spatial_range_km2",
+      "true_value": 35.0,
+      "pred_value": 35.0,
+      "match": true,
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "175",
+      "field": "species",
+      "true_value": [
+        "sapin baumier",
+        "epinette blanche",
+        "bouleau jaune",
+        "bouleau a papier",
+        "Crable a epis",
+        "cerisier de Pennsylvanie"
+      ],
+      "pred_value": [
+        "Abies balsamea (L.) Mill.",
+        "Betula alleghaniensis Britton",
+        "Betula papyrifera Marsh.",
+        "Acer spicatum Lam.",
+        "Prunus pensylvanica (L.)",
+        "Picea glauca (Moench) Voss",
+        "Rubus idaeus (L.)",
+        "Epilobium angustifolium L.",
+        "Corylus cornuta Marsh.",
+        "Sorbus americana Marsh.",
+        "Sambucus pubens Michx.",
+        "SAB (sapin baumier)",
+        "EPB (\u00c9pinette blanche)",
+        "BOJ (bouleau jaune)",
+        "BOP (bouleau \u00e0 papier)",
+        "ERE (\u00e9rable \u00e0 \u00e9pis)",
+        "PRP (cerisier de Pennsylvanie)"
+      ],
+      "match": false,
+      "tp": 5,
+      "fp": 12,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "175",
+      "field": "temp_range_f",
+      "true_value": null,
+      "pred_value": 1997,
+      "match": false,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "175",
+      "field": "temp_range_i",
+      "true_value": null,
+      "pred_value": 1997,
+      "match": false,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "175",
+      "field": "threatened_species",
+      "true_value": false,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "175",
+      "field": "time_series",
+      "true_value": null,
+      "pred_value": false,
+      "match": false,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "201",
+      "field": "bias_north_south",
+      "true_value": false,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "201",
+      "field": "data_type",
+      "true_value": [
+        "presence-only"
+      ],
+      "pred_value": [
+        "abundance",
+        "presence-absence",
+        "time_series",
+        "traits"
+      ],
+      "match": false,
+      "tp": 0,
+      "fp": 4,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "201",
+      "field": "geospatial_info_dataset",
+      "true_value": null,
+      "pred_value": [
+        "site",
+        "maps",
+        "administrative_units",
+        "site_ids"
+      ],
+      "match": false,
+      "tp": 0,
+      "fp": 4,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "201",
+      "field": "multispecies",
+      "true_value": false,
+      "pred_value": true,
+      "match": false,
+      "tp": 0,
+      "fp": 1,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "201",
+      "field": "new_species_region",
+      "true_value": false,
+      "pred_value": false,
+      "match": true,
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "201",
+      "field": "new_species_science",
+      "true_value": false,
+      "pred_value": false,
+      "match": true,
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "201",
+      "field": "spatial_range_km2",
+      "true_value": 0.5,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "201",
+      "field": "species",
+      "true_value": [
+        "Moxostoma anisurum",
+        "Moxostoma carinatum",
+        "Moxostoma macrolepidotum"
+      ],
+      "pred_value": [
+        "Moxostoma anisurum",
+        "Moxostoma carinatum",
+        "Moxostoma macrolepidotum"
+      ],
+      "match": true,
+      "tp": 3,
+      "fp": 0,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "201",
+      "field": "temp_range_f",
+      "true_value": null,
+      "pred_value": 2012,
+      "match": false,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "201",
+      "field": "temp_range_i",
+      "true_value": null,
+      "pred_value": 2010,
+      "match": false,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "201",
+      "field": "threatened_species",
+      "true_value": false,
+      "pred_value": false,
+      "match": true,
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "201",
+      "field": "time_series",
+      "true_value": null,
+      "pred_value": true,
+      "match": false,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "208",
+      "field": "bias_north_south",
+      "true_value": true,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "208",
+      "field": "data_type",
+      "true_value": [
+        "density"
+      ],
+      "pred_value": [
+        "abundance",
+        "density",
+        "traits",
+        "species_richness",
+        "ecosystem_structure",
+        "other"
+      ],
+      "match": false,
+      "tp": 1,
+      "fp": 5,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "208",
+      "field": "geospatial_info_dataset",
+      "true_value": [
+        "site_ids"
+      ],
+      "pred_value": [
+        "sample",
+        "site",
+        "maps",
+        "administrative_units",
+        "site_ids"
+      ],
+      "match": false,
+      "tp": 1,
+      "fp": 4,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "208",
+      "field": "multispecies",
+      "true_value": true,
+      "pred_value": true,
+      "match": true,
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "208",
+      "field": "new_species_region",
+      "true_value": null,
+      "pred_value": null,
+      "match": true,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 1
+    },
+    {
+      "record_id": "208",
+      "field": "new_species_science",
+      "true_value": null,
+      "pred_value": null,
+      "match": true,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 1
+    },
+    {
+      "record_id": "208",
+      "field": "spatial_range_km2",
+      "true_value": 370000.0,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "208",
+      "field": "species",
+      "true_value": [
+        "c.132 species of benthic community"
+      ],
+      "pred_value": [
+        "132 taxa (8 phyla) \u2014 dominance of arthropods, mollusks, and annelids",
+        "Micronephthys neotena",
+        "Eudorellopsis integra",
+        "Protomedeia grandimana",
+        "Nematoda (adults)",
+        "Macoma calcarea",
+        "Cossura longocirrata",
+        "Eteone sp.",
+        "Hediste diversicolor",
+        "Praxillella praetermissa",
+        "Ameroculodes edwardsi",
+        "Ampelisca vadorum",
+        "Byblis gaimardii",
+        "Lysianassidae",
+        "Maera danae",
+        "Phoxocephalus holbolli",
+        "Pontoporeia femorata",
+        "Quasimelita formosa",
+        "Quasimelita quadrispinosa"
+      ],
+      "match": false,
+      "tp": 0,
+      "fp": 19,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "208",
+      "field": "temp_range_f",
+      "true_value": null,
+      "pred_value": 2017,
+      "match": false,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "208",
+      "field": "temp_range_i",
+      "true_value": null,
+      "pred_value": 2017,
+      "match": false,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "208",
+      "field": "threatened_species",
+      "true_value": null,
+      "pred_value": null,
+      "match": true,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 1
+    },
+    {
+      "record_id": "208",
+      "field": "time_series",
+      "true_value": null,
+      "pred_value": false,
+      "match": false,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "225",
+      "field": "bias_north_south",
+      "true_value": false,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "225",
+      "field": "data_type",
+      "true_value": [
+        "density"
+      ],
+      "pred_value": [
+        "abundance",
+        "ecosystem_function",
+        "ecosystem_structure",
+        "species_richness"
+      ],
+      "match": false,
+      "tp": 0,
+      "fp": 4,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "225",
+      "field": "geospatial_info_dataset",
+      "true_value": null,
+      "pred_value": [
+        "site",
+        "administrative_units"
+      ],
+      "match": false,
+      "tp": 0,
+      "fp": 2,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "225",
+      "field": "multispecies",
+      "true_value": true,
+      "pred_value": true,
+      "match": true,
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "225",
+      "field": "new_species_region",
+      "true_value": null,
+      "pred_value": false,
+      "match": false,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "225",
+      "field": "new_species_science",
+      "true_value": null,
+      "pred_value": false,
+      "match": false,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "225",
+      "field": "spatial_range_km2",
+      "true_value": null,
+      "pred_value": null,
+      "match": true,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 1
+    },
+    {
+      "record_id": "225",
+      "field": "species",
+      "true_value": [
+        "Benthic intertidal community (c.20 algae",
+        "c.15 molluscs",
+        "c.15 annelid species",
+        "and others)"
+      ],
+      "pred_value": [
+        "Fucus distichus edentatus",
+        "Fucus vesiculosus",
+        "Mytilus spp.",
+        "Ralfsia clavata",
+        "Ralfsia spp.",
+        "Gammarus spp.",
+        "Lacuna vincta",
+        "Margarites helicinus",
+        "Polychaeta",
+        "barnacles"
+      ],
+      "match": false,
+      "tp": 0,
+      "fp": 10,
+      "fn": 4,
+      "tn": 0
+    },
+    {
+      "record_id": "225",
+      "field": "temp_range_f",
+      "true_value": null,
+      "pred_value": 2011,
+      "match": false,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "225",
+      "field": "temp_range_i",
+      "true_value": null,
+      "pred_value": 2011,
+      "match": false,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "225",
+      "field": "threatened_species",
+      "true_value": null,
+      "pred_value": false,
+      "match": false,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "225",
+      "field": "time_series",
+      "true_value": null,
+      "pred_value": false,
+      "match": false,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "253",
+      "field": "bias_north_south",
+      "true_value": true,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "253",
+      "field": "data_type",
+      "true_value": [
+        "genetic_analysis",
+        "presence-only"
+      ],
+      "pred_value": [
+        "genetic_analysis"
+      ],
+      "match": false,
+      "tp": 1,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "253",
+      "field": "geospatial_info_dataset",
+      "true_value": [
+        "site"
+      ],
+      "pred_value": [
+        "site",
+        "maps"
+      ],
+      "match": false,
+      "tp": 1,
+      "fp": 1,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "253",
+      "field": "multispecies",
+      "true_value": false,
+      "pred_value": false,
+      "match": true,
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "253",
+      "field": "new_species_region",
+      "true_value": false,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "253",
+      "field": "new_species_science",
+      "true_value": false,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "253",
+      "field": "spatial_range_km2",
+      "true_value": 140000.0,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "253",
+      "field": "species",
+      "true_value": [
+        "Salvelinus alpinus"
+      ],
+      "pred_value": [
+        "Arctic Char (Salvelinus alpinus)"
+      ],
+      "match": true,
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "253",
+      "field": "temp_range_f",
+      "true_value": null,
+      "pred_value": null,
+      "match": true,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 1
+    },
+    {
+      "record_id": "253",
+      "field": "temp_range_i",
+      "true_value": null,
+      "pred_value": null,
+      "match": true,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 1
+    },
+    {
+      "record_id": "253",
+      "field": "threatened_species",
+      "true_value": false,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "253",
+      "field": "time_series",
+      "true_value": null,
+      "pred_value": false,
+      "match": false,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "258",
+      "field": "bias_north_south",
+      "true_value": false,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "258",
+      "field": "data_type",
+      "true_value": [
+        "abundance",
+        "presence-only"
+      ],
+      "pred_value": [
+        "abundance",
+        "presence-absence",
+        "species_richness",
+        "genetic_analysis",
+        "distribution",
+        "time_series"
+      ],
+      "match": false,
+      "tp": 1,
+      "fp": 5,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "258",
+      "field": "geospatial_info_dataset",
+      "true_value": null,
+      "pred_value": [
+        "site",
+        "sample",
+        "maps",
+        "administrative_units",
+        "range",
+        "distribution",
+        "site_ids"
+      ],
+      "match": false,
+      "tp": 0,
+      "fp": 7,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "258",
+      "field": "multispecies",
+      "true_value": true,
+      "pred_value": true,
+      "match": true,
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "258",
+      "field": "new_species_region",
+      "true_value": null,
+      "pred_value": null,
+      "match": true,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 1
+    },
+    {
+      "record_id": "258",
+      "field": "new_species_science",
+      "true_value": null,
+      "pred_value": false,
+      "match": false,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "258",
+      "field": "spatial_range_km2",
+      "true_value": 40.0,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "258",
+      "field": "species",
+      "true_value": [
+        "16 damselfly species",
+        "water mite"
+      ],
+      "pred_value": [
+        "Amphiagrion saucium",
+        "Chromagrion conditum",
+        "Coenagrion interrogatum",
+        "Coenagrion resolutum",
+        "Enallagma aspersum",
+        "Enallagma boreale",
+        "Enallagma carunculatum",
+        "Enallagma cyathigerum",
+        "Enallagma ebrium",
+        "Enallagma geminatum",
+        "Enallagma hageni",
+        "Enallagma signatum",
+        "Ischnura posita",
+        "Ischnura verticalis",
+        "Nehalennia gracilis",
+        "Nehalennia irene",
+        "Arrenurus (Arrenuridae) water mites (15 OTUs; COI sequences submitted to GenBank KJ709142-KJ709343)"
+      ],
+      "match": false,
+      "tp": 1,
+      "fp": 16,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "258",
+      "field": "temp_range_f",
+      "true_value": null,
+      "pred_value": 2011,
+      "match": false,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "258",
+      "field": "temp_range_i",
+      "true_value": null,
+      "pred_value": 2011,
+      "match": false,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "258",
+      "field": "threatened_species",
+      "true_value": null,
+      "pred_value": null,
+      "match": true,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 1
+    },
+    {
+      "record_id": "258",
+      "field": "time_series",
+      "true_value": null,
+      "pred_value": true,
+      "match": false,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "271",
+      "field": "bias_north_south",
+      "true_value": false,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "271",
+      "field": "data_type",
+      "true_value": [
+        "abundance",
+        "presence-only"
+      ],
+      "pred_value": [
+        "abundance",
+        "time_series",
+        "species_richness"
+      ],
+      "match": false,
+      "tp": 1,
+      "fp": 2,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "271",
+      "field": "geospatial_info_dataset",
+      "true_value": [
+        "administrative_units"
+      ],
+      "pred_value": [
+        "site",
+        "administrative_units"
+      ],
+      "match": false,
+      "tp": 1,
+      "fp": 1,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "271",
+      "field": "multispecies",
+      "true_value": true,
+      "pred_value": true,
+      "match": true,
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "271",
+      "field": "new_species_region",
+      "true_value": true,
+      "pred_value": true,
+      "match": true,
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "271",
+      "field": "new_species_science",
+      "true_value": false,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "271",
+      "field": "spatial_range_km2",
+      "true_value": null,
+      "pred_value": 0.35,
+      "match": false,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "271",
+      "field": "species",
+      "true_value": [
+        "11 mite species"
+      ],
+      "pred_value": [
+        "Amblyseius fallacis (Garman)",
+        "Typhlodromus caudiglans Schuster",
+        "Agistemus fleschneri Summers",
+        "Typhlodromus conspicuus (Garman)",
+        "Typhlodromus herbertae Chant",
+        "Typhlodromus longipilis Nesbitt",
+        "Typhlodromus bakeri (Garman)",
+        "Typhlodromus pyri Scheuten",
+        "Amblyseius okanagensis (Chant)",
+        "Amblyseius finlandicus (Oudemans)",
+        "Phytoseius sp.",
+        "Anystis baccarum (L.)",
+        "Balaustium sp."
+      ],
+      "match": false,
+      "tp": 0,
+      "fp": 13,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "271",
+      "field": "temp_range_f",
+      "true_value": 2000,
+      "pred_value": 2000,
+      "match": true,
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "271",
+      "field": "temp_range_i",
+      "true_value": 1999,
+      "pred_value": 1999,
+      "match": true,
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "271",
+      "field": "threatened_species",
+      "true_value": null,
+      "pred_value": null,
+      "match": true,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 1
+    },
+    {
+      "record_id": "271",
+      "field": "time_series",
+      "true_value": null,
+      "pred_value": true,
+      "match": false,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "315",
+      "field": "bias_north_south",
+      "true_value": false,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "315",
+      "field": "data_type",
+      "true_value": [
+        "abundance"
+      ],
+      "pred_value": [
+        "abundance",
+        "species_richness"
+      ],
+      "match": false,
+      "tp": 1,
+      "fp": 1,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "315",
+      "field": "geospatial_info_dataset",
+      "true_value": null,
+      "pred_value": [
+        "site",
+        "administrative_units"
+      ],
+      "match": false,
+      "tp": 0,
+      "fp": 2,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "315",
+      "field": "multispecies",
+      "true_value": true,
+      "pred_value": true,
+      "match": true,
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "315",
+      "field": "new_species_region",
+      "true_value": null,
+      "pred_value": null,
+      "match": true,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 1
+    },
+    {
+      "record_id": "315",
+      "field": "new_species_science",
+      "true_value": null,
+      "pred_value": null,
+      "match": true,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 1
+    },
+    {
+      "record_id": "315",
+      "field": "spatial_range_km2",
+      "true_value": null,
+      "pred_value": null,
+      "match": true,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 1
+    },
+    {
+      "record_id": "315",
+      "field": "species",
+      "true_value": [
+        "c.30 beetle species"
+      ],
+      "pred_value": [
+        "Histeridae",
+        "Hydrophilidae",
+        "Leiodidae",
+        "Ptilidae",
+        "Scarabaeidae",
+        "Silphidae",
+        "Staphylinidae",
+        "Trogidae",
+        "Hister furtivus LeConte",
+        "Margarinotus egregius (Casey)",
+        "Margarinotus faedatus (LeConte)",
+        "Margarinotus hudsonicus (Casey)",
+        "Margarinotus lecontei Wenzel",
+        "Cercyon assecla Smetana",
+        "Cercyon minusculus Melsheimer",
+        "Cercyon pygmaeus (Illiger)",
+        "Cryptopleurum minutum Fabricius",
+        "Gnathoncus communis (Marseul)",
+        "Dialytes striatulus (Say)",
+        "Onthophagus hecate hecate (L.)",
+        "Necrodes surinamensis Fabricius",
+        "Necrophila americana L.",
+        "Oiceoptoma noveboracense (Forster)",
+        "Nicrophorus defodiens Mannerheim",
+        "Nicrophorus investigator Zetterstedt",
+        "Nicrophorus orbicollis Say",
+        "Nicrophorus pustulatus Herschel",
+        "Nicrophorus sayi Laporte",
+        "Nicrophorus tomentosus Weber"
+      ],
+      "match": false,
+      "tp": 0,
+      "fp": 29,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "315",
+      "field": "temp_range_f",
+      "true_value": null,
+      "pred_value": 2006,
+      "match": false,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "315",
+      "field": "temp_range_i",
+      "true_value": null,
+      "pred_value": 2006,
+      "match": false,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "315",
+      "field": "threatened_species",
+      "true_value": null,
+      "pred_value": null,
+      "match": true,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 1
+    },
+    {
+      "record_id": "315",
+      "field": "time_series",
+      "true_value": null,
+      "pred_value": false,
+      "match": false,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "343",
+      "field": "bias_north_south",
+      "true_value": true,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "343",
+      "field": "data_type",
+      "true_value": null,
+      "pred_value": null,
+      "match": true,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 1
+    },
+    {
+      "record_id": "343",
+      "field": "geospatial_info_dataset",
+      "true_value": null,
+      "pred_value": null,
+      "match": true,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 1
+    },
+    {
+      "record_id": "343",
+      "field": "multispecies",
+      "true_value": true,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "343",
+      "field": "new_species_region",
+      "true_value": null,
+      "pred_value": null,
+      "match": true,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 1
+    },
+    {
+      "record_id": "343",
+      "field": "new_species_science",
+      "true_value": null,
+      "pred_value": null,
+      "match": true,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 1
+    },
+    {
+      "record_id": "343",
+      "field": "spatial_range_km2",
+      "true_value": null,
+      "pred_value": null,
+      "match": true,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 1
+    },
+    {
+      "record_id": "343",
+      "field": "species",
+      "true_value": [
+        "c.30 bird species"
+      ],
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "343",
+      "field": "temp_range_f",
+      "true_value": null,
+      "pred_value": null,
+      "match": true,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 1
+    },
+    {
+      "record_id": "343",
+      "field": "temp_range_i",
+      "true_value": null,
+      "pred_value": null,
+      "match": true,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 1
+    },
+    {
+      "record_id": "343",
+      "field": "threatened_species",
+      "true_value": null,
+      "pred_value": null,
+      "match": true,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 1
+    },
+    {
+      "record_id": "343",
+      "field": "time_series",
+      "true_value": null,
+      "pred_value": null,
+      "match": true,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 1
+    },
+    {
+      "record_id": "351",
+      "field": "bias_north_south",
+      "true_value": false,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "351",
+      "field": "data_type",
+      "true_value": [
+        "abundance"
+      ],
+      "pred_value": [
+        "abundance",
+        "species_richness"
+      ],
+      "match": false,
+      "tp": 1,
+      "fp": 1,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "351",
+      "field": "geospatial_info_dataset",
+      "true_value": null,
+      "pred_value": [
+        "sample",
+        "site",
+        "administrative_units",
+        "site_ids"
+      ],
+      "match": false,
+      "tp": 0,
+      "fp": 4,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "351",
+      "field": "multispecies",
+      "true_value": true,
+      "pred_value": true,
+      "match": true,
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "351",
+      "field": "new_species_region",
+      "true_value": null,
+      "pred_value": true,
+      "match": false,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "351",
+      "field": "new_species_science",
+      "true_value": null,
+      "pred_value": null,
+      "match": true,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 1
+    },
+    {
+      "record_id": "351",
+      "field": "spatial_range_km2",
+      "true_value": 0.5,
+      "pred_value": 0.158,
+      "match": false,
+      "tp": 0,
+      "fp": 1,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "351",
+      "field": "species",
+      "true_value": [
+        "73 weevil species"
+      ],
+      "pred_value": [
+        "Eurymycter fasciatus (Olivier)",
+        "Trigonorhinus sticticus (Boheman)",
+        "Apion sp.",
+        "Baris interstitialis (Say)",
+        "Cosmobaris americana Casey",
+        "Dirabius rectirostris (LeConte)",
+        "Madarellus undulatus (Say)",
+        "Acanthoscelidius acephalus (Say)",
+        "Amalus scortillum (Herbst)",
+        "Auleutes nebulosus (LeConte)",
+        "Ceutorhynchus americanus Buchanan",
+        "Ceutorhynchus erysimi (F.)",
+        "Ceutorhynchus neglectus Blatchley",
+        "Ceutorhynchus omissus Fall",
+        "Ceutorhynchus oregonensis Dietz",
+        "Ceutorhynchus typhae (Herbst)",
+        "Glocianus punctiger (Gyllenhal)",
+        "Homorosoma sulcipenne (LeConte)",
+        "Mononychus vulpeculus (F.)",
+        "Pelenomus fuliginosus (Dietz)",
+        "Pelenomus waltoni (Boheman)",
+        "Perigaster cretura (Herbst)",
+        "Rhinoncus bruchoides (Herbst)",
+        "Rhinoncus castor (F.)",
+        "Rhinoncus pericarpius (L.)",
+        "Rhinoncus perpendicularis (Reiche)",
+        "Acoptus suturalis LeConte",
+        "Cryptorhynchus lapathi (L.)",
+        "Tyloderma nigrum Casey",
+        "Anthonomus corvulus LeConte",
+        "Anthonomus quadrigibbus Say",
+        "Anthonomus rubidus LeConte",
+        "Anthonomus signatus Say",
+        "Gymnetron antirrhini (Paykull)",
+        "Gymnetron tetrum (F.)",
+        "Isochnus rufipes (LeConte)",
+        "Pseudanthonomus sp.",
+        "Smicronyx sp.",
+        "Tachyerges niger (Horn)",
+        "Tachyerges salicis (L.)",
+        "Tychius meliloti Stephens",
+        "Tychius picirostris (F.)",
+        "Tychius stephensi Schoenherr",
+        "Listronotus delumbis (Gyllenhal)",
+        "Listronotus o. oregonensis (LeConte)",
+        "Listronotus sparsus (Say)",
+        "Dryophthorus americanus Bedel",
+        "Sphenophorus callosus (Olivier)",
+        "Sphenophorus minimus Hart",
+        "Sphenophorus parvulus Gyllenhal",
+        "Sphenophorus zeae Walsh",
+        "Barypeithes pellucidus (Boheman)",
+        "Otiorhynchus ovatus (L.)",
+        "Otiorhynchus sulcatus (F.)",
+        "Phyllobius oblongus (L.)",
+        "Polydrusus cervinus (L.)",
+        "Polydrusus impressifrons (Gyllenhal)",
+        "Polydrusus sericeus (Schaller)",
+        "Sciaphilus asperatus (Bonsdorff)",
+        "Sitona cylindricollis (Fahraeus)",
+        "Sitona flavescens (Marsham)",
+        "Sitona hispidulus (F.)",
+        "Sitona lineellus (Bonsdorff)",
+        "Trachyphloeus bifoveolatus (Beck)",
+        "Grypus equiseti (F.)",
+        "Tanysphyrus lemnae (F.)",
+        "Hypera nigrirostris (F.)",
+        "Hypera zoilus (Scopoli)",
+        "Cleonis pigra (Scopoli)",
+        "Magdalis barbita (Say)",
+        "Lepyrus palustris (Scopoli)",
+        "Piazorhinus pictus LeConte",
+        "Piazorhinus scutellaris (Say)"
+      ],
+      "match": false,
+      "tp": 0,
+      "fp": 73,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "351",
+      "field": "temp_range_f",
+      "true_value": 1999,
+      "pred_value": 1999,
+      "match": true,
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "351",
+      "field": "temp_range_i",
+      "true_value": 1997,
+      "pred_value": 1997,
+      "match": true,
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "351",
+      "field": "threatened_species",
+      "true_value": null,
+      "pred_value": null,
+      "match": true,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 1
+    },
+    {
+      "record_id": "351",
+      "field": "time_series",
+      "true_value": null,
+      "pred_value": true,
+      "match": false,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "tn": 0
+    },
+    {
+      "record_id": "38",
+      "field": "bias_north_south",
+      "true_value": true,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "38",
+      "field": "data_type",
+      "true_value": [
+        "presence-absence"
+      ],
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "38",
+      "field": "geospatial_info_dataset",
+      "true_value": [
+        "site_ids"
+      ],
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "38",
+      "field": "multispecies",
+      "true_value": true,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "38",
+      "field": "new_species_region",
+      "true_value": null,
+      "pred_value": null,
+      "match": true,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 1
+    },
+    {
+      "record_id": "38",
+      "field": "new_species_science",
+      "true_value": null,
+      "pred_value": null,
+      "match": true,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 1
+    },
+    {
+      "record_id": "38",
+      "field": "spatial_range_km2",
+      "true_value": null,
+      "pred_value": null,
+      "match": true,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 1
+    },
+    {
+      "record_id": "38",
+      "field": "species",
+      "true_value": [
+        "12 mammal",
+        "199 ground-dwelling beetles",
+        "240 flying-beetles species"
+      ],
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 3,
+      "tn": 0
+    },
+    {
+      "record_id": "38",
+      "field": "temp_range_f",
+      "true_value": 2011,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "38",
+      "field": "temp_range_i",
+      "true_value": 2007,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "38",
+      "field": "threatened_species",
+      "true_value": null,
+      "pred_value": null,
+      "match": true,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 1
+    },
+    {
+      "record_id": "38",
+      "field": "time_series",
+      "true_value": null,
+      "pred_value": null,
+      "match": true,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 1
+    },
+    {
+      "record_id": "56",
+      "field": "bias_north_south",
+      "true_value": false,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "56",
+      "field": "data_type",
+      "true_value": [
+        "density"
+      ],
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "56",
+      "field": "geospatial_info_dataset",
+      "true_value": [
+        "sample"
+      ],
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "56",
+      "field": "multispecies",
+      "true_value": false,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "56",
+      "field": "new_species_region",
+      "true_value": false,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "56",
+      "field": "new_species_science",
+      "true_value": false,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "56",
+      "field": "spatial_range_km2",
+      "true_value": 10200.0,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "56",
+      "field": "species",
+      "true_value": [
+        "Tachycineta bicolor"
+      ],
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "56",
+      "field": "temp_range_f",
+      "true_value": 2013,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "56",
+      "field": "temp_range_i",
+      "true_value": 2004,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "56",
+      "field": "threatened_species",
+      "true_value": false,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "56",
+      "field": "time_series",
+      "true_value": true,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "71",
+      "field": "bias_north_south",
+      "true_value": false,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "71",
+      "field": "data_type",
+      "true_value": [
+        "density"
+      ],
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "71",
+      "field": "geospatial_info_dataset",
+      "true_value": [
+        "site_ids"
+      ],
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "71",
+      "field": "multispecies",
+      "true_value": true,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "71",
+      "field": "new_species_region",
+      "true_value": null,
+      "pred_value": null,
+      "match": true,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 1
+    },
+    {
+      "record_id": "71",
+      "field": "new_species_science",
+      "true_value": null,
+      "pred_value": null,
+      "match": true,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 1
+    },
+    {
+      "record_id": "71",
+      "field": "spatial_range_km2",
+      "true_value": 200.0,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "71",
+      "field": "species",
+      "true_value": [
+        "c.150 plant species"
+      ],
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "71",
+      "field": "temp_range_f",
+      "true_value": 2012,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "71",
+      "field": "temp_range_i",
+      "true_value": 2012,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "71",
+      "field": "threatened_species",
+      "true_value": null,
+      "pred_value": null,
+      "match": true,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 1
+    },
+    {
+      "record_id": "71",
+      "field": "time_series",
+      "true_value": null,
+      "pred_value": null,
+      "match": true,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 1
+    },
+    {
+      "record_id": "89",
+      "field": "bias_north_south",
+      "true_value": true,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "89",
+      "field": "data_type",
+      "true_value": [
+        "presence-only"
+      ],
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "89",
+      "field": "geospatial_info_dataset",
+      "true_value": null,
+      "pred_value": null,
+      "match": true,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 1
+    },
+    {
+      "record_id": "89",
+      "field": "multispecies",
+      "true_value": false,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "89",
+      "field": "new_species_region",
+      "true_value": false,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "89",
+      "field": "new_species_science",
+      "true_value": false,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "89",
+      "field": "spatial_range_km2",
+      "true_value": 33900.0,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "89",
+      "field": "species",
+      "true_value": [
+        "Rangifer tarandus",
+        "Alces alces",
+        "Canis lupus"
+      ],
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 3,
+      "tn": 0
+    },
+    {
+      "record_id": "89",
+      "field": "temp_range_f",
+      "true_value": 2009,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "89",
+      "field": "temp_range_i",
+      "true_value": 2005,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "89",
+      "field": "threatened_species",
+      "true_value": true,
+      "pred_value": null,
+      "match": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 0
+    },
+    {
+      "record_id": "89",
+      "field": "time_series",
+      "true_value": null,
+      "pred_value": null,
+      "match": true,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 1
+    }
+  ]
+}

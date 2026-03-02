@@ -327,7 +327,25 @@ Output conventions:
 **Inspect runs in the Streamlit Eval Viewer**
 
 ```bash
-uv run streamlit run src/llm_metadata/app_eval_viewer.py
+uv run streamlit run app/app_eval_viewer.py
+```
+
+**Run the Eval Viewer in Docker (distinct compose stack, Streamlit only)**
+
+```bash
+docker compose -f docker-compose.viewer.yml up --build
+```
+
+- The viewer runs at `http://localhost:8501`
+- The repository is bind-mounted from host to container at `/app` for live sync
+- This compose file contains only the Streamlit viewer service (no Grobid/Qdrant)
+- JSON run discovery directory is configurable via `EVAL_VIEWER_RESULTS_DIR`
+- Recommended deploy value: `EVAL_VIEWER_RESULTS_DIR=app/prompt_eval_results`
+
+Example local override:
+
+```bash
+EVAL_VIEWER_RESULTS_DIR=data uv run streamlit run app/app_eval_viewer.py
 ```
 
 In `Overview`, expand:
@@ -395,7 +413,6 @@ llm_metadata/
 ├── prefect_pipeline.py         # Batch processing orchestration
 ├── prompt_eval.py              # Prompt evaluation runner (Python API + CLI)
 ├── registry.py                 # Document tracking database
-├── app_eval_viewer.py          # Streamlit app for exploration of evaluation results
 ├── prompts/
 │   ├── common.py               # Shared prompt blocks (PERSONA, PHILOSOPHY, etc.)
 │   ├── abstract.py             # Abstract extraction prompt
@@ -412,6 +429,8 @@ llm_metadata/
     ├── eval_fuzzy_species.json # Fuzzy species matching variant
     └── eval_strict.json        # Exact-only matching baseline
 ```
+
+Viewer app path: `app/app_eval_viewer.py`
 
 ## License
 

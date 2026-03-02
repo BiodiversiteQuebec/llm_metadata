@@ -11,7 +11,7 @@ The eval viewer app (`app_eval_viewer.py`) currently depends on two xlsx files f
 | File | Changes |
 |------|---------|
 | `src/llm_metadata/prompt_eval.py` | Add `name` param, bundle records + system_message into JSON |
-| `src/llm_metadata/app_eval_viewer.py` | Read records/prompt from JSON first, xlsx/import fallback |
+| `app/app_eval_viewer.py` | Read records/prompt from JSON first, xlsx/import fallback |
 | `CLAUDE.md` | Update docs for `--name` flag and self-contained output |
 | `notebooks/prompt_eval_results.ipynb` | Update example CLI in markdown cell |
 
@@ -149,7 +149,7 @@ Check `meta_a.get("system_message")` first; fall back to `importlib.import_modul
 
 #### WU-2: app self-contained loading `sonnet`
 
-**deps:** none | **files:** `src/llm_metadata/app_eval_viewer.py`
+**deps:** none | **files:** `app/app_eval_viewer.py`
 
 - Add `_records_from_meta()` and `_abstracts_from_meta()` helpers (Change 3a, 3b)
 - Update data loading to prefer JSON records, xlsx fallback (Change 3d)
@@ -193,7 +193,7 @@ Check `meta_a.get("system_message")` first; fall back to `importlib.import_modul
    Then verify `data/test_selfcontained.json` contains `records` and `system_message` keys.
 3. **App smoke test:**
    ```bash
-   uv run streamlit run src/llm_metadata/app_eval_viewer.py
+    uv run streamlit run app/app_eval_viewer.py
    ```
    Select the `test_selfcontained.json` run → verify Dataset Results tab shows titles, abstracts, and prompt renders without xlsx files.
 4. **Backward compat:** Load an old JSON file (without `records`) → app should fall back to xlsx gracefully.

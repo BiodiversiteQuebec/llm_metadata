@@ -1,7 +1,7 @@
 """Streamlit app for interactive EvaluationReport results browsing.
 
 Usage:
-    uv run streamlit run src/llm_metadata/app_eval_viewer.py
+    uv run streamlit run app/app_eval_viewer.py
 
 ## Tab map
 
@@ -17,7 +17,7 @@ Usage:
 
 | File | Required | Used for |
 |------|----------|---------|
-| `data/*.json` | Yes — app stops if none found | Run results (EvaluationReport), including bundled records + system message when present |
+| `${EVAL_VIEWER_RESULTS_DIR}` (default: `data`) | Yes — app stops if none found | Run results (EvaluationReport), including bundled records + system message when present |
 | `data/dataset_092624_validated.xlsx` | Optional fallback | Paper title, DOI, links, validity chips in Dataset Results for older run JSON |
 | `data/dataset_092624.xlsx` | Optional fallback | Abstract text (full_text column) for older run JSON |
 | `data/{run}_notes.md` | Optional (created on first save) | Per-run analyst notes |
@@ -35,53 +35,90 @@ import streamlit as st
 
 from llm_metadata.groundtruth_eval import EvaluationReport
 
-RESULTS_DIR = Path("data")
+RESULTS_DIR = os.getenv("EVAL_VIEWER_RESULTS_DIR")
+if not RESULTS_DIR:
+    legacy_glob = os.getenv("EVAL_VIEWER_RESULTS_GLOB")
+    if legacy_glob:
+        RESULTS_DIR = str(Path(legacy_glob).parent)
+    else:
+        RESULTS_DIR = "data"
 GT_VALIDATED_PATH = Path("data/dataset_092624_validated.xlsx")
 GT_RAW_PATH = Path("data/dataset_092624.xlsx")
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
-def _notes_path(run_name: str) -> Path:
+def _resolve_result_files(results_dir: str) -> list[Path]:
+    """Resolve JSON result files from a directory path."""
+    path = Path((results_dir or "").strip() or "data")
+    files = [p for p in path.glob("*.json") if p.is_file()]
+    return sorted(files, key=lambda p: (p.name.lower(), str(p).lower()))
+
+
+def _build_file_label_map(result_files: list[Path]) -> dict[str, Path]:
+    """Build unique labels for run selection, handling duplicate file names."""
+    name_counts: dict[str, int] = {}
+    for path in result_files:
+        name_counts[path.name] = name_counts.get(path.name, 0) + 1
+
+    label_map: dict[str, Path] = {}
+    for path in result_files:
+        if name_counts[path.name] == 1:
+            label = path.name
+        else:
+            try:
+                label = str(path.relative_to(Path.cwd()))
+            except ValueError:
+                label = str(path)
+        label_map[label] = path
+    return label_map
+
+
+def _notes_path(run_path: Path) -> Path:
     """Return path for the notes file: same folder as run JSON, .md extension."""
-    return RESULTS_DIR / run_name.replace(".json", "_notes.md")
+    return run_path.with_name(f"{run_path.stem}_notes.md")
 
 
-def _log_path(run_name: str) -> Path:
+def _log_path(run_path: Path) -> Path:
     """Return path for the run log file: same folder as run JSON, .log extension."""
-    return RESULTS_DIR / run_name.replace(".json", ".log")
+    return run_path.with_suffix(".log")
 
 
-def _notes_header(run_name: str, meta: dict) -> str:
+def _notes_header(run_path: Path, meta: dict) -> str:
     """Build a markdown header with run metadata for a new notes file."""
+    run_name = run_path.name
     prompt = meta.get("prompt_module", "—")
     model = meta.get("model", "—")
     cost = meta.get("cost_usd")
     cost_str = f"${cost:.4f}" if cost is not None else "—"
     ts = meta.get("timestamp", "—")
+    try:
+        run_ref = str(run_path.relative_to(Path.cwd()))
+    except ValueError:
+        run_ref = str(run_path)
     return (
         f"# Notes — {run_name}\n\n"
         f"**Prompt:** `{prompt}` · "
         f"**Model:** {model} · "
         f"**Cost:** {cost_str} · "
         f"**Timestamp:** {ts} · "
-        f"**Run file:** `data/{run_name}`\n\n"
+        f"**Run file:** `{run_ref}`\n\n"
         f"---\n\n"
     )
 
 
-def _ensure_notes_file(run_name: str, meta: dict) -> Path:
+def _ensure_notes_file(run_path: Path, meta: dict) -> Path:
     """Return the notes file path, creating it with a metadata header if missing."""
-    path = _notes_path(run_name)
+    path = _notes_path(run_path)
     path.parent.mkdir(parents=True, exist_ok=True)
     if not path.exists():
-        path.write_text(_notes_header(run_name, meta), encoding="utf-8")
+        path.write_text(_notes_header(run_path, meta), encoding="utf-8")
     return path
 
 
-def _open_notes_in_editor(run_name: str, meta: dict) -> None:
+def _open_notes_in_editor(run_path: Path, meta: dict) -> None:
     """Open the run's notes file in VS Code. Creates the file if missing."""
-    path = _ensure_notes_file(run_name, meta)
+    path = _ensure_notes_file(run_path, meta)
     if sys.platform == "win32":
         os.startfile(str(path))  # noqa: S606 — opens with default .md handler
     else:
@@ -144,25 +181,34 @@ header_left, header_right = st.columns([3, 2])
 with header_left:
     st.title("Prompt Eval Viewer")
 
-result_files = sorted(RESULTS_DIR.glob("*.json")) if RESULTS_DIR.exists() else []
-file_names = [f.name for f in result_files]
+result_files = _resolve_result_files(RESULTS_DIR)
+result_file_map = _build_file_label_map(result_files)
+file_labels = list(result_file_map.keys())
 
-if not file_names:
-    st.warning(f"No result files found in `{RESULTS_DIR}/`. Run `prompt_eval` first.")
+if not file_labels:
+    st.warning(
+        "No result files found. "
+        f"Set `EVAL_VIEWER_RESULTS_DIR` (current: `{RESULTS_DIR}`) "
+        "or run `prompt_eval` first."
+    )
     st.stop()
 
 with header_right:
     st.write("")  # vertical spacing to align with title baseline
-    run_a_name = st.selectbox("Run", file_names, index=0, label_visibility="collapsed")
+    run_a_label = st.selectbox(
+        "Run", file_labels, index=0, label_visibility="collapsed",
+        format_func=lambda label: result_file_map[label].stem,
+    )
+run_a_path = result_file_map[run_a_label]
+run_a_name = run_a_path.name
 
 
 # ── Data loading ─────────────────────────────────────────────────────────────
 
 @st.cache_data
-def load_report(name: str) -> tuple[EvaluationReport, dict]:
-    path = RESULTS_DIR / name
+def load_report(path: Path) -> tuple[EvaluationReport, dict]:
     report = EvaluationReport.load(path)
-    with open(path) as f:
+    with open(path, encoding="utf-8") as f:
         meta = json.load(f)
     return report, meta
 
@@ -285,7 +331,7 @@ def load_abstracts() -> dict[str, str]:
     return dict(zip(df["id"], df["full_text"]))
 
 
-report_a, meta_a = load_report(run_a_name)
+report_a, meta_a = load_report(run_a_path)
 gt_index = _records_from_meta(meta_a)
 if gt_index is None:
     gt_index = load_gt_index()  # fallback for older JSON runs
@@ -364,6 +410,17 @@ with tab_overview:
         else:
             st.warning(f"XLSX not found at `{GT_VALIDATED_PATH}`")
 
+    # Schema (foldable — DatasetFeatures JSON schema sent to the model)
+    with st.expander("Output schema (DatasetFeatures)", expanded=False):
+        schema_data = meta_a.get("schema")
+        if isinstance(schema_data, dict) and schema_data:
+            st.code(json.dumps(schema_data, indent=2), language="json")
+        else:
+            st.caption(
+                "No schema recorded. Regenerate with a current `prompt_eval` run "
+                "or inspect `DatasetFeatures.model_json_schema()` directly."
+            )
+
     # Prompt (foldable, rendered system message)
     with st.expander("Prompt", expanded=False):
         serialized_message = _system_message_from_meta(meta_a)
@@ -394,7 +451,7 @@ with tab_overview:
 
     # Run logs (foldable)
     with st.expander("Logs", expanded=False):
-        log_file = _log_path(run_a_name)
+        log_file = _log_path(run_a_path)
         if log_file.exists():
             try:
                 log_text = log_file.read_text(encoding="utf-8")
@@ -444,8 +501,6 @@ with tab_metrics:
         key="metrics_field_select",
     )
 
-    st.divider()
-
     # Mismatch table for selected field
     errors = report_a.errors_for_field(selected_field)
     m = report_a.metrics_for(selected_field)
@@ -467,7 +522,11 @@ with tab_metrics:
             if gt_index is None or rid not in gt_index.index:
                 return rid
             row = gt_index.loc[rid]
-            doi_val = row["doi"].iloc[0] if hasattr(row["doi"], "iloc") else row["doi"]
+            raw_doi = row["doi"]
+            if isinstance(raw_doi, pd.Series):
+                doi_val = raw_doi.iloc[0] if not raw_doi.empty else None
+            else:
+                doi_val = raw_doi
             if pd.notna(doi_val) and str(doi_val).strip():
                 return str(doi_val).strip()
             return rid
@@ -559,9 +618,16 @@ with tab_records:
                     st.caption("No abstract available for this record.")
 
             # Link badges
+            _SOURCE_LABELS = {
+                "dryad": "Dryad", "zenodo": "Zenodo",
+                "semantic_scholar": "Semantic Scholar",
+            }
             links: list[str] = []
             if src_url := _scalar("source_url"):
-                links.append(f"[Dataset]({src_url})")
+                src_label = _SOURCE_LABELS.get(
+                    (_scalar("source") or "").strip().lower(), "Source"
+                )
+                links.append(f"[{src_label}]({src_url})")
             if j_url := _scalar("journal_url"):
                 links.append(f"[Article]({j_url})")
             if pdf_url := _scalar("pdf_url"):
@@ -629,22 +695,25 @@ with tab_records:
 # ════════════════════════════════════════════════════════════════════════════
 with tab_compare:
     col_a, col_b = st.columns(2)
+    _fmt_run = lambda label: result_file_map[label].stem
     with col_a:
-        run_a_cmp = st.selectbox("Run A", file_names, index=0, key="cmp_run_a")
+        run_a_cmp = st.selectbox("Run A", file_labels, index=0, key="cmp_run_a",
+                                  format_func=_fmt_run)
     with col_b:
-        other_names = [n for n in file_names if n != run_a_cmp]
+        other_names = [n for n in file_labels if n != run_a_cmp]
         run_b_cmp = st.selectbox(
             "Run B",
-            other_names if other_names else file_names,
+            other_names if other_names else file_labels,
             index=0,
             key="cmp_run_b",
+            format_func=_fmt_run,
         )
 
     if run_a_cmp == run_b_cmp:
         st.warning("Select two different runs to compare.")
     else:
-        report_cmp_a, _ = load_report(run_a_cmp)
-        report_cmp_b, _ = load_report(run_b_cmp)
+        report_cmp_a, _ = load_report(result_file_map[run_a_cmp])
+        report_cmp_b, _ = load_report(result_file_map[run_b_cmp])
 
         metrics_cmp_a = report_cmp_a.metrics_to_pandas()
         metrics_cmp_b = report_cmp_b.metrics_to_pandas()
@@ -683,15 +752,15 @@ with tab_compare:
 with tab_notes:
     from streamlit_lexical import streamlit_lexical
 
-    note_key = f"run_note_{run_a_name}"
-    notes_file = _notes_path(run_a_name)
+    note_key = f"run_note_{run_a_label}"
+    notes_file = _notes_path(run_a_path)
 
     # Load from disk on first access; seed with metadata header for new files
     if note_key not in st.session_state:
         if notes_file.exists():
             st.session_state[note_key] = notes_file.read_text(encoding="utf-8")
         else:
-            st.session_state[note_key] = _notes_header(run_a_name, meta_a)
+            st.session_state[note_key] = _notes_header(run_a_path, meta_a)
 
     # Header row: title left, action buttons right-aligned
     hdr_title, _, hdr_save, hdr_open = st.columns([6, 2, 1, 1])
@@ -717,5 +786,5 @@ with tab_notes:
         notes_file.write_text(st.session_state[note_key], encoding="utf-8")
         st.toast("Notes saved.", icon="✅")
     if open_clicked:
-        _open_notes_in_editor(run_a_name, meta_a)
+        _open_notes_in_editor(run_a_path, meta_a)
         st.toast(f"Opening {notes_file.name}...")

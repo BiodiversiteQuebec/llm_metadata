@@ -13,7 +13,7 @@
 - [x] WU-2.3: `src/llm_metadata/prompt_eval.py` — `run_eval()` Python API + CLI (`python -m llm_metadata.prompt_eval --help`)
 - [x] WU-2.4: `configs/eval_default.json`, `configs/eval_fuzzy_species.json`, `configs/eval_strict.json`
 - [x] WU-2.5: `data/dev_subset.csv` — 30 curated records (10/source: Dryad/Zenodo/SS); covers time_series, threatened_species, bias_north_south positives
-- [x] WU-2.6: `notebooks/prompt_eval_results.ipynb` viewer + `src/llm_metadata/app_eval_viewer.py` Streamlit app
+- [x] WU-2.6: `notebooks/prompt_eval_results.ipynb` viewer + `app/app_eval_viewer.py` Streamlit app
 - [x] WU-2.7: "Prompt Engineering Workflow" section added to `CLAUDE.md`
 
 **Next:** Phase 3 — Per-Field Prompt Iteration (WU-3.1 baseline run requires API key)
