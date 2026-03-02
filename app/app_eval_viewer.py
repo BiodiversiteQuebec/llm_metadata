@@ -44,6 +44,10 @@ if not RESULTS_DIR:
         RESULTS_DIR = "data"
 GT_VALIDATED_PATH = Path("data/dataset_092624_validated.xlsx")
 GT_RAW_PATH = Path("data/dataset_092624.xlsx")
+APP_DIR = Path(__file__).resolve().parent
+ASSETS_DIR = APP_DIR / "assets"
+FAVICON_PATH = ASSETS_DIR / "favicon.ico"
+LOGO_PATH = ASSETS_DIR / "FRVersion horizontale 2 ligne (couleur)_cropped.png"
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
@@ -175,11 +179,26 @@ def _export_buttons(df: pd.DataFrame, key: str, label: str,
 
 # ── Page config & header ─────────────────────────────────────────────────────
 
-st.set_page_config(page_title="Prompt Eval Viewer", layout="wide")
+st.set_page_config(
+    page_title="Extraction evaluation viewer",
+    page_icon=str(FAVICON_PATH) if FAVICON_PATH.exists() else None,
+    layout="wide",
+)
+if LOGO_PATH.exists():
+    st.image(str(LOGO_PATH), width=120)
 
 header_left, header_right = st.columns([3, 2])
 with header_left:
-    st.title("Prompt Eval Viewer")
+    st.title("Extraction evaluation viewer")
+    with st.expander("ℹ️ About this viewer", expanded=False):
+        st.caption(
+            "Explore AI-extracted ecological metadata from scientific dataset abstracts and "
+            "its evaluation against expert annotations to support biodiversity monitoring "
+            "and data-gap analysis.\n\n"
+            "Select an extraction run from the dropdown on the right, then use the tabs "
+            "below to inspect run metadata, field metrics, mismatches, and record-level "
+            "results."
+        )
 
 result_files = _resolve_result_files(RESULTS_DIR)
 result_file_map = _build_file_label_map(result_files)
