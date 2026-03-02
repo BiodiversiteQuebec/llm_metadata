@@ -431,7 +431,11 @@ with tab_metrics:
     _export_buttons(_sorted_metrics_df, "metrics", "Per-field metrics",
                     event=metrics_event)
 
-    # Field selector for mismatch drill-down
+    st.divider()
+
+    st.subheader("Mismatches")
+
+    # Field selector + mismatch table for selected field
     all_fields = report_a.fields()
     selected_field = st.selectbox(
         "Select field for mismatches",
@@ -450,12 +454,12 @@ with tab_metrics:
         p_str = f"{m.precision:.3f}" if m.precision is not None else "N/A"
         r_str = f"{m.recall:.3f}" if m.recall is not None else "N/A"
         f1_str = f"{m.f1:.3f}" if m.f1 is not None else "N/A"
-        st.subheader(
-            f"Mismatches — {selected_field} "
+        st.markdown(
+            f"**Selected field :** {selected_field} "
             f"({len(errors)} / {m.n} records | P={p_str} R={r_str} F1={f1_str})"
         )
     else:
-        st.subheader(f"Mismatches — {selected_field} ({len(errors)} mismatches)")
+        st.markdown(f"**Selected field :** {selected_field} ({len(errors)} mismatches)")
 
     if errors:
         def _error_doi(record_id) -> str:
@@ -489,7 +493,7 @@ with tab_metrics:
             key=f"mismatch_table_{selected_field}",
         )
         _export_buttons(error_df, f"mismatch_{selected_field}",
-                        f"Mismatches — {selected_field}",
+                        f"**Selected field :** {selected_field}",
                         event=mismatch_event)
     else:
         st.success("No mismatches for this field.")
