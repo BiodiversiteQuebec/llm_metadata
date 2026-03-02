@@ -1,25 +1,6 @@
-# Preliminary results presentation
+# Article and results plan
 
-
-## Todo
-
-### Minimal
-* Include semantic scholar data
-* Add modulator features to extraction schema
-* Run all abstract only
-    * Feature based performance discussion with examples
-* Run all oa full text
-    * Feature based performance discussion with examples
-* Run all oa full text with section-based approach
-    * Feature based performance discussion with examples
-
-### Nice to have
-* Prompt engineering to improve performance
-* Openai evals
-* Front-end demo for user testing
-* Model comparison & llm abstraction layer
-* Benchmark ds from gbif
-
+Scope : We do the same thing than Fuster & Valentin (2024) but with LLMs instead of NLP classification.
 
 ## Introduction
 
@@ -30,9 +11,7 @@
 Goal : 
 
 * Automated metadata extraction from scientific documents using LLMs, comparing abstract-only vs full-text approaches, and evaluating against manual annotations for precision/recall/F1.
-* Performance for relevancy classification
-
-* Scope : We do the same thing than Fuster & Valentin (2024) but with LLMs instead of NLP classification.
+* Performance for relevancy classification and comparison with manual and NLP classification results from Fuster & Valentin (2024)
 
 
 ## Methods
@@ -91,3 +70,24 @@ Goal :
 * Performance comparison with NLP classification (Fuster & Valentin, 2024)
 * Techniques to improve benchmark database and feature extraction performance
 * Benefits, limitations and perspectives/futures/dreams for LLM-based extraction for Biodiversité Québec
+
+---
+
+## Todo
+
+### Minimal
+*  [x] Include semantic scholar data
+*  [x] Add modulator features to extraction schema
+*  [ ] Run all abstract only
+    *  [ ] Feature based performance discussion with examples
+*  [ ] Run all oa full text
+    *  [ ] Feature based performance discussion with examples
+*  [ ] Run all oa full text with section-based approach
+    *  [ ] Feature based performance discussion with examples
+
+### Nice to have
+*  [ ] Prompt engineering to improve performance
+*  [ ] Openai evals
+*  [x] Front-end demo for user testing
+*  [ ] Model comparison & llm abstraction layer
+*  [ ] Benchmark ds from gbif / ecology data paper

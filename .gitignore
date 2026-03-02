@@ -35,3 +35,4 @@ data/*.json
 *tmpclaude-*
 uv.lock
 .jupyter_ystore.db
+docs\fuster_et_al_2024\peerj-18853.pdf
