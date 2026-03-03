@@ -12,4 +12,5 @@ services:
     environment:
       - PYTHONPATH=/llm_metadata/src
       - EVAL_VIEWER_RESULTS_DIR=app/prompt_eval_results
+      - STREAMLIT_SERVER_BASE_URL_PATH=apps/llm_extraction_results
     restart: unless-stopped
