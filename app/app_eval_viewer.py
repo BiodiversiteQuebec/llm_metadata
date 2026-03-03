@@ -361,8 +361,8 @@ if not abstracts:
 
 
 # ── Tabs ─────────────────────────────────────────────────────────────────────
-tab_overview, tab_metrics, tab_records, tab_compare, tab_notes = st.tabs(
-    ["Overview", "Detailed Metrics", "Dataset Results", "Compare Runs", "Notes"]
+tab_overview, tab_metrics, tab_records, tab_compare = st.tabs(
+    ["Overview", "Detailed Metrics", "Dataset Results", "Compare Runs"]
 )
 
 
