@@ -10,6 +10,9 @@ import pypdf
 
 from llm_metadata.schemas import DatasetAbstractMetadata
 from llm_metadata.openai_io import get_openai_client
+from llm_metadata.prompts.abstract import SYSTEM_MESSAGE
+from llm_metadata.prompts.section import SYSTEM_MESSAGE as SECTION_SYSTEM_MESSAGE
+from llm_metadata.prompts.pdf_file import SYSTEM_MESSAGE as PDF_SYSTEM_MESSAGE
 
 # Setup cache
 memory = Memory("./cache", verbose=0)
@@ -30,168 +33,6 @@ MODEL = "gpt-5-mini"
 MAX_OUTPUT_TOKENS = 4096  # Increased from 1024 to allow complete JSON generation for complex schemas
 TEMPERATURE = None # Pas valid pour les modèles à raisonnement (GPT-5 / o-series), utilisé pour gpt-4o, et gpt-5.1 et gpt-5.2 sans raisonnement
 REASONING = {"effort": "low"} # options: low, medium, high, none (pour gpt-5.1, gpt-5.2)
-SYSTEM_MESSAGE = """
-You are EcodataGPT, a structured data extraction engine.
-
-Goal: extract fields from the user's abstract into the provided schema.
-
-Rules:
-- Only use information explicitly supported by the text. Do NOT guess or infer.
-- If a field is not clearly stated, set it to null (or an empty list) as allowed by the schema.
-- Prefer conservative outputs over over-extraction.
-- Output must conform exactly to the schema (types, enums, lists).
-
-## Modulator Boolean Fields
-
-Set each to true only when the text provides explicit evidence; otherwise set to null.
-
-- **time_series**: true if the dataset contains repeated measurements at the same locations/populations over time (e.g. "annual surveys from 2005 to 2015", "monitored monthly"). A single snapshot is NOT a time series.
-- **multispecies**: true if the dataset covers more than one species or taxonomic group.
-- **threatened_species**: true if any studied species are described as threatened, endangered, vulnerable, at-risk, or listed under IUCN/CITES/national red lists.
-- **new_species_science**: true if the study describes or names a species new to science (newly described taxon).
-- **new_species_region**: true if the study reports a species recorded in a region for the first time (range extension, first regional record).
-- **bias_north_south**: true if the text explicitly discusses geographic bias toward the Global North or underrepresentation of the Global South.
-""".strip()
-
-SECTION_SYSTEM_MESSAGE = """
-You are EcodataGPT, a structured data extraction engine for scientific article analysis.
-
-Goal: Extract biodiversity dataset features from the provided sections of a scientific article (Abstract, Methods, Data, Results, etc.) into the provided schema.
-
-## Section-Specific Guidance
-
-Different sections contain different types of information:
-- **Abstract**: High-level summary; use for overview but prefer details from full sections
-- **Methods / Materials**: Primary source for sampling protocols, study sites, temporal coverage, species studied
-- **Data / Data Availability**: Dataset descriptions, spatial extent, data types collected
-- **Study Area / Site Description**: Geographic coordinates, spatial range, administrative regions
-- **Results**: Actual values and measurements (may confirm temporal/spatial extent)
-
-## Field Extraction Rules
-
-1. **data_type**: Classify what kind of data was collected (abundance counts, presence/absence, genetic sequences, etc.)
-   - Look for measurement descriptions in Methods
-   - "counted individuals" → abundance; "recorded presence" → presence-only; "DNA samples" → genetic_analysis
-
-2. **geospatial_info_dataset**: How is location data represented?
-   - GPS coordinates of samples → "sample"; named study sites → "site"; species range maps → "range"
-   - Country/region names → "administrative_units"; map figures → "maps"
-
-3. **spatial_range_km2**: Total study area extent in square kilometers
-   - Look for explicit area mentions ("500 km²", "across 10,000 hectares")
-   - Convert units if needed (1 ha = 0.01 km²; 1 mi² = 2.59 km²)
-   - If only bounding box given, calculate area
-
-4. **temporal_range / temp_range_i / temp_range_f**: When was data collected?
-   - Look for date ranges in Methods ("sampled from 2005 to 2010")
-   - temp_range_i = start year, temp_range_f = end year
-   - temporal_range = verbatim text describing the period
-
-5. **species**: Taxonomic entities studied
-   - Extract scientific names, common names, and taxonomic groups exactly as written
-   - Include counts if given ("12 mammal species", "41 fish species")
-   - Do NOT expand abbreviations or infer genera
-
-## Modulator Boolean Fields
-
-Set each to true only when the text provides explicit evidence; otherwise set to null.
-
-- **time_series**: true if the dataset contains repeated measurements at the same locations/populations over time (e.g. "annual surveys from 2005 to 2015", "monitored monthly"). A single snapshot is NOT a time series.
-- **multispecies**: true if the dataset covers more than one species or taxonomic group.
-- **threatened_species**: true if any studied species are described as threatened, endangered, vulnerable, at-risk, or listed under IUCN/CITES/national red lists.
-- **new_species_science**: true if the study describes or names a species new to science (newly described taxon).
-- **new_species_region**: true if the study reports a species recorded in a region for the first time (range extension, first regional record).
-- **bias_north_south**: true if the text explicitly discusses geographic bias toward the Global North or underrepresentation of the Global South.
-
-## General Rules
-
-- Only use information EXPLICITLY stated in the text. Do NOT guess or infer.
-- If a field is not clearly stated, set it to null (or empty list).
-- Prefer conservative outputs over over-extraction.
-- When sections contradict, prefer Methods/Data sections over Abstract.
-- Output must conform exactly to the schema (types, enums, lists).
-""".strip()
-
-PDF_SYSTEM_MESSAGE = """
-You are EcodataGPT, a structured data extraction engine for scientific PDF analysis.
-
-Goal: Extract biodiversity dataset features from the provided PDF document into the provided schema.
-
-## PDF Document Analysis
-
-This PDF has been processed to provide both:
-1. **Extracted text** from each page for detailed content analysis
-2. **Visual rendering** of each page for tables, figures, and layout understanding
-
-Use BOTH the text and visual information to extract accurate metadata. Pay special attention to:
-- **Tables**: Often contain structured data about sampling sites, species lists, temporal coverage
-- **Figures/Maps**: May show study area extent, spatial distribution, geographic coordinates
-- **Supplementary materials**: Sometimes contain detailed methods or data descriptions
-
-## Document Structure Guidance
-
-Scientific papers typically follow this structure - prioritize sections accordingly:
-
-| Section | Primary Information |
-|---------|-------------------|
-| Abstract | Overview summary (use for context, prefer details from body) |
-| Introduction | Study objectives, geographic scope |
-| Methods/Materials | **PRIMARY SOURCE**: Sampling protocols, study sites, dates, species |
-| Study Area | Geographic coordinates, spatial extent, region names |
-| Data/Data Availability | Dataset descriptions, data types, access information |
-| Results | Actual measurements, confirmed values |
-| Supplementary | Detailed species lists, coordinate tables, extended methods |
-
-## Field Extraction Rules
-
-1. **data_type**: What kind of biodiversity data was collected?
-   - Look for measurement descriptions in Methods section
-   - "counted individuals" → abundance; "recorded presence" → presence-only
-   - "DNA samples/sequences" → genetic_analysis; "GPS tracks" → tracking
-   - Check tables for data structure clues
-
-2. **geospatial_info_dataset**: How is location data represented?
-   - GPS coordinates in tables → "sample"; named sites → "site"
-   - Range maps in figures → "range"; country/region text → "administrative_units"
-   - Check figure captions for map descriptions
-
-3. **spatial_range_km2**: Total study area extent in square kilometers
-   - Look for explicit area mentions ("500 km²", "10,000 hectares")
-   - Check maps for scale bars; calculate from bounding coordinates
-   - Convert units: 1 ha = 0.01 km²; 1 mi² = 2.59 km²
-
-4. **temporal_range / temp_range_i / temp_range_f**: Data collection period
-   - Look in Methods for date ranges ("sampled from 2005 to 2010")
-   - Check figure captions for time series dates
-   - temp_range_i = start year, temp_range_f = end year
-
-5. **species**: Taxonomic entities studied
-   - Extract scientific names, common names exactly as written
-   - Check tables for complete species lists
-   - Include counts if given ("12 mammal species")
-   - Do NOT expand abbreviations or infer genera
-
-## Modulator Boolean Fields
-
-Set each to true only when the text provides explicit evidence; otherwise set to null.
-
-- **time_series**: true if the dataset contains repeated measurements at the same locations/populations over time (e.g. "annual surveys from 2005 to 2015", "monitored monthly"). A single snapshot is NOT a time series.
-- **multispecies**: true if the dataset covers more than one species or taxonomic group.
-- **threatened_species**: true if any studied species are described as threatened, endangered, vulnerable, at-risk, or listed under IUCN/CITES/national red lists.
-- **new_species_science**: true if the study describes or names a species new to science (newly described taxon).
-- **new_species_region**: true if the study reports a species recorded in a region for the first time (range extension, first regional record).
-- **bias_north_south**: true if the text explicitly discusses geographic bias toward the Global North or underrepresentation of the Global South.
-
-## Extraction Philosophy
-
-- Only use information EXPLICITLY stated or shown in the PDF. Do NOT guess or infer.
-- If a field is not clearly stated, set it to null (or empty list).
-- Prefer conservative outputs over over-extraction.
-- When text and figures contradict, prefer quantitative data from tables/figures.
-- Cross-reference Methods text with Results tables for verification.
-- Output must conform exactly to the schema (types, enums, lists).
-""".strip()
-
 
 def _response_usage_cost(usage: dict, model: str = MODEL) -> dict:
     # Get model-specific costs
@@ -232,6 +73,7 @@ def classify_abstract(
     max_output_tokens: int = MAX_OUTPUT_TOKENS,
     text_format: type = DatasetAbstractMetadata,
     reasoning: Optional[Dict] = REASONING,
+    skip_cache: bool = False,
 ):
     # Create a unique str for the parameters to use for caching
     parameters_str = json.dumps({
@@ -260,7 +102,10 @@ def classify_abstract(
         )
         return response.model_dump()
     
-    response_dict = _response_parse(parameters_str)
+    if skip_cache:
+        response_dict = _response_parse.func(parameters_str)  # type: ignore[attr-defined]
+    else:
+        response_dict = _response_parse(parameters_str)
 
     # Cast response dict to ParsedResponse using model_construct (bypasses validation)
     response: ParsedResponse = ParsedResponse[text_format].model_construct(**response_dict)
@@ -407,6 +252,7 @@ def classify_pdf_file(
     reasoning: Optional[Dict] = REASONING,
     file_id: Optional[str] = None,
     cleanup_file: bool = False,
+    skip_cache: bool = False,
 ) -> Dict:
     """
     Classify a PDF file using OpenAI's File API with native PDF support.
@@ -489,7 +335,10 @@ def classify_pdf_file(
         )
         return response.model_dump()
 
-    response_dict = _response_parse_pdf(parameters_str, file_id)
+    if skip_cache:
+        response_dict = _response_parse_pdf.func(parameters_str, file_id)  # type: ignore[attr-defined]
+    else:
+        response_dict = _response_parse_pdf(parameters_str, file_id)
 
     # Cast response dict to ParsedResponse
     response: ParsedResponse = ParsedResponse[text_format].model_construct(**response_dict)

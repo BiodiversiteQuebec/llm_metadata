@@ -299,7 +299,7 @@ The file is hand-curated once and stable. Changing it breaks comparability acros
 
 ### 2.6 Results visualization — notebook + Streamlit `sonnet`
 
-**deps:** 2.2, 2.3 | **files:** `notebooks/prompt_eval_results.ipynb`, `src/llm_metadata/app_eval_viewer.py`
+**deps:** 2.2, 2.3 | **files:** `notebooks/prompt_eval_results.ipynb`, `app/app_eval_viewer.py`
 
 **Notebook template** (`notebooks/prompt_eval_results.ipynb`) — minimum viable viewer:
 - Load one or more `results/*.json` files
@@ -307,10 +307,10 @@ The file is hand-curated once and stable. Changing it breaks comparability acros
 - Drill into mismatches for a selected field
 - Side-by-side comparison of two runs
 
-**Streamlit app** (`src/llm_metadata/app_eval_viewer.py`) — interactive browser:
+**Streamlit app** (`app/app_eval_viewer.py`) — interactive browser:
 
 ```bash
-uv run streamlit run src/llm_metadata/app_eval_viewer.py
+uv run streamlit run app/app_eval_viewer.py
 ```
 
 Features:

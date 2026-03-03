@@ -25,7 +25,7 @@ A Python package for extracting structured ecological metadata from scientific d
 
 Biodiversity observation networks require comprehensive and representative data to track progress toward global biodiversity frameworks (e.g., Kunming-Montreal). However, many valuable datasets remain buried in unstructured text within scientific literature and repository abstracts.
 
-This package leverages GPT-4 to programmatically extract structured metadata from dataset abstracts, including:
+This package leverages LLM models to programmatically extract structured metadata from dataset abstracts, including:
 - **Species studied** (taxonomic coverage)
 - **Spatial extent** (geographic coverage)
 - **Temporal period** (time range)
@@ -33,7 +33,11 @@ This package leverages GPT-4 to programmatically extract structured metadata fro
 
 The goal is to identify relevant datasets that can fill data gaps and support more effective biodiversity monitoring.
 
-**Pipeline Architecture:** This package implements a 4-stage workflow: (1) **Data Ingestion** — acquire papers from repositories and parse full-text structure, (2) **Schema & Prompt Engineering** — design Pydantic models as LLM output formats and chunk documents for semantic search, (3) **LLM Inference** — run GPT extraction with Prefect orchestration for batch processing and cost tracking, (4) **Evaluation & Validation** — compare automated extraction against manually annotated ground truth with configurable normalization and fuzzy matching.
+The scope of current work focuses on evaluating extraction approaches using LLM to describe and prioritize the datasets annotated by Fuster et al. (2024) and compare results against their manual annotations and relevancy assessments.
+
+Complete proposed article outline and methodology details are documented in `docs/article_outline.md`.
+
+**Pipeline Architecture:** This package implements a 4-stage workflow: (1) **Data Ingestion** — acquire papers from repositories and parse full-text structure, (2) **Schema & Prompt Engineering** — design Pydantic models as LLM output formats and chunk documents for semantic search, (3) **LLM Inference** — run GPT extraction with Prefect orchestration for batch processing and cost tracking, (4) **Evaluation & Validation** — compare automated extraction against manually annotated (Fuster et al. 2024) ground truth with configurable normalization and fuzzy matching.
 
 This work follows the methodology outlined in Fuster et al. (2024) and their results:
 
@@ -43,10 +47,14 @@ This work follows the methodology outlined in Fuster et al. (2024) and their res
 
 - **Dryad API Integration**: Search and retrieve datasets from Dryad repository
 - **Zenodo API Integration**: Query records from Zenodo by DOI
-- **GPT-4 Metadata Extraction**: Extract structured ecological metadata from dataset abstracts using OpenAI's GPT-4
-- **Structured Schemas**: Pydantic models for dataset metadata and Essential Biodiversity Variables (EBV) features
+- **SemanticScholar API**: Retrieve article metadata and open access PDF URLs
+- **OpenAlex Metadata Enrichment**: Retrieve journal and PDF URLs, open access status for articles
+- **Multi-Strategy PDF Download**: Robust acquisition with OpenAlex, Unpaywall, institutional access (EZproxy), and Sci-Hub fallback
+- **GPT-5-mini Metadata Extraction**: Extract structured ecological metadata from dataset abstracts using OpenAI's GPT-5-mini model
+- **Structured Schemas**: Pydantic models for deterministic structured output extraction and validation of manual annotations
 - **Batch Processing**: Prefect pipeline for processing multiple datasets in parallel
-- **Reproducible Extraction**: Deterministic structured output format for consistent metadata extraction
+- **Evaluation Framework**: Compare automated extraction against manual annotations with configurable normalization, fuzzy matching and extracted species parsing. Generates Detailed TP/FP/FN reports for error analysis with micro/macro averaging of precision, recall, and F1 metrics.
+- **Interactive app for evaluation results**: Interactive app to explore evaluation results, inspect prompts, and analyze mismatches between automated and manual extraction.
 
 ## Installation
 
@@ -67,7 +75,7 @@ pip install -e .[dev]
 Create a `.env` file in the project root:
 
 ```bash
-# For GPT-4 classification
+# For GPT classification
 OPENAI_API_KEY=your_openai_api_key
 
 # For Zenodo API access (optional, required only for Zenodo features)
@@ -296,6 +304,55 @@ print(f"Recall: {micro_metrics['recall']:.3f}")
 print(f"F1: {micro_metrics['f1']:.3f}")
 ```
 
+**Run prompt evaluation from CLI**
+
+```bash
+# Abstract mode on dev subset (cached by default)
+uv run python -m llm_metadata.prompt_eval \
+  --subset data/dev_subset.csv \
+  --name dev_subset_abstract_20260220_01
+
+# Force fresh API calls (skip joblib cache)
+uv run python -m llm_metadata.prompt_eval \
+  --subset data/dev_subset.csv \
+  --name dev_subset_abstract_20260220_02 \
+  --skip-cache
+```
+
+Output conventions:
+- `--name run_id` saves `data/run_id.json` and `data/run_id.log`
+- `--output run.json` (bare filename) saves to `data/{timestamp}_run.json` and matching `.log`
+- `--output path/to/run.json` keeps the explicit directory and writes `path/to/run.log`
+
+**Inspect runs in the Streamlit Eval Viewer**
+
+```bash
+uv run streamlit run app/app_eval_viewer.py
+```
+
+**Run the Eval Viewer in Docker (distinct compose stack, Streamlit only)**
+
+```bash
+docker compose -f docker-compose.viewer.yml up --build
+```
+
+- The viewer runs at `http://localhost:8501`
+- The repository is bind-mounted from host to container at `/app` for live sync
+- This compose file contains only the Streamlit viewer service (no Grobid/Qdrant)
+- JSON run discovery directory is configurable via `EVAL_VIEWER_RESULTS_DIR`
+- Recommended deploy value: `EVAL_VIEWER_RESULTS_DIR=app/prompt_eval_results`
+
+Example local override:
+
+```bash
+EVAL_VIEWER_RESULTS_DIR=data uv run streamlit run app/app_eval_viewer.py
+```
+
+In `Overview`, expand:
+- `Ground truth dataset` for source data table
+- `Prompt` for serialized system prompt used in the run
+- `Logs` to view `data/{run}.log` content directly in the app
+
 ## Project Context
 
 This work is part of ongoing research to support biodiversity observation networks like **Biodiversité Québec** in implementing the **Kunming-Montreal Global Biodiversity Framework**. The project aims to:
@@ -325,10 +382,12 @@ Development tools included:
 All experimentation, model evaluation, and proof-of-concept work happens in **Jupyter notebooks**. Notebooks serve as a research lab journal for testing the 4-stage pipeline: data ingestion strategies, schema variations, prompt engineering, and evaluation metric computation. Results are documented in `notebooks/README.md` with timestamped experiment reports.
 
 **Key notebooks:**
-- `fuster_test_extraction_evaluation.ipynb` - Abstract extraction evaluation (precision/recall/F1)
-- `fulltext_extraction_evaluation.ipynb` - Full-text extraction with GROBID-parsed sections
-- `download_dryad_pdfs_fuster.ipynb` - PDF acquisition with multi-strategy fallback
-- `fuster_annotations_validation.ipynb` - Ground truth cleaning with Pydantic validation
+- `fuster_annotations_validation.ipynb` - Ground truth cleaning and all-source validation (Dryad, Zenodo, Semantic Scholar)
+- `download_all_fuster_pdfs.ipynb` - PDF acquisition coverage with multi-strategy fallback and source-level download stats
+- `batch_abstract_evaluation.ipynb` - Abstract-only extraction and field-level evaluation across sources
+- `batch_pdf_file_evaluation.ipynb` - Full-text extraction with OpenAI PDF File API and comparative evaluation
+- `batch_fulltext_evaluation.ipynb` - Section-based full-text extraction from GROBID-parsed documents
+- `field_strategies_eval_demo.ipynb` - Evaluation methodology and per-field strategy registry demo
 
 See `notebooks/README.md` for complete experiment history and detailed results.
 
@@ -349,16 +408,29 @@ llm_metadata/
 ├── section_normalize.py        # Section classification
 ├── embedding.py                # OpenAI embeddings with caching
 ├── vector_store.py             # Qdrant vector database client
-├── gpt_classify.py             # LLM classification engine
+├── openai_io.py                # OpenAI client factory with env-driven base URL routing
+├── gpt_classify.py             # LLM classification engine (GPT-5-mini)
 ├── prefect_pipeline.py         # Batch processing orchestration
+├── prompt_eval.py              # Prompt evaluation runner (Python API + CLI)
 ├── registry.py                 # Document tracking database
-└── schemas/
-    ├── abstract_metadata.py    # High-level metadata schema
-    ├── fuster_features.py      # Detailed EBV feature schema
-    ├── chunk_metadata.py       # Section-aware chunk metadata
-    ├── evaluation.py           # Evaluation metrics framework
-    └── validation.py           # Ground truth validation
+├── prompts/
+│   ├── common.py               # Shared prompt blocks (PERSONA, PHILOSOPHY, etc.)
+│   ├── abstract.py             # Abstract extraction prompt
+│   ├── section.py              # Section/chunk extraction prompt
+│   └── pdf_file.py             # PDF File API extraction prompt
+├── schemas/
+│   ├── abstract_metadata.py    # High-level metadata schema
+│   ├── fuster_features.py      # Detailed EBV feature schema with validators
+│   ├── chunk_metadata.py       # Section-aware chunk metadata
+│   ├── validation.py           # Ground truth validation (Pydantic-based)
+│   └── groundtruth_eval.py     # Evaluation framework (field strategies, metrics)
+└── configs/
+    ├── eval_default.json       # Default field strategies + normalization
+    ├── eval_fuzzy_species.json # Fuzzy species matching variant
+    └── eval_strict.json        # Exact-only matching baseline
 ```
+
+Viewer app path: `app/app_eval_viewer.py`
 
 ## License
 
@@ -366,4 +438,4 @@ MIT License. See LICENSE for details.
 
 ---
 
-**Keywords**: biodiversity, metadata extraction, LLM, GPT-4, Essential Biodiversity Variables (EBV), data gaps, Dryad, Zenodo, Kunming-Montreal Framework, Biodiversité Québec
+**Keywords**: biodiversity, metadata extraction, LLM, GPT, Essential Biodiversity Variables (EBV), data gaps, Dryad, Zenodo, Kunming-Montreal Framework, Biodiversité Québec

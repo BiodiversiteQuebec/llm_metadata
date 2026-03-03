@@ -1,0 +1,15 @@
+services:
+  streamlit:
+    build:
+      context: ..
+      dockerfile: app/Dockerfile
+    container_name: llm-metadata-eval-viewer
+    working_dir: /llm_metadata
+    ports:
+      - "8501:8501"
+    volumes:
+      - ../:/llm_metadata
+    environment:
+      - PYTHONPATH=/llm_metadata/src
+      - EVAL_VIEWER_RESULTS_DIR=app/prompt_eval_results
+    restart: unless-stopped
