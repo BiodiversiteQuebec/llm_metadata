@@ -768,42 +768,42 @@ with tab_compare:
 # ════════════════════════════════════════════════════════════════════════════
 # TAB 5 — Notes
 # ════════════════════════════════════════════════════════════════════════════
-with tab_notes:
-    from streamlit_lexical import streamlit_lexical
+# with tab_notes:
+#     from streamlit_lexical import streamlit_lexical
 
-    note_key = f"run_note_{run_a_label}"
-    notes_file = _notes_path(run_a_path)
+#     note_key = f"run_note_{run_a_label}"
+#     notes_file = _notes_path(run_a_path)
 
-    # Load from disk on first access; seed with metadata header for new files
-    if note_key not in st.session_state:
-        if notes_file.exists():
-            st.session_state[note_key] = notes_file.read_text(encoding="utf-8")
-        else:
-            st.session_state[note_key] = _notes_header(run_a_path, meta_a)
+#     # Load from disk on first access; seed with metadata header for new files
+#     if note_key not in st.session_state:
+#         if notes_file.exists():
+#             st.session_state[note_key] = notes_file.read_text(encoding="utf-8")
+#         else:
+#             st.session_state[note_key] = _notes_header(run_a_path, meta_a)
 
-    # Header row: title left, action buttons right-aligned
-    hdr_title, _, hdr_save, hdr_open = st.columns([6, 2, 1, 1])
-    hdr_title.subheader(f"Notes — {run_a_name}")
-    save_clicked = hdr_save.button("Save", type="primary", key="notes_save",
-                                   use_container_width=True)
-    open_clicked = hdr_open.button("Open in Windows", key="notes_open_vscode",
-                                   use_container_width=True)
+#     # Header row: title left, action buttons right-aligned
+#     hdr_title, _, hdr_save, hdr_open = st.columns([6, 2, 1, 1])
+#     hdr_title.subheader(f"Notes — {run_a_name}")
+#     save_clicked = hdr_save.button("Save", type="primary", key="notes_save",
+#                                    use_container_width=True)
+#     open_clicked = hdr_open.button("Open in Windows", key="notes_open_vscode",
+#                                    use_container_width=True)
 
-    st.caption(f"Notes are located at `{notes_file.resolve()}`")
+#     st.caption(f"Notes are located at `{notes_file.resolve()}`")
 
-    editor_value = streamlit_lexical(
-        value=st.session_state[note_key],
-        placeholder="Write run-level observations, field analysis, recommendations...",
-        height=500,
-        key=f"lexical_notes_{run_a_name}",
-    )
-    if editor_value is not None:
-        st.session_state[note_key] = editor_value
+#     editor_value = streamlit_lexical(
+#         value=st.session_state[note_key],
+#         placeholder="Write run-level observations, field analysis, recommendations...",
+#         height=500,
+#         key=f"lexical_notes_{run_a_name}",
+#     )
+#     if editor_value is not None:
+#         st.session_state[note_key] = editor_value
 
-    if save_clicked:
-        notes_file.parent.mkdir(parents=True, exist_ok=True)
-        notes_file.write_text(st.session_state[note_key], encoding="utf-8")
-        st.toast("Notes saved.", icon="✅")
-    if open_clicked:
-        _open_notes_in_editor(run_a_path, meta_a)
-        st.toast(f"Opening {notes_file.name}...")
+#     if save_clicked:
+#         notes_file.parent.mkdir(parents=True, exist_ok=True)
+#         notes_file.write_text(st.session_state[note_key], encoding="utf-8")
+#         st.toast("Notes saved.", icon="✅")
+#     if open_clicked:
+#         _open_notes_in_editor(run_a_path, meta_a)
+#         st.toast(f"Opening {notes_file.name}...")
