@@ -2,6 +2,8 @@
 
 A Python package for extracting structured ecological metadata from scientific dataset abstracts using Large Language Models (LLMs). This tool supports biodiversity monitoring efforts by identifying and characterizing datasets to fill taxonomic, spatial, and temporal gaps in biodiversity data coverage.
 
+✨ Results exploration app available [here](https://bq-llm-extraction-results.streamlit.app/).
+
 ## Table of Contents
 
 - [llm\_metadata](#llm_metadata)
