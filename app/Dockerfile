@@ -8,13 +8,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONPATH=/llm_metadata/src
 
 RUN pip install --upgrade pip && \
-    pip install \
-        streamlit \
-        pandas \
-        openpyxl \
-        pydantic \
-        rapidfuzz \
-        streamlit-lexical
+    pip install -r app/requirements.txt
 
 EXPOSE 8501
 
