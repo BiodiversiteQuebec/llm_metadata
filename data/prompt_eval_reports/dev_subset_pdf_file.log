@@ -1,0 +1,44 @@
+Logging to: data\prompt_eval_reports\dev_subset_pdf_file.log
+Recreate command: uv run python -m llm_metadata.prompt_eval --prompt prompts.pdf_file --model gpt-5-mini --gt ./data/dataset_092624_validated.xlsx --pdf-dir ./data/pdfs/fuster/ --subset data/dev_subset.csv --name dev_subset_pdf_file
+Warning: PDF not found for doi=10.5061/dryad.121sk in ./data/pdfs/fuster/, skipping.
+Warning: PDF not found for doi=10.5061/dryad.1771t in ./data/pdfs/fuster/, skipping.
+Warning: PDF not found for doi=10.5061/dryad.1cc4v in ./data/pdfs/fuster/, skipping.
+Warning: PDF not found for doi=10.5061/dryad.24q6q70 in ./data/pdfs/fuster/, skipping.
+Warning: PDF not found for doi=10.5061/dryad.2n5h6 in ./data/pdfs/fuster/, skipping.
+Warning: PDF not found for doi=10.5061/dryad.36634 in ./data/pdfs/fuster/, skipping.
+Warning: PDF not found for doi=10.5061/dryad.3nh72 in ./data/pdfs/fuster/, skipping.
+Warning: PDF not found for doi=10.5061/dryad.4767v in ./data/pdfs/fuster/, skipping.
+Warning: PDF not found for doi=10.5061/dryad.4k275 in ./data/pdfs/fuster/, skipping.
+Warning: PDF not found for doi=10.5061/dryad.4k739 in ./data/pdfs/fuster/, skipping.
+Warning: PDF not found for doi=10.5061/dryad.63fr7 in ./data/pdfs/fuster/, skipping.
+Warning: PDF not found for doi=10.5061/dryad.679s1dt in ./data/pdfs/fuster/, skipping.
+Warning: PDF not found for doi=10.5061/dryad.67t23 in ./data/pdfs/fuster/, skipping.
+Warning: PDF not found for doi=10.5061/dryad.87jb3 in ./data/pdfs/fuster/, skipping.
+Warning: PDF not found for doi=10.5061/dryad.b46k4 in ./data/pdfs/fuster/, skipping.
+Warning: PDF not found for doi=10.5061/dryad.h65f4 in ./data/pdfs/fuster/, skipping.
+Warning: PDF not found for doi=10.5061/dryad.hs37s in ./data/pdfs/fuster/, skipping.
+Warning: PDF not found for doi=10.5061/dryad.n3c2f in ./data/pdfs/fuster/, skipping.
+Warning: PDF not found for doi=10.5061/dryad.n726pq6 in ./data/pdfs/fuster/, skipping.
+Warning: PDF not found for doi=10.5061/dryad.qn1cj in ./data/pdfs/fuster/, skipping.
+Warning: extraction failed for id=343 (10.3390/ijgi7090335): 1 validation error for DatasetFeatures
+  Invalid JSON: EOF while parsing a string at line 41 column 35 [type=json_invalid, input_value='{\n  "data_type": [\n   ... calendula Ruby-crowned', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/json_invalid
+PDF mode: skipped 0 records (no DOI), 20 records (no PDF found).
+Field                         N       P       R      F1
+-------------------------------------------------------
+bias_north_south             30     N/A   0.000     N/A
+data_type                    30   0.233   0.194   0.212
+geospatial_info_dataset      30   0.097   0.214   0.133
+multispecies                 30   0.778   0.233   0.359
+new_species_region           30   0.500   0.091   0.154
+new_species_science          30   0.333   0.045   0.080
+spatial_range_km2            30   0.333   0.050   0.087
+species                      30   0.055   0.192   0.085
+temp_range_f                 30   0.250   0.095   0.138
+temp_range_i                 30   0.250   0.095   0.138
+threatened_species           30   0.500   0.048   0.087
+time_series                  30   0.000   0.000     N/A
+
+Total API cost: $0.1484
+
+Report saved to: data\prompt_eval_reports\dev_subset_pdf_file.json

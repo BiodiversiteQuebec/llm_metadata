@@ -17,7 +17,7 @@ Usage:
 
 | File | Required | Used for |
 |------|----------|---------|
-| `${EVAL_VIEWER_RESULTS_DIR}` (default: `data`) | Yes — app stops if none found | Run results (EvaluationReport), including bundled records + system message when present |
+| `${EVAL_VIEWER_RESULTS_DIR}` (default: `${PROMPT_EVAL_OUTPUT_DIR}` or `data/prompt_eval_reports`) | Yes — app stops if none found | Run results (EvaluationReport), including bundled records + system message when present |
 | `data/dataset_092624_validated.xlsx` | Optional fallback | Paper title, DOI, links, validity chips in Dataset Results for older run JSON |
 | `data/dataset_092624.xlsx` | Optional fallback | Abstract text (full_text column) for older run JSON |
 | `data/{run}_notes.md` | Optional (created on first save) | Per-run analyst notes |
@@ -35,13 +35,13 @@ import streamlit as st
 
 from llm_metadata.groundtruth_eval import EvaluationReport
 
-RESULTS_DIR = os.getenv("EVAL_VIEWER_RESULTS_DIR")
+RESULTS_DIR = os.getenv("EVAL_VIEWER_RESULTS_DIR") or os.getenv("PROMPT_EVAL_OUTPUT_DIR")
 if not RESULTS_DIR:
     legacy_glob = os.getenv("EVAL_VIEWER_RESULTS_GLOB")
     if legacy_glob:
         RESULTS_DIR = str(Path(legacy_glob).parent)
     else:
-        RESULTS_DIR = "data"
+        RESULTS_DIR = "data/prompt_eval_reports"
 GT_VALIDATED_PATH = Path("data/dataset_092624_validated.xlsx")
 GT_RAW_PATH = Path("data/dataset_092624.xlsx")
 APP_DIR = Path(__file__).resolve().parent

@@ -11,5 +11,6 @@ services:
       - ../:/llm_metadata
     environment:
       - PYTHONPATH=/llm_metadata/src
-      - EVAL_VIEWER_RESULTS_DIR=app/prompt_eval_results
+      - PROMPT_EVAL_OUTPUT_DIR=${PROMPT_EVAL_OUTPUT_DIR:-data/prompt_eval_reports}
+      - EVAL_VIEWER_RESULTS_DIR=${EVAL_VIEWER_RESULTS_DIR:-}
     restart: unless-stopped

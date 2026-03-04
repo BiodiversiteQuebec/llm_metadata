@@ -80,6 +80,13 @@ Create a `.env` file in the project root:
 # For GPT classification
 OPENAI_API_KEY=your_openai_api_key
 
+# Optional: prompt_eval JSON/log output directory
+PROMPT_EVAL_OUTPUT_DIR=data/prompt_eval_reports
+
+# Optional: eval viewer run discovery directory
+# Defaults to EVAL_VIEWER_RESULTS_DIR, then PROMPT_EVAL_OUTPUT_DIR, then data/prompt_eval_reports
+EVAL_VIEWER_RESULTS_DIR=data/prompt_eval_reports
+
 # For Zenodo API access (optional, required only for Zenodo features)
 ZENODO_ACCESS_TOKEN=your_zenodo_token
 ```
@@ -322,8 +329,9 @@ uv run python -m llm_metadata.prompt_eval \
 ```
 
 Output conventions:
-- `--name run_id` saves `data/run_id.json` and `data/run_id.log`
-- `--output run.json` (bare filename) saves to `data/{timestamp}_run.json` and matching `.log`
+- no `--name` and no `--output`: auto-saves `{timestamp}_{prompt}.json` and matching `.log` to `PROMPT_EVAL_OUTPUT_DIR` (default: `data/prompt_eval_reports`)
+- `--name run_id` saves `PROMPT_EVAL_OUTPUT_DIR/{timestamp}_run_id.json` and `PROMPT_EVAL_OUTPUT_DIR/{timestamp}_run_id.log`
+- `--output run.json` (bare filename) saves to `PROMPT_EVAL_OUTPUT_DIR/{timestamp}_run.json` and matching `.log`
 - `--output path/to/run.json` keeps the explicit directory and writes `path/to/run.log`
 
 **Inspect runs in the Streamlit Eval Viewer**
@@ -342,6 +350,7 @@ docker compose -f docker-compose.viewer.yml up --build
 - The repository is bind-mounted from host to container at `/app` for live sync
 - This compose file contains only the Streamlit viewer service (no Grobid/Qdrant)
 - JSON run discovery directory is configurable via `EVAL_VIEWER_RESULTS_DIR`
+- Default discovery order: `EVAL_VIEWER_RESULTS_DIR` → `PROMPT_EVAL_OUTPUT_DIR` → `data/prompt_eval_reports`
 - Recommended deploy value: `EVAL_VIEWER_RESULTS_DIR=app/prompt_eval_results`
 
 Example local override:

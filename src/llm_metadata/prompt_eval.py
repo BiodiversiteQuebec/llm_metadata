@@ -27,6 +27,8 @@ import ast
 import contextlib
 from datetime import datetime
 import importlib
+import os
+import shlex
 import sys
 import warnings
 from pathlib import Path
@@ -50,6 +52,15 @@ _LIST_COLS = ["data_type", "geospatial_info_dataset", "species"]
 
 # Raw XLSX with abstract / full_text column (sibling of gt_path by default)
 _DEFAULT_RAW_PATH = "data/dataset_092624.xlsx"
+
+# Default output directory (override with PROMPT_EVAL_OUTPUT_DIR)
+_OUTPUT_DIR = Path(
+    os.getenv("PROMPT_EVAL_OUTPUT_DIR", "data/prompt_eval_reports").strip()
+    or "data/prompt_eval_reports"
+)
+
+if not _OUTPUT_DIR.exists():
+    _OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 # Per-record metadata bundled into saved JSON for self-contained viewer runs
 _RECORD_META_COLS = [
@@ -388,7 +399,9 @@ def run_eval(
         pdf_dir: Directory containing PDFs named ``{doi_with_slashes_as_underscores}.pdf``.
             When set, extraction uses the OpenAI File API (classify_pdf_file)
             instead of abstract text.  Records without a matching PDF are skipped.
-        name: Optional run name. When provided, auto-saves to ``data/{name}.json``.
+        name: Optional run name. When provided, auto-saves to
+            ``{PROMPT_EVAL_OUTPUT_DIR}/{name}.json`` (default directory:
+            ``data/prompt_eval_reports``).
         skip_cache: If True, bypass joblib cache for extraction API calls.
 
     Returns:
@@ -565,7 +578,7 @@ def run_eval(
     report.subset_path = subset_path  # type: ignore[attr-defined]
 
     if name:
-        save_path = Path("data") / f"{name}.json"
+        save_path = _OUTPUT_DIR / f"{name}.json"
         report.save(
             save_path,
             name=name,
@@ -633,6 +646,52 @@ def _tee_console_to_log(log_path: Path):
             yield
 
 
+def _build_recreate_command(
+    *,
+    prompt_module: str,
+    pdf_dir: Optional[str],
+    subset_path: Optional[str],
+    config_path: Optional[str],
+    fields: Optional[list[str]],
+    output_path: Optional[Path],
+    name: Optional[str],
+    model: str,
+    gt_path: str,
+    skip_cache: bool,
+) -> str:
+    """Build a shell-safe command string that recreates the current run."""
+    cmd: list[str] = [
+        "uv",
+        "run",
+        "python",
+        "-m",
+        "llm_metadata.prompt_eval",
+        "--prompt",
+        prompt_module,
+        "--model",
+        model,
+        "--gt",
+        gt_path,
+    ]
+
+    if pdf_dir:
+        cmd.extend(["--pdf-dir", pdf_dir])
+    if subset_path:
+        cmd.extend(["--subset", subset_path])
+    if config_path:
+        cmd.extend(["--config", config_path])
+    if fields:
+        cmd.extend(["--fields", ",".join(fields)])
+    if output_path is not None:
+        cmd.extend(["--output", str(output_path)])
+    elif name:
+        cmd.extend(["--name", name])
+    if skip_cache:
+        cmd.append("--skip-cache")
+
+    return " ".join(shlex.quote(part) for part in cmd)
+
+
 # ---------------------------------------------------------------------------
 # CLI entry point
 # ---------------------------------------------------------------------------
@@ -685,13 +744,19 @@ def main() -> None:
         default=None,
         help=(
             "Path to save the EvaluationReport as JSON. "
-            "If only a filename is provided, it is saved under data/ with a timestamp prefix."
+            "If only a filename is provided, it is saved under the configured output "
+            "directory (`PROMPT_EVAL_OUTPUT_DIR`, default: data/prompt_eval_reports) "
+            "with a timestamp prefix."
         ),
     )
     parser.add_argument(
         "--name",
         default=None,
-        help="Run name. Auto-saves to data/{name}.json. --output takes precedence.",
+        help=(
+            "Run name stem. Auto-saves to {PROMPT_EVAL_OUTPUT_DIR}/{timestamp}_{name}.json "
+            "(default directory: data/prompt_eval_reports). "
+            "--output takes precedence."
+        ),
     )
     parser.add_argument(
         "--model",
@@ -706,29 +771,54 @@ def main() -> None:
     parser.add_argument(
         "--skip-cache",
         action="store_true",
-        help="Bypass extraction cache and force fresh API calls.",
+        help="Bypass extraction cache and force fresh API calls (False when not specified).",
     )
     args = parser.parse_args()
 
     fields = [f.strip() for f in args.fields.split(",")] if args.fields else None
+    effective_prompt = args.prompt or (
+        "prompts.pdf_file" if args.pdf_dir else "prompts.abstract"
+    )
 
     effective_output: Optional[Path] = None
+    output_arg_path: Optional[Path] = Path(args.output) if args.output else None
     if args.output:
-        raw_output = Path(args.output)
+        assert output_arg_path is not None
         effective_output = (
-            Path("data") / f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{raw_output.name}"
-            if raw_output.parent == Path(".")
-            else raw_output
+            _OUTPUT_DIR / f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{output_arg_path.name}"
+            if output_arg_path.parent == Path(".")
+            else output_arg_path
+        )
+    elif args.name:
+        effective_output = _OUTPUT_DIR / (
+            f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{args.name}.json"
+        )
+    else:
+        prompt_name = effective_prompt.split(".")[-1]
+        effective_output = _OUTPUT_DIR / (
+            f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{prompt_name}.json"
         )
 
-    log_path: Optional[Path] = None
-    if effective_output is not None:
-        log_path = effective_output.with_suffix(".log")
-    elif args.name:
-        log_path = Path("data") / f"{args.name}.log"
+    log_path: Optional[Path] = effective_output.with_suffix(".log") if effective_output else None
 
     log_context = _tee_console_to_log(log_path) if log_path else contextlib.nullcontext()
     with log_context:
+        recreate_output_path = output_arg_path if args.output else None
+        recreate_name = args.name if (args.name and not args.output) else None
+        recreate_cmd = _build_recreate_command(
+            prompt_module=effective_prompt,
+            pdf_dir=args.pdf_dir,
+            subset_path=args.subset,
+            config_path=args.config,
+            fields=fields,
+            output_path=recreate_output_path,
+            name=recreate_name,
+            model=args.model,
+            gt_path=args.gt,
+            skip_cache=args.skip_cache,
+        )
+        print(f"Recreate command: {recreate_cmd}")
+
         report = run_eval(
             prompt_module=args.prompt,
             subset_path=args.subset,
@@ -737,17 +827,13 @@ def main() -> None:
             model=args.model,
             gt_path=args.gt,
             pdf_dir=args.pdf_dir,
-            name=args.name if effective_output is None else None,
+            name=None,
             skip_cache=args.skip_cache,
         )
 
         _print_metrics_table(report)
 
         if effective_output is not None:
-            # Resolve the effective prompt module name for metadata
-            effective_prompt = args.prompt or (
-                "prompts.pdf_file" if args.pdf_dir else "prompts.abstract"
-            )
             report.save(
                 effective_output,
                 name=args.name,
@@ -759,9 +845,6 @@ def main() -> None:
                 subset_path=args.subset,
             )
             print(f"\nReport saved to: {effective_output}")
-        elif args.name:
-            saved_path = getattr(report, "saved_path", f"data/{args.name}.json")
-            print(f"\nReport saved to: {saved_path}")
 
 
 if __name__ == "__main__":

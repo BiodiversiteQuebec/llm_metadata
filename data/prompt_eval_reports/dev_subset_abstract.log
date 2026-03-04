@@ -1,0 +1,20 @@
+Logging to: data\prompt_eval_reports\dev_subset_abstract.log
+Recreate command: uv run python -m llm_metadata.prompt_eval --prompt prompts.abstract --model gpt-5-mini --gt data/dataset_092624_validated.xlsx --subset data/dev_subset.csv --name dev_subset_abstract
+Field                         N       P       R      F1
+-------------------------------------------------------
+bias_north_south             30     N/A   0.000     N/A
+data_type                    30   0.254   0.417   0.316
+geospatial_info_dataset      30   0.083   0.429   0.140
+multispecies                 30   0.731   0.633   0.679
+new_species_region           30   0.333   0.045   0.080
+new_species_science          30     N/A   0.000     N/A
+spatial_range_km2            30   1.000   0.050   0.095
+species                      30   0.303   0.635   0.410
+temp_range_f                 30   0.846   0.524   0.647
+temp_range_i                 30   1.000   0.619   0.765
+threatened_species           30   1.000   0.238   0.385
+time_series                  30   0.357   1.000   0.526
+
+Total API cost: $0.2072
+
+Report saved to: data\prompt_eval_reports\dev_subset_abstract.json
