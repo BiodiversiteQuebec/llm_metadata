@@ -316,14 +316,16 @@ print(f"F1: {micro_metrics['f1']:.3f}")
 **Run prompt evaluation from CLI**
 
 ```bash
-# Abstract mode on dev subset (cached by default)
+# Abstract mode on a manifest-defined subset (cached by default)
 uv run python -m llm_metadata.prompt_eval \
-  --subset data/dev_subset.csv \
+  --manifest data/manifests/dev_subset_data_paper.csv \
+  --prompt prompts.abstract \
   --name dev_subset_abstract_20260220_01
 
 # Force fresh API calls (skip joblib cache)
 uv run python -m llm_metadata.prompt_eval \
-  --subset data/dev_subset.csv \
+  --manifest data/manifests/dev_subset_data_paper.csv \
+  --prompt prompts.abstract \
   --name dev_subset_abstract_20260220_02 \
   --skip-cache
 ```

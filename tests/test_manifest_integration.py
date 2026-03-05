@@ -3,7 +3,6 @@
 These tests validate the acceptance criteria from plans/data-papers-manifest-refactor.md:
 - Manifest-driven PDF eval resolves pdf_local_path without DOI name inference
 - Duplicate GT IDs trigger validation error
-- Backward compatibility: abstract mode + old subset flag still work
 - dev_subset manifest meets preflight criteria (30/30 coverage)
 """
 
@@ -224,45 +223,6 @@ class TestDuplicateGtIdRejection:
 
 
 # ---------------------------------------------------------------------------
-# Backward compatibility: old subset DOI filter still works
-# ---------------------------------------------------------------------------
-
-
-class TestBackwardCompatSubset:
-    """Ensure the legacy --subset + DOI-based filter still functions."""
-
-    def test_old_subset_csv_loads(self, tmp_path):
-        pytest.importorskip("pandas")
-        import pandas as pd
-
-        # Legacy dev_subset.csv format: id, doi, source, notes
-        subset_data = {
-            "id": [1, 2],
-            "doi": ["https://doi.org/10.5061/dryad.abc", "https://doi.org/10.5281/zenodo.12345"],
-            "source": ["dryad", "zenodo"],
-            "notes": ["", ""],
-        }
-        subset_path = tmp_path / "dev_subset.csv"
-        pd.DataFrame(subset_data).to_csv(str(subset_path), index=False)
-
-        from llm_metadata.data_paper_manifest import _load_subset_ids
-        ids = _load_subset_ids(subset_path)
-        assert ids == {1, 2}
-
-    def test_new_subset_csv_with_gt_record_id_col(self, tmp_path):
-        pytest.importorskip("pandas")
-        import pandas as pd
-
-        subset_data = {"gt_record_id": [5, 9, 19]}
-        subset_path = tmp_path / "manifest_subset.csv"
-        pd.DataFrame(subset_data).to_csv(str(subset_path), index=False)
-
-        from llm_metadata.data_paper_manifest import _load_subset_ids
-        ids = _load_subset_ids(subset_path)
-        assert ids == {5, 9, 19}
-
-
-# ---------------------------------------------------------------------------
 # Acceptance: dev_subset manifest preflight (30/30 coverage)
 # ---------------------------------------------------------------------------
 
@@ -276,7 +236,7 @@ class TestDevSubsetManifestPreflight:
         assert self.DEV_SUBSET_MANIFEST.exists(), (
             f"dev_subset manifest not found at {self.DEV_SUBSET_MANIFEST}. "
             "Run: uv run python -m llm_metadata.data_paper_manifest "
-            "--subset data/dev_subset.csv --output data/manifests/dev_subset_data_paper.csv"
+            "--subset-ids 9,19,27 --output data/manifests/dev_subset_data_paper.csv"
         )
 
     def test_row_count_equals_30(self):

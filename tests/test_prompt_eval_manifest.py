@@ -4,7 +4,6 @@ These tests verify:
 - When manifest_path is provided, pdf_local_path is used directly
 - Records with pdf_local_path=None are skipped with a warning
 - --manifest CLI flag is accepted and passed through
-- Backward compat: --subset + --pdf-dir still works without --manifest
 - Manifest metadata (article_doi, source_doi, pdf_local_path, is_oa) is
   included in the saved report records dict
 
@@ -15,7 +14,6 @@ from __future__ import annotations
 
 import csv
 import sys
-import warnings
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -49,6 +47,7 @@ def tiny_gt_xlsx(tmp_path):
         "pdf_url": [None, None, None],
         "journal_url": [None, None, None],
         "title": ["Paper A", "Paper B", "Paper C"],
+        "abstract": ["Abstract 10", "Abstract 20", "Abstract 30"],
         # Annotation fields expected by DatasetFeaturesNormalized
         "data_type": [None, None, None],
         "geospatial_info_dataset": [None, None, None],
@@ -154,6 +153,7 @@ def mock_extraction_result():
 # ---------------------------------------------------------------------------
 
 _PATCH_TARGET = "llm_metadata.gpt_classify.classify_pdf_file"
+_PATCH_TARGET_ABSTRACT = "llm_metadata.gpt_classify.classify_abstract"
 
 
 # ---------------------------------------------------------------------------
@@ -271,93 +271,32 @@ class TestManifestPdfPathUsed:
         assert set(records.keys()).issubset({"10", "20", "30"})
 
 
-# ---------------------------------------------------------------------------
-# Test: subset + manifest emits deprecation warning
-# ---------------------------------------------------------------------------
-
-
-class TestSubsetWithManifestDeprecation:
-    def test_subset_ignored_when_manifest_provided(
-        self, tiny_gt_xlsx, tiny_manifest_csv, mock_extraction_result, tmp_path
+class TestManifestSubsetAbstractMode:
+    def test_manifest_filters_ids_without_forcing_pdf_mode(
+        self, tiny_gt_xlsx, tiny_manifest_csv, mock_extraction_result
     ):
-        """When --manifest and --subset are both given in PDF mode, a
-        DeprecationWarning must be emitted."""
+        """With prompt=abstract + manifest, run_eval must use abstract extraction
+        and still restrict records to manifest gt_record_id values."""
         pytest.importorskip("pandas")
-        import pandas as pd
         from llm_metadata.prompt_eval import run_eval
 
-        # Create a tiny subset CSV (legacy format)
-        subset_csv = tmp_path / "subset.csv"
-        pd.DataFrame({"doi": ["10.5061/dryad.aaa"], "source": ["dryad"]}).to_csv(
-            str(subset_csv), index=False
-        )
+        abstract_calls: list[str] = []
 
-        def fake_classify(pdf_path, **kwargs):
+        def fake_classify_abstract(abstract, **kwargs):
+            abstract_calls.append(str(abstract))
             return mock_extraction_result
 
-        with patch(_PATCH_TARGET, side_effect=fake_classify):
-            with warnings.catch_warnings(record=True) as caught:
-                warnings.simplefilter("always")
-                run_eval(
-                    prompt_module="prompts.pdf_file",
-                    gt_path=str(tiny_gt_xlsx),
-                    manifest_path=str(tiny_manifest_csv),
-                    subset_path=str(subset_csv),
-                )
-
-        deprecation_warnings = [
-            w for w in caught if issubclass(w.category, DeprecationWarning)
-        ]
-        assert len(deprecation_warnings) >= 1
-        assert any("manifest" in str(w.message).lower() for w in deprecation_warnings)
-
-
-# ---------------------------------------------------------------------------
-# Test: backward compat — --subset + --pdf-dir without --manifest still works
-# ---------------------------------------------------------------------------
-
-
-class TestBackwardCompatSubsetPdfDir:
-    def test_subset_pdf_dir_without_manifest(
-        self, tiny_gt_xlsx, mock_extraction_result, tmp_path
-    ):
-        """Legacy mode: --pdf-dir + --subset (no --manifest) must still work
-        and use DOI-to-filename inference for PDF lookup."""
-        pytest.importorskip("pandas")
-        import pandas as pd
-        from llm_metadata.prompt_eval import run_eval
-
-        # Create a fake PDF using DOI-based naming for record id=10
-        pdf_dir = tmp_path / "pdfs"
-        pdf_dir.mkdir()
-        # DOI for record 10 is 10.5061/dryad.aaa → source_url, but the legacy
-        # PDF mode uses source_doi (from source_url column). Filename convention:
-        # bare DOI with / replaced by _
-        (pdf_dir / "10.5061_dryad.aaa.pdf").write_bytes(b"%PDF-1.4 fake")
-
-        # Subset CSV (legacy format with doi column = source DOI)
-        subset_csv = tmp_path / "subset_legacy.csv"
-        pd.DataFrame(
-            {"doi": ["10.5061/dryad.aaa"], "source": ["dryad"]}
-        ).to_csv(str(subset_csv), index=False)
-
-        calls: list[Path] = []
-
-        def fake_classify(pdf_path, **kwargs):
-            calls.append(Path(pdf_path))
-            return mock_extraction_result
-
-        with patch(_PATCH_TARGET, side_effect=fake_classify):
+        with patch(_PATCH_TARGET_ABSTRACT, side_effect=fake_classify_abstract) as abstract_mock, \
+             patch(_PATCH_TARGET) as pdf_mock:
             report = run_eval(
-                prompt_module="prompts.pdf_file",
+                prompt_module="prompts.abstract",
                 gt_path=str(tiny_gt_xlsx),
-                subset_path=str(subset_csv),
-                pdf_dir=str(pdf_dir),
-                # no manifest_path
+                manifest_path=str(tiny_manifest_csv),
             )
 
-        # Must have attempted at least one extraction (the PDF we created)
-        assert len(calls) >= 1
+        assert abstract_mock.call_count == 3
+        assert pdf_mock.call_count == 0
+        assert set(getattr(report, "records", {}).keys()) == {"10", "20", "30"}
 
 
 # ---------------------------------------------------------------------------
@@ -374,7 +313,6 @@ class TestBuildRecreateCommand:
             prompt_module="prompts.pdf_file",
             manifest_path="data/manifests/dev_subset_data_paper.csv",
             pdf_dir=None,
-            subset_path=None,
             config_path=None,
             fields=None,
             output_path=None,
@@ -394,7 +332,6 @@ class TestBuildRecreateCommand:
             prompt_module="prompts.abstract",
             manifest_path=None,
             pdf_dir=None,
-            subset_path="data/dev_subset.csv",
             config_path=None,
             fields=None,
             output_path=None,
@@ -404,7 +341,7 @@ class TestBuildRecreateCommand:
             skip_cache=False,
         )
         assert "--manifest" not in cmd
-        assert "--subset" in cmd
+        assert "--prompt" in cmd
 
 
 # ---------------------------------------------------------------------------
@@ -430,7 +367,6 @@ class TestCliManifestFlag:
             report.total_cost_usd = 0.0
             report.records = {}
             report.system_message = "sys"
-            report.subset_path = None
             report.manifest_path = kwargs.get("manifest_path")
             report.save = MagicMock()
             return report
@@ -469,7 +405,6 @@ class TestCliManifestFlag:
             report.total_cost_usd = 0.0
             report.records = {}
             report.system_message = "sys"
-            report.subset_path = None
             report.manifest_path = None
             report.save = MagicMock()
             return report

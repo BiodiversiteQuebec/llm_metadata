@@ -140,22 +140,6 @@ class TestBuildManifest:
         assert len(manifest) == 2
         assert all(r.gt_record_id in {1, 2} for r in manifest)
 
-    def test_subset_path(self, minimal_gt_xlsx, minimal_pdf_manifest, tmp_path):
-        pytest.importorskip("pandas")
-        import pandas as pd
-
-        subset_csv = tmp_path / "subset.csv"
-        pd.DataFrame({"id": [1, 3], "notes": ["", ""]}).to_csv(str(subset_csv), index=False)
-
-        manifest = build_manifest(
-            gt_path=minimal_gt_xlsx,
-            pdf_manifest_path=minimal_pdf_manifest,
-            pdf_dir=tmp_path,
-            subset_path=subset_csv,
-        )
-        assert len(manifest) == 2
-        assert {r.gt_record_id for r in manifest} == {1, 3}
-
     def test_invalid_subset_raises(self, minimal_gt_xlsx, minimal_pdf_manifest, tmp_path):
         pytest.importorskip("pandas")
         with pytest.raises(ValueError, match="not found in GT XLSX"):

@@ -21,7 +21,7 @@ CLI
         --gt data/dataset_092624_validated.xlsx \\
         --pdf-manifest data/pdfs/fuster/manifest.csv \\
         --pdf-dir data/pdfs \\
-        --subset data/dev_subset.csv \\
+        --subset-ids 9,19,27 \\
         --output data/manifests/dev_subset_data_paper.csv
 """
 
@@ -87,31 +87,6 @@ def _load_pdf_manifest(manifest_path: str | Path) -> "pd.DataFrame":  # type: ig
     return m
 
 
-def _load_subset_ids(subset_path: str | Path) -> set[int]:
-    """Load gt_record_id integers from a dev_subset CSV.
-
-    Accepts two formats:
-    - New format: ``gt_record_id`` column
-    - Legacy format: ``id`` column (original dev_subset.csv)
-    """
-    try:
-        import pandas as pd  # type: ignore
-    except ImportError as exc:
-        raise ImportError("pandas is required") from exc
-
-    df = pd.read_csv(str(subset_path))
-    if "gt_record_id" in df.columns:
-        col = "gt_record_id"
-    elif "id" in df.columns:
-        col = "id"
-    else:
-        raise ValueError(
-            f"Subset CSV at '{subset_path}' must have 'gt_record_id' or 'id' column; "
-            f"found: {df.columns.tolist()}"
-        )
-    return {int(v) for v in df[col].dropna()}
-
-
 # ---------------------------------------------------------------------------
 # Public builder API
 # ---------------------------------------------------------------------------
@@ -122,7 +97,6 @@ def build_manifest(
     pdf_manifest_path: str | Path = "data/pdfs/fuster/manifest.csv",
     pdf_dir: str | Path = "data/pdfs",
     subset_ids: Optional[set[int]] = None,
-    subset_path: Optional[str | Path] = None,
     allow_missing_pdf: bool = True,
     deduplicate_gt: bool = False,
 ) -> DataPaperManifest:
@@ -140,9 +114,6 @@ def build_manifest(
     subset_ids:
         Optional set of gt_record_ids to include. When provided, only these
         records appear in the output manifest.
-    subset_path:
-        Alternative to ``subset_ids``: path to a CSV with an ``id`` or
-        ``gt_record_id`` column. Takes precedence if both are given.
     allow_missing_pdf:
         If False, raises ValueError when a record has no resolved PDF.
         Default True (warnings only).
@@ -160,10 +131,6 @@ def build_manifest(
         import pandas as pd  # type: ignore
     except ImportError as exc:
         raise ImportError("pandas is required") from exc
-
-    # Resolve subset IDs
-    if subset_path is not None:
-        subset_ids = _load_subset_ids(subset_path)
 
     # Load GT XLSX
     gt = _load_gt(gt_path)
@@ -414,8 +381,11 @@ def main() -> None:
     parser.add_argument("--pdf-dir", default="data/pdfs",
                         dest="pdf_dir",
                         help="Root directory for PDF files.")
-    parser.add_argument("--subset", default=None,
-                        help="CSV with 'id' or 'gt_record_id' column to filter records.")
+    parser.add_argument(
+        "--subset-ids",
+        default=None,
+        help="Comma-separated gt_record_id values to include (e.g., 9,19,27).",
+    )
     parser.add_argument("--output", required=True,
                         help="Output path for the manifest CSV.")
     parser.add_argument("--strict", action="store_true",
@@ -425,11 +395,20 @@ def main() -> None:
     args = parser.parse_args()
 
     print(f"Building manifest from GT={args.gt}, PDF manifest={args.pdf_manifest}")
+    subset_ids: Optional[set[int]] = None
+    if args.subset_ids:
+        try:
+            subset_ids = {int(token.strip()) for token in args.subset_ids.split(",") if token.strip()}
+        except ValueError as exc:
+            raise ValueError(
+                f"Invalid --subset-ids value {args.subset_ids!r}; expected comma-separated integers."
+            ) from exc
+
     manifest = build_manifest(
         gt_path=args.gt,
         pdf_manifest_path=args.pdf_manifest,
         pdf_dir=args.pdf_dir,
-        subset_path=args.subset,
+        subset_ids=subset_ids,
         allow_missing_pdf=not args.strict,
         deduplicate_gt=args.deduplicate_gt,
     )
