@@ -338,7 +338,7 @@ class EvaluationReport:
 				run_id="abstract_20260219_01",
 				prompt_module="prompts.abstract",
 				model="gpt-5-mini",
-				subset="data/dev_subset.csv",
+				manifest_path="data/manifests/dev_subset_data_paper.csv",
 				cost_usd=0.12
 		"""
 		import json

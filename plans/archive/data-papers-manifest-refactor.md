@@ -6,7 +6,7 @@
 
 ## Objective
 
-Replace `dev_subset.csv` DOI-driven selection with a canonical manifest contract that:
+Replace legacy DOI-driven subset selection with a canonical manifest contract that:
 
 1. uses `gt_record_id` as the primary join key,
 2. stores normalized source/article DOI references,
@@ -59,7 +59,7 @@ Replace `dev_subset.csv` DOI-driven selection with a canonical manifest contract
 
 **deps:** WU-SR1 | **files:** `src/llm_metadata/data_paper_manifest.py`, `tests/test_data_paper_manifest.py`
 
-- Add a builder that joins validated GT XLSX + `data/pdfs/fuster/manifest.csv` + optional subset input.
+- Add a builder that joins validated GT XLSX + `data/pdfs/fuster/manifest.csv` + optional explicit `subset_ids` input.
 - Resolve `article_doi`, `source_doi`, `pdf_local_path` and provenance fields per record.
 - Add integrity checks: unique `gt_record_id`, no orphan subset IDs, no ambiguous joins.
 - Add CLI entrypoint for generating manifest outputs (CSV only).
@@ -70,7 +70,7 @@ Replace `dev_subset.csv` DOI-driven selection with a canonical manifest contract
 
 - Add `--manifest` and `manifest_path` API argument.
 - In PDF mode, load records from manifest and use `pdf_local_path` directly.
-- Keep `--subset` for backward compatibility, but deprecate for PDF mode.
+- Remove `--subset` filtering; use manifest `gt_record_id` as the only subset selector.
 - Preserve report metadata by attaching manifest-derived fields.
 
 #### WU-SR4: Integrate with PDF download + retrieval flows `opus`
@@ -92,10 +92,10 @@ Replace `dev_subset.csv` DOI-driven selection with a canonical manifest contract
 
 #### WU-SR6: Migrate dev_subset to manifest format `haiku`
 
-**deps:** WU-SR2 | **files:** `data/dev_subset.csv`, `data/manifests/dev_subset_data_paper.csv`
+**deps:** WU-SR2 | **files:** `data/manifests/dev_subset_data_paper.csv`, `scripts/*`
 
-- Generate `dev_subset` manifest using the same 30 GT IDs.
-- Preserve subset notes/tags in manifest.
+- Generate `dev_subset` manifest using an explicit GT ID set (e.g., `subset_ids={...}` / `--subset-ids`).
+- Move old subset notes/tags to manifest build docs/scripts (not prompt-eval inputs).
 - Validate that all included records have resolved `article_doi`; for PDF mode, validate `pdf_local_path` availability.
 
 #### WU-SR7: Validation + acceptance gates `sonnet`
@@ -105,12 +105,12 @@ Replace `dev_subset.csv` DOI-driven selection with a canonical manifest contract
 - Add integration test: manifest-driven prompt_eval PDF mode should not skip Dryad/Zenodo rows due to source DOI mismatch.
 - Add regression test for duplicate GT IDs and ambiguous DOI joins.
 - Run prompt_eval on dev subset with manifest and verify extraction coverage improvement.
-- Confirm backward compatibility for abstract mode + old subset flag.
+- Confirm abstract mode works with manifest-defined subsets (`--prompt prompts.abstract --manifest ...`).
 - Replay `data/prompt_eval_reports/dev_subset_pdf_file.log` run conditions and verify full 30/30 PDF coverage.
 
 ### WU-SR7 Replay Steps: `dev_subset_pdf_file` rerun (target: 30 PDFs)
 
-1. Build `data/manifests/dev_subset_data_paper.csv` from the same 30 `data/dev_subset.csv` IDs.
+1. Build `data/manifests/dev_subset_data_paper.csv` from an explicit 30-ID set (`--subset-ids` or `subset_ids={...}`).
 2. Preflight-check manifest:
    - `row_count == 30`
    - `unique(gt_record_id) == 30`

@@ -1,6 +1,6 @@
 # Plan: Populate source_url, journal_url, pdf_url, is_oa, cited_article_doi
 
-> **Status:** Ready for implementation
+> **Status:** Completed (archived 2026-03-05)
 > **Created:** 2026-02-17
 > **Model:** `sonnet`
 > **Deps:** WU-A1 (done), WU-A2 (done)

@@ -1,5 +1,29 @@
 # TODO
 
+## Data-Paper Manifest Refactor ✅
+
+> **Plan:** [`plans/archive/data-papers-manifest-refactor.md`](plans/archive/data-papers-manifest-refactor.md)
+>
+> All 8 work units complete. Acceptance criteria met.
+
+- [x] WU-SR1: `src/llm_metadata/doi_utils.py` + `schemas/data_paper.py` (`DataPaperRecord`, `DataPaperManifest`) + tests
+- [x] WU-SR2: `src/llm_metadata/data_paper_manifest.py` — builder joining GT XLSX + PDF manifest, save/load CSV, CLI entrypoint + tests
+- [x] WU-SR3: `prompt_eval.py` — `--manifest` / `manifest_path` arg; PDF mode uses `pdf_local_path` directly; backward compat preserved + tests
+- [x] WU-SR4: DOI normalization centralized via `doi_utils` in `article_retrieval.py` and `pdf_download.py`; `update_record_pdf_path()` helper in manifest module
+- [x] WU-SR5: `src/llm_metadata/manifest_adapters.py` — adapter functions for fulltext/pdf/section pipelines + tests
+- [x] WU-SR6: `data/manifests/dev_subset_data_paper.csv` generated — 30/30 records with `pdf_local_path` on disk
+- [x] WU-SR7: Integration tests in `tests/test_manifest_integration.py` — preflight passes (30/30 PDF coverage), duplicate ID rejection, backward compat
+- [x] WU-SR8: TODO.md + notebooks/README.md updated
+
+**Acceptance criteria:**
+- PDF eval mode uses manifest `pdf_local_path` (no DOI name inference required) ✅
+- DOI normalization centralized in `doi_utils.py` ✅
+- dev_subset manifest at `data/manifests/dev_subset_data_paper.csv` with 30/30 PDFs on disk ✅
+- Provider provenance fields available in `DataPaperRecord` without raw API blobs ✅
+- Existing pipelines remain runnable via adapter compatibility layer ✅
+
+---
+
 ## Prompt Engineering — Phase 2 ✅
 
 > **Plan:** [`plans/prompt-engineering-flow.md`](plans/prompt-engineering-flow.md)
@@ -62,7 +86,7 @@
 
 ### WU-A3: Enrich URL metadata (source_url, journal_url, pdf_url, is_oa) `sonnet` ✅
 
-> **Plan:** [`plans/enrich_url_metadata.md`](plans/enrich_url_metadata.md)
+> **Plan:** [`plans/archive/enrich_url_metadata.md`](plans/archive/enrich_url_metadata.md)
 
 - [x] Add `enrich_article_metadata()` to `article_retrieval.py` (OpenAlex + SS fallback)
 - [x] Column rename in validation notebook (`url` → `source_url`, `cited_articles` → `cited_article_doi`)

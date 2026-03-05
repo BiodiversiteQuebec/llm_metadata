@@ -14,6 +14,8 @@ from pathlib import Path
 from typing import Optional, Dict, List
 from urllib.parse import urlparse
 
+from llm_metadata import doi_utils
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -74,7 +76,9 @@ def sanitize_doi(doi: str) -> str:
     """
     Sanitize DOI for use as filename.
 
-    Replaces characters that are problematic in filenames.
+    Delegates to ``doi_utils.doi_filename_stem`` for prefix stripping and
+    slash replacement, then additionally replaces backslashes, colons, and
+    spaces which may appear in malformed DOI strings.
 
     Args:
         doi: DOI string (e.g., "10.1371/journal.pone.0128238")
@@ -86,15 +90,10 @@ def sanitize_doi(doi: str) -> str:
         >>> sanitize_doi("10.1371/journal.pone.0128238")
         '10.1371_journal.pone.0128238'
     """
-    # Remove common prefixes
-    doi = doi.replace("https://doi.org/", "")
-    doi = doi.replace("http://doi.org/", "")
-    doi = doi.replace("doi:", "")
-
-    # Replace problematic characters
-    sanitized = doi.replace("/", "_").replace("\\", "_")
-    sanitized = sanitized.replace(":", "_").replace(" ", "_")
-
+    stem = doi_utils.doi_filename_stem(doi)
+    # doi_filename_stem handles prefix stripping and "/" → "_"; apply
+    # additional replacements for edge-case characters in malformed DOIs.
+    sanitized = stem.replace("\\", "_").replace(":", "_").replace(" ", "_")
     return sanitized
 
 

@@ -30,8 +30,10 @@ presentation/
 data/_runtime_pdfs/
 artifacts/
 qdrant_storage/
-# prompt_eval result JSONs stored in data/ (commit baselines with git add -f)
+# prompt_eval result JSONs/logs — commit baselines with git add -f
 data/*.json
+data/prompt_eval_reports/*.json
+data/prompt_eval_reports/*.log
 *tmpclaude-*
 uv.lock
 .jupyter_ystore.db

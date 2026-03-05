@@ -193,7 +193,7 @@ Add round-trip persistence to `EvaluationReport` so runs can be saved, loaded, a
   "run_id": "abstract_20260219_01",
   "prompt_module": "prompts.abstract",
   "model": "gpt-5-mini",
-  "subset": "data/dev_subset.csv",
+  "manifest_path": "data/manifests/dev_subset_data_paper.csv",
   "timestamp": "2026-02-19T14:30:00",
   "cost_usd": 0.12,
   "config": {
@@ -238,7 +238,7 @@ Two interfaces, one engine.
 ```bash
 uv run python -m llm_metadata.prompt_eval \
   --prompt prompts.abstract \
-  --subset data/dev_subset.csv \
+  --manifest data/manifests/dev_subset_data_paper.csv \
   --config configs/eval_default.json \
   --fields species,data_type,time_series \
   --output results/abstract_20260219_01.json
@@ -255,7 +255,7 @@ from llm_metadata.groundtruth_eval import EvaluationReport
 # Run fresh extraction + evaluation
 report = run_eval(
     prompt_module="prompts.abstract",
-    subset_path="data/dev_subset.csv",
+    manifest_path="data/manifests/dev_subset_data_paper.csv",
     config_path="configs/eval_default.json",
 )
 report.save("results/abstract_20260219_01.json",
@@ -279,23 +279,16 @@ configs/
 
 CLI default: `--config configs/eval_default.json`. Notebooks load the same files via `EvaluationConfig.from_json()`. Single source of truth — no config drift.
 
-### 2.5 Curate dev subset `sonnet`
+### 2.5 Curate dev manifest subset `sonnet`
 
-**deps:** WU-EH5 (audit informs selection) | **files:** `data/dev_subset.csv`
-
-```csv
-doi,source,notes
-10.5061/dryad.xxx,dryad,good species variety
-10.5281/zenodo.yyy,zenodo,tricky spatial scope
-...
-```
+**deps:** WU-EH5 (audit informs selection) | **files:** `data/manifests/dev_subset_data_paper.csv`, `scripts/*`
 
 30 records (10 per source: Dryad, Zenodo, SS). Selection criteria informed by Phase 1 audit:
 - Cover hard cases: multi-dataset papers, vernacular+scientific species, ambiguous spatial scope
 - Include boolean edge cases (positive examples for `time_series`, `threatened_species`, `bias_north_south`)
 - Include GT-ambiguity cases (annotator intent unclear)
 
-The file is hand-curated once and stable. Changing it breaks comparability across prompt iterations — if it must change, bump the filename (`dev_subset_v2.csv`).
+The manifest is built once from a stable GT ID list and versioned. Changing membership breaks comparability across prompt iterations — if it must change, bump the manifest name (e.g., `dev_subset_v2_data_paper.csv`).
 
 ### 2.6 Results visualization — notebook + Streamlit `sonnet`
 
@@ -484,7 +477,7 @@ configs/
   eval_strict.json
 
 data/
-  dev_subset.csv              # 30-record curated subset (stable, versioned)
+  manifests/dev_subset_data_paper.csv  # 30-record curated subset manifest (stable, versioned)
   dataset_092624_validated.xlsx
 
 results/                      # prompt_eval output (JSON), gitignored except baselines
