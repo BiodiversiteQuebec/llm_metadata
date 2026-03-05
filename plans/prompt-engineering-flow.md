@@ -146,9 +146,9 @@ Build the tooling that makes prompt iteration fast and measurable: versioned pro
 
 ### 2.1 Prompt Refactor — `prompts/` package `sonnet`
 
-**deps:** none | **files:** `src/llm_metadata/prompts/`, `gpt_classify.py`, pipeline modules
+**deps:** none | **files:** `src/llm_metadata/prompts/`, `gpt_extract.py`, pipeline modules
 
-Extract prompts from `gpt_classify.py` into a dedicated package with a shared base:
+Extract prompts from `gpt_extract.py` into a dedicated package with a shared base:
 
 ```
 src/llm_metadata/prompts/
@@ -176,7 +176,7 @@ Each module exposes:
 - `build_prompt(**overrides) -> str` — parameterized constructor (for experiments, e.g. injecting field-specific emphasis)
 
 **Refactor in consuming modules:**
-- `gpt_classify.py`: import `SYSTEM_MESSAGE` from `prompts.abstract` (delete inline constants)
+- `gpt_extract.py`: import `SYSTEM_MESSAGE` from `prompts.abstract` (delete inline constants)
 - `section_pipeline.py` / `text_pipeline.py`: import from `prompts.section`
 - `pdf_pipeline.py`: import from `prompts.pdf_file`
 

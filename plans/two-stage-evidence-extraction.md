@@ -138,7 +138,7 @@ def extract_metadata(text, mode='fast'):
 ### Option B: Post-Hoc Evidence (Lighter Alternative)
 ```python
 # Stage 1: Extract features (existing approach)
-result = classify_abstract(text, schema=DatasetFeatureExtraction)
+result = extract_from_text(text, schema=DatasetFeatureExtraction)
 
 # Stage 2 (optional): Explain extractions only when needed
 if need_evidence:
@@ -190,7 +190,7 @@ Output: list[FieldEvidence]
    - Does Stage 1 have acceptable recall (>90%)?
 
 ### Phase 3: Integration (Optional, 1 Week)
-1. **If metrics justify:** Implement mode-based extraction in `gpt_classify.py`
+1. **If metrics justify:** Implement mode-based extraction in `gpt_extract.py`
 2. **Add evidence storage:** Save evidence artifacts for later analysis
 3. **Update notebooks:** Use two-stage for evaluation workflows
 
@@ -270,7 +270,7 @@ Output: list[FieldEvidence]
 
 ## References
 
-- Current implementation: `src/llm_metadata/gpt_classify.py`
+- Current implementation: `src/llm_metadata/gpt_extract.py`
 - Evaluation framework: `src/llm_metadata/groundtruth_eval.py`
 - Evidence schema: `src/llm_metadata/schemas/fuster_features.py` (`FieldEvidence`)
 - Test notebook: `notebooks/single_doi_extraction_with_evidence.ipynb`

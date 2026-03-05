@@ -167,7 +167,7 @@ def normalize_heading(heading: str) -> str:
     return heading
 
 
-def classify_section(heading: str) -> SectionType:
+def extract_from_section(heading: str) -> SectionType:
     """
     Classify section heading into canonical SectionType.
 
@@ -181,11 +181,11 @@ def classify_section(heading: str) -> SectionType:
         Canonical SectionType enum value
 
     Example:
-        >>> classify_section("1. Introduction")
+        >>> extract_from_section("1. Introduction")
         <SectionType.INTRO: 'INTRO'>
-        >>> classify_section("Materials and Methods")
+        >>> extract_from_section("Materials and Methods")
         <SectionType.METHODS: 'METHODS'>
-        >>> classify_section("Novel Section Name")
+        >>> extract_from_section("Novel Section Name")
         <SectionType.OTHER: 'OTHER'>
     """
     # Normalize heading
@@ -282,6 +282,6 @@ if __name__ == "__main__":
     print("Section Classification Tests:")
     print("-" * 60)
     for heading in test_headings:
-        section_type = classify_section(heading)
+        section_type = extract_from_section(heading)
         normalized = normalize_heading(heading)
         print(f"{heading:40s} → {section_type.value:15s} ('{normalized}')")

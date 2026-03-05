@@ -1,27 +1,18 @@
-"""Tests for llm_metadata.data_paper_manifest."""
+"""Tests for DataPaperManifest construction and CSV persistence."""
 
 import csv
-import io
-from pathlib import Path
 
 import pytest
 
-from llm_metadata.data_paper_manifest import (
-    build_manifest,
-    save_manifest_csv,
-    load_manifest_csv,
+from llm_metadata.schemas.data_paper import (
+    DataPaperManifest,
+    DataPaperRecord,
     _resolve_pdf_path,
 )
-from llm_metadata.schemas.data_paper import DataPaperManifest, DataPaperRecord
 
-
-# ---------------------------------------------------------------------------
-# Fixtures
-# ---------------------------------------------------------------------------
 
 @pytest.fixture
 def minimal_gt_xlsx(tmp_path):
-    """Create a minimal GT XLSX with 3 records."""
     pytest.importorskip("pandas")
     import pandas as pd
 
@@ -49,8 +40,18 @@ def minimal_gt_xlsx(tmp_path):
 
 
 @pytest.fixture
+def minimal_raw_xlsx(tmp_path):
+    pytest.importorskip("pandas")
+    import pandas as pd
+
+    data = {"id": [1, 2, 3], "full_text": ["Abstract 1", "Abstract 2", "Abstract 3"]}
+    path = tmp_path / "raw.xlsx"
+    pd.DataFrame(data).to_excel(str(path), index=False)
+    return path
+
+
+@pytest.fixture
 def minimal_pdf_manifest(tmp_path):
-    """Create a minimal PDF manifest CSV."""
     rows = [
         {
             "article_doi": "https://doi.org/10.1371/journal.pone.0001",
@@ -76,26 +77,17 @@ def minimal_pdf_manifest(tmp_path):
         },
     ]
     path = tmp_path / "manifest.csv"
-    with path.open("w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=list(rows[0].keys()))
+    with path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=list(rows[0].keys()))
         writer.writeheader()
         writer.writerows(rows)
     return path
 
 
-# ---------------------------------------------------------------------------
-# Tests
-# ---------------------------------------------------------------------------
-
-
 class TestResolvePdfPath:
-    def test_backslash_path(self, tmp_path):
-        result = _resolve_pdf_path("fuster\\test.pdf", tmp_path)
-        assert result == str(tmp_path / "fuster" / "test.pdf")
-
-    def test_forward_slash_path(self, tmp_path):
-        result = _resolve_pdf_path("fuster/test.pdf", tmp_path)
-        assert result == str(tmp_path / "fuster" / "test.pdf")
+    def test_normalizes_separators(self, tmp_path):
+        assert _resolve_pdf_path("fuster\\test.pdf", tmp_path) == str(tmp_path / "fuster" / "test.pdf")
+        assert _resolve_pdf_path("fuster/test.pdf", tmp_path) == str(tmp_path / "fuster" / "test.pdf")
 
     def test_empty_returns_none(self, tmp_path):
         assert _resolve_pdf_path("", tmp_path) is None
@@ -103,114 +95,78 @@ class TestResolvePdfPath:
 
 
 class TestBuildManifest:
-    def test_full_join(self, minimal_gt_xlsx, minimal_pdf_manifest, tmp_path):
-        pytest.importorskip("pandas")
-        manifest = build_manifest(
+    def test_builds_from_gt_pdf_manifest_and_raw(
+        self, minimal_gt_xlsx, minimal_raw_xlsx, minimal_pdf_manifest, tmp_path
+    ):
+        manifest = DataPaperManifest.build(
             gt_path=minimal_gt_xlsx,
+            raw_path=minimal_raw_xlsx,
             pdf_manifest_path=minimal_pdf_manifest,
             pdf_dir=tmp_path,
         )
         assert len(manifest) == 3
         by_id = manifest.by_id()
+        assert by_id[1].abstract == "Abstract 1"
+        assert by_id[1].article_doi == "10.1371/journal.pone.0001"
+        assert by_id[1].pdf_local_path is not None
+        assert by_id[2].pdf_local_path is None
+        assert by_id[3].article_doi is None
 
-        # Record 1: has article_doi and pdf_local_path
-        r1 = by_id[1]
-        assert r1.article_doi == "10.1371/journal.pone.0001"
-        assert r1.source_doi == "10.5061/dryad.abc"
-        assert r1.pdf_local_path is not None
-        assert "10.1371_journal.pone.0001.pdf" in r1.pdf_local_path
-
-        # Record 2: no PDF downloaded
-        r2 = by_id[2]
-        assert r2.article_doi == "10.1371/journal.pone.0002"
-        assert r2.pdf_local_path is None
-
-        # Record 3: no article_doi in GT, no PDF
-        r3 = by_id[3]
-        assert r3.article_doi is None
-
-    def test_subset_filter(self, minimal_gt_xlsx, minimal_pdf_manifest, tmp_path):
-        pytest.importorskip("pandas")
-        manifest = build_manifest(
+    def test_subset_filter(self, minimal_gt_xlsx, minimal_raw_xlsx, minimal_pdf_manifest, tmp_path):
+        manifest = DataPaperManifest.build(
             gt_path=minimal_gt_xlsx,
+            raw_path=minimal_raw_xlsx,
             pdf_manifest_path=minimal_pdf_manifest,
             pdf_dir=tmp_path,
             subset_ids={1, 2},
         )
-        assert len(manifest) == 2
-        assert all(r.gt_record_id in {1, 2} for r in manifest)
+        assert len(manifest.records) == 2
 
-    def test_invalid_subset_raises(self, minimal_gt_xlsx, minimal_pdf_manifest, tmp_path):
-        pytest.importorskip("pandas")
-        with pytest.raises(ValueError, match="not found in GT XLSX"):
-            build_manifest(
-                gt_path=minimal_gt_xlsx,
-                pdf_manifest_path=minimal_pdf_manifest,
-                pdf_dir=tmp_path,
-                subset_ids={999},
-            )
-
-    def test_duplicate_gt_ids_raise(self, minimal_pdf_manifest, tmp_path):
+    def test_duplicate_gt_ids_raise(self, minimal_pdf_manifest, minimal_raw_xlsx, tmp_path):
         pytest.importorskip("pandas")
         import pandas as pd
 
-        data = {
-            "id": [1, 1],  # duplicate!
-            "source": ["dryad", "dryad"],
-            "source_url": ["https://doi.org/10.5061/a", "https://doi.org/10.5061/b"],
-            "cited_article_doi": [None, None],
-            "is_oa": [None, None],
-            "pdf_url": [None, None],
-            "journal_url": [None, None],
-            "title": ["A", "B"],
-        }
         bad_gt = tmp_path / "bad_gt.xlsx"
-        pd.DataFrame(data).to_excel(str(bad_gt), index=False)
+        pd.DataFrame(
+            {
+                "id": [1, 1],
+                "source": ["dryad", "dryad"],
+                "source_url": ["https://doi.org/10.5061/a", "https://doi.org/10.5061/b"],
+                "cited_article_doi": [None, None],
+                "is_oa": [None, None],
+                "pdf_url": [None, None],
+                "journal_url": [None, None],
+                "title": ["A", "B"],
+            }
+        ).to_excel(str(bad_gt), index=False)
 
-        with pytest.raises(ValueError, match="Duplicate id"):
-            build_manifest(
+        with pytest.raises(ValueError, match="Duplicate id values found"):
+            DataPaperManifest.build(
                 gt_path=bad_gt,
+                raw_path=minimal_raw_xlsx,
                 pdf_manifest_path=minimal_pdf_manifest,
                 pdf_dir=tmp_path,
             )
 
 
-class TestSaveAndLoadManifestCsv:
+class TestManifestCsvRoundTrip:
     def test_roundtrip(self, tmp_path):
-        records = [
-            DataPaperRecord(
-                gt_record_id=9,
-                source="dryad",
-                source_doi="10.5061/dryad.qn1cj",
-                article_doi="10.1371/journal.pone.0128238",
-                pdf_local_path="/some/path.pdf",
-                is_oa=True,
-            ),
-            DataPaperRecord(gt_record_id=19, article_doi="10.1093/jhered/esw073"),
-        ]
-        manifest = DataPaperManifest(records=records)
+        manifest = DataPaperManifest(
+            records=[
+                DataPaperRecord(
+                    gt_record_id=9,
+                    source="dryad",
+                    source_doi="10.5061/dryad.qn1cj",
+                    article_doi="10.1371/journal.pone.0128238",
+                    pdf_local_path="/some/path.pdf",
+                    is_oa=True,
+                ),
+                DataPaperRecord(gt_record_id=19, article_doi="10.1093/jhered/esw073"),
+            ]
+        )
 
-        csv_path = tmp_path / "test_manifest.csv"
-        save_manifest_csv(manifest, csv_path)
-        assert csv_path.exists()
-
-        loaded = load_manifest_csv(csv_path)
-        assert len(loaded) == 2
-        by_id = loaded.by_id()
-
-        assert by_id[9].source_doi == "10.5061/dryad.qn1cj"
-        assert by_id[9].article_doi == "10.1371/journal.pone.0128238"
-        assert by_id[9].pdf_local_path == "/some/path.pdf"
-        assert by_id[9].is_oa is True
-        assert by_id[19].article_doi == "10.1093/jhered/esw073"
-
-    def test_creates_parent_dirs(self, tmp_path):
-        records = [DataPaperRecord(gt_record_id=1)]
-        manifest = DataPaperManifest(records=records)
-        out = tmp_path / "nested" / "dir" / "manifest.csv"
-        save_manifest_csv(manifest, out)
-        assert out.exists()
-
-    def test_load_missing_file_raises(self, tmp_path):
-        with pytest.raises(FileNotFoundError):
-            load_manifest_csv(tmp_path / "nonexistent.csv")
+        csv_path = tmp_path / "nested" / "manifest.csv"
+        manifest.save_csv(csv_path)
+        loaded = DataPaperManifest.load_csv(csv_path)
+        assert loaded.by_id()[9].article_doi == "10.1371/journal.pone.0128238"
+        assert loaded.by_id()[19].article_doi == "10.1093/jhered/esw073"

@@ -1,7 +1,7 @@
 # llm_metadata Project Instructions
 
 ## Project Overview
-Python package for extracting and classifying metadata from biodiversity research using LLMs. Focus on data integration from Zenodo, Dryad, and other sources.
+Python package for extracting and extracting metadata from biodiversity research using LLMs. Focus on data integration from Zenodo, Dryad, and other sources.
 
 ## Repository Structure
 - `src/llm_metadata/` - Main source code with API clients (Zenodo, Dryad) and classification modules

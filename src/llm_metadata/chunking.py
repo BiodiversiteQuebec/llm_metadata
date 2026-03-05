@@ -19,7 +19,7 @@ from llm_metadata.schemas.chunk_metadata import (
     SectionType,
     ParserInfo
 )
-from llm_metadata.section_normalize import classify_section, get_section_path
+from llm_metadata.section_normalize import extract_from_section, get_section_path
 from llm_metadata.pdf_parsing import Section, ParsedDocument
 
 
@@ -320,7 +320,7 @@ def chunk_section(
     section_path = get_section_path(section.title, parent_path)
 
     # Classify section type
-    section_type = classify_section(section.title)
+    section_type = extract_from_section(section.title)
 
     # Create section metadata
     section_metadata = SectionMetadata(

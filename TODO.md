@@ -7,10 +7,10 @@
 > All 8 work units complete. Acceptance criteria met.
 
 - [x] WU-SR1: `src/llm_metadata/doi_utils.py` + `schemas/data_paper.py` (`DataPaperRecord`, `DataPaperManifest`) + tests
-- [x] WU-SR2: `src/llm_metadata/data_paper_manifest.py` — builder joining GT XLSX + PDF manifest, save/load CSV, CLI entrypoint + tests
+- [x] WU-SR2: `src/llm_metadata/schemas/data_paper.py` — builder joining GT XLSX + PDF manifest, save/load CSV, CLI entrypoint + tests
 - [x] WU-SR3: `prompt_eval.py` — `--manifest` / `manifest_path` arg; PDF mode uses `pdf_local_path` directly; backward compat preserved + tests
 - [x] WU-SR4: DOI normalization centralized via `doi_utils` in `article_retrieval.py` and `pdf_download.py`; `update_record_pdf_path()` helper in manifest module
-- [x] WU-SR5: `src/llm_metadata/manifest_adapters.py` — adapter functions for fulltext/pdf/section pipelines + tests
+- [x] WU-SR5: merged into `src/llm_metadata/extraction.py` / `src/llm_metadata/schemas/data_paper.py` during explicit-mode refactor
 - [x] WU-SR6: `data/manifests/dev_subset_data_paper.csv` generated — 30/30 records with `pdf_local_path` on disk
 - [x] WU-SR7: Integration tests in `tests/test_manifest_integration.py` — preflight passes (30/30 PDF coverage), duplicate ID rejection, backward compat
 - [x] WU-SR8: TODO.md + notebooks/README.md updated
@@ -20,7 +20,7 @@
 - DOI normalization centralized in `doi_utils.py` ✅
 - dev_subset manifest at `data/manifests/dev_subset_data_paper.csv` with 30/30 PDFs on disk ✅
 - Provider provenance fields available in `DataPaperRecord` without raw API blobs ✅
-- Existing pipelines remain runnable via adapter compatibility layer ✅
+- Existing extraction modes now run through the unified explicit-mode engine ✅
 
 ---
 
@@ -32,7 +32,7 @@
 
 - [x] WU-EH1: `FieldEvalStrategy` + `field_strategies` + `DEFAULT_FIELD_STRATEGIES` added to `groundtruth_eval.py`
 - [x] WU-EH2: `compare_models` dispatches by `field_strategies` when populated; backward compat preserved
-- [x] WU-2.1: `src/llm_metadata/prompts/` package — `common.py`, `abstract.py`, `section.py`, `pdf_file.py`; `gpt_classify.py` now imports from prompts
+- [x] WU-2.1: `src/llm_metadata/prompts/` package — `common.py`, `abstract.py`, `section.py`, `pdf_file.py`; `gpt_extract.py` now imports from prompts
 - [x] WU-2.2: `EvaluationConfig.to_dict/from_dict/to_json/from_json` + `EvaluationReport.save/load` methods
 - [x] WU-2.3: `src/llm_metadata/prompt_eval.py` — `run_eval()` Python API + CLI (`python -m llm_metadata.prompt_eval --help`)
 - [x] WU-2.4: `configs/eval_default.json`, `configs/eval_fuzzy_species.json`, `configs/eval_strict.json`
@@ -69,10 +69,10 @@
 - [x] Add `DataSource(str, Enum)` with `dryad`, `zenodo`, `semantic_scholar`, `referenced`
 - [x] Add `source: Optional[DataSource]` field
 - [x] Add boolean coercion validator in `DatasetFeaturesNormalized`
-- [x] Update system prompts in `gpt_classify.py` for modulator extraction (all 3: SYSTEM_MESSAGE, SECTION_SYSTEM_MESSAGE, PDF_SYSTEM_MESSAGE)
+- [x] Update system prompts in `gpt_extract.py` for modulator extraction (all 3: SYSTEM_MESSAGE, SECTION_SYSTEM_MESSAGE, PDF_SYSTEM_MESSAGE)
 - [x] Update `schemas/__init__.py` exports (`DatasetFeaturesNormalized`, `DataSource`)
 - [x] Update tests for new fields + boolean coercion edge cases (`tests/test_schema_modulators.py`, 27 new tests)
-- **Tag:** `CLOUD` | **Deps:** none | **Files:** `schemas/fuster_features.py`, `schemas/__init__.py`, `gpt_classify.py`, `tests/test_schema_modulators.py`
+- **Tag:** `CLOUD` | **Deps:** none | **Files:** `schemas/fuster_features.py`, `schemas/__init__.py`, `gpt_extract.py`, `tests/test_schema_modulators.py`
 
 ### WU-A2: Validate all-source ground truth (includes SS Task 3.1) `sonnet` ✅
 
@@ -103,8 +103,8 @@
 - [x] Per-field P/R/F1 for all 14 evaluatable fields (8 core + 6 modulators)
 - [x] Segment by source (Dryad vs Zenodo vs SS), cross-source summary table, mismatch examples
 - [x] HTML report in `notebooks/results/`, extraction CSV for WU-D1
-- [x] `text_pipeline.py`: added `system_message` field to `TextClassificationConfig`
-- **Tag:** `CLOUD` | **Deps:** WU-A2 | **Files:** `text_pipeline.py`, `gpt_classify.py`, `groundtruth_eval.py`, notebook
+- [x] Abstract extraction now runs through the unified explicit-mode engine
+- **Tag:** `CLOUD` | **Deps:** WU-A2 | **Files:** `extraction.py`, `gpt_extract.py`, `groundtruth_eval.py`, notebook
 - **Note:** Notebook created; needs execution (OpenAI API key required). Cache lands at `{PROJECT_ROOT}/cache/` (not gitignored — committable and syncable).
 
 ### WU-C1: Download all PDFs (Dryad + Zenodo + SS) `sonnet` ✅
@@ -127,18 +127,18 @@
 ### WU-C3: Full-text extraction (PDF File API) + eval `sonnet`
 
 - [ ] Refactor `notebooks/batch_pdf_file_evaluation.ipynb` — extend to SS OA PDFs + updated schema
-- [ ] Run PDF File API extraction via `pdf_pipeline.py` on all OA PDFs (Dryad+Zenodo + SS)
+- [ ] Run `pdf_native` extraction mode via `extraction.py` / `prompt_eval.py` on all OA PDFs (Dryad+Zenodo + SS)
 - [ ] Evaluate against ground truth, segment by source, compare vs abstract-only (WU-B2)
 - [ ] HTML report
-- **Tag:** `LOCAL+CLOUD` | **Deps:** WU-C1, WU-A2 | **Files:** `pdf_pipeline.py`, notebook
+- **Tag:** `LOCAL+CLOUD` | **Deps:** WU-C1, WU-A2 | **Files:** `extraction.py`, notebook
 
 ### WU-C4: Section-based extraction + eval `sonnet`
 
 - [ ] Refactor `notebooks/batch_fulltext_evaluation.ipynb` — extend to SS PDFs + updated schema
-- [ ] Run section extraction via `section_pipeline.py` on all GROBID-parsed PDFs
+- [ ] Run `sections` extraction mode via `extraction.py` / `prompt_eval.py` on all GROBID-parsed PDFs
 - [ ] Evaluate, compare vs abstract-only (WU-B2) and full-text (WU-C3)
 - [ ] HTML report
-- **Tag:** `LOCAL` | **Deps:** WU-C2, WU-A2 | **Files:** `section_pipeline.py`, notebook
+- **Tag:** `LOCAL` | **Deps:** WU-C2, WU-A2 | **Files:** `extraction.py`, notebook
 
 ### WU-D1: Assemble presentation materials `opus`
 
@@ -268,7 +268,7 @@
 - [ ] Split `DatasetFeatures` into hierarchy: `BaseFeatureModel` → `SourcesFeatureModel` / `ExtractionFeatureModel` → `EvaluationFeatureModel`
 - [ ] Move source-tracking fields (`is_oa`, `source_url`, etc.) to `SourcesFeatureModel`
 - [ ] Move derived evaluation fields (`gbif_keys`, future `gadm_codes`) to `EvaluationFeatureModel`
-- [ ] Update notebooks, pipelines, and tests to use correct subclass
+- [ ] Update notebooks, extraction, and tests to use correct subclass
 
 ---
 
@@ -276,8 +276,8 @@
 
 - [ ] Streamline artifacts, manifests, data storage
 - [ ] Standardize logging, error handling across modules
-- [ ] Harden pipelines io using manifest with BaseModel and classes serialization
-- [ ] Workflow orchestration with Prefect
+- [ ] Harden extraction io using manifest with BaseModel and classes serialization
+- [ ] Decide whether workflow orchestration is still needed after the explicit-mode simplification
 - [ ] Full DB model (articles, datasets, features, runs, evaluations) + Postgres
 - [ ] Refactor tests to reflect pipeline structure
 - [ ] Refactor classification modules to reflect pipeline structure

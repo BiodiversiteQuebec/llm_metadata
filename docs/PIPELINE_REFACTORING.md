@@ -2,13 +2,13 @@
 
 ## Overview
 
-The monolithic `fulltext_pipeline.py` has been refactored into three focused, specialized pipelines:
+The monolithic `fulltext_pipeline.py` has been refactored into three focused, specialized extraction:
 
 1. **text_pipeline.py** - Direct text classification
 2. **pdf_pipeline.py** - Raw PDF extraction and classification  
 3. **section_pipeline.py** - GROBID-based section extraction and classification
 
-Plus a unified interface in **pipelines.py** for easy access to all three.
+Plus a unified interface in **extraction.py** for easy access to all three.
 
 ## New Structure
 
@@ -17,8 +17,8 @@ src/llm_metadata/
 ├── text_pipeline.py         # Text → GPT
 ├── pdf_pipeline.py           # PDF → pypdf → GPT
 ├── section_pipeline.py       # PDF → GROBID → Sections → GPT
-├── pipelines.py              # Unified interface (classify() function)
-├── gpt_classify.py           # Core GPT functions (updated)
+├── extraction.py              # Unified interface (extract() function)
+├── gpt_extract.py           # Core GPT functions (updated)
 └── fulltext_pipeline.py      # DEPRECATED (with migration guide)
 ```
 
@@ -42,8 +42,8 @@ SectionClassificationConfig(...)  # or
 TextClassificationConfig(...)
 ```
 
-### 3. Consistent API Across All Pipelines
-All three pipelines share the same structure:
+### 3. Consistent API Across All extraction
+All three extraction share the same structure:
 - `*InputRecord` - Input schema
 - `*OutputRecord` - Output schema
 - `*ClassificationConfig` - Configuration
@@ -53,12 +53,12 @@ All three pipelines share the same structure:
 
 ### 4. Unified Interface
 ```python
-from llm_metadata.pipelines import classify
+from llm_metadata.extraction import extract
 
 # Auto-detects the right pipeline
-results = classify("text")  # → text_pipeline
-results = classify(Path("paper.pdf"))  # → pdf_pipeline
-results = classify(Path("paper.pdf"), pipeline="section")  # → section_pipeline
+results = extract("text")  # → text_pipeline
+results = extract(Path("paper.pdf"))  # → pdf_pipeline
+results = extract(Path("paper.pdf"), pipeline="section")  # → section_pipeline
 ```
 
 ## Migration Guide
@@ -136,14 +136,14 @@ results = section_classification_flow(input_records, config)
 
 **New Code (Unified Interface):**
 ```python
-from llm_metadata.pipelines import classify, PDFClassificationConfig
+from llm_metadata.extraction import extract, PDFClassificationConfig
 
 config = PDFClassificationConfig(
     model="gpt-5-mini",
     max_pdf_pages=10
 )
 
-results = classify(
+results = extract(
     source=pdfs,
     pipeline="pdf",  # or "section" or "auto"
     config=config
@@ -163,7 +163,7 @@ Expected output:
 ✓ text_pipeline imports successful
 ✓ pdf_pipeline imports successful
 ✓ section_pipeline imports successful
-✓ unified pipelines interface imports successful
+✓ unified extraction interface imports successful
 ✓ Configuration creation tests pass
 ✓ Record creation tests pass
 ✓ Pipeline auto-detection tests pass
@@ -214,10 +214,10 @@ python -m llm_metadata.section_pipeline
 
 ## Next Steps
 
-1. Update existing notebooks to use new pipelines
+1. Update existing notebooks to use new extraction
 2. Update any scripts that import from fulltext_pipeline.py
 3. Consider removing fulltext_pipeline.py in next major version
-4. Add integration tests for all three pipelines
+4. Add integration tests for all three extraction
 
 ## Files Changed
 
@@ -225,13 +225,13 @@ python -m llm_metadata.section_pipeline
 - `src/llm_metadata/text_pipeline.py` (345 lines)
 - `src/llm_metadata/pdf_pipeline.py` (437 lines)
 - `src/llm_metadata/section_pipeline.py` (592 lines)
-- `src/llm_metadata/pipelines.py` (353 lines) - Unified interface
+- `src/llm_metadata/extraction.py` (353 lines) - Unified interface
 - `docs/pipelines_guide.md` - Comprehensive documentation
 - `test_pipelines.py` - Test suite
 
 ### Modified Files
 - `src/llm_metadata/fulltext_pipeline.py` - Added deprecation warning
-- `src/llm_metadata/gpt_classify.py` - Added raw PDF support (already done)
+- `src/llm_metadata/gpt_extract.py` - Added raw PDF support (already done)
 - `pyproject.toml` - Added pypdf dependency (already done)
 
 ### Total

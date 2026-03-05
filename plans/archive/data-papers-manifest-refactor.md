@@ -82,7 +82,7 @@ Replace legacy DOI-driven subset selection with a canonical manifest contract th
 - Persist selection provenance (`candidate_pdf_urls`, `selected_pdf_url`, reason).
 - Avoid introducing provider-specific raw payload storage into manifest rows.
 
-#### WU-SR5: Add adapters for downstream pipelines `sonnet`
+#### WU-SR5: Add adapters for downstream extraction `sonnet`
 
 **deps:** WU-SR2 | **files:** `src/llm_metadata/manifest_adapters.py`, `src/llm_metadata/fulltext_pipeline.py`, `src/llm_metadata/pdf_pipeline.py`, `src/llm_metadata/section_pipeline.py`, `tests/test_manifest_adapters.py`
 
@@ -148,7 +148,7 @@ Round 5: WU-SR8
 - Source/article DOI normalization behavior is centralized in one utility module.
 - Dev subset exists as a data-paper manifest reusing the same GT records.
 - Provider provenance fields are available in normalized form without raw API blobs.
-- Existing pipelines remain runnable through adapter compatibility.
+- Existing extraction remain runnable through adapter compatibility.
 - Historical `dev_subset_pdf_file` replay passes with full coverage:
   - `data/prompt_eval_reports/dev_subset_pdf_file.log` shows zero PDF-not-found skips
   - `data/prompt_eval_reports/dev_subset_pdf_file.json` includes results for all 30 records

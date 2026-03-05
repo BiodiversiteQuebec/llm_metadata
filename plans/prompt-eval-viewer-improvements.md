@@ -82,7 +82,7 @@ uv run python -m llm_metadata.prompt_eval \
 **files:** `tests/test_prompt_eval.py`
 
 - Test round-trip: `run_eval()` → `save()` → reload predictions → re-evaluate with new config
-- Confirm zero API calls when `pred_from` is set (mock `classify_abstract`)
+- Confirm zero API calls when `pred_from` is set (mock `extract_from_text`)
 
 ---
 

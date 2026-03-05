@@ -75,7 +75,7 @@ Validators must be pure and fast. Enrichment involves network I/O (GBIF API, GAD
 The hierarchy refactor touches:
 - `schemas/fuster_features.py` — split `DatasetFeatures` into hierarchy
 - All notebooks constructing `DatasetFeatures` — pick the right subclass
-- All pipelines (`text_pipeline.py`, `pdf_pipeline.py`, etc.) — update return types
+- All extraction (`text_pipeline.py`, `pdf_pipeline.py`, etc.) — update return types
 - `groundtruth_eval.py` — may benefit but `compare_models()` already handles mixed fields
 - Tests — update model construction
 

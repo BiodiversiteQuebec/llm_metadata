@@ -85,14 +85,14 @@ def parse_location_list(cls, v: Any) -> Optional[list[str]]:
     # Same pattern as parse_species_list — split by ;,, strip, deduplicate
 ```
 
-**System prompt updates in `gpt_classify.py`** — all three (SYSTEM_MESSAGE, SECTION_SYSTEM_MESSAGE, PDF_SYSTEM_MESSAGE):
+**System prompt updates in `gpt_extract.py`** — all three (SYSTEM_MESSAGE, SECTION_SYSTEM_MESSAGE, PDF_SYSTEM_MESSAGE):
 - Add `location_text` bullet describing it as verbatim location names (country, province, region, site name)
 - Place after `geospatial_info_dataset` field description
 - Emphasize: copy-paste from text, do not standardize to ISO codes
 
 **Files:**
 - `schemas/fuster_features.py`
-- `gpt_classify.py`
+- `gpt_extract.py`
 
 **Tests:** `tests/test_schema_location_text.py`
 - String input → list split (comma, semicolon)

@@ -1,8 +1,8 @@
-# Classification Pipelines Guide
+# Classification extraction Guide
 
 ## Overview
 
-The LLM Metadata package provides three specialized classification pipelines for extracting structured metadata from scientific documents:
+The LLM Metadata package provides three specialized classification extraction for extracting structured metadata from scientific documents:
 
 1. **Text Pipeline** - Direct text classification
 2. **PDF Pipeline** - Raw PDF extraction and classification  
@@ -12,16 +12,16 @@ The LLM Metadata package provides three specialized classification pipelines for
 
 ### Unified Interface
 
-The simplest way to use any pipeline is through the unified `classify()` function:
+The simplest way to use any pipeline is through the unified `extract()` function:
 
 ```python
-from llm_metadata.pipelines import classify
+from llm_metadata.extraction import extract
 
-# Auto-detect and classify
-results = classify("path/to/paper.pdf")
+# Auto-detect and extract
+results = extract("path/to/paper.pdf")
 
 # Or specify pipeline explicitly
-results = classify("path/to/paper.pdf", pipeline="pdf")
+results = extract("path/to/paper.pdf", pipeline="pdf")
 ```
 
 ### Pipeline Selection
@@ -208,23 +208,23 @@ results = section_classification_flow(records, config)
 ### Auto-Detection
 
 ```python
-from llm_metadata.pipelines import classify
+from llm_metadata.extraction import extract
 
 # Automatically detects pipeline based on input type
-results = classify("Direct text to classify")  # → text_pipeline
-results = classify(Path("paper.pdf"))  # → pdf_pipeline (default for PDFs)
-results = classify([Path("p1.pdf"), Path("p2.pdf")])  # → pdf_pipeline
+results = extract("Direct text to extract")  # → text_pipeline
+results = extract(Path("paper.pdf"))  # → pdf_pipeline (default for PDFs)
+results = extract([Path("p1.pdf"), Path("p2.pdf")])  # → pdf_pipeline
 ```
 
 ### Explicit Pipeline Selection
 
 ```python
-from llm_metadata.pipelines import classify, TextClassificationConfig
+from llm_metadata.extraction import extract, TextClassificationConfig
 
 # Force specific pipeline
 config = TextClassificationConfig(model="gpt-5-mini")
-results = classify(
-    source="Some text to classify",
+results = extract(
+    source="Some text to extract",
     pipeline="text",
     config=config,
     output_manifest=Path("results.csv")
@@ -234,12 +234,12 @@ results = classify(
 ### Batch Processing
 
 ```python
-from llm_metadata.pipelines import classify
+from llm_metadata.extraction import extract
 from pathlib import Path
 
 # Process directory of PDFs
 pdf_files = list(Path("data/pdfs").glob("*.pdf"))
-results = classify(
+results = extract(
     source=pdf_files,
     pipeline="pdf",
     output_manifest=Path("artifacts/results.csv")
@@ -253,7 +253,7 @@ print(f"Success: {sum(r.status == 'success' for r in results)}")
 
 ### Input Records
 
-All pipelines use structured input records:
+All extraction use structured input records:
 
 ```python
 # Text Pipeline
@@ -268,7 +268,7 @@ SectionInputRecord(id="...", pdf_path="...", metadata={...})
 
 ### Output Records
 
-All pipelines return structured output records:
+All extraction return structured output records:
 
 ```python
 OutputRecord(
@@ -310,7 +310,7 @@ paper_1,"We collected samples...",openalex,2024
 paper_2,"Field surveys were...",crossref,2023
 ```
 
-**Output CSV** (all pipelines):
+**Output CSV** (all extraction):
 ```csv
 id,status,input_tokens,output_tokens,cost_usd,extraction_field1,extraction_field2,...
 paper_1,success,1234,567,0.0123,value1,value2,...
@@ -398,10 +398,10 @@ results = fulltext_extraction_pipeline(config=config, pdf_paths=pdfs)
 
 New code:
 ```python
-from llm_metadata.pipelines import classify, PDFClassificationConfig
+from llm_metadata.extraction import extract, PDFClassificationConfig
 
 config = PDFClassificationConfig()
-results = classify(source=pdfs, pipeline="pdf", config=config)
+results = extract(source=pdfs, pipeline="pdf", config=config)
 ```
 
 ## Troubleshooting
@@ -434,4 +434,4 @@ See individual module documentation:
 - [`text_pipeline.py`](../src/llm_metadata/text_pipeline.py)
 - [`pdf_pipeline.py`](../src/llm_metadata/pdf_pipeline.py)
 - [`section_pipeline.py`](../src/llm_metadata/section_pipeline.py)
-- [`pipelines.py`](../src/llm_metadata/pipelines.py) - Unified interface
+- [`extraction.py`](../src/llm_metadata/extraction.py) - Unified interface

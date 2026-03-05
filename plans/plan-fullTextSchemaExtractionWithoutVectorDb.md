@@ -8,13 +8,13 @@ Test whether feeding complete document sections directly to GPT (without embeddi
 
 2. **Parse PDF to sections** - Use `process_pdf()` from `pdf_parsing.py` to extract `ParsedDocument` with hierarchical `Section` objects containing `.title` and `.text`
 
-3. **Select relevant sections by keywords** - Filter sections where `classify_section(section.title)` returns `ABSTRACT`, `METHODS`, or where `section.title` contains keywords: `data|dataset|survey|site|area|species|sampling|collection`
+3. **Select relevant sections by keywords** - Filter sections where `extract_from_section(section.title)` returns `ABSTRACT`, `METHODS`, or where `section.title` contains keywords: `data|dataset|survey|site|area|species|sampling|collection`
 
 4. **Count tokens per section** - Use `count_tokens(section.text)` from `chunking.py` with tiktoken `cl100k_base` encoding to measure each section's token footprint
 
 5. **Construct prompt with full sections** - Build user message: concatenate abstract + filtered sections with clear delimiters (e.g., `## {section.title}\n{section.text}\n\n`), ensuring total stays under context window limit.
 
-6. **Extract metadata with token logging** - Call `classify_abstract()` from `gpt_classify.py` with full-text prompt; capture `result['usage']` dict containing `prompt_tokens`, `completion_tokens`, `total_tokens`. May need to create a new function `classify_fulltext()` if necessary.
+6. **Extract metadata with token logging** - Call `extract_from_text()` from `gpt_extract.py` with full-text prompt; capture `result['usage']` dict containing `prompt_tokens`, `completion_tokens`, `total_tokens`. May need to create a new function `classify_fulltext()` if necessary.
 
 7. **Evaluate vs ground truth** - Load manual annotation for DOI `10.5061/dryad.3nh72` from `fuster_annotations_validation.ipynb`, use `evaluate_indexed()` from `groundtruth_eval.py` to compute per-field precision/recall/F1
 

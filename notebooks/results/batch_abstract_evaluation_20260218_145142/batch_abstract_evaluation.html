@@ -7813,7 +7813,7 @@ a.anchor-link {
 <li>Per-field P/R/F1 for all 14 evaluatable fields (8 core + 6 modulators)</li>
 <li>Segmented by source: Dryad vs Zenodo vs Semantic Scholar</li>
 </ul>
-<p><strong>Cache note:</strong> The joblib cache in <code>gpt_classify.py</code> uses <code>./cache</code> relative to the working directory.
+<p><strong>Cache note:</strong> The joblib cache in <code>gpt_extract.py</code> uses <code>./cache</code> relative to the working directory.
 This notebook ensures <code>os.chdir(PROJECT_ROOT)</code> is called before imports so the cache lands at
 <code>{PROJECT_ROOT}/cache/</code> — which is NOT matched by the <code>*/cache/*</code> gitignore pattern and can be
 committed and synced to your local machine.</p>
@@ -7836,7 +7836,7 @@ committed and synced to your local machine.</p>
 
 <span class="c1"># ── Cache &amp; working directory ──────────────────────────────────────────────</span>
 <span class="c1"># IMPORTANT: set PROJECT_ROOT and chdir BEFORE importing any llm_metadata</span>
-<span class="c1"># modules. gpt_classify.py creates Memory('./cache') at import time, so the</span>
+<span class="c1"># modules. gpt_extract.py creates Memory('./cache') at import time, so the</span>
 <span class="c1"># resolved cache path depends on cwd at import time.</span>
 <span class="c1">#</span>
 <span class="c1"># Root-level cache/ is NOT matched by the '*/cache/*' gitignore pattern</span>
@@ -7856,7 +7856,7 @@ committed and synced to your local machine.</p>
 <span class="n">load_dotenv</span><span class="p">()</span>
 
 <span class="c1"># ── Project modules ────────────────────────────────────────────────────────</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">llm_metadata.gpt_classify</span><span class="w"> </span><span class="kn">import</span> <span class="n">SYSTEM_MESSAGE</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">llm_metadata.gpt_extract</span><span class="w"> </span><span class="kn">import</span> <span class="n">SYSTEM_MESSAGE</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">llm_metadata.text_pipeline</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">TextClassificationConfig</span><span class="p">,</span>
     <span class="n">TextInputRecord</span><span class="p">,</span>

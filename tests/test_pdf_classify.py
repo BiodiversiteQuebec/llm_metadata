@@ -9,9 +9,9 @@ import os
 import pytest
 from pathlib import Path
 
-from llm_metadata.gpt_classify import (
-    classify_pdf_file,
-    classify_pdf_url,
+from llm_metadata.gpt_extract import (
+    extract_from_pdf_file,
+    extract_from_pdf_url,
     upload_pdf_to_openai,
     delete_openai_file,
     PDF_SYSTEM_MESSAGE,
@@ -64,13 +64,13 @@ class TestUploadPdfToOpenAI:
     reason="Slow test - set RUN_SLOW_TESTS=1"
 )
 class TestClassifyPdfFile:
-    """Tests for classify_pdf_file function."""
+    """Tests for extract_from_pdf_file function."""
 
-    def test_classify_local_pdf_basic(self):
+    def test_extract_from_local_pdf_basic(self):
         """Test basic PDF classification from local file."""
         assert SAMPLE_PDF_PATH.exists(), f"Test PDF not found: {SAMPLE_PDF_PATH}"
 
-        result = classify_pdf_file(
+        result = extract_from_pdf_file(
             pdf_path=SAMPLE_PDF_PATH,
             system_message=PDF_SYSTEM_MESSAGE,
             model="gpt-5-mini",
@@ -100,11 +100,11 @@ class TestClassifyPdfFile:
         assert usage["input_tokens"] > 0
         assert usage["output_tokens"] > 0
 
-    def test_classify_local_pdf_extracts_features(self):
+    def test_extract_from_local_pdf_extracts_features(self):
         """Test that PDF classification extracts meaningful features."""
         assert SAMPLE_PDF_PATH.exists()
 
-        result = classify_pdf_file(
+        result = extract_from_pdf_file(
             pdf_path=SAMPLE_PDF_PATH,
             text_format=DatasetFeatures,
         )
@@ -120,11 +120,11 @@ class TestClassifyPdfFile:
         )
         assert has_data, "Expected at least some features to be extracted"
 
-    def test_classify_with_cleanup(self):
+    def test_extract_from_with_cleanup(self):
         """Test PDF classification with file cleanup."""
         assert SAMPLE_PDF_PATH.exists()
 
-        result = classify_pdf_file(
+        result = extract_from_pdf_file(
             pdf_path=SAMPLE_PDF_PATH,
             text_format=DatasetFeatures,
             cleanup_file=True,
@@ -140,11 +140,11 @@ class TestClassifyPdfFile:
     reason="Slow test - set RUN_SLOW_TESTS=1"
 )
 class TestClassifyPdfUrl:
-    """Tests for classify_pdf_url function."""
+    """Tests for extract_from_pdf_url function."""
 
-    def test_classify_pdf_from_url_basic(self):
+    def test_extract_from_pdffrom_url_basic(self):
         """Test basic PDF classification from URL."""
-        result = classify_pdf_url(
+        result = extract_from_pdf_url(
             pdf_url=TEST_PDF_URL,
             system_message=PDF_SYSTEM_MESSAGE,
             model="gpt-5-mini",
@@ -168,9 +168,9 @@ class TestClassifyPdfUrl:
         # Verify URL is stored
         assert result["pdf_url"] == TEST_PDF_URL
 
-    def test_classify_pdf_url_returns_valid_output(self):
+    def test_extract_from_pdfurl_returns_valid_output(self):
         """Test that URL-based PDF classification returns valid DatasetFeatures."""
-        result = classify_pdf_url(
+        result = extract_from_pdf_url(
             pdf_url=TEST_PDF_URL,
             text_format=DatasetFeatures,
         )
@@ -197,7 +197,7 @@ class TestPdfClassifyEdgeCases:
 
         try:
             with pytest.raises(Exception) as exc_info:
-                classify_pdf_file(
+                extract_from_pdf_file(
                     pdf_path=fake_pdf,
                     text_format=DatasetFeatures,
                 )

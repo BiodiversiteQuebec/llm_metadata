@@ -162,7 +162,7 @@ OA proportion among records **with a PDF URL** (the correct denominator):
 
 - **`src/llm_metadata/prompt_eval.py`** — PDF mode added:
   - New helpers: `_strip_doi_prefix()`, `_doi_to_pdf_path()` (DOI→filename via `/`→`_`), `_build_doi_by_id()`.
-  - `run_eval()` now accepts `pdf_dir: Optional[str]`; when set, calls `classify_pdf_file()` instead of `classify_abstract()`.
+  - `run_eval()` now accepts `pdf_dir: Optional[str]`; when set, calls `extract_from_pdf_file()` instead of `extract_from_text()`.
   - `prompt_module` defaults to `"prompts.pdf_file"` when `pdf_dir` is set, `"prompts.abstract"` otherwise.
   - CLI: new `--pdf-dir` flag; `--prompt` is now nullable with smart default.
 
@@ -293,7 +293,7 @@ OA proportion among records **with a PDF URL** (the correct denominator):
   - Step 6: Per-field table + cross-source breakdown (Dryad / Zenodo / Semantic Scholar)
   - Step 7: Cost analysis per source
   - Step 8: Export detail CSV + field/source summary CSVs + HTML report
-- **`src/llm_metadata/text_pipeline.py`**: Added `system_message: str` field to `TextClassificationConfig` (defaulting to `SYSTEM_MESSAGE` from `gpt_classify.py`), passed through to `classify_abstract()`.
+- **`src/llm_metadata/text_pipeline.py`**: Added `system_message: str` field to `TextClassificationConfig` (defaulting to `SYSTEM_MESSAGE` from `gpt_extract.py`), passed through to `extract_from_text()`.
 - **Cache:** Notebook sets `os.chdir(PROJECT_ROOT)` before imports so joblib cache lands at `{PROJECT_ROOT}/cache/`. This path is NOT matched by the `*/cache/*` gitignore pattern (which requires a path segment before "cache"), so the cache is committable and syncable to local.
 
 **Key issues identified:**
@@ -436,7 +436,7 @@ Valid data stored as `data/dataset_092624_validated.xlsx`.
 
 **Work Performed:**
 - **Notebook:** `notebooks/fuster_test_extraction_evaluation.ipynb`
-- **Model Change:** Switched from `gpt-4` to `gpt-5-mini` in `classify_abstract()` call. Include new reasoning parameter (effort: "low") while loosing temperature setting. This is a new setting that can be played with for GPT-5 series models.
+- **Model Change:** Switched from `gpt-4` to `gpt-5-mini` in `extract_from_text()` call. Include new reasoning parameter (effort: "low") while loosing temperature setting. This is a new setting that can be played with for GPT-5 series models.
 - **Configuration:** Maintained same extraction schema (`DatasetFeatureExtraction`).
 
 **Results:**
@@ -541,7 +541,7 @@ Valid data stored as `data/dataset_092624_validated.xlsx`.
 1. **Test GPT-4o** - Evaluate if better instruction-following improves confidence calibration
 2. **Implement post-hoc evidence** - Refactor to opt-in model: extract features first, explain on-demand
 3. **Alternative schema** - Replace `confidence: int` with `evidence_type: Literal["explicit", "inferred", "speculative"]`
-4. **Production decision** - Reserve evidence for evaluation/debugging only, not production pipelines
+4. **Production decision** - Reserve evidence for evaluation/debugging only, not production extraction
 5. **Cost measurement** - Calculate token/time costs across 5-DOI test set for formal cost-benefit analysis
 
 **Architectural Recommendation:**
@@ -962,7 +962,7 @@ Your codebase naturally organizes into **4 distinct workflow stages** that align
 
 ##### 3. **LLM Inference**
 - GPT classification engine
-- Batch processing (Prefect pipelines)
+- Batch processing (Prefect extraction)
 - Abstract vs full-text extraction
 - Cost tracking & caching
 
@@ -1019,7 +1019,7 @@ Using "Replace String in File"
 
 **3. Module Names vs Stage Names**
 - **Observation:** Some modules don't align with stage names
-  - gpt_classify.py → "classification" not "inference"
+  - gpt_extract.py → "classification" not "inference"
   - validation.py → validates input data, not evaluation metrics
 - **Tradeoff:**
   - ✅ Changing module names = breaking changes
@@ -1041,7 +1041,7 @@ Your current terminology achieves the right balance:
 
 #### 📊 **Future Development**
 
-1. **Consider renaming gpt_classify.py → `llm_inference.py`** in next major version (v2.0+) for consistency, but not worth the breaking change now.
+1. **Consider renaming gpt_extract.py → `llm_inference.py`** in next major version (v2.0+) for consistency, but not worth the breaking change now.
 
 2. **Refactor project structure** to reflect stages in future releases (e.g., `llm_metadata/ingestion/`, `llm_metadata/inference/`), but keep flat structure for now.
 
@@ -1400,7 +1400,7 @@ Goal : Manual deep dive into the Fuster dataset to understand the data and its s
 
 **Next steps**
 
-* [ ] Streamline urls (search engine (dryad, zenodo, semantic), journal_url, pdf_url) in validated schema and existing pipelines (dryad ?) to parse the xlsx file and add the relevant links to the dataset records
+* [ ] Streamline urls (search engine (dryad, zenodo, semantic), journal_url, pdf_url) in validated schema and existing extraction (dryad ?) to parse the xlsx file and add the relevant links to the dataset records
 * [ ] Integrate semantic scholar api to retrieve cited articles and their metadata, and pdf if available
 * [ ] Run download on the remaining valid pdfs from semantic scholar
 * [ ] Run extraction on all valid data with pdfs, including semantic scholar data, and compare with abstract-only approach

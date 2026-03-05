@@ -74,7 +74,7 @@ WU-D1 [CLOUD] Assemble presentation materials
 - Add `source: Optional[DataSource]` field (for ground truth tracking, not LLM extraction)
 - Add boolean coercion validator in `DatasetFeaturesNormalized` (yes/no/1/0/NaN → `Optional[bool]`)
 
-**Changes to `src/llm_metadata/gpt_classify.py`:**
+**Changes to `src/llm_metadata/gpt_extract.py`:**
 - Update system prompts (`SYSTEM_MESSAGE`, `SECTION_SYSTEM_MESSAGE`, `PDF_SYSTEM_MESSAGE`) with extraction guidance for the 6 modulator boolean fields
 
 **Changes to `tests/`:**
@@ -293,7 +293,7 @@ After Thursday, the SS plan continues with API client (Task 2.2), URL fields, ci
 
 **Scope:** Good coverage of the core deliverable. 288 records (36 Dryad + 67 Zenodo + 185 SS), gpt-5-mini, $1.91 total. Per-field table for 14 fields (8 core + 6 modulators). Cross-source Micro F1: Dryad 0.259, Zenodo 0.273, SS 0.148. Mismatch examples present. This is the primary results notebook for the presentation.
 
-**Currency:** Minor gap. Imports `text_pipeline`, `gpt_classify.SYSTEM_MESSAGE`, `DatasetFeaturesNormalized`, `groundtruth_eval` — all current. However it uses the older `EvaluationConfig(fuzzy_match_fields=...)` API rather than `DEFAULT_FIELD_STRATEGIES` from `groundtruth_eval.py`. The 12-field registry (dropping `temporal_range` and `referred_dataset`) established in `field_strategies_eval_demo.ipynb` is not reflected here. Metrics are slightly different as a result (14 fields vs 12). Not a blocker for the presentation, but note the discrepancy if showing both notebooks.
+**Currency:** Minor gap. Imports `text_pipeline`, `gpt_extract.SYSTEM_MESSAGE`, `DatasetFeaturesNormalized`, `groundtruth_eval` — all current. However it uses the older `EvaluationConfig(fuzzy_match_fields=...)` API rather than `DEFAULT_FIELD_STRATEGIES` from `groundtruth_eval.py`. The 12-field registry (dropping `temporal_range` and `referred_dataset`) established in `field_strategies_eval_demo.ipynb` is not reflected here. Metrics are slightly different as a result (14 fields vs 12). Not a blocker for the presentation, but note the discrepancy if showing both notebooks.
 
 ---
 
@@ -311,7 +311,7 @@ After Thursday, the SS plan continues with API client (Task 2.2), URL fields, ci
 
 **Scope:** Partial. Covers 38 OA records (Dryad + Zenodo only — no SS). Evaluates 7 core fields (pre-modulator schema, missing the 6 boolean modulators). Micro F1 0.357 vs abstract-only 0.202 shows meaningful gain. Good for a comparison slide if you scope it clearly as "existing Dryad+Zenodo OA subset." WU-C3 (extending to SS OA PDFs + modulator fields) is not done.
 
-**Currency:** Stale on two fronts. (1) Schema: predates WU-A1 — evaluates only 7 of 14 fields; modulator booleans missing. (2) Scope: 38 records only, SS not included. The `pdf_pipeline` and `gpt_classify.PDF_SYSTEM_MESSAGE` imports are current, but the evaluation config uses the old API. Presenting raw outputs risks confusion about field count mismatch with WU-B results.
+**Currency:** Stale on two fronts. (1) Schema: predates WU-A1 — evaluates only 7 of 14 fields; modulator booleans missing. (2) Scope: 38 records only, SS not included. The `pdf_pipeline` and `gpt_extract.PDF_SYSTEM_MESSAGE` imports are current, but the evaluation config uses the old API. Presenting raw outputs risks confusion about field count mismatch with WU-B results.
 
 ---
 
@@ -329,7 +329,7 @@ After Thursday, the SS plan continues with API client (Task 2.2), URL fields, ci
 
 **Scope:** Good, focused experiment. 10 OA Dryad PDFs, 2×2 grid: {baseline, improved prompt} × {basic fuzzy, enhanced species matching}. Best config: improved prompt + enhanced matching — F1=0.824, recall=0.933. Shows the value of both prompt tuning and smarter matching. Self-contained result, does not depend on incomplete WU work.
 
-**Currency:** Current. Uses `pdf_pipeline`, `gpt_classify.PDF_SYSTEM_MESSAGE`, `groundtruth_eval`, `DatasetFeaturesNormalized` — all present in current src. The `enhanced_species` matching aligns with `DEFAULT_FIELD_STRATEGIES` (threshold=70). Only caveat: `PDF_SYSTEM_MESSAGE` has been updated since this ran (WU-A1 added modulator guidance), so a re-run would use the newer prompt.
+**Currency:** Current. Uses `pdf_pipeline`, `gpt_extract.PDF_SYSTEM_MESSAGE`, `groundtruth_eval`, `DatasetFeaturesNormalized` — all present in current src. The `enhanced_species` matching aligns with `DEFAULT_FIELD_STRATEGIES` (threshold=70). Only caveat: `PDF_SYSTEM_MESSAGE` has been updated since this ran (WU-A1 added modulator guidance), so a re-run would use the newer prompt.
 
 ---
 
@@ -346,7 +346,7 @@ After Thursday, the SS plan continues with API client (Task 2.2), URL fields, ci
 
 | Notebook | Reason |
 |---|---|
-| `fuster_test_extraction_evaluation.ipynb` | Early 5-record POC predating `text_pipeline`; uses `classify_abstract()` directly and old `DataFrameValidator` import path. Stale. |
+| `fuster_test_extraction_evaluation.ipynb` | Early 5-record POC predating `text_pipeline`; uses `extract_from_text()` directly and old `DataFrameValidator` import path. Stale. |
 | `fulltext_extraction_evaluation.ipynb` | Single-DOI feasibility stub; imports `DatasetFeatureExtraction` (old model name). Stale, inconclusive. |
 | `prompt_eval_results.ipynb` | Utility viewer template; no outputs populated — `results/baseline_abstract.json` not present. |
 
@@ -357,7 +357,7 @@ After Thursday, the SS plan continues with API client (Task 2.2), URL fields, ci
 | File | Work Units | Changes |
 |---|---|---|
 | `src/llm_metadata/schemas/fuster_features.py` | WU-A1 | +6 modulator fields, +DataSource enum, +source field, +validators |
-| `src/llm_metadata/gpt_classify.py` | WU-A1 | Update system prompts for modulator extraction |
+| `src/llm_metadata/gpt_extract.py` | WU-A1 | Update system prompts for modulator extraction |
 | `src/llm_metadata/groundtruth_eval.py` | WU-B | Minor: verify boolean field comparison works |
 | `src/llm_metadata/text_pipeline.py` | WU-B | Use for batch abstract extraction |
 | `src/llm_metadata/pdf_pipeline.py` | WU-C3 | Use for PDF File API extraction |
@@ -374,5 +374,5 @@ After Thursday, the SS plan continues with API client (Task 2.2), URL fields, ci
 1. **Schema:** `uv run python -m pytest tests/` passes after WU-A1
 2. **Data validation:** All 418 xlsx records validate through updated schema (WU-A2)
 3. **Abstract extraction + evaluation:** `batch_abstract_evaluation.ipynb` runs end-to-end on >=450 records; per-field P/R/F1 for all 16 fields, segmented by source (WU-B)
-4. **Full-text:** At least the existing ~44 OA Dryad+Zenodo PDFs processed through both pipelines (WU-C3, WU-C4)
+4. **Full-text:** At least the existing ~44 OA Dryad+Zenodo PDFs processed through both extraction (WU-C3, WU-C4)
 5. **Presentation:** `work_plan.md` has actual numbers, not TBD placeholders (WU-D1)

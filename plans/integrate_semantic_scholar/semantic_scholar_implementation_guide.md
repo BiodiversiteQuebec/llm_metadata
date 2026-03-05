@@ -436,7 +436,7 @@ PDF acquisition for Semantic Scholar records does **not** require modifying `pdf
 **Inputs:**
 - Validated Semantic Scholar data
 - `notebooks/fuster_test_extraction_evaluation.ipynb`
-- `src/llm_metadata/gpt_classify.py`
+- `src/llm_metadata/gpt_extract.py`
 - `src/llm_metadata/groundtruth_eval.py`
 
 **Tasks:**
@@ -445,7 +445,7 @@ PDF acquisition for Semantic Scholar records does **not** require modifying `pdf
 3. Run abstract extraction on Semantic Scholar records:
    ```python
    for idx, row in ss_df.iterrows():
-       result = classify_abstract(row['abstract'])
+       result = extract_from_text(row['abstract'])
        predictions.append(result)
    ```
 4. Compute evaluation metrics:

@@ -6,17 +6,17 @@ Added functionality to perform classification from raw PDF files without requiri
 
 ## Changes Made
 
-### 1. `gpt_classify.py`
+### 1. `gpt_extract.py`
 
 **New Functions:**
 - `extract_text_from_pdf(pdf_path, max_pages=None)`: Extracts text from PDF files using pypdf
-- `classify_pdf(pdf_path, ...)`: Complete classification pipeline for raw PDF files
+- `extract_from_pdf_file(pdf_path, ...)`: Complete classification pipeline for raw PDF files
 
 **Key Features:**
 - Page limit support (`max_pages` parameter)
 - Error handling for invalid PDFs
 - Caching support via joblib
-- Returns same structure as `classify_abstract()`
+- Returns same structure as `extract_from_text()`
 
 ### 2. `fulltext_pipeline.py`
 
@@ -37,20 +37,20 @@ Added functionality to perform classification from raw PDF files without requiri
 
 ## Usage Examples
 
-### Basic Usage (gpt_classify.py)
+### Basic Usage (gpt_extract.py)
 
 ```python
-from llm_metadata.gpt_classify import classify_pdf
+from llm_metadata.gpt_extract import extract_from_pdf_file
 from pathlib import Path
 
 # Classify entire PDF
-result = classify_pdf(
+result = extract_from_pdf_file(
     pdf_path=Path("data/pdfs/paper.pdf"),
     model="gpt-5-mini"
 )
 
 # Classify first 10 pages only
-result = classify_pdf(
+result = extract_from_pdf_file(
     pdf_path=Path("data/pdfs/paper.pdf"),
     max_pages=10,
     model="gpt-5-mini"

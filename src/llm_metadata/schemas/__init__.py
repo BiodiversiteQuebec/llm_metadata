@@ -36,6 +36,9 @@ from llm_metadata.schemas.openalex_work import (
 from llm_metadata.schemas.data_paper import (
     DataPaperRecord,
     DataPaperManifest,
+    ExtractionMode,
+    RunRecord,
+    RunArtifact,
 )
 
 
@@ -66,4 +69,7 @@ __all__ = [
     # Data paper manifest
     "DataPaperRecord",
     "DataPaperManifest",
+    "ExtractionMode",
+    "RunRecord",
+    "RunArtifact",
 ]

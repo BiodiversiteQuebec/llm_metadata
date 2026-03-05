@@ -7,7 +7,7 @@ Design choice: this module accepts **Pydantic BaseModel instances only**.
 Rationale:
 - Keeps a single input path (no "dict or model" branching).
 - Leverages your existing Pydantic schemas/validators/normalization.
-- Makes comparisons stable across notebooks/pipelines.
+- Makes comparisons stable across notebooks/extraction.
 
 If you currently have dicts (e.g. rows from a DataFrame), validate first:
 	DatasetFeatureExtraction.model_validate(row_dict)

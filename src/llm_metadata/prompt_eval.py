@@ -1,92 +1,37 @@
-"""llm_metadata.prompt_eval
-
-CLI + Python API for the extract-evaluate loop.
-
-Runs GPT extraction against ground-truth records and computes precision/recall/F1
-metrics per field using groundtruth_eval. When ``--manifest`` is provided, the
-manifest's ``gt_record_id`` values define the evaluated record set.
-
-Usage (Python API):
-    from llm_metadata.prompt_eval import run_eval
-    report = run_eval(
-        prompt_module="prompts.abstract",
-        manifest_path="data/manifests/dev_subset_data_paper.csv",
-        model="gpt-5-mini",
-    )
-
-Usage (CLI):
-    uv run python -m llm_metadata.prompt_eval \\
-        --prompt prompts.abstract \\
-        --manifest data/manifests/dev_subset_data_paper.csv \\
-        --fields data_type,species,time_series \\
-        --name run_01
-"""
+"""Prompt-eval entrypoint built on the unified extraction engine."""
 
 from __future__ import annotations
 
 import ast
 import contextlib
-from datetime import datetime
-import importlib
-import os
+import json
 import shlex
 import sys
-import warnings
+from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
-from llm_metadata.doi_utils import strip_doi_prefix as _strip_doi_prefix, doi_filename_stem as _doi_filename_stem
 from llm_metadata.groundtruth_eval import (
     DEFAULT_FIELD_STRATEGIES,
     EvaluationConfig,
     EvaluationReport,
     evaluate_indexed,
 )
+from llm_metadata.extraction import ExtractionConfig, ExtractionMode, run_manifest_extraction
+from llm_metadata.schemas.data_paper import DataPaperManifest, RunArtifact
 from llm_metadata.schemas.fuster_features import DatasetFeatures, DatasetFeaturesNormalized
 
 
-# ---------------------------------------------------------------------------
-# Constants
-# ---------------------------------------------------------------------------
-
-# Columns that XLSX stores as Python list repr strings (from pandas .to_excel)
 _LIST_COLS = ["data_type", "geospatial_info_dataset", "species"]
-
-# Raw XLSX with abstract / full_text column (sibling of gt_path by default)
-_DEFAULT_RAW_PATH = "data/dataset_092624.xlsx"
-
-# Default output directory (override with PROMPT_EVAL_OUTPUT_DIR)
-_OUTPUT_DIR = Path(
-    os.getenv("PROMPT_EVAL_OUTPUT_DIR", "data/prompt_eval_reports").strip()
-    or "data/prompt_eval_reports"
-)
-
-if not _OUTPUT_DIR.exists():
-    _OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-
-# Per-record metadata bundled into saved JSON for self-contained viewer runs
-_RECORD_META_COLS = [
-    "title", "source_url", "journal_url", "pdf_url",
-    "is_oa", "cited_article_doi", "source",
-    "valid_yn", "reason_not_valid", "has_abstract", "extraction_success",
-]
-
-
-# ---------------------------------------------------------------------------
-# Internal helpers
-# ---------------------------------------------------------------------------
+_OUTPUT_DIR = Path("artifacts/runs")
 
 
 def _parse_excel_val(val):
-    """Parse Python list repr from Excel back to native types.
-
-    pandas .to_excel() serialises list values as their repr string, e.g.
-    "['genetic_analysis']" — we restore them here before Pydantic validation.
-    """
     if val is None:
         return None
     try:
         import pandas as pd  # type: ignore
+
         if isinstance(val, float) and pd.isna(val):
             return None
     except ImportError:
@@ -94,534 +39,147 @@ def _parse_excel_val(val):
     if isinstance(val, list):
         return val
     if isinstance(val, str):
-        s = val.strip()
-        if s.startswith("["):
+        stripped = val.strip()
+        if stripped.startswith("["):
             try:
-                return ast.literal_eval(s)
+                return ast.literal_eval(stripped)
             except Exception:
-                pass
+                return val
     return val
 
 
-def _load_ground_truth(
-    gt_path: str,
-    raw_path: str,
-) -> "pd.DataFrame":  # type: ignore[name-defined]
-    """Load and merge validated GT with raw XLSX (for abstract text).
-
-    Returns a DataFrame with an 'abstract' column (from full_text in raw)
-    merged on record 'id'.
-    """
+def _load_ground_truth(gt_path: str) -> "pd.DataFrame":  # type: ignore[name-defined]
     try:
         import pandas as pd  # type: ignore
     except ImportError as exc:
-        raise ImportError(
-            "pandas is required for prompt_eval; install with `pip install pandas openpyxl`."
-        ) from exc
+        raise ImportError("pandas is required for prompt_eval; install with `pip install pandas openpyxl`.") from exc
 
-    validated_df = pd.read_excel(gt_path)
-
-    # Parse list columns that may have been round-tripped through Excel repr
+    df = pd.read_excel(gt_path)
     for col in _LIST_COLS:
-        if col in validated_df.columns:
-            validated_df[col] = validated_df[col].map(_parse_excel_val)
-
-    # Load abstract text from raw XLSX if it exists
-    raw_xlsx = Path(raw_path)
-    if raw_xlsx.exists() and "abstract" not in validated_df.columns:
-        try:
-            raw_df = pd.read_excel(str(raw_xlsx), usecols=["id", "full_text"])
-            raw_df = raw_df.rename(columns={"full_text": "abstract"})
-            raw_df["id"] = raw_df["id"].astype(int)
-            validated_df["id"] = validated_df["id"].astype(int)
-            validated_df = validated_df.merge(raw_df, on="id", how="left")
-        except Exception as exc:
-            warnings.warn(
-                f"Could not merge abstract text from {raw_xlsx}: {exc}",
-                stacklevel=3,
-            )
-
-    return validated_df
+        if col in df.columns:
+            df[col] = df[col].map(_parse_excel_val)
+    return df
 
 
 def _build_true_by_id(
     df: "pd.DataFrame",  # type: ignore[name-defined]
+    allowed_ids: set[int],
 ) -> dict[str, DatasetFeaturesNormalized]:
-    """Validate GT rows through DatasetFeaturesNormalized and return id-keyed dict.
-
-    Record ID is ``str(int(row.id))``.
-    """
-    try:
-        import pandas as pd  # type: ignore
-    except ImportError as exc:
-        raise ImportError("pandas is required") from exc
-
-    # The relevant annotation columns (all fields in DatasetFeaturesNormalized)
     annotation_cols = [
-        "data_type", "geospatial_info_dataset", "spatial_range_km2",
-        "temporal_range", "temp_range_i", "temp_range_f",
-        "species", "referred_dataset",
-        "time_series", "multispecies", "threatened_species",
-        "new_species_science", "new_species_region", "bias_north_south",
-        "valid_yn", "reason_not_valid",
-        "source", "source_url", "journal_url", "pdf_url", "is_oa", "cited_article_doi",
+        "data_type",
+        "geospatial_info_dataset",
+        "spatial_range_km2",
+        "temporal_range",
+        "temp_range_i",
+        "temp_range_f",
+        "species",
+        "referred_dataset",
+        "time_series",
+        "multispecies",
+        "threatened_species",
+        "new_species_science",
+        "new_species_region",
+        "bias_north_south",
+        "valid_yn",
+        "reason_not_valid",
+        "source",
+        "source_url",
+        "journal_url",
+        "pdf_url",
+        "is_oa",
+        "cited_article_doi",
     ]
-    available_cols = [c for c in annotation_cols if c in df.columns]
-
+    available_cols = [col for col in annotation_cols if col in df.columns]
     true_by_id: dict[str, DatasetFeaturesNormalized] = {}
-
     for _, row in df.iterrows():
-        record_id = str(int(row["id"]))
+        record_id = int(row["id"])
+        if record_id not in allowed_ids:
+            continue
         row_dict = {col: row[col] for col in available_cols if col in row.index}
-
-        try:
-            validated = DatasetFeaturesNormalized.model_validate(row_dict)
-            true_by_id[record_id] = validated
-        except Exception as exc:
-            print(
-                f"Warning: GT validation failed for id={record_id}: {exc}",
-                file=sys.stderr,
-            )
-
+        true_by_id[str(record_id)] = DatasetFeaturesNormalized.model_validate(row_dict)
     return true_by_id
 
 
-def _is_nan(val) -> bool:
-    """Return True if val is a float NaN."""
-    try:
-        import math
-        return math.isnan(float(val))
-    except (TypeError, ValueError):
-        return False
-
-
-def _doi_to_pdf_path(doi: str, pdf_dir: str) -> Optional[Path]:
-    """Return Path to the PDF for *doi* under *pdf_dir*, or None if not found.
-
-    Convention: DOI slashes are replaced with underscores to form the filename,
-    e.g. ``10.1371/journal.pone.0128238`` → ``10.1371_journal.pone.0128238.pdf``.
-    """
-    path = Path(pdf_dir) / (_doi_filename_stem(doi) + ".pdf")
-    return path if path.exists() else None
-
-
-def _build_doi_by_id(df: "pd.DataFrame") -> "dict[str, str]":  # type: ignore[name-defined]
-    """Return record_id -> bare DOI from the GT dataframe's source_url column."""
-    result: dict[str, str] = {}
-    for _, row in df.iterrows():
-        source_url = str(row.get("source_url", "") or "")
-        if not source_url:
-            continue
-        doi = _strip_doi_prefix(source_url)
-        try:
-            record_id = str(int(row["id"]))
-        except (ValueError, TypeError):
-            continue
-        if doi:
-            result[record_id] = doi
-    return result
-
-
-def _record_meta_value(val):
-    """Convert DataFrame scalar values to JSON-safe metadata values."""
-    if val is None:
-        return None
-    if hasattr(val, "item") and callable(val.item):
-        try:
-            val = val.item()
-        except Exception:
-            pass
-    try:
-        import pandas as pd  # type: ignore
-        if pd.isna(val):
-            return None
-    except Exception:
-        pass
-    return val
-
-
-def _build_records_dict(
-    df: "pd.DataFrame",  # type: ignore[name-defined]
-    record_ids: set[str],
-    success_ids: Optional[set[str]] = None,
-) -> dict[str, dict]:
-    """Build record_id -> metadata dict used by the eval viewer."""
-    records: dict[str, dict] = {}
-    available_meta = [c for c in _RECORD_META_COLS if c in df.columns]
-
-    for _, row in df.iterrows():
-        try:
-            record_id = str(int(row["id"]))
-        except (ValueError, TypeError):
-            continue
-        if record_id not in record_ids:
-            continue
-
-        record_meta = {
-            col: _record_meta_value(row.get(col))
-            for col in available_meta
-        }
-        record_meta["abstract"] = _record_meta_value(row.get("abstract"))
-        record_meta["extraction_success"] = bool(success_ids and record_id in success_ids)
-        records[record_id] = record_meta
-
-    for record_id in record_ids:
-        if record_id not in records:
-            records[record_id] = {
-                col: None for col in _RECORD_META_COLS
-            }
-            records[record_id]["abstract"] = None
-            records[record_id]["extraction_success"] = bool(success_ids and record_id in success_ids)
-
-    return records
-
-
-# ---------------------------------------------------------------------------
-# Public Python API
-# ---------------------------------------------------------------------------
+def _evaluation_payload(report: EvaluationReport) -> dict:
+    return {
+        "config": report.config.to_dict(),
+        "field_metrics": {name: metrics.to_dict() for name, metrics in report.field_metrics.items()},
+        "field_results": [result.to_dict() for result in report.field_results],
+    }
 
 
 def run_eval(
     *,
+    mode: ExtractionMode | str,
+    manifest_path: str,
     prompt_module: Optional[str] = None,
     config: Optional[EvaluationConfig] = None,
     config_path: Optional[str] = None,
     fields: Optional[list[str]] = None,
     model: str = "gpt-5-mini",
     gt_path: str = "data/dataset_092624_validated.xlsx",
-    raw_path: str = _DEFAULT_RAW_PATH,
-    manifest_path: Optional[str] = None,
-    pdf_dir: Optional[str] = None,
     name: Optional[str] = None,
+    output_path: Optional[str | Path] = None,
     skip_cache: bool = False,
 ) -> EvaluationReport:
-    """Run extraction + evaluation on ground-truth records.
+    """Run extraction + evaluation for one explicit mode over one manifest."""
 
-    Args:
-        prompt_module: Dotted module path (relative to llm_metadata) for the
-            prompt, e.g. "prompts.abstract" or "prompts.pdf_file". The module
-            must expose a SYSTEM_MESSAGE string. Defaults to
-            "prompts.pdf_file" when *pdf_dir* or *manifest_path* is set,
-            "prompts.abstract" otherwise. Extraction mode is based on the
-            prompt module: ``prompts.pdf_file`` uses PDF extraction, other
-            prompts use abstract extraction.
-        config: EvaluationConfig to use. Takes precedence over config_path.
-        config_path: Path to a JSON config file (EvaluationConfig.from_json).
-            If both config and config_path are None, uses DEFAULT_FIELD_STRATEGIES.
-        fields: Optional list of field names to evaluate. If None, the config's
-            field_strategies keys are used (or common model fields).
-        model: OpenAI model name.
-        gt_path: Path to validated ground truth XLSX.
-        raw_path: Path to the raw XLSX containing the abstract/full_text column.
-            Defaults to ``data/dataset_092624.xlsx`` alongside gt_path.
-        manifest_path: Path to a DataPaperManifest CSV (produced by
-            data_paper_manifest.save_manifest_csv). When set, the manifest
-            defines the evaluated record subset via ``gt_record_id``. In PDF
-            extraction mode, ``rec.pdf_local_path`` is used directly.
-        pdf_dir: Directory containing PDFs named
-            ``{doi_with_slashes_as_underscores}.pdf``. In PDF extraction mode,
-            this is used for DOI-based lookup and as a fallback for manifest
-            records with missing ``pdf_local_path``.
-        name: Optional run name. When provided, auto-saves to
-            ``{PROMPT_EVAL_OUTPUT_DIR}/{name}.json`` (default directory:
-            ``data/prompt_eval_reports``).
-        skip_cache: If True, bypass joblib cache for extraction API calls.
+    manifest = DataPaperManifest.load_csv(manifest_path)
+    eval_config = config or (
+        EvaluationConfig.from_json(config_path)
+        if config_path is not None
+        else EvaluationConfig(field_strategies=DEFAULT_FIELD_STRATEGIES)
+    )
+    run_config = ExtractionConfig(model=model, text_format=DatasetFeatures)
+    run_artifact = run_manifest_extraction(
+        manifest,
+        mode=mode,
+        prompt_module=prompt_module,
+        config=run_config,
+        manifest_path=manifest_path,
+        name=name,
+        skip_cache=skip_cache,
+    )
 
-    Returns:
-        EvaluationReport with per-field metrics and per-record results.
-        The report has an extra ``total_cost_usd`` float attribute with the
-        cumulative API cost for the run.
-    """
-    # Default prompt module based on extraction source availability
-    _pdf_mode = manifest_path is not None or pdf_dir is not None
-    if prompt_module is None:
-        prompt_module = "prompts.pdf_file" if _pdf_mode else "prompts.abstract"
-
-    # 1. Resolve evaluation config
-    if config is not None:
-        eval_config = config
-    elif config_path is not None:
-        eval_config = EvaluationConfig.from_json(config_path)
-    else:
-        eval_config = EvaluationConfig(field_strategies=DEFAULT_FIELD_STRATEGIES)
-
-    # 2. Load prompt module and resolve SYSTEM_MESSAGE
-    try:
-        mod = importlib.import_module(f"llm_metadata.{prompt_module}")
-    except ModuleNotFoundError:
-        # Allow fully-qualified module path as fallback
-        mod = importlib.import_module(prompt_module)
-    system_message: str = mod.SYSTEM_MESSAGE
-
-    # 3. Derive raw_path from gt_path if caller didn't specify
-    gt_resolved = Path(gt_path)
-    if raw_path == _DEFAULT_RAW_PATH:
-        companion = gt_resolved.parent / "dataset_092624.xlsx"
-        if companion.exists():
-            raw_path = str(companion)
-
-    # 4. Load ground truth DataFrame (merges abstract from raw xlsx)
-    df = _load_ground_truth(str(gt_resolved), raw_path)
-
-    # 5. Validate GT rows into Pydantic models, keyed by record id
-    true_by_id = _build_true_by_id(df)
+    gt_df = _load_ground_truth(gt_path)
+    true_by_id = _build_true_by_id(gt_df, {record.gt_record_id for record in manifest.records})
     if not true_by_id:
-        raise ValueError(
-            "No valid ground truth records found. Check gt_path and that the raw "
-            "XLSX with abstract text is accessible."
-        )
+        raise ValueError("No valid GT rows matched the manifest.")
 
-    # 6. Load manifest and apply manifest-defined record subset, when provided
-    manifest = None
-    manifest_by_id = {}
-    if manifest_path is not None:
-        from llm_metadata.data_paper_manifest import load_manifest_csv  # local import
-
-        manifest = load_manifest_csv(manifest_path)
-        manifest_by_id = manifest.by_id()
-        manifest_str_ids = {str(rec.gt_record_id) for rec in manifest}
-        true_by_id = {k: v for k, v in true_by_id.items() if k in manifest_str_ids}
-
-        if not true_by_id:
-            raise ValueError(
-                "Manifest filtering removed all GT records. Ensure manifest "
-                "gt_record_id values exist in the validated GT file."
-            )
-
-    # 7. Determine extraction mode from prompt module
-    prompt_name = prompt_module.split(".")[-1]
-    pdf_extraction_mode = prompt_name == "pdf_file"
-
-    # 8. Run extraction
-    pred_by_id: dict[str, DatasetFeatures] = {}
-    results: list[dict] = []
-
-    if pdf_extraction_mode:
-        from llm_metadata.gpt_classify import classify_pdf_file  # local import
-
-        if manifest is None and pdf_dir is None:
-            raise ValueError("PDF extraction requires --manifest or --pdf-dir.")
-
-        if manifest is not None:
-            skipped_no_pdf = 0
-            for record_id in true_by_id:
-                int_id = int(record_id)
-                rec = manifest_by_id.get(int_id)
-
-                pdf_path: Optional[Path] = None
-                if rec is not None and rec.pdf_local_path:
-                    pdf_path = Path(rec.pdf_local_path)
-                elif pdf_dir is not None and rec is not None:
-                    doi = rec.article_doi or rec.source_doi
-                    if doi:
-                        pdf_path = _doi_to_pdf_path(doi, pdf_dir)
-
-                if pdf_path is None:
-                    skipped_no_pdf += 1
-                    print(
-                        f"Warning: no pdf_local_path for manifest record id={record_id}, skipping.",
-                        file=sys.stderr,
-                    )
-                    continue
-
-                try:
-                    result = classify_pdf_file(
-                        pdf_path=pdf_path,
-                        system_message=system_message,
-                        model=model,
-                        text_format=DatasetFeatures,
-                        skip_cache=skip_cache,
-                    )
-                    pred_by_id[record_id] = result["output"]
-                    results.append(result)
-                except Exception as exc:
-                    print(
-                        f"Warning: extraction failed for id={record_id}: {exc}",
-                        file=sys.stderr,
-                    )
-
-            if skipped_no_pdf:
-                print(
-                    f"Manifest PDF mode: skipped {skipped_no_pdf} records (no pdf_local_path).",
-                    file=sys.stderr,
-                )
-        else:
-            assert pdf_dir is not None
-            doi_by_id = _build_doi_by_id(df)
-            skipped_no_doi = 0
-            skipped_no_pdf = 0
-
-            for record_id in true_by_id:
-                doi = doi_by_id.get(record_id)
-                if doi is None:
-                    skipped_no_doi += 1
-                    print(
-                        f"Warning: no source DOI for id={record_id}, skipping.",
-                        file=sys.stderr,
-                    )
-                    continue
-
-                pdf_path = _doi_to_pdf_path(doi, pdf_dir)
-                if pdf_path is None:
-                    skipped_no_pdf += 1
-                    print(
-                        f"Warning: PDF not found for doi={doi} in {pdf_dir}, skipping.",
-                        file=sys.stderr,
-                    )
-                    continue
-
-                try:
-                    result = classify_pdf_file(
-                        pdf_path=pdf_path,
-                        system_message=system_message,
-                        model=model,
-                        text_format=DatasetFeatures,
-                        skip_cache=skip_cache,
-                    )
-                    pred_by_id[record_id] = result["output"]
-                    results.append(result)
-                except Exception as exc:
-                    print(
-                        f"Warning: extraction failed for id={record_id} ({doi}): {exc}",
-                        file=sys.stderr,
-                    )
-
-            if skipped_no_doi or skipped_no_pdf:
-                print(
-                    f"PDF mode: skipped {skipped_no_doi} records (no DOI), "
-                    f"{skipped_no_pdf} records (no PDF found).",
-                    file=sys.stderr,
-                )
-
-    else:
-        from llm_metadata.gpt_classify import classify_abstract  # local import
-
-        if "abstract" in df.columns:
-            abstract_by_id = {
-                str(int(row["id"])): str(row["abstract"])
-                for _, row in df.iterrows()
-                if not _is_nan(row.get("abstract"))
-                and row.get("abstract") is not None
-                and str(int(row["id"])) in true_by_id
-            }
-        else:
-            abstract_by_id = {}
-
-        for record_id in true_by_id:
-            abstract = abstract_by_id.get(record_id)
-            if abstract is None:
-                print(
-                    f"Warning: no abstract for record id={record_id}, skipping extraction.",
-                    file=sys.stderr,
-                )
-                continue
-
-            try:
-                result = classify_abstract(
-                    abstract=abstract,
-                    system_message=system_message,
-                    model=model,
-                    text_format=DatasetFeatures,
-                    skip_cache=skip_cache,
-                )
-                pred_by_id[record_id] = result["output"]
-                results.append(result)
-            except Exception as exc:
-                print(
-                    f"Warning: extraction failed for id={record_id}: {exc}",
-                    file=sys.stderr,
-                )
-
-    # 9. Evaluate
     report = evaluate_indexed(
         true_by_id=true_by_id,
-        pred_by_id=pred_by_id,
+        pred_by_id=run_artifact.predictions_by_id(DatasetFeatures),
         fields=fields,
         config=eval_config,
     )
+    report.total_cost_usd = run_artifact.total_cost_usd  # type: ignore[attr-defined]
+    report.run_artifact = run_artifact  # type: ignore[attr-defined]
 
-    # 10. Attach total cost as a simple attribute
-    total_cost = sum(
-        (r.get("usage_cost") or {}).get("total_cost", 0) or 0
-        for r in results
-    )
-    report.total_cost_usd = total_cost  # type: ignore[attr-defined]
-
-    # 11. Attach self-contained run metadata for downstream save calls
-    record_ids_for_metadata = set(true_by_id.keys())
-    records_dict = _build_records_dict(
-        df,
-        record_ids_for_metadata,
-        success_ids=set(pred_by_id.keys()),
-    )
-
-    # 11a. Enrich records with manifest-derived fields when running with a manifest
-    if manifest is not None:
-        for rec in manifest:
-            record_id = str(rec.gt_record_id)
-            meta = {
-                "article_doi": rec.article_doi,
-                "source_doi": rec.source_doi,
-                "pdf_local_path": rec.pdf_local_path,
-                "is_oa": rec.is_oa,
-            }
-            if record_id in records_dict:
-                records_dict[record_id].update(meta)
-            else:
-                stub = {col: None for col in _RECORD_META_COLS}
-                stub["abstract"] = None
-                stub["extraction_success"] = record_id in pred_by_id
-                stub.update(meta)
-                records_dict[record_id] = stub
-
-    report.records = records_dict  # type: ignore[attr-defined]
-    report.system_message = system_message  # type: ignore[attr-defined]
-    report.manifest_path = manifest_path  # type: ignore[attr-defined]
-
-    if name:
-        save_path = _OUTPUT_DIR / f"{name}.json"
-        report.save(
-            save_path,
-            name=name,
-            prompt_module=prompt_module,
-            model=model,
-            cost_usd=total_cost,
-            records=records_dict,
-            system_message=system_message,
-            manifest_path=manifest_path,
-        )
-        report.saved_path = str(save_path)  # type: ignore[attr-defined]
+    run_artifact.evaluation = _evaluation_payload(report)
+    if output_path is not None:
+        run_artifact.save_json(output_path)
+        report.saved_path = str(output_path)  # type: ignore[attr-defined]
 
     return report
 
 
-# ---------------------------------------------------------------------------
-# Output helpers
-# ---------------------------------------------------------------------------
-
-
 def _print_metrics_table(report: EvaluationReport) -> None:
-    """Print a simple ASCII table of per-field precision/recall/F1."""
     header = f"{'Field':<25} {'N':>5}  {'P':>6}  {'R':>6}  {'F1':>6}"
     separator = "-" * len(header)
     print(header)
     print(separator)
-    for fname in sorted(report.field_metrics.keys()):
-        m = report.field_metrics[fname]
-        p = f"{m.precision:.3f}" if m.precision is not None else "  N/A"
-        r = f"{m.recall:.3f}" if m.recall is not None else "  N/A"
-        f1 = f"{m.f1:.3f}" if m.f1 is not None else "  N/A"
-        print(f"{fname:<25} {m.n:>5}  {p:>6}  {r:>6}  {f1:>6}")
-
-    # Print total cost if attached
+    for field_name in sorted(report.field_metrics.keys()):
+        metrics = report.field_metrics[field_name]
+        precision = f"{metrics.precision:.3f}" if metrics.precision is not None else "  N/A"
+        recall = f"{metrics.recall:.3f}" if metrics.recall is not None else "  N/A"
+        f1 = f"{metrics.f1:.3f}" if metrics.f1 is not None else "  N/A"
+        print(f"{field_name:<25} {metrics.n:>5}  {precision:>6}  {recall:>6}  {f1:>6}")
     total_cost = getattr(report, "total_cost_usd", None)
     if total_cost is not None:
         print(f"\nTotal API cost: ${total_cost:.4f}")
 
 
 class _TeeStream:
-    """Write stream content to multiple underlying streams."""
-
     def __init__(self, *streams):
         self._streams = streams
 
@@ -637,7 +195,6 @@ class _TeeStream:
 
 @contextlib.contextmanager
 def _tee_console_to_log(log_path: Path):
-    """Mirror stdout/stderr to a log file while preserving console output."""
     log_path.parent.mkdir(parents=True, exist_ok=True)
     with log_path.open("w", encoding="utf-8") as log_file:
         out = _TeeStream(sys.__stdout__, log_file)
@@ -649,9 +206,9 @@ def _tee_console_to_log(log_path: Path):
 
 def _build_recreate_command(
     *,
-    prompt_module: str,
-    manifest_path: Optional[str],
-    pdf_dir: Optional[str],
+    mode: ExtractionMode | str,
+    manifest_path: str,
+    prompt_module: Optional[str],
     config_path: Optional[str],
     fields: Optional[list[str]],
     output_path: Optional[Path],
@@ -660,169 +217,76 @@ def _build_recreate_command(
     gt_path: str,
     skip_cache: bool,
 ) -> str:
-    """Build a shell-safe command string that recreates the current run."""
-    cmd: list[str] = [
+    command = [
         "uv",
         "run",
         "python",
         "-m",
         "llm_metadata.prompt_eval",
-        "--prompt",
-        prompt_module,
+        "--mode",
+        str(ExtractionMode(mode).value),
+        "--manifest",
+        manifest_path,
         "--model",
         model,
         "--gt",
         gt_path,
     ]
-
-    if manifest_path:
-        cmd.extend(["--manifest", manifest_path])
-    if pdf_dir:
-        cmd.extend(["--pdf-dir", pdf_dir])
+    if prompt_module:
+        command.extend(["--prompt", prompt_module])
     if config_path:
-        cmd.extend(["--config", config_path])
+        command.extend(["--config", config_path])
     if fields:
-        cmd.extend(["--fields", ",".join(fields)])
+        command.extend(["--fields", ",".join(fields)])
     if output_path is not None:
-        cmd.extend(["--output", str(output_path)])
+        command.extend(["--output", str(output_path)])
     elif name:
-        cmd.extend(["--name", name])
+        command.extend(["--name", name])
     if skip_cache:
-        cmd.append("--skip-cache")
+        command.append("--skip-cache")
+    return " ".join(shlex.quote(part) for part in command)
 
-    return " ".join(shlex.quote(part) for part in cmd)
 
-
-# ---------------------------------------------------------------------------
-# CLI entry point
-# ---------------------------------------------------------------------------
+def _resolve_output_path(name: Optional[str], output: Optional[str]) -> Path:
+    _OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    if output:
+        path = Path(output)
+        return _OUTPUT_DIR / f"{timestamp}_{path.name}" if path.parent == Path(".") else path
+    if name:
+        return _OUTPUT_DIR / f"{timestamp}_{name}.json"
+    return _OUTPUT_DIR / f"{timestamp}_prompt_eval.json"
 
 
 def main() -> None:
-    """CLI entry point: uv run python -m llm_metadata.prompt_eval [args]"""
     import argparse
 
-    parser = argparse.ArgumentParser(
-        description="Run extraction + evaluation loop for a prompt against ground truth."
-    )
-    parser.add_argument(
-        "--prompt",
-        default=None,
-        help=(
-            "Prompt module path relative to llm_metadata "
-            "(e.g. prompts.abstract, prompts.pdf_file). "
-            "Defaults to prompts.pdf_file when --manifest/--pdf-dir is set, "
-            "prompts.abstract otherwise."
-        ),
-    )
-    parser.add_argument(
-        "--manifest",
-        default=None,
-        dest="manifest",
-        help=(
-            "Path to a DataPaperManifest CSV (data/manifests/*.csv). "
-            "When set, manifest gt_record_id values define the evaluated record set. "
-            "In prompts.pdf_file mode, pdf_local_path is taken from the manifest "
-            "(with optional --pdf-dir fallback)."
-        ),
-    )
-    parser.add_argument(
-        "--pdf-dir",
-        default=None,
-        dest="pdf_dir",
-        help=(
-            "Directory containing PDFs named {doi_with_slashes_as_underscores}.pdf. "
-            "When set without --manifest, switches to PDF extraction mode using the "
-            "OpenAI File API. When used alongside --manifest, serves as a fallback "
-            "for records whose pdf_local_path is None."
-        ),
-    )
-    parser.add_argument(
-        "--config",
-        default=None,
-        help="Path to an EvaluationConfig JSON file.",
-    )
-    parser.add_argument(
-        "--fields",
-        default=None,
-        help="Comma-separated list of field names to evaluate. "
-             "If omitted, uses the config's field_strategies keys.",
-    )
-    parser.add_argument(
-        "--output",
-        default=None,
-        help=(
-            "Path to save the EvaluationReport as JSON. "
-            "If only a filename is provided, it is saved under the configured output "
-            "directory (`PROMPT_EVAL_OUTPUT_DIR`, default: data/prompt_eval_reports) "
-            "with a timestamp prefix."
-        ),
-    )
-    parser.add_argument(
-        "--name",
-        default=None,
-        help=(
-            "Run name stem. Auto-saves to {PROMPT_EVAL_OUTPUT_DIR}/{timestamp}_{name}.json "
-            "(default directory: data/prompt_eval_reports). "
-            "--output takes precedence."
-        ),
-    )
-    parser.add_argument(
-        "--model",
-        default="gpt-5-mini",
-        help="OpenAI model name (default: gpt-5-mini).",
-    )
-    parser.add_argument(
-        "--gt",
-        default="data/dataset_092624_validated.xlsx",
-        help="Path to the validated ground truth XLSX.",
-    )
-    parser.add_argument(
-        "--skip-cache",
-        action="store_true",
-        help="Bypass extraction cache and force fresh API calls (False when not specified).",
-    )
+    parser = argparse.ArgumentParser(description="Run extraction + evaluation over a manifest.")
+    parser.add_argument("--mode", required=True, choices=[mode.value for mode in ExtractionMode])
+    parser.add_argument("--manifest", required=True, help="Path to the canonical DataPaperManifest CSV.")
+    parser.add_argument("--prompt", default=None, help="Prompt module path relative to llm_metadata.")
+    parser.add_argument("--config", default=None, help="Path to an EvaluationConfig JSON file.")
+    parser.add_argument("--fields", default=None, help="Comma-separated field names to evaluate.")
+    parser.add_argument("--output", default=None, help="Path to save the run artifact JSON.")
+    parser.add_argument("--name", default=None, help="Run name stem for auto-generated output paths.")
+    parser.add_argument("--model", default="gpt-5-mini", help="OpenAI model name.")
+    parser.add_argument("--gt", default="data/dataset_092624_validated.xlsx", help="Validated GT XLSX path.")
+    parser.add_argument("--skip-cache", action="store_true", help="Bypass extraction cache.")
     args = parser.parse_args()
 
-    fields = [f.strip() for f in args.fields.split(",")] if args.fields else None
-    _cli_pdf_mode = args.manifest or args.pdf_dir
-    effective_prompt = args.prompt or (
-        "prompts.pdf_file" if _cli_pdf_mode else "prompts.abstract"
-    )
+    fields = [field.strip() for field in args.fields.split(",")] if args.fields else None
+    output_path = _resolve_output_path(args.name, args.output)
+    log_path = output_path.with_suffix(".log")
 
-    effective_output: Optional[Path] = None
-    output_arg_path: Optional[Path] = Path(args.output) if args.output else None
-    if args.output:
-        assert output_arg_path is not None
-        effective_output = (
-            _OUTPUT_DIR / f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{output_arg_path.name}"
-            if output_arg_path.parent == Path(".")
-            else output_arg_path
-        )
-    elif args.name:
-        effective_output = _OUTPUT_DIR / (
-            f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{args.name}.json"
-        )
-    else:
-        prompt_name = effective_prompt.split(".")[-1]
-        effective_output = _OUTPUT_DIR / (
-            f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{prompt_name}.json"
-        )
-
-    log_path: Optional[Path] = effective_output.with_suffix(".log") if effective_output else None
-
-    log_context = _tee_console_to_log(log_path) if log_path else contextlib.nullcontext()
-    with log_context:
-        recreate_output_path = output_arg_path if args.output else None
-        recreate_name = args.name if (args.name and not args.output) else None
+    with _tee_console_to_log(log_path):
         recreate_cmd = _build_recreate_command(
-            prompt_module=effective_prompt,
+            mode=args.mode,
             manifest_path=args.manifest,
-            pdf_dir=args.pdf_dir,
+            prompt_module=args.prompt,
             config_path=args.config,
             fields=fields,
-            output_path=recreate_output_path,
-            name=recreate_name,
+            output_path=Path(args.output) if args.output else None,
+            name=args.name if not args.output else None,
             model=args.model,
             gt_path=args.gt,
             skip_cache=args.skip_cache,
@@ -830,31 +294,19 @@ def main() -> None:
         print(f"Recreate command: {recreate_cmd}")
 
         report = run_eval(
+            mode=args.mode,
+            manifest_path=args.manifest,
             prompt_module=args.prompt,
             config_path=args.config,
             fields=fields,
             model=args.model,
             gt_path=args.gt,
-            manifest_path=args.manifest,
-            pdf_dir=args.pdf_dir,
-            name=None,
+            name=args.name,
+            output_path=output_path,
             skip_cache=args.skip_cache,
         )
-
         _print_metrics_table(report)
-
-        if effective_output is not None:
-            report.save(
-                effective_output,
-                name=args.name,
-                prompt_module=effective_prompt,
-                model=args.model,
-                cost_usd=getattr(report, "total_cost_usd", None),
-                records=getattr(report, "records", None),
-                system_message=getattr(report, "system_message", None),
-                manifest_path=args.manifest,
-            )
-            print(f"\nReport saved to: {effective_output}")
+        print(f"\nRun artifact saved to: {output_path}")
 
 
 if __name__ == "__main__":

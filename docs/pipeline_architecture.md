@@ -22,9 +22,9 @@
 
 ```
 ┌──────────────────────────────────────────────────────────────────┐
-│                      pipelines.py                                 │
-│              Unified Interface - classify()                       │
-│          Auto-detection & routing to specialized pipelines        │
+│                      extraction.py                                 │
+│              Unified Interface - extract()                       │
+│          Auto-detection & routing to specialized extraction        │
 └────────────┬──────────────┬──────────────┬────────────────────────┘
              │              │              │
              ▼              ▼              ▼
@@ -182,15 +182,15 @@ results = text_classification_flow(records, config)
 
 ### Pattern 2: Unified Interface
 ```python
-from llm_metadata.pipelines import classify
-results = classify(source, pipeline="text")
+from llm_metadata.extraction import extract
+results = extract(source, pipeline="text")
 ```
 
 ### Pattern 3: Auto-detection
 ```python
-from llm_metadata.pipelines import classify
-results = classify("raw text")          # → text_pipeline
-results = classify(Path("file.pdf"))    # → pdf_pipeline
+from llm_metadata.extraction import extract
+results = extract("raw text")          # → text_pipeline
+results = extract(Path("file.pdf"))    # → pdf_pipeline
 ```
 
 ## Migration Path

@@ -34,10 +34,10 @@ python -m pytest tests/test_evaluation.py::TestEvaluation::test_evaluate_pairs_s
 ### Running Scripts
 ```bash
 # Test GPT classification with example abstract
-python src/llm_metadata/gpt_classify.py
+python src/llm_metadata/gpt_extract.py
 
-# Test Prefect pipeline for batch processing
-python src/llm_metadata/prefect_pipeline.py
+# Run extraction + evaluation over a manifest with an explicit mode
+uv run python -m llm_metadata.prompt_eval --mode abstract --manifest data/manifests/dev_subset_data_paper.csv
 ```
 
 ### Environment Setup
@@ -104,9 +104,8 @@ Data Ingestion → Schema & Prompt Engineering → LLM Inference → Evaluation 
 - **[Stage 1]** `article_retrieval.py` — DOI matching between data papers (Dryad) and scientific articles (for ground truth preparation)
 - **[Stage 1]** `unpaywall.py` — Open access PDF discovery API
 - **[Stage 1]** `semantic_scholar.py` — Semantic Scholar Graph API client for paper search, citations, and references
-- **[Stage 1]** `registry.py` — SQLite-based document tracking database for processing status and chunk management
 
-**Key Pattern:** All batch operations (search, download, parsing) use **Prefect** for parallelization, monitoring, and retry logic.
+**Key Pattern:** Canonical durable inputs live in `data/`; generated intermediates and run artifacts live in `artifacts/`.
 
 ### Stage 2: Schema Design & Prompt Engineering
 
@@ -132,19 +131,16 @@ Data Ingestion → Schema & Prompt Engineering → LLM Inference → Evaluation 
 **Purpose:** Execute metadata extraction at scale with cost tracking and caching.
 
 **Modules:**
-- **[Stage 3]** `gpt_classify.py` — Core classification engine using OpenAI's structured output API
+- **[Stage 3]** `gpt_extract.py` — Core classification engine using OpenAI's structured output API
   - Currently using `gpt-5-mini` with `reasoning={"effort": "low"}` (GPT-5 series parameter)
   - System prompt: "EcodataGPT" — conservative extraction philosophy (only explicit information)
   - Uses `client.responses.parse()` with Pydantic `text_format` for deterministic schema compliance
   - Built-in cost tracking per inference (`_response_usage_cost()`)
   - Joblib caching for reproducibility (`Memory("./cache")`)
-- **[Stage 3]** `prefect_pipeline.py` — Orchestration layer for all batch operations
-  - ThreadPoolTaskRunner (max_workers=10) for parallel DOI processing
-  - Workflows: `doi_classification_pipeline()`, `quebec_papers_pipeline()`
-  - Task decomposition: `fetch_abstracts()` → `classify_abstract_task()` (mapped)
-  - Handles batch retrieval from Zenodo (20 DOIs per API call)
+- **[Stage 3]** `extraction.py` — Single extraction engine with explicit modes: `abstract`, `pdf_text`, `pdf_native`, `sections`
+- **[Stage 3]** `prompt_eval.py` — Evaluation runner built directly on `extraction.run_manifest_extraction()`
 
-**Key Pattern:** Prefect manages ALL batch workflows (paper search, PDF download, inference) with monitoring dashboards.
+**Key Pattern:** Mode is explicit everywhere. Prompt modules do not imply mode.
 
 ### Stage 4: Evaluation & Validation
 
@@ -221,6 +217,13 @@ When `field_strategies` is populated on `EvaluationConfig`:
 **Enrichment Pattern**: For fields that benefit from external resolution (e.g., species strings → GBIF taxon keys, locations → GADM codes), add a derived field to the model (like `gbif_keys: Optional[list[int]]`) alongside the original, then evaluate both independently in a single `evaluate_indexed()` call. This avoids complex matcher abstractions — strategy comparison is just `report.metrics_for("species")` vs `report.metrics_for("gbif_keys")`. Precedent: source-tracking fields (`source`, `is_oa`, etc.) in `fuster_features.py`.
 
 **Validator Boundary**: Pydantic validators handle pure, fast normalization only — delimiter splitting, whitespace stripping, vocabulary mapping. Never put network I/O or external API calls in validators. Enrichment from external services (GBIF, GADM, etc.) is a separate preprocessing step that runs *after* model construction.
+
+**Contract Construction Rule**: Build and mutate data contracts only through routines on the contract module itself. Use constructor/classmethod/setter patterns like `DataPaperManifest.build(...)`, `DataPaperManifest.load_csv(...)`, `manifest.save_csv(...)`, and `manifest.with_pdf_path(...)`. Do not hand-roll manifests or run artifacts from loose dict/DataFrame logic outside the contract module.
+
+**Storage Rule**:
+- `data/` = durable source inputs and canonical manifests
+- `artifacts/` = generated TEI, chunks, logs, and run artifacts
+- Avoid overlapping stores for the same state
 
 **Structured Preprocessing Models**: When a raw field (e.g., `species: list[str]`) needs structured parsing for downstream consumers, use a Pydantic model with `model_validator(mode='before')` that accepts the raw type (e.g., `ParsedTaxon("41 fish mock species")` → structured fields). This keeps the storage format unchanged while providing structured access when needed.
 
@@ -353,8 +356,8 @@ The prompt engineering loop uses the infrastructure built in Phase 2 to iterate 
 ```bash
 # Run extraction + evaluation on dev subset
 uv run python -m llm_metadata.prompt_eval \
-  --prompt prompts.abstract \
-  --subset data/dev_subset.csv \
+  --mode abstract \
+  --manifest data/manifests/dev_subset_data_paper.csv \
   --config configs/eval_default.json \
   --fields species,data_type,time_series \
   --name abstract_20260219_01 \
@@ -367,18 +370,18 @@ Or from a notebook:
 from llm_metadata.prompt_eval import run_eval
 
 report = run_eval(
-    prompt_module="prompts.abstract",
-    subset_path="data/dev_subset.csv",
+    mode="abstract",
+    manifest_path="data/manifests/dev_subset_data_paper.csv",
     config_path="configs/eval_default.json",
     name="abstract_20260219_01",
 )
 ```
 
-`prompt_eval` saves run-level metadata in JSON including `prompt_module`, `model`, `cost_usd`, `subset_path`, `records`, and `system_message`.
+`prompt_eval` saves one run artifact JSON to `artifacts/runs/` containing run metadata, per-record extraction output, and the evaluation payload.
 
 CLI output/log behavior:
-- `--name run_id` writes `data/run_id.json` and `data/run_id.log`
-- `--output some_name.json` (bare filename) writes `data/{timestamp}_some_name.json` and matching `.log`
+- `--name run_id` writes `artifacts/runs/{timestamp}_run_id.json` and matching `.log`
+- `--output some_name.json` (bare filename) writes `artifacts/runs/{timestamp}_some_name.json` and matching `.log`
 - `--output path/to/file.json` (explicit directory) writes exactly there and uses the same stem for `.log`
 
 Cache behavior:
@@ -443,11 +446,13 @@ Also add a summary to `notebooks/README.md` under a dated session header per the
 | `src/llm_metadata/prompts/section.py` | Section/chunk extraction prompt |
 | `src/llm_metadata/prompts/pdf_file.py` | PDF File API extraction prompt |
 | `src/llm_metadata/prompt_eval.py` | `run_eval()` Python API + CLI entry point |
+| `src/llm_metadata/extraction.py` | Explicit-mode extraction engine |
+| `src/llm_metadata/schemas/data_paper.py` | Canonical input/output contracts plus construction/load/save routines |
 | `configs/eval_default.json` | DEFAULT_FIELD_STRATEGIES + standard normalization |
 | `configs/eval_fuzzy_species.json` | Fuzzy species matching variant |
 | `configs/eval_strict.json` | Exact-only matching baseline |
 | `data/dev_subset.csv` | 30-record curated evaluation subset (stable — don't change without bumping version) |
-| `data/*.json` | `prompt_eval` JSON outputs (gitignored except baselines committed with `git add -f`) |
+| `artifacts/runs/*.json` | `prompt_eval` run artifacts (gitignored except baselines committed with `git add -f`) |
 
 ## Task Management & Session Coordination
 
