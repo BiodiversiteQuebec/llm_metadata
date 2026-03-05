@@ -34,6 +34,7 @@ import warnings
 from pathlib import Path
 from typing import Optional
 
+from llm_metadata.doi_utils import strip_doi_prefix as _strip_doi_prefix, doi_filename_stem as _doi_filename_stem
 from llm_metadata.groundtruth_eval import (
     DEFAULT_FIELD_STRATEGIES,
     EvaluationConfig,
@@ -237,24 +238,13 @@ def _load_subset_dois(subset_path: str) -> set[str]:
     }
 
 
-def _strip_doi_prefix(doi: str) -> str:
-    """Strip https://doi.org/ or http://doi.org/ prefix from a DOI string."""
-    return (
-        doi.replace("https://doi.org/", "")
-        .replace("http://doi.org/", "")
-        .strip()
-    )
-
-
 def _doi_to_pdf_path(doi: str, pdf_dir: str) -> Optional[Path]:
     """Return Path to the PDF for *doi* under *pdf_dir*, or None if not found.
 
     Convention: DOI slashes are replaced with underscores to form the filename,
     e.g. ``10.1371/journal.pone.0128238`` → ``10.1371_journal.pone.0128238.pdf``.
     """
-    bare = _strip_doi_prefix(doi)
-    filename = bare.replace("/", "_") + ".pdf"
-    path = Path(pdf_dir) / filename
+    path = Path(pdf_dir) / (_doi_filename_stem(doi) + ".pdf")
     return path if path.exists() else None
 
 
@@ -373,6 +363,7 @@ def run_eval(
     model: str = "gpt-5-mini",
     gt_path: str = "data/dataset_092624_validated.xlsx",
     raw_path: str = _DEFAULT_RAW_PATH,
+    manifest_path: Optional[str] = None,
     pdf_dir: Optional[str] = None,
     name: Optional[str] = None,
     skip_cache: bool = False,
@@ -383,8 +374,8 @@ def run_eval(
         prompt_module: Dotted module path (relative to llm_metadata) for the
             prompt, e.g. "prompts.abstract" or "prompts.pdf_file".  The module
             must expose a SYSTEM_MESSAGE string.  Defaults to
-            "prompts.pdf_file" when *pdf_dir* is set, "prompts.abstract"
-            otherwise.
+            "prompts.pdf_file" when *pdf_dir* or *manifest_path* is set,
+            "prompts.abstract" otherwise.
         subset_path: Path to dev_subset.csv (doi, source, notes). If None,
             uses all records from gt_path that have an abstract.
         config: EvaluationConfig to use. Takes precedence over config_path.
@@ -396,9 +387,18 @@ def run_eval(
         gt_path: Path to validated ground truth XLSX.
         raw_path: Path to the raw XLSX containing the abstract/full_text column.
             Defaults to ``data/dataset_092624.xlsx`` alongside gt_path.
+        manifest_path: Path to a DataPaperManifest CSV (produced by
+            data_paper_manifest.save_manifest_csv).  When set, switches to PDF
+            mode using ``rec.pdf_local_path`` from the manifest directly instead
+            of DOI-to-filename inference.  Records with no ``pdf_local_path``
+            are skipped with a warning.  ``--subset`` is still accepted for GT
+            filtering when used alongside this flag, but a deprecation warning
+            is emitted in PDF mode.
         pdf_dir: Directory containing PDFs named ``{doi_with_slashes_as_underscores}.pdf``.
-            When set, extraction uses the OpenAI File API (classify_pdf_file)
-            instead of abstract text.  Records without a matching PDF are skipped.
+            When set (without manifest_path), extraction uses the OpenAI File API
+            (classify_pdf_file) instead of abstract text.  Records without a
+            matching PDF are skipped.  When used alongside manifest_path, serves
+            as a fallback for records whose pdf_local_path is None.
         name: Optional run name. When provided, auto-saves to
             ``{PROMPT_EVAL_OUTPUT_DIR}/{name}.json`` (default directory:
             ``data/prompt_eval_reports``).
@@ -410,8 +410,9 @@ def run_eval(
         cumulative API cost for the run.
     """
     # Default prompt module based on extraction mode
+    _pdf_mode = manifest_path is not None or pdf_dir is not None
     if prompt_module is None:
-        prompt_module = "prompts.pdf_file" if pdf_dir is not None else "prompts.abstract"
+        prompt_module = "prompts.pdf_file" if _pdf_mode else "prompts.abstract"
     # 1. Resolve evaluation config
     if config is not None:
         eval_config = config
@@ -442,7 +443,16 @@ def run_eval(
     # 5. Load subset DOIs if provided
     subset_dois: Optional[set[str]] = None
     if subset_path is not None:
-        subset_dois = _load_subset_dois(subset_path)
+        if manifest_path is not None:
+            warnings.warn(
+                "--subset is ignored when --manifest is provided in PDF mode. "
+                "The manifest already encodes the record subset via gt_record_id. "
+                "Use --subset only for abstract mode backward compatibility.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+        else:
+            subset_dois = _load_subset_dois(subset_path)
 
     # 6. Validate GT rows into Pydantic models, keyed by record id
     true_by_id = _build_true_by_id(df, subset_dois=subset_dois)
@@ -457,8 +467,65 @@ def run_eval(
     pred_by_id: dict[str, DatasetFeatures] = {}
     results: list[dict] = []
 
-    if pdf_dir is not None:
-        # --- PDF mode: use OpenAI File API ---
+    if manifest_path is not None:
+        # --- Manifest PDF mode: pdf_local_path from DataPaperManifest ---
+        from llm_metadata.gpt_classify import classify_pdf_file  # local import
+        from llm_metadata.data_paper_manifest import load_manifest_csv  # local import
+
+        manifest = load_manifest_csv(manifest_path)
+        manifest_by_id = manifest.by_id()  # int -> DataPaperRecord
+
+        # Filter true_by_id to only records present in the manifest
+        manifest_str_ids = {str(rec.gt_record_id) for rec in manifest}
+        true_by_id = {k: v for k, v in true_by_id.items() if k in manifest_str_ids}
+
+        skipped_no_pdf = 0
+
+        for record_id, _true_model in true_by_id.items():
+            int_id = int(record_id)
+            rec = manifest_by_id.get(int_id)
+
+            # Resolve pdf_local_path: manifest first, then fallback DOI-to-dir
+            pdf_path: Optional[Path] = None
+            if rec is not None and rec.pdf_local_path:
+                pdf_path = Path(rec.pdf_local_path)
+            elif pdf_dir is not None and rec is not None:
+                doi = rec.article_doi or rec.source_doi
+                if doi:
+                    pdf_path = _doi_to_pdf_path(doi, pdf_dir)
+
+            if pdf_path is None:
+                skipped_no_pdf += 1
+                print(
+                    f"Warning: no pdf_local_path for manifest record id={record_id}, skipping.",
+                    file=sys.stderr,
+                )
+                continue
+
+            try:
+                result = classify_pdf_file(
+                    pdf_path=pdf_path,
+                    system_message=system_message,
+                    model=model,
+                    text_format=DatasetFeatures,
+                    skip_cache=skip_cache,
+                )
+                pred_by_id[record_id] = result["output"]
+                results.append(result)
+            except Exception as exc:
+                print(
+                    f"Warning: extraction failed for id={record_id}: {exc}",
+                    file=sys.stderr,
+                )
+
+        if skipped_no_pdf:
+            print(
+                f"Manifest PDF mode: skipped {skipped_no_pdf} records (no pdf_local_path).",
+                file=sys.stderr,
+            )
+
+    elif pdf_dir is not None:
+        # --- Legacy PDF mode: DOI-to-filename inference ---
         from llm_metadata.gpt_classify import classify_pdf_file  # local import
 
         doi_by_id = _build_doi_by_id(df)
@@ -573,9 +640,31 @@ def run_eval(
         record_ids_for_metadata,
         success_ids=set(pred_by_id.keys()),
     )
+
+    # 10a. Enrich records with manifest-derived fields when running in manifest mode
+    if manifest_path is not None:
+        for rec in manifest:
+            record_id = str(rec.gt_record_id)
+            meta = {
+                "article_doi": rec.article_doi,
+                "source_doi": rec.source_doi,
+                "pdf_local_path": rec.pdf_local_path,
+                "is_oa": rec.is_oa,
+            }
+            if record_id in records_dict:
+                records_dict[record_id].update(meta)
+            else:
+                # Record was in manifest but not in GT subset — add a stub
+                stub = {col: None for col in _RECORD_META_COLS}
+                stub["abstract"] = None
+                stub["extraction_success"] = record_id in pred_by_id
+                stub.update(meta)
+                records_dict[record_id] = stub
+
     report.records = records_dict  # type: ignore[attr-defined]
     report.system_message = system_message  # type: ignore[attr-defined]
     report.subset_path = subset_path  # type: ignore[attr-defined]
+    report.manifest_path = manifest_path  # type: ignore[attr-defined]
 
     if name:
         save_path = _OUTPUT_DIR / f"{name}.json"
@@ -649,6 +738,7 @@ def _tee_console_to_log(log_path: Path):
 def _build_recreate_command(
     *,
     prompt_module: str,
+    manifest_path: Optional[str],
     pdf_dir: Optional[str],
     subset_path: Optional[str],
     config_path: Optional[str],
@@ -674,6 +764,8 @@ def _build_recreate_command(
         gt_path,
     ]
 
+    if manifest_path:
+        cmd.extend(["--manifest", manifest_path])
     if pdf_dir:
         cmd.extend(["--pdf-dir", pdf_dir])
     if subset_path:
@@ -714,19 +806,33 @@ def main() -> None:
         ),
     )
     parser.add_argument(
+        "--manifest",
+        default=None,
+        dest="manifest",
+        help=(
+            "Path to a DataPaperManifest CSV (data/manifests/*.csv). "
+            "When set, switches to manifest-first PDF mode: pdf_local_path is taken "
+            "directly from the manifest instead of DOI-to-filename inference. "
+            "Records with no pdf_local_path are skipped with a warning."
+        ),
+    )
+    parser.add_argument(
         "--pdf-dir",
         default=None,
         dest="pdf_dir",
         help=(
             "Directory containing PDFs named {doi_with_slashes_as_underscores}.pdf. "
-            "When set, switches to PDF extraction mode using the OpenAI File API."
+            "When set without --manifest, switches to PDF extraction mode using the "
+            "OpenAI File API. When used alongside --manifest, serves as a fallback "
+            "for records whose pdf_local_path is None."
         ),
     )
     parser.add_argument(
         "--subset",
         default=None,
         help="Path to dev_subset.csv (columns: doi, source, notes). "
-             "If omitted, all GT records with an abstract are used.",
+             "If omitted, all GT records with an abstract are used. "
+             "Deprecated in PDF mode when --manifest is provided.",
     )
     parser.add_argument(
         "--config",
@@ -776,8 +882,9 @@ def main() -> None:
     args = parser.parse_args()
 
     fields = [f.strip() for f in args.fields.split(",")] if args.fields else None
+    _cli_pdf_mode = args.manifest or args.pdf_dir
     effective_prompt = args.prompt or (
-        "prompts.pdf_file" if args.pdf_dir else "prompts.abstract"
+        "prompts.pdf_file" if _cli_pdf_mode else "prompts.abstract"
     )
 
     effective_output: Optional[Path] = None
@@ -807,6 +914,7 @@ def main() -> None:
         recreate_name = args.name if (args.name and not args.output) else None
         recreate_cmd = _build_recreate_command(
             prompt_module=effective_prompt,
+            manifest_path=args.manifest,
             pdf_dir=args.pdf_dir,
             subset_path=args.subset,
             config_path=args.config,
@@ -826,6 +934,7 @@ def main() -> None:
             fields=fields,
             model=args.model,
             gt_path=args.gt,
+            manifest_path=args.manifest,
             pdf_dir=args.pdf_dir,
             name=None,
             skip_cache=args.skip_cache,

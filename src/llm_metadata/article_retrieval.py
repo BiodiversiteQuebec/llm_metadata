@@ -12,18 +12,7 @@ from llm_metadata.dryad import get_dataset
 from llm_metadata.zenodo import get_record_by_doi
 from llm_metadata.openalex import get_work_by_doi
 from llm_metadata.semantic_scholar import get_open_access_pdf_url
-
-
-def extract_doi_from_url(url: str) -> str:
-    """Extract DOI from URL (handles both https://doi.org/ and bare DOIs)"""
-    if pd.isna(url):
-        return None
-    url = str(url).strip()
-    if url.startswith('https://doi.org/'):
-        return url.replace('https://doi.org/', '')
-    elif url.startswith('http://doi.org/'):
-        return url.replace('http://doi.org/', '')
-    return url
+from llm_metadata import doi_utils
 
 
 def get_article_doi_from_excel(row: pd.Series) -> Optional[str]:
@@ -36,8 +25,8 @@ def get_article_doi_from_excel(row: pd.Series) -> Optional[str]:
     cited_articles = row.get('cited_articles')
     if pd.notna(cited_articles):
         # Clean and extract DOI
-        article_doi = extract_doi_from_url(cited_articles)
-        return article_doi
+        article_doi = doi_utils.strip_doi_prefix(str(cited_articles))
+        return article_doi or None
     return None
 
 
@@ -52,7 +41,7 @@ def get_article_doi_from_dryad_api(dataset_url: str) -> Optional[str]:
         Article DOI string or None if not found
     """
     try:
-        doi = extract_doi_from_url(dataset_url)
+        doi = doi_utils.strip_doi_prefix(str(dataset_url)) if dataset_url else None
         if not doi:
             return None
 
@@ -67,7 +56,7 @@ def get_article_doi_from_dryad_api(dataset_url: str) -> Optional[str]:
                 # Look for primary article
                 if work.get('relationship') == 'primary_article':
                     article_identifier = work.get('identifier', '')
-                    return extract_doi_from_url(article_identifier)
+                    return doi_utils.strip_doi_prefix(article_identifier) or None
 
         return None
     except Exception as e:
@@ -86,7 +75,7 @@ def get_article_doi_from_zenodo_api(dataset_url: str) -> Optional[str]:
         Article DOI string or None if not found
     """
     try:
-        doi = extract_doi_from_url(dataset_url)
+        doi = doi_utils.strip_doi_prefix(str(dataset_url)) if dataset_url else None
         if not doi:
             return None
 
@@ -240,7 +229,9 @@ def process_dataset(excel_path: str, output_csv: str = 'data/dataset_article_map
     output_df = output_df.rename(columns={'url': 'dataset_url'})
 
     # Extract dataset DOI for cleaner output
-    output_df['dataset_doi'] = output_df['dataset_url'].apply(extract_doi_from_url)
+    output_df['dataset_doi'] = output_df['dataset_url'].apply(
+        lambda u: doi_utils.strip_doi_prefix(str(u)) if pd.notna(u) else None
+    )
     output_df = output_df[['id', 'dataset_doi', 'article_doi', 'source', 'retrieval_method', 'title']]
 
     # Save to CSV

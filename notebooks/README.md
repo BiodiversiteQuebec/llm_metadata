@@ -4,6 +4,32 @@ This folder contains analysis and validation notebooks for ecological dataset ch
 
 ## Recent Activity
 
+### 2026-03-05: Data-Paper Manifest Refactor (WU-SR1 through WU-SR8)
+
+**Task:** Implement the canonical manifest contract for data-paper sources, replacing DOI-driven PDF selection with a `gt_record_id`-keyed manifest that stores explicit `pdf_local_path` fields.
+
+**Work Performed:**
+- Created `src/llm_metadata/doi_utils.py`: centralized DOI normalization (`normalize_doi`, `doi_equal`, `doi_filename_stem`, `doi_candidate_variants`, `extract_doi_from_url`)
+- Created `src/llm_metadata/schemas/data_paper.py`: `DataPaperRecord` and `DataPaperManifest` Pydantic models with integrity checks (duplicate ID rejection, DOI normalization on construction)
+- Created `src/llm_metadata/data_paper_manifest.py`: builder joining GT XLSX + PDF manifest CSV, save/load CSV, CLI entrypoint, `update_record_pdf_path()` helper
+- Refactored `src/llm_metadata/prompt_eval.py`: added `--manifest` / `manifest_path` arg; PDF mode now uses `pdf_local_path` directly; `--subset` preserved for backward compat
+- Created `src/llm_metadata/manifest_adapters.py`: adapter layer for fulltext/pdf/section pipeline compatibility
+- Centralized DOI handling in `article_retrieval.py` and `pdf_download.py` via `doi_utils`
+- Generated `data/manifests/dev_subset_data_paper.csv`: 30/30 dev subset records with `pdf_local_path` all existing on disk
+- Added 6 test files: `test_doi_utils.py`, `test_data_paper_schema.py`, `test_data_paper_manifest.py`, `test_manifest_adapters.py`, `test_prompt_eval_manifest.py`, `test_manifest_integration.py`
+
+**Results:**
+- 114 new tests, all passing
+- Dev subset manifest preflight: 30/30 records, 30/30 unique IDs, 30/30 PDFs on disk
+- Pre-existing test suite: 286 passed, 4 pre-existing failures in `test_pdf_classify.py` (unrelated to this refactor)
+
+**Key Issues Identified:**
+- GT XLSX (`dataset_092624_validated.xlsx`) has a duplicate row for id=306 (identical data). Added `deduplicate_gt=True` option to manifest builder to handle this gracefully.
+- The `dev_subset.csv` `doi` column contains the *dataset* DOI (source_url), not the *article* DOI — PDF lookup must join through the fuster manifest to get `article_doi` and `downloaded_pdf_path`.
+
+**Next Steps:**
+- WU-SR7 replay: run PDF eval against the manifest with `--manifest data/manifests/dev_subset_data_paper.csv` to verify 30/30 extraction success (requires OpenAI API key)
+
 ### 2026-02-19: WU-C2 — GROBID parsing of all downloaded PDFs
 
 **Task:** Parse all 182 downloaded PDFs (Dryad + Zenodo + Semantic Scholar) through GROBID to produce TEI XML for section-based extraction.

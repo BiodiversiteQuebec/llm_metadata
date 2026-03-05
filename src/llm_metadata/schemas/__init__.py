@@ -33,6 +33,10 @@ from llm_metadata.schemas.openalex_work import (
     work_dict_to_model,
     works_to_dict_list,
 )
+from llm_metadata.schemas.data_paper import (
+    DataPaperRecord,
+    DataPaperManifest,
+)
 
 
 __all__ = [
@@ -59,4 +63,7 @@ __all__ = [
     "OpenAlexAuthor",
     "work_dict_to_model",
     "works_to_dict_list",
+    # Data paper manifest
+    "DataPaperRecord",
+    "DataPaperManifest",
 ]
