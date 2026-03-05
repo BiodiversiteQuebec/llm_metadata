@@ -27,7 +27,7 @@ The eval viewer app (`app_eval_viewer.py`) currently depends on two xlsx files f
 def run_eval(
     *,
     prompt_module: Optional[str] = None,
-    subset_path: Optional[str] = None,
+    manifest_path: Optional[str] = None,
     ...
     name: Optional[str] = None,       # NEW
 ) -> EvaluationReport:
@@ -80,7 +80,7 @@ report.save(
     cost_usd=...,
     records=records_dict,
     system_message=system_message,
-    subset_path=subset_path,  # bonus: track which subset was used
+    manifest_path=manifest_path,  # track which manifest defined the run subset
 )
 ```
 
@@ -123,7 +123,7 @@ Check `meta_a.get("system_message")` first; fall back to `importlib.import_modul
 - Inner Loop CLI example: add `--name` flag
 - Python API example: add `name` parameter
 - Eval Viewer data dependencies table: mark xlsx as "Fallback only"
-- Add `subset_path` to saved metadata fields
+- Add `manifest_path` to saved metadata fields
 
 ---
 
@@ -144,7 +144,7 @@ Check `meta_a.get("system_message")` first; fall back to `importlib.import_modul
 - Add `name` parameter to `run_eval()` (Change 1a)
 - Add `--name` CLI flag (Change 1b)
 - Add `_build_records_dict()` helper (Change 2a)
-- Bundle `records`, `system_message`, `subset_path` into save calls (Change 2b, 2c)
+- Bundle `records`, `system_message`, `manifest_path` into save calls (Change 2b, 2c)
 - Attach `records` and `system_message` as report attributes for Python API callers
 
 #### WU-2: app self-contained loading `sonnet`
@@ -186,7 +186,7 @@ Check `meta_a.get("system_message")` first; fall back to `importlib.import_modul
    ```bash
    uv run python -m llm_metadata.prompt_eval \
      --prompt prompts.abstract \
-     --subset data/dev_subset.csv \
+     --manifest data/manifests/dev_subset_data_paper.csv \
      --name test_selfcontained \
      --fields species
    ```

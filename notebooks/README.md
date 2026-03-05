@@ -12,7 +12,7 @@ This folder contains analysis and validation notebooks for ecological dataset ch
 - Created `src/llm_metadata/doi_utils.py`: centralized DOI normalization (`normalize_doi`, `doi_equal`, `doi_filename_stem`, `doi_candidate_variants`, `extract_doi_from_url`)
 - Created `src/llm_metadata/schemas/data_paper.py`: `DataPaperRecord` and `DataPaperManifest` Pydantic models with integrity checks (duplicate ID rejection, DOI normalization on construction)
 - Created `src/llm_metadata/data_paper_manifest.py`: builder joining GT XLSX + PDF manifest CSV, save/load CSV, CLI entrypoint, `update_record_pdf_path()` helper
-- Refactored `src/llm_metadata/prompt_eval.py`: added `--manifest` / `manifest_path` arg; PDF mode now uses `pdf_local_path` directly; `--subset` preserved for backward compat
+- Refactored `src/llm_metadata/prompt_eval.py`: added manifest-driven record selection (`manifest_path`) and removed `--subset` filtering. Prompt module now determines extraction mode (`prompts.abstract` vs `prompts.pdf_file`), while manifest defines the evaluated record IDs.
 - Created `src/llm_metadata/manifest_adapters.py`: adapter layer for fulltext/pdf/section pipeline compatibility
 - Centralized DOI handling in `article_retrieval.py` and `pdf_download.py` via `doi_utils`
 - Generated `data/manifests/dev_subset_data_paper.csv`: 30/30 dev subset records with `pdf_local_path` all existing on disk
@@ -25,7 +25,7 @@ This folder contains analysis and validation notebooks for ecological dataset ch
 
 **Key Issues Identified:**
 - GT XLSX (`dataset_092624_validated.xlsx`) has a duplicate row for id=306 (identical data). Added `deduplicate_gt=True` option to manifest builder to handle this gracefully.
-- The `dev_subset.csv` `doi` column contains the *dataset* DOI (source_url), not the *article* DOI — PDF lookup must join through the fuster manifest to get `article_doi` and `downloaded_pdf_path`.
+- Legacy note: `dev_subset.csv` used dataset DOIs (`source_url`) rather than article DOIs. The current flow is manifest-only (`data/manifests/*.csv`) and uses explicit `gt_record_id` + `pdf_local_path`.
 
 **Next Steps:**
 - WU-SR7 replay: run PDF eval against the manifest with `--manifest data/manifests/dev_subset_data_paper.csv` to verify 30/30 extraction success (requires OpenAI API key)
@@ -147,7 +147,7 @@ OA proportion among records **with a PDF URL** (the correct denominator):
 
 ### 2026-02-19: Prompt eval infrastructure — baselines (abstract + full PDF)
 
-**Task:** Wire up the `prompt_eval` loop end-to-end: fix the results viewer notebook, add PDF extraction mode to `prompt_eval.py`, run abstract and full-PDF baselines on `dev_subset.csv`.
+**Task:** Wire up the `prompt_eval` loop end-to-end: fix the results viewer notebook, add PDF extraction mode to `prompt_eval.py`, run abstract and full-PDF baselines on the dev subset cohort.
 
 **Work Performed:**
 
