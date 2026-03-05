@@ -80,12 +80,12 @@ Create a `.env` file in the project root:
 # For GPT classification
 OPENAI_API_KEY=your_openai_api_key
 
-# Optional: prompt_eval JSON/log output directory
-PROMPT_EVAL_OUTPUT_DIR=data/prompt_eval_reports
+# Optional: prompt_eval run artifact directory
+PROMPT_EVAL_OUTPUT_DIR=artifacts/runs
 
 # Optional: eval viewer run discovery directory
-# Defaults to EVAL_VIEWER_RESULTS_DIR, then PROMPT_EVAL_OUTPUT_DIR, then data/prompt_eval_reports
-EVAL_VIEWER_RESULTS_DIR=data/prompt_eval_reports
+# Defaults to EVAL_VIEWER_RESULTS_DIR, then PROMPT_EVAL_OUTPUT_DIR, then artifacts/runs
+EVAL_VIEWER_RESULTS_DIR=artifacts/runs
 
 # For Zenodo API access (optional, required only for Zenodo features)
 ZENODO_ACCESS_TOKEN=your_zenodo_token
@@ -209,51 +209,49 @@ store.upsert_chunks(chunks, embeddings)
 
 ### Stage 3: LLM Inference & Batch Processing
 
-**Extract Metadata from Abstract**
+**Extract Metadata from Text**
 
 ```python
-from llm_metadata.gpt_classify import classify_abstract
-from llm_metadata.schemas.fuster_features import DatasetFeatureExtraction
+from llm_metadata.gpt_extract import extract_from_text
+from llm_metadata.schemas.fuster_features import DatasetFeatures
 
-abstract = """
+text = """
 We monitored caribou populations in northern Quebec from 1999 to 2015
 using GPS telemetry. The dataset includes movement trajectories and
 habitat use data for 45 individuals across three herds.
 """
 
-# Extract detailed EBV features
-result = classify_abstract(
-    abstract,
-    response_format=DatasetFeatureExtraction
+# Extract detailed EBV features from arbitrary text
+result = extract_from_text(
+    text,
+    text_format=DatasetFeatures,
 )
 
 features = result['output']
-print(f"Taxons: {features.taxons}")
+print(f"Species: {features.species}")
 print(f"Temporal range: {features.temp_range_i} - {features.temp_range_f}")
 print(f"Data type: {features.data_type}")
 print(f"Cost: ${result['usage_cost']['total_cost']}")
 ```
 
-**Batch Processing with Prefect**
+**Run explicit extraction modes over a manifest**
 
-Process multiple datasets in parallel with monitoring:
+All extraction paths use one canonical input contract, `DataPaperManifest`, and one explicit `mode`:
 
 ```python
-from llm_metadata.prefect_pipeline import doi_classification_pipeline
+from llm_metadata.pipelines import run_manifest_extraction
+from llm_metadata.schemas.data_paper import DataPaperManifest
 
-dois = [
-    "10.5061/dryad.2n5h6",
-    "10.5061/dryad.3nh72",
-    "10.5061/dryad.4k275"
-]
+manifest = DataPaperManifest.load_csv("data/manifests/dev_subset_data_paper.csv")
 
-# Prefect manages parallelization, retries, and monitoring
-results = doi_classification_pipeline(dois=dois)
+artifact = run_manifest_extraction(
+    manifest,
+    mode="abstract",   # or: pdf_text, pdf_native, sections
+    name="dev_subset_abstract",
+)
 
-for result in results:
-    print(f"DOI: {result['abstract'][:30]}...")
-    print(f"  Species: {result['output'].taxons}")
-    print(f"  Cost: ${result['usage_cost']['total_cost']}")
+print(artifact.total_cost_usd)
+print(artifact.records[0].status)
 ```
 
 ### Stage 4: Evaluation & Validation
@@ -316,20 +314,22 @@ print(f"F1: {micro_metrics['f1']:.3f}")
 **Run prompt evaluation from CLI**
 
 ```bash
-# Abstract mode on dev subset (cached by default)
+# Abstract mode on a manifest-defined subset (cached by default)
 uv run python -m llm_metadata.prompt_eval \
-  --subset data/dev_subset.csv \
+  --mode abstract \
+  --manifest data/manifests/dev_subset_data_paper.csv \
   --name dev_subset_abstract_20260220_01
 
-# Force fresh API calls (skip joblib cache)
+# Native PDF mode
 uv run python -m llm_metadata.prompt_eval \
-  --subset data/dev_subset.csv \
-  --name dev_subset_abstract_20260220_02 \
+  --mode pdf_native \
+  --manifest data/manifests/dev_subset_data_paper.csv \
+  --name dev_subset_pdf_native_20260220_01 \
   --skip-cache
 ```
 
 Output conventions:
-- no `--name` and no `--output`: auto-saves `{timestamp}_{prompt}.json` and matching `.log` to `PROMPT_EVAL_OUTPUT_DIR` (default: `data/prompt_eval_reports`)
+- no `--name` and no `--output`: auto-saves `{timestamp}_prompt_eval.json` and matching `.log` to `PROMPT_EVAL_OUTPUT_DIR` (default: `artifacts/runs`)
 - `--name run_id` saves `PROMPT_EVAL_OUTPUT_DIR/{timestamp}_run_id.json` and `PROMPT_EVAL_OUTPUT_DIR/{timestamp}_run_id.log`
 - `--output run.json` (bare filename) saves to `PROMPT_EVAL_OUTPUT_DIR/{timestamp}_run.json` and matching `.log`
 - `--output path/to/run.json` keeps the explicit directory and writes `path/to/run.log`
@@ -350,19 +350,19 @@ docker compose -f docker-compose.viewer.yml up --build
 - The repository is bind-mounted from host to container at `/app` for live sync
 - This compose file contains only the Streamlit viewer service (no Grobid/Qdrant)
 - JSON run discovery directory is configurable via `EVAL_VIEWER_RESULTS_DIR`
-- Default discovery order: `EVAL_VIEWER_RESULTS_DIR` → `PROMPT_EVAL_OUTPUT_DIR` → `data/prompt_eval_reports`
+- Default discovery order: `EVAL_VIEWER_RESULTS_DIR` → `PROMPT_EVAL_OUTPUT_DIR` → `artifacts/runs`
 - Recommended deploy value: `EVAL_VIEWER_RESULTS_DIR=app/prompt_eval_results`
 
 Example local override:
 
 ```bash
-EVAL_VIEWER_RESULTS_DIR=data uv run streamlit run app/app_eval_viewer.py
+EVAL_VIEWER_RESULTS_DIR=artifacts/runs uv run streamlit run app/app_eval_viewer.py
 ```
 
 In `Overview`, expand:
 - `Ground truth dataset` for source data table
 - `Prompt` for serialized system prompt used in the run
-- `Logs` to view `data/{run}.log` content directly in the app
+- `Logs` to view `{run}.log` content directly in the app
 
 ## Project Context
 
@@ -420,10 +420,10 @@ llm_metadata/
 ├── embedding.py                # OpenAI embeddings with caching
 ├── vector_store.py             # Qdrant vector database client
 ├── openai_io.py                # OpenAI client factory with env-driven base URL routing
-├── gpt_classify.py             # LLM classification engine (GPT-5-mini)
-├── prefect_pipeline.py         # Batch processing orchestration
+├── gpt_classify.py             # Canonical classifier import surface
+├── gpt_extract.py              # Text/PDF classification implementation
+├── extraction.py               # Unified explicit-mode extraction engine
 ├── prompt_eval.py              # Prompt evaluation runner (Python API + CLI)
-├── registry.py                 # Document tracking database
 ├── prompts/
 │   ├── common.py               # Shared prompt blocks (PERSONA, PHILOSOPHY, etc.)
 │   ├── abstract.py             # Abstract extraction prompt
@@ -431,14 +431,11 @@ llm_metadata/
 │   └── pdf_file.py             # PDF File API extraction prompt
 ├── schemas/
 │   ├── abstract_metadata.py    # High-level metadata schema
+│   ├── data_paper.py           # Canonical manifest + run artifact contracts
 │   ├── fuster_features.py      # Detailed EBV feature schema with validators
 │   ├── chunk_metadata.py       # Section-aware chunk metadata
-│   ├── validation.py           # Ground truth validation (Pydantic-based)
-│   └── groundtruth_eval.py     # Evaluation framework (field strategies, metrics)
-└── configs/
-    ├── eval_default.json       # Default field strategies + normalization
-    ├── eval_fuzzy_species.json # Fuzzy species matching variant
-    └── eval_strict.json        # Exact-only matching baseline
+│   └── validation.py           # Ground truth validation (Pydantic-based)
+└── groundtruth_eval.py         # Evaluation framework (field strategies, metrics)
 ```
 
 Viewer app path: `app/app_eval_viewer.py`
