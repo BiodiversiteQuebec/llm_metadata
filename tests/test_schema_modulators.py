@@ -1,4 +1,4 @@
-"""Tests for modulator fields, DataSource enum, and boolean coercion in fuster_features schema."""
+"""Tests for modulator fields and boolean coercion in feature schemas."""
 
 import pytest
 
@@ -17,19 +17,6 @@ class TestDataSourceEnum:
         assert DataSource.ZENODO == "zenodo"
         assert DataSource.SEMANTIC_SCHOLAR == "semantic_scholar"
         assert DataSource.REFERENCED == "referenced"
-
-    def test_source_field_on_base_model(self):
-        m = DatasetFeatures(source="dryad")
-        assert m.source == "dryad"
-
-    def test_source_field_none_default(self):
-        m = DatasetFeatures()
-        assert m.source is None
-
-    def test_source_field_all_values(self):
-        for val in ("dryad", "zenodo", "semantic_scholar", "referenced"):
-            m = DatasetFeatures(source=val)
-            assert m.source == val
 
 
 class TestModulatorFieldsBase:
@@ -69,17 +56,14 @@ class TestModulatorFieldsBase:
         m = DatasetFeatures(
             time_series=True,
             multispecies=False,
-            source="zenodo",
         )
         d = m.model_dump()
         assert d["time_series"] is True
         assert d["multispecies"] is False
-        assert d["source"] == "zenodo"
 
         m2 = DatasetFeatures.model_validate(d)
         assert m2.time_series is True
         assert m2.multispecies is False
-        assert m2.source == "zenodo"
 
 
 class TestBooleanCoercionValidator:
@@ -156,31 +140,6 @@ class TestBooleanCoercionValidator:
         assert m.bias_north_south is False
 
 
-class TestSourceCoercionValidator:
-    """Test source field coercion in DatasetFeaturesNormalized."""
-
-    def test_string_values(self):
-        for val in ("dryad", "zenodo", "semantic_scholar", "referenced"):
-            m = DatasetFeaturesNormalized(source=val)
-            assert m.source == val
-
-    def test_case_normalization(self):
-        m = DatasetFeaturesNormalized(source="Dryad")
-        assert m.source == "dryad"
-
-    def test_nan_to_none(self):
-        m = DatasetFeaturesNormalized(source=float("nan"))
-        assert m.source is None
-
-    def test_empty_string_to_none(self):
-        m = DatasetFeaturesNormalized(source="")
-        assert m.source is None
-
-    def test_none_passthrough(self):
-        m = DatasetFeaturesNormalized(source=None)
-        assert m.source is None
-
-
 class TestNormalizedModelWithModulators:
     """Integration tests: full DatasetFeaturesNormalized with modulator fields and existing fields."""
 
@@ -195,7 +154,6 @@ class TestNormalizedModelWithModulators:
             temp_range_f=2015.0,
             species="Tamias striatus, Ursus americanus",
             valid_yn="yes",
-            source="dryad",
             time_series="yes",
             multispecies=True,
             threatened_species=False,
@@ -216,7 +174,6 @@ class TestNormalizedModelWithModulators:
         assert m.time_series is True
         assert m.multispecies is True
         assert m.threatened_species is False
-        assert m.source == "dryad"
 
     def test_record_with_all_nan_modulators(self):
         """Simulate a record where all modulator fields are NaN (common in xlsx)."""
@@ -228,7 +185,6 @@ class TestNormalizedModelWithModulators:
             new_species_science=float("nan"),
             new_species_region=float("nan"),
             bias_north_south=float("nan"),
-            source=float("nan"),
         )
         assert "abundance" in m.data_type
         assert m.time_series is None
@@ -237,4 +193,3 @@ class TestNormalizedModelWithModulators:
         assert m.new_species_science is None
         assert m.new_species_region is None
         assert m.bias_north_south is None
-        assert m.source is None

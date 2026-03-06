@@ -1,18 +1,4 @@
-"""Helpers for notebook-based taxonomic relevance evaluation.
-
-These utilities enrich `DatasetFeatures` with derived taxonomic comparison
-fields while preserving the original raw extraction contract:
-
-- `parsed_species`: structured name parsing for analysis
-- `taxon_richness_mentions`: structured count + group mentions
-- `taxon_richness_counts`: projected counts for comparison
-- `taxon_richness_group_keys`: projected count+group keys for comparison
-- `gbif_keys`: GBIF taxon IDs derived from parsed taxa
-
-The intended usage is notebook-first: load an existing `RunArtifact`, enrich
-ground truth and predictions, then evaluate only the field subset relevant to
-the question being asked.
-"""
+"""Helpers for notebook-based taxonomic relevance evaluation."""
 
 from __future__ import annotations
 
@@ -20,7 +6,7 @@ import ast
 from pathlib import Path
 from typing import Collection, Optional
 
-from llm_metadata.gbif import resolve_species_list
+from llm_metadata.gbif import ResolvedTaxon, resolve_species_list
 from llm_metadata.groundtruth_eval import (
     EvaluationConfig,
     EvaluationReport,
@@ -28,7 +14,12 @@ from llm_metadata.groundtruth_eval import (
     evaluate_indexed,
 )
 from llm_metadata.schemas.data_paper import RunArtifact
-from llm_metadata.schemas.fuster_features import DatasetFeatures, DatasetFeaturesNormalized
+from llm_metadata.schemas.fuster_features import (
+    CoreFeatureModel,
+    DatasetFeaturesEvaluation,
+    DatasetFeaturesExtraction,
+    DatasetFeaturesNormalized,
+)
 from llm_metadata.species_parsing import (
     extract_parsed_taxa,
     extract_taxon_richness_mentions,
@@ -77,12 +68,6 @@ _GBIF_GROUP_LABELS = {
 
 
 def _parse_excel_val(val):
-    """Best-effort parse of Excel cell values into Python scalars or lists.
-
-    Ground-truth spreadsheets may store list-like values as literal strings.
-    This helper preserves native lists, converts parseable list literals, and
-    normalizes pandas missing values to ``None``.
-    """
     if val is None:
         return None
     try:
@@ -108,7 +93,7 @@ def build_ground_truth_by_id(
     gt_path: str | Path = "data/dataset_092624_validated.xlsx",
     allowed_ids: Optional[Collection[int]] = None,
 ) -> dict[str, DatasetFeaturesNormalized]:
-    """Load validated GT rows and return `DatasetFeaturesNormalized` keyed by record id."""
+    """Load validated GT rows and return normalized feature models keyed by record id."""
     try:
         import pandas as pd  # type: ignore
     except ImportError as exc:
@@ -133,26 +118,22 @@ def build_ground_truth_by_id(
 
 def load_predictions_by_id(
     run_artifact_path: str | Path,
-    model_type: type[DatasetFeatures] = DatasetFeatures,
-) -> dict[str, DatasetFeatures]:
+    model_type: type[DatasetFeaturesExtraction] = DatasetFeaturesExtraction,
+) -> dict[str, DatasetFeaturesExtraction]:
     """Load successful predictions from a saved `RunArtifact` JSON."""
     artifact = RunArtifact.load_json(run_artifact_path)
     return artifact.predictions_by_id(model_type)  # type: ignore[return-value]
 
 
 def project_taxon_broad_group_labels(
-    model: DatasetFeatures,
+    model: CoreFeatureModel,
     *,
     use_gbif: bool = True,
     confidence_threshold: int = 80,
     accept_higherrank: bool = True,
+    resolved_taxa: Optional[list[ResolvedTaxon]] = None,
 ) -> Optional[list[str]]:
-    """Project a model into broad comparison-oriented group labels.
-
-    Sources, in order:
-    1. Explicit count-bearing/group-description strings from `species`
-    2. GBIF hierarchy for resolved taxa, mapped to a coarse user-facing label
-    """
+    """Project a model into broad comparison-oriented group labels."""
     labels: set[str] = set()
 
     parsed_species = extract_parsed_taxa(model.species) or []
@@ -169,11 +150,12 @@ def project_taxon_broad_group_labels(
                 labels.add(group)
 
     if use_gbif and model.species:
-        for resolved in resolve_species_list(
+        gbif_payload = resolved_taxa or resolve_species_list(
             list(model.species),
             confidence_threshold=confidence_threshold,
             accept_higherrank=accept_higherrank,
-        ):
+        )
+        for resolved in gbif_payload:
             match = resolved.gbif_match
             if match is None:
                 continue
@@ -195,61 +177,50 @@ def project_taxon_broad_group_labels(
 
 
 def enrich_with_taxonomy(
-    model: DatasetFeatures,
+    model: CoreFeatureModel,
     *,
     include_gbif: bool = True,
     gbif_confidence_threshold: int = 80,
     accept_higherrank: bool = True,
-) -> DatasetFeatures:
-    """Return a copy of `model` with derived taxonomy analysis fields populated."""
+) -> DatasetFeaturesEvaluation:
+    """Build an evaluation model populated with taxonomy-derived fields."""
     parsed_species = extract_parsed_taxa(model.species)
     richness_mentions = extract_taxon_richness_mentions(model.species)
-    richness_counts = project_taxon_richness_counts(model.species, richness_mentions)
-    richness_group_keys = project_taxon_richness_group_keys(richness_mentions)
-    broad_group_labels = None
-    gbif_keys = None
+    resolved_taxa: Optional[list[ResolvedTaxon]] = None
 
     if include_gbif and model.species:
-        resolved = resolve_species_list(
+        resolved_taxa = resolve_species_list(
             list(model.species),
             confidence_threshold=gbif_confidence_threshold,
             accept_higherrank=accept_higherrank,
         )
-        gbif_keys = sorted({r.gbif_match.gbif_key for r in resolved if r.gbif_match is not None}) or None
-        broad_group_labels = project_taxon_broad_group_labels(
-            model,
-            use_gbif=True,
-            confidence_threshold=gbif_confidence_threshold,
-            accept_higherrank=accept_higherrank,
-        )
-    else:
-        broad_group_labels = project_taxon_broad_group_labels(
-            model,
-            use_gbif=False,
-            confidence_threshold=gbif_confidence_threshold,
-            accept_higherrank=accept_higherrank,
-        )
 
-    enriched = model.model_copy(
-        update={
-            "parsed_species": parsed_species,
-            "taxon_richness_mentions": richness_mentions,
-            "taxon_richness_counts": richness_counts,
-            "taxon_richness_group_keys": richness_group_keys,
-            "taxon_broad_group_labels": broad_group_labels,
-            "gbif_keys": gbif_keys,
-        }
+    broad_group_labels = project_taxon_broad_group_labels(
+        model,
+        use_gbif=include_gbif,
+        confidence_threshold=gbif_confidence_threshold,
+        accept_higherrank=accept_higherrank,
+        resolved_taxa=resolved_taxa,
     )
-    return enriched
+
+    return DatasetFeaturesEvaluation.from_extraction(
+        model,
+        gbif=resolved_taxa,
+        parsed_species=parsed_species,
+        taxon_richness_mentions=richness_mentions,
+        taxon_richness_counts=project_taxon_richness_counts(model.species, richness_mentions),
+        taxon_richness_group_keys=project_taxon_richness_group_keys(richness_mentions),
+        taxon_broad_group_labels=broad_group_labels,
+    )
 
 
 def enrich_indexed_models(
-    models_by_id: dict[str, DatasetFeatures],
+    models_by_id: dict[str, CoreFeatureModel],
     *,
     include_gbif: bool = True,
     gbif_confidence_threshold: int = 80,
     accept_higherrank: bool = True,
-) -> dict[str, DatasetFeatures]:
+) -> dict[str, DatasetFeaturesEvaluation]:
     """Apply `enrich_with_taxonomy` to each record in an indexed model dictionary."""
     return {
         record_id: enrich_with_taxonomy(
@@ -277,8 +248,8 @@ def build_taxonomy_eval_config(
 
 def evaluate_taxonomy_fields(
     *,
-    true_by_id: dict[str, DatasetFeatures],
-    pred_by_id: dict[str, DatasetFeatures],
+    true_by_id: dict[str, CoreFeatureModel],
+    pred_by_id: dict[str, CoreFeatureModel],
     fields: Optional[Collection[str]] = None,
     include_gbif: bool = True,
     gbif_confidence_threshold: int = 80,

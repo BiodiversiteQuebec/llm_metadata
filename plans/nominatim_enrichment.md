@@ -8,7 +8,7 @@ The `spatial_range_km2` field records study area size in km², and `geospatial_i
 
 **Approach:** Following the enrichment pattern established by GBIF species matching and formalized in `plans/model_hierarchy_enrichment.md`:
 
-1. Add `location_text: Optional[list[str]]` to `DatasetFeatures` — raw location strings extracted as-is by the LLM (mirrors `species` field design).
+1. Add `location_text: Optional[list[str]]` to `DatasetFeaturesExtraction` — raw location strings extracted as-is by the LLM (mirrors `species` field design).
 2. Add `location_ids: Optional[list[str]]` to `DatasetFeaturesEvaluation` — stable place identifiers derived from `location_text` via Nominatim geocoding. Populated by preprocessing, not extracted by the LLM.
 3. Create `nominatim.py` — geocoding wrapper using the Nominatim (OpenStreetMap) API, which is free, key-free, and returns structured admin hierarchy plus Wikidata QIDs.
 
@@ -61,7 +61,7 @@ Strategy comparison: `report.metrics_for("location_text")` vs `report.metrics_fo
 ### WU-1: Schema field — `location_text`
 `model: sonnet` | deps: none
 
-Add `location_text` extraction field to `DatasetFeatures` and update the LLM system prompts to extract it.
+Add `location_text` extraction field to `DatasetFeaturesExtraction` and update the LLM system prompts to extract it.
 
 **Schema change in `schemas/fuster_features.py`:**
 ```python

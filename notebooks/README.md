@@ -4,6 +4,30 @@ This folder contains analysis and validation notebooks for ecological dataset ch
 
 ## Recent Activity
 
+### 2026-03-06: Model Hierarchy & Enrichment Refactor
+
+**Task:** Split the overloaded `DatasetFeatures` contract into extraction, ground-truth normalization, and evaluation-time models so source metadata and enrichment fields no longer leak into the LLM schema.
+
+**Work Performed:**
+- Refactored `src/llm_metadata/schemas/fuster_features.py` into `CoreFeatureModel`, `DatasetFeaturesExtraction`, `DatasetFeaturesNormalized`, and `DatasetFeaturesEvaluation`
+- Kept `DatasetFeatures` as a compatibility alias for the extraction contract so older notebooks and tests still load
+- Moved ownership of source/provenance metadata to `DataPaperRecord` and rewired `prompt_eval.py` to build GT rows from semantic fields only
+- Updated `taxonomy_eval.py` and `gbif.py` so service lookup returns payloads first and evaluation-model assembly happens through `DatasetFeaturesEvaluation.from_extraction(...)`
+- Migrated contract-boundary tests (`test_datasource_schema.py`, `test_multisource_integration.py`, `test_gbif_enrichment.py`, `test_taxonomy_eval.py`) to assert the new separation explicitly
+
+**Results:**
+- The schema passed to `responses.parse()` now excludes source/provenance fields and enrichment-only fields
+- GT normalization keeps the same semantic fields and validators, but ignores record-level provenance columns
+- Evaluation-only derived fields (`parsed_species`, richness projections, `gbif_keys`) are now isolated on `DatasetFeaturesEvaluation`
+- No metric run was executed as part of this refactor; this was a contract cleanup and test migration pass
+
+**Key Issues Identified:**
+- Existing notebooks still rely on the `DatasetFeatures` name in many cells; compatibility is preserved via aliasing, but future notebook cleanup should switch explicit imports to `DatasetFeaturesExtraction` / `DatasetFeaturesEvaluation`
+- Older narrative docs and rendered notebook exports may still refer to the pre-split schema name until they are regenerated
+
+**Next Steps:**
+- Regenerate the main evaluation notebooks when the next prompt-eval experiment runs so notebook code and exported HTML use the explicit class names
+
 ### 2026-03-05: Data-Paper Manifest Refactor (WU-SR1 through WU-SR8)
 
 **Task:** Implement the canonical manifest contract for data-paper sources, replacing DOI-driven PDF selection with a `gt_record_id`-keyed manifest that stores explicit `pdf_local_path` fields.

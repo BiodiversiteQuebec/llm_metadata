@@ -10,7 +10,7 @@ Rationale:
 - Makes comparisons stable across notebooks/extraction.
 
 If you currently have dicts (e.g. rows from a DataFrame), validate first:
-	DatasetFeatureExtraction.model_validate(row_dict)
+	DatasetFeaturesNormalized.model_validate(row_dict)
 """
 
 from __future__ import annotations

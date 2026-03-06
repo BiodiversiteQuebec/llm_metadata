@@ -14,12 +14,17 @@ from llm_metadata.schemas.abstract_metadata import (
     DEFAULT_DATASET_CATEGORIES,
 )
 from llm_metadata.schemas.fuster_features import (
+    CoreFeatureModel,
     DatasetFeatures,
+    DatasetFeaturesExtraction,
+    DatasetFeaturesEvaluation,
     DatasetFeaturesNormalized,
     DataSource,
     EBVDataType,
+    EVALUATION_FEATURE_FIELD_NAMES,
     GeospatialInfoType,
     FeatureLocation,
+    SEMANTIC_FEATURE_FIELD_NAMES,
 )
 from llm_metadata.schemas.validation import (
     DataFrameValidator,
@@ -50,10 +55,15 @@ __all__ = [
     "DatasetAbstractMetadata",
     "DEFAULT_DATASET_CATEGORIES",
     # Fuster features
+    "CoreFeatureModel",
     "DatasetFeatures",
+    "DatasetFeaturesExtraction",
+    "DatasetFeaturesEvaluation",
     "DatasetFeaturesNormalized",
     "DataSource",
     "EBVDataType",
+    "SEMANTIC_FEATURE_FIELD_NAMES",
+    "EVALUATION_FEATURE_FIELD_NAMES",
     "GeospatialInfoType",
     "FeatureLocation",
     # Validation

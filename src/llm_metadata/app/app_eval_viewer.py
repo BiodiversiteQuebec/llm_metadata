@@ -534,7 +534,7 @@ def main() -> None:
             else:
                 st.caption("No record metadata available for this run.")
 
-        with st.expander("Output schema (DatasetFeatures)", expanded=False):
+        with st.expander("Output schema (DatasetFeaturesExtraction)", expanded=False):
             schema_data = meta_a.get("schema")
             if isinstance(schema_data, dict) and schema_data:
                 st.code(json.dumps(schema_data, indent=2), language="json")

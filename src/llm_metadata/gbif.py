@@ -1,18 +1,4 @@
-"""
-GBIF Species Match API wrapper for taxon key resolution.
-
-Resolves species strings (scientific names, vernacular names, or mixed formats)
-to GBIF backbone taxon keys via the GBIF Species Match API. Designed as a
-preprocessing enrichment step for the LLM metadata pipeline — populates a
-`gbif_keys` field on extracted models to enable integer-key-based evaluation
-alongside traditional string matching.
-
-API Documentation: https://www.gbif.org/developer/species#searching
-Endpoint: GET https://api.gbif.org/v1/species/match
-
-No authentication required; no documented rate limit. A small polite delay is
-applied between requests to be considerate of the public API.
-"""
+"""GBIF Species Match API wrapper for taxon key resolution."""
 
 import time
 from dataclasses import dataclass
@@ -233,37 +219,41 @@ def resolve_species_list(
     return results
 
 
-def enrich_with_gbif(
-    model: "DatasetFeatures",  # type: ignore[name-defined]  # avoid circular import
+def resolve_model_species(
+    model: "CoreFeatureModel",  # type: ignore[name-defined]  # avoid circular import
     confidence_threshold: int = 80,
     accept_higherrank: bool = True,
-) -> "DatasetFeatures":
-    """Resolve species strings to GBIF keys and return an enriched model copy.
-
-    Reads ``model.species``, resolves each string to a GBIF backbone taxon key,
-    and returns a new model instance with ``gbif_keys`` populated. The original
-    model is not mutated.
+) -> list[ResolvedTaxon]:
+    """Resolve the `species` field on a feature model to GBIF payloads.
 
     Args:
-        model: A `DatasetFeatures` (or subclass) instance with a ``species`` field.
+        model: A feature model instance with a ``species`` field.
         confidence_threshold: Minimum GBIF confidence score to accept a match.
         accept_higherrank: Whether to accept HIGHERRANK (broader taxon) matches.
 
     Returns:
-        A copy of `model` with ``gbif_keys`` set to a list of resolved integer
-        keys, or ``None`` if no species were present or none resolved.
-
-    Example:
-        >>> enriched = enrich_with_gbif(extracted_model)
-        >>> enriched.gbif_keys  # [5219243, 2435099, ...]
+        A list of resolved GBIF payloads. Empty when no species were present.
     """
     if not model.species:
-        return model.model_copy(update={"gbif_keys": None})
-
-    resolved = resolve_species_list(
+        return []
+    return resolve_species_list(
         model.species,
         confidence_threshold=confidence_threshold,
         accept_higherrank=accept_higherrank,
     )
-    keys = [r.gbif_match.gbif_key for r in resolved if r.gbif_match is not None]
-    return model.model_copy(update={"gbif_keys": keys if keys else None})
+
+
+def enrich_with_gbif(
+    model: "CoreFeatureModel",  # type: ignore[name-defined]  # avoid circular import
+    confidence_threshold: int = 80,
+    accept_higherrank: bool = True,
+) -> "DatasetFeaturesEvaluation":
+    """Backward-compatible convenience wrapper returning an evaluation model."""
+    from llm_metadata.schemas.fuster_features import DatasetFeaturesEvaluation
+
+    resolved = resolve_model_species(
+        model,
+        confidence_threshold=confidence_threshold,
+        accept_higherrank=accept_higherrank,
+    )
+    return DatasetFeaturesEvaluation.from_extraction(model, gbif=resolved)

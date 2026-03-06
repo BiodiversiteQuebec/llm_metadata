@@ -88,11 +88,11 @@
 
 > **Plan:** [`plans/model_hierarchy_enrichment.md`](plans/model_hierarchy_enrichment.md)
 
-- [ ] Split `DatasetFeatures` into role-specific models: `CoreFeatureModel` → `DatasetFeaturesExtraction` / `DatasetFeaturesNormalized` / `DatasetFeaturesEvaluation`
-- [ ] Keep source/provenance metadata (`is_oa`, `source_url`, etc.) on `DataPaperRecord`, not a feature subclass
-- [ ] Move derived evaluation fields (`gbif_keys`, future `gadm_codes`, `location_ids`) to `DatasetFeaturesEvaluation`
-- [ ] Standardize enrichment flow: external lookup in service modules, pure assembly via evaluation-model constructors/copy helpers
-- [ ] Update notebooks, extraction, and tests to use correct subclass
+- [x] Split `DatasetFeatures` into role-specific models: `CoreFeatureModel` → `DatasetFeaturesExtraction` / `DatasetFeaturesNormalized` / `DatasetFeaturesEvaluation`
+- [x] Keep source/provenance metadata (`is_oa`, `source_url`, etc.) on `DataPaperRecord`, not a feature subclass
+- [x] Move derived evaluation fields (`gbif_keys`, future `gadm_codes`, `location_ids`) to `DatasetFeaturesEvaluation`
+- [x] Standardize enrichment flow: external lookup in service modules, pure assembly via evaluation-model constructors/copy helpers
+- [x] Update notebooks, extraction, and tests to use correct subclass
 
 ---
 

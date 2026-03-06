@@ -21,7 +21,11 @@ from llm_metadata.groundtruth_eval import (
 from llm_metadata.extraction import ExtractionConfig, ExtractionMode, run_manifest_extraction
 from llm_metadata.logging_utils import configure_extraction_logging, logger
 from llm_metadata.schemas.data_paper import DataPaperManifest, RunArtifact
-from llm_metadata.schemas.fuster_features import DatasetFeatures, DatasetFeaturesNormalized
+from llm_metadata.schemas.fuster_features import (
+    DatasetFeaturesExtraction,
+    DatasetFeaturesNormalized,
+    SEMANTIC_FEATURE_FIELD_NAMES,
+)
 
 
 _LIST_COLS = ["data_type", "geospatial_info_dataset", "species"]
@@ -67,30 +71,7 @@ def _build_true_by_id(
     df: "pd.DataFrame",  # type: ignore[name-defined]
     allowed_ids: set[int],
 ) -> dict[str, DatasetFeaturesNormalized]:
-    annotation_cols = [
-        "data_type",
-        "geospatial_info_dataset",
-        "spatial_range_km2",
-        "temporal_range",
-        "temp_range_i",
-        "temp_range_f",
-        "species",
-        "referred_dataset",
-        "time_series",
-        "multispecies",
-        "threatened_species",
-        "new_species_science",
-        "new_species_region",
-        "bias_north_south",
-        "valid_yn",
-        "reason_not_valid",
-        "source",
-        "source_url",
-        "journal_url",
-        "pdf_url",
-        "is_oa",
-        "cited_article_doi",
-    ]
+    annotation_cols = list(SEMANTIC_FEATURE_FIELD_NAMES)
     available_cols = [col for col in annotation_cols if col in df.columns]
     true_by_id: dict[str, DatasetFeaturesNormalized] = {}
     for _, row in df.iterrows():
@@ -149,7 +130,7 @@ def run_eval(
         if config_path is not None
         else EvaluationConfig(field_strategies=DEFAULT_FIELD_STRATEGIES)
     )
-    run_config = ExtractionConfig(model=model, text_format=DatasetFeatures)
+    run_config = ExtractionConfig(model=model, text_format=DatasetFeaturesExtraction)
     run_artifact = run_manifest_extraction(
         manifest,
         mode=mode,
@@ -174,7 +155,7 @@ def run_eval(
     )
     report = evaluate_indexed(
         true_by_id=true_by_id,
-        pred_by_id=run_artifact.predictions_by_id(DatasetFeatures),
+        pred_by_id=run_artifact.predictions_by_id(DatasetFeaturesExtraction),
         fields=fields,
         config=eval_config,
     )
