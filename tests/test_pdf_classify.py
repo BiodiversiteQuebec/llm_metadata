@@ -87,7 +87,7 @@ class TestClassifyPdfFile:
         assert "file_id" in result
 
         # Verify extraction method
-        assert result["extraction_method"] == "openai_file_api"
+        assert result["extraction_method"] == "pdf_native"
 
         # Verify output is correct type
         assert isinstance(result["output"], DatasetFeatures)
@@ -160,7 +160,7 @@ class TestClassifyPdfUrl:
         assert "pdf_url" in result
 
         # Verify extraction method
-        assert result["extraction_method"] == "openai_url_api"
+        assert result["extraction_method"] == "pdf_url"
 
         # Verify output is correct type
         assert isinstance(result["output"], DatasetFeatures)
@@ -201,10 +201,15 @@ class TestPdfClassifyEdgeCases:
                     pdf_path=fake_pdf,
                     text_format=DatasetFeatures,
                 )
-            # Should fail with unsupported file type error
+            # OpenAI may reject malformed uploads with different invalid-file messages.
             error_msg = str(exc_info.value).lower()
-            assert "unsupported" in error_msg or "pdf" in error_msg, \
-                f"Expected 'unsupported' or 'pdf' in error: {error_msg}"
+            assert (
+                "unsupported" in error_msg
+                or "pdf" in error_msg
+                or "invalid_file" in error_msg
+                or "corrupted" in error_msg
+                or "badly formatted" in error_msg
+            ), f"Expected malformed-PDF signal in error: {error_msg}"
         finally:
             # Cleanup
             fake_pdf.unlink(missing_ok=True)
