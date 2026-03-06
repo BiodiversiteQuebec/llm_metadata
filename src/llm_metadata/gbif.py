@@ -57,6 +57,11 @@ class GBIFMatch:
     confidence: int
     match_type: str
     kingdom: Optional[str]
+    phylum: Optional[str] = None
+    class_name: Optional[str] = None
+    order: Optional[str] = None
+    family: Optional[str] = None
+    genus: Optional[str] = None
 
 
 @dataclass
@@ -164,6 +169,11 @@ def match_species(
         confidence=int(data.get("confidence", 0)),
         match_type=match_type,
         kingdom=data.get("kingdom"),
+        phylum=data.get("phylum"),
+        class_name=data.get("class"),
+        order=data.get("order"),
+        family=data.get("family"),
+        genus=data.get("genus"),
     )
 
 

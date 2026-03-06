@@ -20,7 +20,7 @@ import ast
 from pathlib import Path
 from typing import Collection, Optional
 
-from llm_metadata.gbif import enrich_with_gbif
+from llm_metadata.gbif import resolve_species_list
 from llm_metadata.groundtruth_eval import (
     EvaluationConfig,
     EvaluationReport,
@@ -32,6 +32,7 @@ from llm_metadata.schemas.fuster_features import DatasetFeatures, DatasetFeature
 from llm_metadata.species_parsing import (
     extract_parsed_taxa,
     extract_taxon_richness_mentions,
+    normalize_taxon_group,
     project_taxon_richness_counts,
     project_taxon_richness_group_keys,
 )
@@ -42,12 +43,46 @@ DEFAULT_TAXONOMY_FIELD_STRATEGIES: dict[str, FieldEvalStrategy] = {
     "species": FieldEvalStrategy(match="enhanced_species", threshold=70),
     "taxon_richness_counts": FieldEvalStrategy(match="exact"),
     "taxon_richness_group_keys": FieldEvalStrategy(match="exact"),
+    "taxon_broad_group_labels": FieldEvalStrategy(match="exact"),
     "gbif_keys": FieldEvalStrategy(match="exact"),
 }
 DEFAULT_TAXONOMY_FIELDS = list(DEFAULT_TAXONOMY_FIELD_STRATEGIES.keys())
 
+_GBIF_GROUP_LABELS = {
+    "class": {
+        "AVES": "bird",
+        "MAMMALIA": "mammal",
+        "ACTINOPTERYGII": "fish",
+        "ELASMOBRANCHII": "fish",
+    },
+    "order": {
+        "COLEOPTERA": "beetle",
+        "IXODIDA": "tick",
+        "TROMBIDIFORMES": "mite",
+        "MESOSTIGMATA": "mite",
+        "SARCOPTIFORMES": "mite",
+    },
+    "family": {
+        "CURCULIONIDAE": "weevil",
+        "BRENTIDAE": "weevil",
+        "ANTHRIBIDAE": "weevil",
+        "ATTELABIDAE": "weevil",
+    },
+    "phylum": {
+        "ARTHROPODA": "arthropod",
+        "MOLLUSCA": "mollusc",
+        "ANNELIDA": "annelid",
+    },
+}
+
 
 def _parse_excel_val(val):
+    """Best-effort parse of Excel cell values into Python scalars or lists.
+
+    Ground-truth spreadsheets may store list-like values as literal strings.
+    This helper preserves native lists, converts parseable list literals, and
+    normalizes pandas missing values to ``None``.
+    """
     if val is None:
         return None
     try:
@@ -105,6 +140,60 @@ def load_predictions_by_id(
     return artifact.predictions_by_id(model_type)  # type: ignore[return-value]
 
 
+def project_taxon_broad_group_labels(
+    model: DatasetFeatures,
+    *,
+    use_gbif: bool = True,
+    confidence_threshold: int = 80,
+    accept_higherrank: bool = True,
+) -> Optional[list[str]]:
+    """Project a model into broad comparison-oriented group labels.
+
+    Sources, in order:
+    1. Explicit count-bearing/group-description strings from `species`
+    2. GBIF hierarchy for resolved taxa, mapped to a coarse user-facing label
+    """
+    labels: set[str] = set()
+
+    parsed_species = extract_parsed_taxa(model.species) or []
+    richness_mentions = extract_taxon_richness_mentions(model.species) or []
+
+    for mention in richness_mentions:
+        if mention.normalized_group:
+            labels.add(mention.normalized_group)
+
+    for parsed in parsed_species:
+        if parsed.is_group_description and parsed.vernacular:
+            group = normalize_taxon_group(parsed.vernacular)
+            if group:
+                labels.add(group)
+
+    if use_gbif and model.species:
+        for resolved in resolve_species_list(
+            list(model.species),
+            confidence_threshold=confidence_threshold,
+            accept_higherrank=accept_higherrank,
+        ):
+            match = resolved.gbif_match
+            if match is None:
+                continue
+            for rank_name, attr_name in (
+                ("family", "family"),
+                ("order", "order"),
+                ("class", "class_name"),
+                ("phylum", "phylum"),
+            ):
+                rank_value = getattr(match, attr_name, None)
+                if not rank_value:
+                    continue
+                mapped = _GBIF_GROUP_LABELS[rank_name].get(str(rank_value).upper())
+                if mapped:
+                    labels.add(mapped)
+                    break
+
+    return sorted(labels) or None
+
+
 def enrich_with_taxonomy(
     model: DatasetFeatures,
     *,
@@ -117,6 +206,29 @@ def enrich_with_taxonomy(
     richness_mentions = extract_taxon_richness_mentions(model.species)
     richness_counts = project_taxon_richness_counts(model.species, richness_mentions)
     richness_group_keys = project_taxon_richness_group_keys(richness_mentions)
+    broad_group_labels = None
+    gbif_keys = None
+
+    if include_gbif and model.species:
+        resolved = resolve_species_list(
+            list(model.species),
+            confidence_threshold=gbif_confidence_threshold,
+            accept_higherrank=accept_higherrank,
+        )
+        gbif_keys = sorted({r.gbif_match.gbif_key for r in resolved if r.gbif_match is not None}) or None
+        broad_group_labels = project_taxon_broad_group_labels(
+            model,
+            use_gbif=True,
+            confidence_threshold=gbif_confidence_threshold,
+            accept_higherrank=accept_higherrank,
+        )
+    else:
+        broad_group_labels = project_taxon_broad_group_labels(
+            model,
+            use_gbif=False,
+            confidence_threshold=gbif_confidence_threshold,
+            accept_higherrank=accept_higherrank,
+        )
 
     enriched = model.model_copy(
         update={
@@ -124,14 +236,10 @@ def enrich_with_taxonomy(
             "taxon_richness_mentions": richness_mentions,
             "taxon_richness_counts": richness_counts,
             "taxon_richness_group_keys": richness_group_keys,
+            "taxon_broad_group_labels": broad_group_labels,
+            "gbif_keys": gbif_keys,
         }
     )
-    if include_gbif:
-        enriched = enrich_with_gbif(
-            enriched,
-            confidence_threshold=gbif_confidence_threshold,
-            accept_higherrank=accept_higherrank,
-        )
     return enriched
 
 

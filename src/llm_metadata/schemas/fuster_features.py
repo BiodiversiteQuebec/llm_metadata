@@ -302,6 +302,12 @@ class DatasetFeatures(BaseModel):
         description="Comparison-oriented projection of count+group richness mentions "
                     "formatted as '<count>|<normalized_group>'. Populated by preprocessing."
     )
+    taxon_broad_group_labels: Optional[list[str]] = Field(
+        None,
+        description="Broad taxonomic group labels derived from explicit group mentions "
+                    "and, when available, GBIF hierarchy (for notebook-oriented relevance evaluation). "
+                    "Populated by preprocessing."
+    )
     gbif_keys: Optional[list[int]] = Field(
         None,
         description="GBIF backbone taxon keys resolved from species field. "

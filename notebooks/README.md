@@ -1479,9 +1479,10 @@ Goal : Manual deep dive into the Fuster dataset to understand the data and its s
 **Work Performed:**
 - **Notebook:** `notebooks/taxonomic_relevance_evaluation.ipynb`
 - **New helper module:** `src/llm_metadata/taxonomy_eval.py`
-- **Schema enrichment fields:** added `parsed_species`, `taxon_richness_mentions`, `taxon_richness_counts`, and `taxon_richness_group_keys` to `DatasetFeatures`
+- **Schema enrichment fields:** added `parsed_species`, `taxon_richness_mentions`, `taxon_richness_counts`, `taxon_richness_group_keys`, and `taxon_broad_group_labels` to `DatasetFeatures`
 - **Parsing extensions:** expanded `species_parsing.py` with `TaxonRichnessMention`, group normalization, count-bearing richness parsing, and projection helpers
-- **Notebook workflow:** loads a saved `RunArtifact`, rebuilds aligned GT/pred dictionaries, enriches both sides with derived taxonomic views, evaluates a field subset, and frames the analysis/discussion explicitly around the mismatch problem
+- **Notebook workflow:** loads a saved `RunArtifact` or older `prompt_eval_reports/*.json`, rebuilds aligned GT/pred dictionaries, enriches both sides with derived taxonomic views, evaluates a field subset, and frames the analysis/discussion explicitly around the mismatch problem
+- **Second derivation:** added a broad-group projection derived from explicit group mentions plus GBIF hierarchy mappings for enumerated predictions
 - **Tests:** added focused parsing and evaluation coverage in `tests/test_species_parsing.py` and `tests/test_taxonomy_eval.py`
 
 **Results:**
@@ -1490,7 +1491,14 @@ Goal : Manual deep dive into the Fuster dataset to understand the data and its s
   - raw string matching (`species`)
   - count-only relevance signal (`taxon_richness_counts`)
   - count + normalized group signal (`taxon_richness_group_keys`)
+  - broad relevance-oriented group labels (`taxon_broad_group_labels`)
   - taxon identity via enrichment (`gbif_keys`)
+- Executed notebook on `20260305_135009_dev_subset_pdf_file`:
+  - `species`: F1 `0.217`
+  - `taxon_richness_counts`: F1 `0.516`
+  - `taxon_richness_group_keys`: no matches
+  - `taxon_broad_group_labels`: F1 `0.542`
+  - `gbif_keys`: F1 `0.133`
 - Verification:
   - `uv run python -m pytest tests/test_species_parsing.py tests/test_taxonomy_eval.py tests/test_gbif_enrichment.py -q`
   - `uv run python -m pytest tests/test_evaluation.py tests/test_evaluation_field_strategies.py tests/test_evaluation_fuzzy.py -q`
@@ -1498,9 +1506,10 @@ Goal : Manual deep dive into the Fuster dataset to understand the data and its s
 **Key Issues Identified:**
 - `taxon_richness_counts` helps with count-vs-enumeration mismatches, but it intentionally discards group identity when predictions do not emit explicit group counts
 - `taxon_richness_group_keys` remains strict and will not rescue cases where the prediction enumerates taxa but never states the broader group label
+- `taxon_broad_group_labels` is the strongest relevance-oriented derivation so far, but it is deliberately looser and can over-match broad categories
 - `gbif_keys` addresses vernacular/scientific equivalence, but not coarse-group or richness-only annotations
 
 **Next Steps:**
-- Run the notebook on `20260305_135009_dev_subset_pdf_file` and log which mismatch archetypes are genuinely improved
-- Decide whether a second derived layer should infer broader group labels from GBIF hierarchy for enumerated predictions
+- Audit the `taxon_broad_group_labels` false positives to decide whether the GBIF-to-group mapping is too permissive
+- Decide whether broad-group matching should stay notebook-only or graduate into a standard evaluation view
 - If the notebook shows clear value, fold the new taxonomic fields into a reusable prompt-eval comparison flow
