@@ -25,12 +25,7 @@ from llm_metadata.schemas.fuster_features import DatasetFeatures, DatasetFeature
 
 
 _LIST_COLS = ["data_type", "geospatial_info_dataset", "species"]
-_LEGACY_OUTPUT_DIR = "data/prompt_eval_reports"
-_configured_output_dir = os.getenv("PROMPT_EVAL_OUTPUT_DIR")
-if _configured_output_dir and Path(_configured_output_dir).as_posix().rstrip("/") != _LEGACY_OUTPUT_DIR:
-    _OUTPUT_DIR = Path(_configured_output_dir)
-else:
-    _OUTPUT_DIR = Path("artifacts/runs")
+_OUTPUT_DIR = Path(os.getenv("PROMPT_EVAL_OUTPUT_DIR", "artifacts/runs"))
 
 
 def _parse_excel_val(val):

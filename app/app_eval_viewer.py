@@ -35,12 +35,7 @@ import streamlit as st
 from llm_metadata.groundtruth_eval import EvaluationConfig, EvaluationReport, FieldMetrics, FieldResult
 from llm_metadata.schemas.data_paper import DataPaperManifest, RunArtifact
 
-_legacy_results_dir = "data/prompt_eval_reports"
-_configured_results_dir = os.getenv("EVAL_VIEWER_RESULTS_DIR") or os.getenv("PROMPT_EVAL_OUTPUT_DIR")
-if _configured_results_dir and Path(_configured_results_dir).as_posix().rstrip("/") != _legacy_results_dir:
-    RESULTS_DIR = _configured_results_dir
-else:
-    RESULTS_DIR = "artifacts/runs"
+RESULTS_DIR = os.getenv("EVAL_VIEWER_RESULTS_DIR") or os.getenv("PROMPT_EVAL_OUTPUT_DIR") or "artifacts/runs"
 GT_VALIDATED_PATH = Path("data/dataset_092624_validated.xlsx")
 GT_RAW_PATH = Path("data/dataset_092624.xlsx")
 APP_DIR = Path(__file__).resolve().parent
