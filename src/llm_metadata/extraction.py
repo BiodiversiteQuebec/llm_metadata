@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, Optional, Type
+from typing import Any, Callable, Dict, Optional, Type
 
 from pydantic import BaseModel
 
@@ -152,6 +153,25 @@ def _record_result_base(record: DataPaperRecord, mode: ExtractionMode) -> dict[s
     }
 
 
+def _run_record_safe(
+    record: DataPaperRecord,
+    *,
+    mode: ExtractionMode,
+    runner: Callable[..., RunRecord],
+    config: ExtractionConfig,
+    system_message: str,
+    skip_cache: bool,
+) -> RunRecord:
+    try:
+        return runner(record, config=config, system_message=system_message, skip_cache=skip_cache)
+    except Exception as exc:
+        return RunRecord(
+            **_record_result_base(record, mode),
+            status="error",
+            error_message=str(exc),
+        )
+
+
 def _run_abstract_mode(
     record: DataPaperRecord,
     *,
@@ -294,6 +314,7 @@ def run_manifest_extraction(
     manifest: DataPaperManifest,
     *,
     mode: ExtractionMode | str,
+    parallelism: int = 1,
     prompt_module: Optional[str] = None,
     config: Optional[ExtractionConfig] = None,
     output_path: Optional[str | Path] = None,
@@ -305,6 +326,8 @@ def run_manifest_extraction(
 
     config = config or ExtractionConfig()
     mode = ExtractionMode(mode)
+    if parallelism < 1:
+        raise ValueError("parallelism must be at least 1.")
     prompt_module = prompt_module or DEFAULT_PROMPT_MODULES[mode]
     system_message = _load_system_message(prompt_module) if prompt_module else _default_system_message(mode)
     artifact = RunArtifact(
@@ -325,19 +348,36 @@ def run_manifest_extraction(
     }
     runner = runners[mode]
 
-    for record in manifest.records:
-        try:
-            artifact.records.append(
-                runner(record, config=config, system_message=system_message, skip_cache=skip_cache)
+    if parallelism == 1 or len(manifest.records) < 2:
+        artifact.records = [
+            _run_record_safe(
+                record,
+                mode=mode,
+                runner=runner,
+                config=config,
+                system_message=system_message,
+                skip_cache=skip_cache,
             )
-        except Exception as exc:
-            artifact.records.append(
-                RunRecord(
-                    **_record_result_base(record, mode),
-                    status="error",
-                    error_message=str(exc),
-                )
-            )
+            for record in manifest.records
+        ]
+    else:
+        ordered_results: list[Optional[RunRecord]] = [None] * len(manifest.records)
+        with ThreadPoolExecutor(max_workers=parallelism) as executor:
+            future_to_index = {
+                executor.submit(
+                    _run_record_safe,
+                    record,
+                    mode=mode,
+                    runner=runner,
+                    config=config,
+                    system_message=system_message,
+                    skip_cache=skip_cache,
+                ): index
+                for index, record in enumerate(manifest.records)
+            }
+            for future in as_completed(future_to_index):
+                ordered_results[future_to_index[future]] = future.result()
+        artifact.records = [record for record in ordered_results if record is not None]
 
     if output_path is not None:
         artifact.save_json(output_path)
@@ -352,3 +392,4 @@ __all__ = [
     "collect_relevant_sections",
     "build_section_prompt",
 ]
+

@@ -1,5 +1,6 @@
 """Tests for the unified explicit-mode extraction engine."""
 
+import time
 from pathlib import Path
 from unittest.mock import patch
 
@@ -79,3 +80,35 @@ class TestUnifiedExtraction:
             )
         assert output.exists()
         assert artifact.manifest_path == "data/manifests/dev_subset_data_paper.csv"
+
+    def test_parallelism_preserves_manifest_order(self):
+        manifest = DataPaperManifest(
+            records=[
+                DataPaperRecord(gt_record_id=1, abstract="slow"),
+                DataPaperRecord(gt_record_id=2, abstract="fast"),
+            ]
+        )
+
+        def fake_extract(text, **kwargs):
+            if text == "slow":
+                time.sleep(0.05)
+            return {
+                "output": type("X", (), {"model_dump": lambda self, mode=None: {"abstract": text}})(),
+                "usage_cost": {"total_cost": 0.1},
+            }
+
+        with patch("llm_metadata.extraction.extract_from_text", side_effect=fake_extract):
+            artifact = run_manifest_extraction(manifest, mode=ExtractionMode.ABSTRACT, parallelism=2)
+
+        assert [record.gt_record_id for record in artifact.records] == [1, 2]
+
+    def test_parallelism_must_be_positive(self):
+        manifest = DataPaperManifest(records=[DataPaperRecord(gt_record_id=1, abstract="Text")])
+
+        with patch("llm_metadata.extraction.extract_from_text"):
+            try:
+                run_manifest_extraction(manifest, mode=ExtractionMode.ABSTRACT, parallelism=0)
+            except ValueError as exc:
+                assert "parallelism" in str(exc)
+            else:
+                raise AssertionError("Expected ValueError for non-positive parallelism")

@@ -112,6 +112,7 @@ def run_eval(
     *,
     mode: ExtractionMode | str,
     manifest_path: str,
+    parallelism: int = 1,
     prompt_module: Optional[str] = None,
     config: Optional[EvaluationConfig] = None,
     config_path: Optional[str] = None,
@@ -134,6 +135,7 @@ def run_eval(
     run_artifact = run_manifest_extraction(
         manifest,
         mode=mode,
+        parallelism=parallelism,
         prompt_module=prompt_module,
         config=run_config,
         manifest_path=manifest_path,
@@ -208,6 +210,7 @@ def _build_recreate_command(
     *,
     mode: ExtractionMode | str,
     manifest_path: str,
+    parallelism: int,
     prompt_module: Optional[str],
     config_path: Optional[str],
     fields: Optional[list[str]],
@@ -227,6 +230,8 @@ def _build_recreate_command(
         str(ExtractionMode(mode).value),
         "--manifest",
         manifest_path,
+        "--parallelism",
+        str(parallelism),
         "--model",
         model,
         "--gt",
@@ -264,6 +269,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Run extraction + evaluation over a manifest.")
     parser.add_argument("--mode", required=True, choices=[mode.value for mode in ExtractionMode])
     parser.add_argument("--manifest", required=True, help="Path to the canonical DataPaperManifest CSV.")
+    parser.add_argument("--parallelism", type=int, default=1, help="Number of records to extract concurrently.")
     parser.add_argument("--prompt", default=None, help="Prompt module path relative to llm_metadata.")
     parser.add_argument("--config", default=None, help="Path to an EvaluationConfig JSON file.")
     parser.add_argument("--fields", default=None, help="Comma-separated field names to evaluate.")
@@ -282,6 +288,7 @@ def main() -> None:
         recreate_cmd = _build_recreate_command(
             mode=args.mode,
             manifest_path=args.manifest,
+            parallelism=args.parallelism,
             prompt_module=args.prompt,
             config_path=args.config,
             fields=fields,
@@ -296,6 +303,7 @@ def main() -> None:
         report = run_eval(
             mode=args.mode,
             manifest_path=args.manifest,
+            parallelism=args.parallelism,
             prompt_module=args.prompt,
             config_path=args.config,
             fields=fields,
@@ -311,3 +319,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

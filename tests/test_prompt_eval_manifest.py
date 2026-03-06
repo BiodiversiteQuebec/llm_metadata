@@ -196,6 +196,38 @@ class TestPromptEvalModes:
         assert loaded.evaluation is not None
         assert getattr(report, "saved_path") == str(output_path)
 
+    def test_run_eval_forwards_parallelism(self, tiny_gt_xlsx, tiny_manifest_csv):
+        from llm_metadata.prompt_eval import run_eval
+        from llm_metadata.schemas.data_paper import RunArtifact
+
+        captured: dict = {}
+
+        def fake_run_manifest_extraction(manifest, **kwargs):
+            captured.update(kwargs)
+            return RunArtifact(
+                name="demo",
+                mode=kwargs["mode"],
+                manifest_path=kwargs.get("manifest_path"),
+                prompt_module="prompts.abstract",
+                system_message="system",
+                model="gpt-5-mini",
+                records=[],
+            )
+
+        with patch("llm_metadata.prompt_eval.run_manifest_extraction", side_effect=fake_run_manifest_extraction):
+            with patch("llm_metadata.prompt_eval.evaluate_indexed") as evaluate_indexed:
+                report = MagicMock()
+                report.field_metrics = {}
+                evaluate_indexed.return_value = report
+                run_eval(
+                    mode="abstract",
+                    manifest_path=str(tiny_manifest_csv),
+                    gt_path=str(tiny_gt_xlsx),
+                    parallelism=3,
+                )
+
+        assert captured["parallelism"] == 3
+
 
 class TestBuildRecreateCommand:
     def test_recreate_command_contains_mode_and_manifest(self):
@@ -204,6 +236,7 @@ class TestBuildRecreateCommand:
         cmd = _build_recreate_command(
             mode="pdf_native",
             manifest_path="data/manifests/dev_subset_data_paper.csv",
+            parallelism=4,
             prompt_module=None,
             config_path=None,
             fields=None,
@@ -215,6 +248,7 @@ class TestBuildRecreateCommand:
         )
         assert "--mode" in cmd
         assert "--manifest" in cmd
+        assert "--parallelism 4" in cmd
 
 
 class TestCliSurface:
@@ -237,6 +271,8 @@ class TestCliSurface:
             "pdf_native",
             "--manifest",
             str(tiny_manifest_csv),
+            "--parallelism",
+            "5",
             "--gt",
             str(tiny_gt_xlsx),
         ]
@@ -251,3 +287,4 @@ class TestCliSurface:
 
         assert called_kwargs["mode"] == "pdf_native"
         assert called_kwargs["manifest_path"] == str(tiny_manifest_csv)
+        assert called_kwargs["parallelism"] == 5
