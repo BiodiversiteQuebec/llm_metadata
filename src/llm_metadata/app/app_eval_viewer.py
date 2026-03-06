@@ -35,6 +35,7 @@ from streamlit.runtime import exists as streamlit_runtime_exists
 from streamlit.runtime.scriptrunner_utils.script_run_context import get_script_run_ctx
 from streamlit.web.bootstrap import run as streamlit_bootstrap_run
 
+from llm_metadata.gpt_extract import MODEL_COST_PER_1M_TOKENS
 from llm_metadata.groundtruth_eval import EvaluationConfig, EvaluationReport, FieldMetrics, FieldResult
 from llm_metadata.schemas.data_paper import DataPaperManifest, RunArtifact, RunRecord
 
@@ -52,6 +53,8 @@ EXTRACTION_BASE_COLUMNS = [
     "status",
     "title",
     "extraction_method",
+    "cache_status",
+    "cached_tokens",
     "cost_usd",
     "error_message",
     "pdf_path",
@@ -388,13 +391,62 @@ def _is_populated_value(value: object) -> bool:
     return True
 
 
+def _cache_status(record: RunRecord) -> str:
+    usage_cost = record.usage_cost or {}
+    cached_tokens = usage_cost.get("cached_tokens")
+    if cached_tokens is None:
+        return "unknown"
+    return "hit" if cached_tokens > 0 else "miss"
+
+
+def _input_tokens_used(record: RunRecord) -> Optional[int]:
+    usage_cost = record.usage_cost or {}
+    input_tokens = usage_cost.get("input_tokens")
+    if input_tokens is None:
+        return None
+    return max(input_tokens - (usage_cost.get("cached_tokens") or 0), 0)
+
+
+def _input_tokens_value(record: RunRecord) -> Optional[int]:
+    usage_cost = record.usage_cost or {}
+    return usage_cost.get("input_tokens")
+
+
+def _cost_value_usd(record: RunRecord, model: str) -> Optional[float]:
+    usage_cost = record.usage_cost or {}
+    total_cost = usage_cost.get("total_cost")
+    cached_tokens = usage_cost.get("cached_tokens")
+    model_costs = MODEL_COST_PER_1M_TOKENS.get(model)
+    if total_cost is None or cached_tokens is None or model_costs is None:
+        return None
+    cache_delta = cached_tokens * (model_costs["input"] - model_costs["cache"]) / 1_000_000
+    return round(total_cost + cache_delta, 4)
+
+
+def _cache_savings_usd(record: RunRecord, model: str) -> Optional[float]:
+    cost_value = _cost_value_usd(record, model)
+    cost_used = (record.usage_cost or {}).get("total_cost")
+    if cost_value is None or cost_used is None:
+        return None
+    return round(cost_value - cost_used, 4)
+
+
 def _field_coverage_df(artifact: Optional[RunArtifact]) -> pd.DataFrame:
     if artifact is None:
         return pd.DataFrame()
     success_records = [record for record in artifact.records if record.status == "success"]
     if not success_records:
         return pd.DataFrame()
-    field_names = artifact.extraction_csv_fieldnames()[len(EXTRACTION_BASE_COLUMNS):]
+    field_names: list[str] = []
+    seen: set[str] = set()
+    for record in success_records:
+        if not record.output:
+            continue
+        for field_name in record.output.keys():
+            if field_name in seen:
+                continue
+            seen.add(field_name)
+            field_names.append(field_name)
     rows = []
     for field_name in field_names:
         populated = sum(
@@ -416,7 +468,17 @@ def _field_coverage_df(artifact: Optional[RunArtifact]) -> pd.DataFrame:
 def _extraction_df(artifact: Optional[RunArtifact]) -> pd.DataFrame:
     if artifact is None:
         return pd.DataFrame()
-    return pd.DataFrame(artifact.to_extraction_rows())
+    rows = artifact.to_extraction_rows()
+    for row, record in zip(rows, artifact.records):
+        usage_cost = record.usage_cost or {}
+        row["cache_status"] = _cache_status(record)
+        row["cached_tokens"] = usage_cost.get("cached_tokens")
+        row["input_tokens_used"] = _input_tokens_used(record)
+        row["input_tokens_value"] = _input_tokens_value(record)
+        row["cost_used_usd"] = usage_cost.get("total_cost")
+        row["cost_value_usd"] = _cost_value_usd(record, artifact.model)
+        row["cache_savings_usd"] = _cache_savings_usd(record, artifact.model)
+    return pd.DataFrame(rows)
 
 
 def main() -> None:
@@ -425,6 +487,24 @@ def main() -> None:
         page_title="Extraction evaluation viewer",
         page_icon=str(FAVICON_PATH) if FAVICON_PATH.exists() else None,
         layout="wide",
+    )
+    st.markdown(
+        """
+        <style>
+        div[data-testid="stMetric"] {
+            background: linear-gradient(180deg, #fbfcfe 0%, #f4f7fb 100%);
+            border: 1px solid rgba(15, 23, 42, 0.08);
+            border-radius: 14px;
+            padding: 0.55rem 0.75rem;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+        }
+        div[data-testid="stMetricLabel"] p {
+            font-weight: 700;
+            letter-spacing: 0.01em;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
     )
     if LOGO_PATH.exists():
         st.image(str(LOGO_PATH), width=120)
@@ -596,7 +676,17 @@ def main() -> None:
             skipped_count = sum(record.status == "skipped" for record in artifact_a.records)
             error_count = sum(record.status == "error" for record in artifact_a.records)
             output_count = sum(record.output is not None for record in artifact_a.records)
+            usage_records = [record for record in artifact_a.records if record.status == "success" and record.usage_cost]
+            cache_hit_count = sum(_cache_status(record) == "hit" for record in usage_records)
+            cache_miss_count = sum(_cache_status(record) == "miss" for record in usage_records)
             avg_cost = artifact_a.total_cost_usd / success_count if success_count else None
+            total_input_tokens_used = sum(_input_tokens_used(record) or 0 for record in usage_records)
+            total_input_tokens_value = sum(_input_tokens_value(record) or 0 for record in usage_records)
+            total_cached_tokens = sum((record.usage_cost or {}).get("cached_tokens", 0) or 0 for record in usage_records)
+            total_cost_used = round(sum((record.usage_cost or {}).get("total_cost", 0) or 0 for record in usage_records), 4)
+            cost_value_rows = [cost for cost in (_cost_value_usd(record, artifact_a.model) for record in usage_records) if cost is not None]
+            total_cost_value = round(sum(cost_value_rows), 4) if cost_value_rows else None
+            total_cache_savings = round(total_cost_value - total_cost_used, 4) if total_cost_value is not None else None
             populated_counts = [
                 sum(_is_populated_value(value) for value in (record.output or {}).values())
                 for record in artifact_a.records
@@ -604,17 +694,45 @@ def main() -> None:
             ]
             avg_populated = sum(populated_counts) / len(populated_counts) if populated_counts else None
 
-            summary_cols = st.columns(6)
-            summary_cols[0].metric("Records run", total_records)
-            summary_cols[1].metric("Success", success_count)
-            summary_cols[2].metric("Skipped", skipped_count)
-            summary_cols[3].metric("Errors", error_count)
-            summary_cols[4].metric("Rows with output", output_count)
-            summary_cols[5].metric("Avg populated fields", f"{avg_populated:.1f}" if avg_populated is not None else "—")
+            st.markdown(
+                (
+                    "<div style='display:inline-block;margin-bottom:0.45rem;padding:0.18rem 0.68rem;"
+                    "border-radius:999px;background:linear-gradient(90deg,#e8f2ff 0%,#d9ecff 100%);"
+                    "color:#0f4c81;font-size:0.82rem;font-weight:700;'>Run & cache</div>"
+                ),
+                unsafe_allow_html=True,
+            )
+            top_cols = st.columns(8)
+            top_cols[0].metric("🧾 Run", total_records)
+            top_cols[1].metric("✅ Success", success_count)
+            top_cols[2].metric("⏭ Skipped", skipped_count)
+            top_cols[3].metric("⛔ Errors", error_count)
+            top_cols[4].metric("📤 Output", output_count)
+            top_cols[5].metric("🧩 Avg fill", f"{avg_populated:.1f}" if avg_populated is not None else "—")
+            top_cols[6].metric("💾 Hits", cache_hit_count)
+            top_cols[7].metric("🫥 Misses", cache_miss_count)
 
-            cost_cols = st.columns(2)
-            cost_cols[0].metric("Total cost (USD)", f"${artifact_a.total_cost_usd:.4f}")
-            cost_cols[1].metric("Avg success cost", f"${avg_cost:.4f}" if avg_cost is not None else "—")
+            st.markdown(
+                (
+                    "<div style='display:inline-block;margin:0.35rem 0 0.45rem;padding:0.18rem 0.68rem;"
+                    "border-radius:999px;background:linear-gradient(90deg,#eef9ed 0%,#e0f4d8 100%);"
+                    "color:#2d6a2d;font-size:0.82rem;font-weight:700;'>Tokens & cost</div>"
+                ),
+                unsafe_allow_html=True,
+            )
+            bottom_cols = st.columns(7)
+            bottom_cols[0].metric("🪙 Tok used", f"{total_input_tokens_used:,}" if usage_records else "—")
+            bottom_cols[1].metric("🪙 Tok value", f"{total_input_tokens_value:,}" if usage_records else "—")
+            bottom_cols[2].metric("🪙 Cached", f"{total_cached_tokens:,}" if usage_records else "—")
+            bottom_cols[3].metric("💵 Cost used", f"${total_cost_used:.4f}" if usage_records else "—")
+            bottom_cols[4].metric("💵 Cost value", f"${total_cost_value:.4f}" if total_cost_value is not None else "—")
+            bottom_cols[5].metric("💵 Saved", f"${total_cache_savings:.4f}" if total_cache_savings is not None else "—")
+            bottom_cols[6].metric("💵 Avg/run", f"${avg_cost:.4f}" if avg_cost is not None else "—")
+            if usage_records:
+                st.caption(
+                    "Token value / cost value are the no-cache baseline. "
+                    "Tokens used / cost used reflect the cached run, with hits based on `usage_cost.cached_tokens` > 0."
+                )
 
             st.divider()
             st.subheader("Field coverage")

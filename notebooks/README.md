@@ -1503,9 +1503,10 @@ Goal : Manual deep dive into the Fuster dataset to understand the data and its s
 **Work Performed:**
 - **Notebook:** `notebooks/taxonomic_relevance_evaluation.ipynb`
 - **New helper module:** `src/llm_metadata/taxonomy_eval.py`
-- **Schema enrichment fields:** added `parsed_species`, `taxon_richness_mentions`, `taxon_richness_counts`, `taxon_richness_group_keys`, and `taxon_broad_group_labels` to `DatasetFeatures`
+- **Schema enrichment fields:** added `parsed_species`, `taxon_richness_mentions`, `taxon_richness_counts`, `taxon_richness_group_keys`, and `taxon_broad_group_labels` to `DatasetFeaturesEvaluation`
 - **Parsing extensions:** expanded `species_parsing.py` with `TaxonRichnessMention`, group normalization, count-bearing richness parsing, and projection helpers
 - **Notebook workflow:** loads a saved `RunArtifact` or older `prompt_eval_reports/*.json`, rebuilds aligned GT/pred dictionaries, enriches both sides with derived taxonomic views, evaluates a field subset, and frames the analysis/discussion explicitly around the mismatch problem
+- **Model hierarchy follow-up:** updated the notebook to load predictions as `DatasetFeaturesExtraction` and describe derived comparison views as `DatasetFeaturesEvaluation`-only fields after the model split
 - **Second derivation:** added a broad-group projection derived from explicit group mentions plus GBIF hierarchy mappings for enumerated predictions
 - **Tests:** added focused parsing and evaluation coverage in `tests/test_species_parsing.py` and `tests/test_taxonomy_eval.py`
 
