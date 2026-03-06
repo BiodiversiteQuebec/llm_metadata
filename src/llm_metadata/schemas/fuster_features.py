@@ -15,6 +15,7 @@ import re
 import pandas as pd
 
 from pydantic import BaseModel, Field, field_validator, model_validator
+from llm_metadata.species_parsing import ParsedTaxon, TaxonRichnessMention
 
 
 # Vocabulary normalization mappings for manual annotations
@@ -279,6 +280,28 @@ class DatasetFeatures(BaseModel):
     )
 
     # Enrichment fields (populated by preprocessing, not extracted by LLM)
+    parsed_species: Optional[list[ParsedTaxon]] = Field(
+        None,
+        description="Structured parse of the raw species field "
+                    "(scientific/common name, count, group flag). "
+                    "Populated by preprocessing, not extracted by LLM."
+    )
+    taxon_richness_mentions: Optional[list[TaxonRichnessMention]] = Field(
+        None,
+        description="Structured count-bearing taxonomic mentions parsed from species "
+                    "(e.g. '73 weevil species'). Populated by preprocessing."
+    )
+    taxon_richness_counts: Optional[list[int]] = Field(
+        None,
+        description="Comparison-oriented projection of taxonomic richness counts. "
+                    "Uses explicit count mentions when present, otherwise falls back "
+                    "to species list length. Populated by preprocessing."
+    )
+    taxon_richness_group_keys: Optional[list[str]] = Field(
+        None,
+        description="Comparison-oriented projection of count+group richness mentions "
+                    "formatted as '<count>|<normalized_group>'. Populated by preprocessing."
+    )
     gbif_keys: Optional[list[int]] = Field(
         None,
         description="GBIF backbone taxon keys resolved from species field. "

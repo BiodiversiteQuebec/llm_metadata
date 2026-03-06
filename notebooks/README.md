@@ -1469,3 +1469,38 @@ Goal : Manual deep dive into the Fuster dataset to understand the data and its s
 - 5 Zenodo failures include multi-DOI strings (e.g., `10.1101/005900; 10.6084/...`) that the pipeline can't resolve
 
 **Next Steps:** WU-C2 — GROBID-parse newly downloaded PDFs
+
+---
+
+### 2026-03-06: Taxonomic Relevance Evaluation Scaffold
+
+**Task:** Build notebook-first tooling to evaluate taxonomic extraction quality using derived fields that better reflect annotation intent than the raw `species` field alone.
+
+**Work Performed:**
+- **Notebook:** `notebooks/taxonomic_relevance_evaluation.ipynb`
+- **New helper module:** `src/llm_metadata/taxonomy_eval.py`
+- **Schema enrichment fields:** added `parsed_species`, `taxon_richness_mentions`, `taxon_richness_counts`, and `taxon_richness_group_keys` to `DatasetFeatures`
+- **Parsing extensions:** expanded `species_parsing.py` with `TaxonRichnessMention`, group normalization, count-bearing richness parsing, and projection helpers
+- **Notebook workflow:** loads a saved `RunArtifact`, rebuilds aligned GT/pred dictionaries, enriches both sides with derived taxonomic views, evaluates a field subset, and frames the analysis/discussion explicitly around the mismatch problem
+- **Tests:** added focused parsing and evaluation coverage in `tests/test_species_parsing.py` and `tests/test_taxonomy_eval.py`
+
+**Results:**
+- Raw `species` is no longer the only taxonomic comparison surface in notebook experiments
+- New derived fields support side-by-side comparison of:
+  - raw string matching (`species`)
+  - count-only relevance signal (`taxon_richness_counts`)
+  - count + normalized group signal (`taxon_richness_group_keys`)
+  - taxon identity via enrichment (`gbif_keys`)
+- Verification:
+  - `uv run python -m pytest tests/test_species_parsing.py tests/test_taxonomy_eval.py tests/test_gbif_enrichment.py -q`
+  - `uv run python -m pytest tests/test_evaluation.py tests/test_evaluation_field_strategies.py tests/test_evaluation_fuzzy.py -q`
+
+**Key Issues Identified:**
+- `taxon_richness_counts` helps with count-vs-enumeration mismatches, but it intentionally discards group identity when predictions do not emit explicit group counts
+- `taxon_richness_group_keys` remains strict and will not rescue cases where the prediction enumerates taxa but never states the broader group label
+- `gbif_keys` addresses vernacular/scientific equivalence, but not coarse-group or richness-only annotations
+
+**Next Steps:**
+- Run the notebook on `20260305_135009_dev_subset_pdf_file` and log which mismatch archetypes are genuinely improved
+- Decide whether a second derived layer should infer broader group labels from GBIF hierarchy for enumerated predictions
+- If the notebook shows clear value, fold the new taxonomic fields into a reusable prompt-eval comparison flow

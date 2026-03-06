@@ -8,7 +8,7 @@ This package contains schema definitions for different metadata extraction appro
 - openalex_work: Scientific paper metadata from OpenAlex for Quebec researcher tracking
 """
 
-from llm_metadata.species_parsing import ParsedTaxon
+from llm_metadata.species_parsing import ParsedTaxon, TaxonRichnessMention
 from llm_metadata.schemas.abstract_metadata import (
     DatasetAbstractMetadata,
     DEFAULT_DATASET_CATEGORIES,
@@ -45,6 +45,7 @@ from llm_metadata.schemas.data_paper import (
 __all__ = [
     # Species parsing
     "ParsedTaxon",
+    "TaxonRichnessMention",
     # Abstract metadata
     "DatasetAbstractMetadata",
     "DEFAULT_DATASET_CATEGORIES",
