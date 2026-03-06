@@ -4,7 +4,12 @@
 
 The `species` field in our extraction/evaluation pipeline is a `list[str]` containing a mix of scientific binomials, common names, and count+group descriptions. Evaluation currently relies on string comparison (exact, fuzzy, or enhanced heuristic) which cannot recognize that "wood turtle" and "Glyptemys insculpta" refer to the same taxon.
 
-**Approach:** Rather than refactoring the evaluation matcher abstraction, we add GBIF resolution as a **preprocessing enrichment step** that populates a new `gbif_keys: list[int]` field on the model — following the precedent of the existing source-tracking fields (`source`, `source_url`, `is_oa`, etc. at `fuster_features.py:254-278`) which are on the model but not extracted by the LLM.
+**Approach:** Rather than refactoring the evaluation matcher abstraction, we add GBIF resolution as a preprocessing enrichment step that produces `gbif_keys: list[int]` for evaluation alongside the existing raw `species` field.
+
+Architecture note:
+- The canonical architecture now lives in `plans/model_hierarchy_enrichment.md`.
+- `gbif_keys` belongs on `DatasetFeaturesEvaluation`, not on the extraction contract shown to the LLM.
+- Source/provenance metadata is no longer the precedent here; that metadata belongs on `DataPaperRecord`.
 
 The existing evaluation framework handles both fields independently in a single run:
 - `species` → enhanced species string matching (existing, unchanged)
@@ -91,14 +96,13 @@ class GBIFMatch:
 
 ---
 
-### WU-3: Schema field + enrichment function
+### WU-3: Evaluation field + lookup assembly
 `model: sonnet` | deps: WU-2
 
-Add `gbif_keys` field to `DatasetFeatures` and an enrichment function that populates it.
+Add `gbif_keys` to the evaluation-oriented feature contract and assemble it from GBIF lookup payloads.
 
 **Schema change in `schemas/fuster_features.py`:**
 ```python
-# Alongside existing source-tracking fields (line ~278)
 gbif_keys: Optional[list[int]] = Field(
     None,
     description="GBIF backbone taxon keys resolved from species field. "
@@ -106,28 +110,29 @@ gbif_keys: Optional[list[int]] = Field(
 )
 ```
 
-**Enrichment function in `gbif.py`:**
+**Lookup + assembly pattern:**
 ```python
-def enrich_with_gbif(
-    model: DatasetFeatures,
-    confidence_threshold: int = 80,
-    accept_higherrank: bool = True,
-) -> DatasetFeatures:
-    """Resolve species strings to GBIF keys and return enriched copy."""
-    if not model.species:
-        return model.model_copy(update={"gbif_keys": None})
-    resolved = resolve_species_list(
-        model.species, confidence_threshold, accept_higherrank
-    )
-    keys = [r.gbif_match.gbif_key for r in resolved if r.gbif_match]
-    return model.model_copy(update={"gbif_keys": keys or None})
+resolved = resolve_species_list(model.species, confidence_threshold, accept_higherrank)
+enriched = DatasetFeaturesEvaluation.from_extraction(model, gbif=resolved)
 ```
+
+`gbif.py` should perform the external lookup and return typed payloads. `DatasetFeaturesEvaluation` should provide the pure constructor/copy helper that maps those payloads to `gbif_keys` and any related derived fields.
 
 **Notebook usage pattern:**
 ```python
 # Preprocess both sides
-true_enriched = {doi: enrich_with_gbif(m) for doi, m in true_by_id.items()}
-pred_enriched = {doi: enrich_with_gbif(m) for doi, m in pred_by_id.items()}
+true_enriched = {
+    doi: DatasetFeaturesEvaluation.from_extraction(
+        m, gbif=resolve_species_list(m.species or [])
+    )
+    for doi, m in true_by_id.items()
+}
+pred_enriched = {
+    doi: DatasetFeaturesEvaluation.from_extraction(
+        m, gbif=resolve_species_list(m.species or [])
+    )
+    for doi, m in pred_by_id.items()
+}
 
 # Single evaluation run — both fields evaluated independently
 report = evaluate_indexed(
@@ -143,15 +148,16 @@ report.metrics_for("gbif_keys")   # set comparison on taxon IDs P/R/F1
 ```
 
 **Files:**
-- `schemas/fuster_features.py` — add `gbif_keys` field
-- `gbif.py` — add `enrich_with_gbif()` function
+- `schemas/fuster_features.py` — add `gbif_keys` to the evaluation model
+- `gbif.py` — add lookup helpers returning typed payloads
+- `schemas/fuster_features.py` or adjacent schema module — add evaluation-model constructor/copy helper
 - `schemas/__init__.py` — ensure exports are updated
 
 **Tests:** `tests/test_gbif_enrichment.py`
-- Enrich model with known species → gbif_keys populated
-- Enrich model with None species → gbif_keys stays None
-- Enrich model with unmatchable species → gbif_keys empty/None
-- End-to-end: enrich both sides, run `evaluate_indexed`, verify `gbif_keys` metrics exist
+- Build evaluation model from known species lookup payload → `gbif_keys` populated
+- Build evaluation model with `species=None` → `gbif_keys` stays None
+- Build evaluation model with unmatchable species payload → `gbif_keys` empty/None
+- End-to-end: resolve both sides, build evaluation models, run `evaluate_indexed`, verify `gbif_keys` metrics exist
 
 ---
 

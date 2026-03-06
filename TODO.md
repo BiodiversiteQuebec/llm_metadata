@@ -265,9 +265,10 @@
 
 > **Plan:** [`plans/model_hierarchy_enrichment.md`](plans/model_hierarchy_enrichment.md)
 
-- [ ] Split `DatasetFeatures` into hierarchy: `BaseFeatureModel` → `SourcesFeatureModel` / `ExtractionFeatureModel` → `EvaluationFeatureModel`
-- [ ] Move source-tracking fields (`is_oa`, `source_url`, etc.) to `SourcesFeatureModel`
-- [ ] Move derived evaluation fields (`gbif_keys`, future `gadm_codes`) to `EvaluationFeatureModel`
+- [ ] Split `DatasetFeatures` into role-specific models: `CoreFeatureModel` → `DatasetFeaturesExtraction` / `DatasetFeaturesNormalized` / `DatasetFeaturesEvaluation`
+- [ ] Keep source/provenance metadata (`is_oa`, `source_url`, etc.) on `DataPaperRecord`, not a feature subclass
+- [ ] Move derived evaluation fields (`gbif_keys`, future `gadm_codes`, `location_ids`) to `DatasetFeaturesEvaluation`
+- [ ] Standardize enrichment flow: external lookup in service modules, pure assembly via evaluation-model constructors/copy helpers
 - [ ] Update notebooks, extraction, and tests to use correct subclass
 
 ---

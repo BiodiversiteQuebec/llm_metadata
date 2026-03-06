@@ -6,10 +6,10 @@ The `spatial_range_km2` field records study area size in km², and `geospatial_i
 
 **Gap:** The current schema has no text field for study location names (e.g., "Quebec, Canada", "North America", "Laurentian Highlands").
 
-**Approach:** Following the enrichment pattern established by GBIF species matching:
+**Approach:** Following the enrichment pattern established by GBIF species matching and formalized in `plans/model_hierarchy_enrichment.md`:
 
 1. Add `location_text: Optional[list[str]]` to `DatasetFeatures` — raw location strings extracted as-is by the LLM (mirrors `species` field design).
-2. Add `location_ids: Optional[list[str]]` — stable place identifiers derived from `location_text` via Nominatim geocoding. Populated by preprocessing, not extracted by LLM.
+2. Add `location_ids: Optional[list[str]]` to `DatasetFeaturesEvaluation` — stable place identifiers derived from `location_text` via Nominatim geocoding. Populated by preprocessing, not extracted by the LLM.
 3. Create `nominatim.py` — geocoding wrapper using the Nominatim (OpenStreetMap) API, which is free, key-free, and returns structured admin hierarchy plus Wikidata QIDs.
 
 **Identifier strategy (tiered):**
@@ -210,7 +210,7 @@ class ResolvedLocation:
 
 ---
 
-### WU-4: Schema `location_ids` field + enrichment function
+### WU-4: Evaluation field + lookup assembly
 `model: sonnet` | deps: WU-3
 
 **Schema change in `schemas/fuster_features.py`:**
@@ -226,23 +226,29 @@ location_ids: Optional[list[str]] = Field(
 )
 ```
 
-**Enrichment function in `nominatim.py`:**
+**Lookup + assembly pattern:**
 ```python
-def enrich_with_location_ids(model: DatasetFeatures) -> DatasetFeatures:
-    """Resolve location_text strings to stable place identifiers and return enriched copy."""
-    if not model.location_text:
-        return model.model_copy(update={"location_ids": None})
-    resolved = resolve_location_list(model.location_text)
-    ids = [r.match.location_id for r in resolved if r.match]
-    unique_ids = list(dict.fromkeys(ids))  # deduplicate, preserve order
-    return model.model_copy(update={"location_ids": unique_ids or None})
+resolved = resolve_location_list(model.location_text or [])
+enriched = DatasetFeaturesEvaluation.from_extraction(model, nominatim=resolved)
 ```
+
+`nominatim.py` should perform geocoding and return typed lookup payloads. `DatasetFeaturesEvaluation` should provide the pure constructor/copy helper that maps those payloads to `location_ids`.
 
 **Notebook usage pattern:**
 ```python
 # Preprocess both sides
-true_enriched = {doi: enrich_with_location_ids(m) for doi, m in true_by_id.items()}
-pred_enriched = {doi: enrich_with_location_ids(m) for doi, m in pred_by_id.items()}
+true_enriched = {
+    doi: DatasetFeaturesEvaluation.from_extraction(
+        m, nominatim=resolve_location_list(m.location_text or [])
+    )
+    for doi, m in true_by_id.items()
+}
+pred_enriched = {
+    doi: DatasetFeaturesEvaluation.from_extraction(
+        m, nominatim=resolve_location_list(m.location_text or [])
+    )
+    for doi, m in pred_by_id.items()
+}
 
 # Single evaluation run — both fields evaluated independently
 report = evaluate_indexed(
@@ -258,16 +264,17 @@ report.metrics_for("location_ids")    # set comparison on place identifiers P/R/
 ```
 
 **Files:**
-- `schemas/fuster_features.py` — add `location_ids` field
-- `nominatim.py` — add `enrich_with_location_ids()` function
+- `schemas/fuster_features.py` — add `location_ids` to the evaluation model
+- `nominatim.py` — add lookup helpers returning typed payloads
+- `schemas/fuster_features.py` or adjacent schema module — add evaluation-model constructor/copy helper
 
 **Tests:** `tests/test_nominatim_enrichment.py`
-- Enrich model with known locations → `location_ids` populated
-- Enrich model with `location_text=None` → `location_ids` stays None
-- Enrich model with only global/marine locations → `location_ids` is None
+- Build evaluation model from known location lookup payloads → `location_ids` populated
+- Build evaluation model with `location_text=None` → `location_ids` stays None
+- Build evaluation model with only global/marine lookup payloads → `location_ids` is None
 - Duplicate ids deduplicated (two Montreal neighbourhoods → one `"Q340"`)
 - Mixed Wikidata + OSM ids in same list (some locations have wikidata, some don't)
-- End-to-end: enrich both sides, run `evaluate_indexed`, verify `location_ids` metrics present
+- End-to-end: resolve both sides, build evaluation models, run `evaluate_indexed`, verify `location_ids` metrics present
 
 ---
 

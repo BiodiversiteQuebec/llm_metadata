@@ -34,27 +34,22 @@ The extraction contract and GT validation contract should not carry enrichment-o
 ## Proposed Hierarchy
 
 ```
-                     CoreFeatureModel
-               (species, data_type, spatial_range, temporal_range,
-                modulators, validity fields, ... — shared semantics)
-                    /            |             \
-                   /             |              \
-      ExtractionFeatureModel  GroundTruthFeatureModel  SourceTrackedFeatureModel
-      (LLM output contract)   (same fields + GT        (+ source metadata only)
-                              normalization validators)
-                   \             /
-                    \           /
-                 EvaluationFeatureModel
-          (+ parsed_species, taxon_richness_mentions,
-           taxon_richness_counts, taxon_richness_group_keys,
-           taxon_broad_group_labels, gbif_keys, future derived fields)
+                CoreFeatureModel
+          (species, data_type, spatial_range, temporal_range,
+           modulators, validity fields, ... — shared semantics)
+                 /            |            \
+                /             |             \
+ExtractionFeatureModel  GroundTruthFeatureModel  EvaluationFeatureModel
+(LLM output contract)   (same fields + GT        (+ derived enrichment fields only)
+                        normalization validators)
 ```
 
 - **CoreFeatureModel**: Shared semantic fields only. No source metadata, no derived enrichment outputs.
 - **ExtractionFeatureModel**: What the LLM actually outputs. This is the `text_format` contract.
 - **GroundTruthFeatureModel**: Same semantic field set as extraction, plus validators/coercion for spreadsheets and CSVs.
-- **SourceTrackedFeatureModel**: Pipeline metadata about where the record came from. Not extracted and not part of GT semantic scoring.
 - **EvaluationFeatureModel**: Derived fields for strategy comparison. Populated by enrichment preprocessing after model construction.
+
+Source/provenance metadata should not become another feature-model subclass. It already fits better on the record/manifest contract (`DataPaperRecord`) because it describes where a paper came from, not what semantic features were extracted from its text.
 
 ## Naming Notes
 
@@ -65,37 +60,54 @@ Recommended landing names:
 - `DatasetFeaturesNormalized`
 - `DatasetFeaturesEvaluation`
 
-Optional if source metadata stays coupled to records outside the feature model:
-- `DatasetSourceMetadata`
-- or a small `DataPaperRecord`-level metadata container instead of a feature subclass
+Do not add a `SourceTrackedFeatureModel` unless a concrete use case appears that cannot be handled at the `DataPaperRecord` level.
 
 ## Enrichment Pattern Decisions
 
 ### Function signature convention
 
-Every enrichment follows the same pattern:
+Every enrichment should follow a two-step pattern:
 
 ```python
-def enrich_with_X(model: DatasetFeaturesExtraction, **config) -> DatasetFeaturesEvaluation:
-    """Returns a copy with derived fields populated. No mutation."""
-    ...
-    return model.model_copy(update={"X_keys": ...})
+payload = resolve_with_X(model.species, **config)
+enriched = DatasetFeaturesEvaluation.from_extraction(model, x=payload)
 ```
 
-### Where enrichment logic lives
+### Where lookup logic lives
 
-Enrichment functions live in their **API wrapper module** (`gbif.py`, future `gadm.py`), not on the model class. Rationale:
+External lookup logic lives in its **API wrapper module** (`gbif.py`, future `gadm.py`), not on the model class. Rationale:
 
 - **Avoids God class**: Model doesn't accumulate methods for every external service
 - **Dependency direction**: API modules → schemas (not reversed)
 - **Testing**: Enrichment testable alongside API mocks, no schema import gymnastics
-- **Composition**: Notebooks chain calls: `model = enrich_with_gbif(enrich_with_gadm(model))`
+- **Composition**: notebooks can resolve one or more payloads, then build one evaluation model from them
 
-If the model hierarchy is implemented, the enrichment return type should narrow to `EvaluationFeatureModel`, but the function stays in the API module.
+These functions may return typed payloads such as `list[ResolvedTaxon]`, `list[int]`, or a small enrichment result model. They should not construct `EvaluationFeatureModel` themselves.
+
+### Where contract construction lives
+
+Construction of the enriched evaluation contract should live on the evaluation model itself via classmethods or copy helpers that do **no I/O**:
+
+```python
+class DatasetFeaturesEvaluation(CoreFeatureModel):
+    @classmethod
+    def from_extraction(
+        cls,
+        model: DatasetFeaturesExtraction | DatasetFeaturesNormalized,
+        *,
+        gbif: Optional[list[ResolvedTaxon]] = None,
+        gadm: Optional[list[GadmMatch]] = None,
+    ) -> "DatasetFeaturesEvaluation":
+        ...
+```
+
+This keeps external service access out of the model while still making the evaluation contract the canonical place where derived fields are assembled.
 
 ### Why not methods on the model
 
-Discussed and rejected for multiple enrichment sources. Works fine for one source but creates God class at three. Lazy imports mitigate circular deps but don't solve the cohesion problem.
+Methods that perform network lookups on the model were discussed and rejected. They create a God class, invert dependencies, and hide I/O inside what should be a pure data contract.
+
+Pure constructor/copy methods on the evaluation model are acceptable and preferred, because they only assemble already-resolved enrichment payloads into the typed contract.
 
 ### Why not Pydantic validators
 
@@ -107,7 +119,7 @@ The hierarchy refactor touches:
 - `schemas/fuster_features.py` — split `DatasetFeatures` into role-specific models
 - `prompt_eval.py`, `extraction.py`, and any direct `responses.parse()` call sites — use extraction model only
 - GT loading and validation paths — use GT-normalized model only
-- `taxonomy_eval.py`, `gbif.py`, future `nominatim.py` — return evaluation model only
+- `taxonomy_eval.py`, `gbif.py`, future `nominatim.py` — return lookup payloads or feed evaluation-model constructors
 - notebooks constructing `DatasetFeatures` — pick the right subclass
 - tests — update model construction and assertions
 
@@ -133,7 +145,7 @@ Round 4: WU-MH6
 **deps:** none | **files:** `src/llm_metadata/schemas/fuster_features.py`, `src/llm_metadata/schemas/data_paper.py`, `tests/test_multisource_integration.py`, `tests/test_datasource_schema.py`
 
 - Remove source-tracking fields from the extraction model.
-- Decide whether source metadata belongs on a dedicated feature subclass or on `DataPaperRecord`.
+- Keep source metadata on `DataPaperRecord` unless a concrete counterexample emerges.
 - Keep current ingest/manifest workflows working without forcing prompt changes.
 
 #### WU-MH3: Rewire extraction and GT validation entry points `sonnet`
@@ -148,7 +160,8 @@ Round 4: WU-MH6
 
 **deps:** WU-MH3 | **files:** `src/llm_metadata/species_parsing.py`, `src/llm_metadata/taxonomy_eval.py`, `src/llm_metadata/gbif.py`, `tests/test_species_parsing.py`, `tests/test_taxonomy_eval.py`, `tests/test_gbif_enrichment.py`
 
-- Change enrichment helpers to return the evaluation-oriented model.
+- Change service helpers to return lookup payloads, not evaluation models.
+- Add evaluation-model constructors/copy helpers that assemble derived fields from those payloads.
 - Keep enrichment as explicit preprocessing, not validators.
 - Confirm notebook-oriented derived fields remain available only after enrichment.
 
@@ -172,5 +185,6 @@ Round 4: WU-MH6
 - The schema passed to `responses.parse()` contains no source-tracking or enrichment-only fields.
 - GT validation still accepts the same human-annotated semantic fields as before.
 - Taxonomy enrichment helpers still support `parsed_species`, richness projections, broad-group labels, and `gbif_keys`.
+- Evaluation-model constructors are pure: no network I/O, no hidden lookups.
 - Existing evaluation notebooks continue to run after updating imports/model names.
 - At least one test asserts the extraction schema and evaluation schema differ intentionally.
