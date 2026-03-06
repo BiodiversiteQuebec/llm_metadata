@@ -1,5 +1,7 @@
 """Tests for canonical data-paper contracts."""
 
+import csv
+
 from pathlib import Path
 
 import pytest
@@ -105,3 +107,35 @@ class TestRunArtifact:
         loaded = RunArtifact.load_json(output_path)
         assert loaded.name == "demo"
         assert loaded.mode == ExtractionMode.ABSTRACT
+
+    def test_save_extraction_csv(self, tmp_path):
+        artifact = RunArtifact(
+            name="demo",
+            mode=ExtractionMode.ABSTRACT,
+            prompt_module="prompts.abstract",
+            system_message="system",
+            model="gpt-5-mini",
+            records=[
+                RunRecord(
+                    gt_record_id=1,
+                    record_id="1",
+                    mode=ExtractionMode.ABSTRACT,
+                    status="success",
+                    title="Paper A",
+                    extraction_method="abstract_text",
+                    usage_cost={"total_cost": 0.1},
+                    output={"species": ["lynx"], "time_series": False},
+                )
+            ],
+        )
+
+        csv_path = tmp_path / "artifact.csv"
+        artifact.save_extraction_csv(csv_path)
+
+        with csv_path.open(newline="", encoding="utf-8") as handle:
+            rows = list(csv.DictReader(handle))
+
+        assert len(rows) == 1
+        assert rows[0]["gt_record_id"] == "1"
+        assert rows[0]["species"] == '["lynx"]'
+        assert rows[0]["time_series"] == "False"

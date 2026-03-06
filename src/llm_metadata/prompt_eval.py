@@ -5,6 +5,7 @@ from __future__ import annotations
 import ast
 import contextlib
 import json
+import os
 import shlex
 import sys
 from datetime import datetime
@@ -24,7 +25,12 @@ from llm_metadata.schemas.fuster_features import DatasetFeatures, DatasetFeature
 
 
 _LIST_COLS = ["data_type", "geospatial_info_dataset", "species"]
-_OUTPUT_DIR = Path("artifacts/runs")
+_LEGACY_OUTPUT_DIR = "data/prompt_eval_reports"
+_configured_output_dir = os.getenv("PROMPT_EVAL_OUTPUT_DIR")
+if _configured_output_dir and Path(_configured_output_dir).as_posix().rstrip("/") != _LEGACY_OUTPUT_DIR:
+    _OUTPUT_DIR = Path(_configured_output_dir)
+else:
+    _OUTPUT_DIR = Path("artifacts/runs")
 
 
 def _parse_excel_val(val):
@@ -109,6 +115,12 @@ def _evaluation_payload(report: EvaluationReport) -> dict:
     }
 
 
+def _save_run_outputs(run_artifact: RunArtifact, output_path: str | Path) -> tuple[Path, Path]:
+    json_path = run_artifact.save_json(output_path)
+    csv_path = run_artifact.save_extraction_csv(json_path.with_suffix(".csv"))
+    return json_path, csv_path
+
+
 def run_eval(
     *,
     mode: ExtractionMode | str,
@@ -128,9 +140,10 @@ def run_eval(
 
     configure_extraction_logging()
     logger.info(
-        "Starting prompt_eval mode={} manifest_path={} model={} skip_cache={}",
+        "Starting prompt_eval mode={} manifest_path={} parallelism={} model={} skip_cache={}",
         ExtractionMode(mode).value,
         manifest_path,
+        parallelism,
         model,
         skip_cache,
     )
@@ -175,9 +188,11 @@ def run_eval(
 
     run_artifact.evaluation = _evaluation_payload(report)
     if output_path is not None:
-        run_artifact.save_json(output_path)
-        report.saved_path = str(output_path)  # type: ignore[attr-defined]
-        logger.info("Saved prompt_eval artifact to {}", output_path)
+        saved_json_path, saved_csv_path = _save_run_outputs(run_artifact, output_path)
+        report.saved_path = str(saved_json_path)  # type: ignore[attr-defined]
+        report.extraction_csv_path = str(saved_csv_path)  # type: ignore[attr-defined]
+        logger.info("Saved prompt_eval artifact to {}", saved_json_path)
+        logger.info("Saved extraction results CSV to {}", saved_csv_path)
 
     logger.info(
         "Completed prompt_eval mode={} records={} total_cost=${:.4f}",
@@ -342,4 +357,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

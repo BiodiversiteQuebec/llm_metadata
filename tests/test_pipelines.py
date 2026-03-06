@@ -79,6 +79,7 @@ class TestUnifiedExtraction:
                 manifest_path="data/manifests/dev_subset_data_paper.csv",
             )
         assert output.exists()
+        assert output.with_suffix(".csv").exists()
         assert artifact.manifest_path == "data/manifests/dev_subset_data_paper.csv"
 
     def test_parallelism_preserves_manifest_order(self):

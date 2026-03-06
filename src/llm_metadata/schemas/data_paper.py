@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import csv
+import json
 import math
 import warnings
 from datetime import datetime, timezone
@@ -376,10 +377,73 @@ class RunArtifact(BaseModel):
             4,
         )
 
+    def extraction_csv_fieldnames(self) -> list[str]:
+        base_fields = [
+            "gt_record_id",
+            "record_id",
+            "mode",
+            "status",
+            "title",
+            "extraction_method",
+            "cost_usd",
+            "error_message",
+            "pdf_path",
+        ]
+        seen = set(base_fields)
+        output_fields: list[str] = []
+        for record in self.records:
+            if not record.output:
+                continue
+            for key in record.output.keys():
+                if key in seen:
+                    continue
+                seen.add(key)
+                output_fields.append(key)
+        return [*base_fields, *output_fields]
+
+    @staticmethod
+    def _csv_cell(value: Any) -> Any:
+        if value is None:
+            return ""
+        if isinstance(value, (list, dict)):
+            return json.dumps(value, ensure_ascii=True)
+        return value
+
+    def to_extraction_rows(self) -> list[dict[str, Any]]:
+        fieldnames = self.extraction_csv_fieldnames()
+        rows: list[dict[str, Any]] = []
+        for record in self.records:
+            row: dict[str, Any] = {
+                "gt_record_id": record.gt_record_id,
+                "record_id": record.record_id,
+                "mode": record.mode.value,
+                "status": record.status,
+                "title": record.title,
+                "extraction_method": record.extraction_method,
+                "cost_usd": (record.usage_cost or {}).get("total_cost"),
+                "error_message": record.error_message,
+                "pdf_path": record.pdf_path,
+            }
+            if record.output:
+                row.update(record.output)
+            rows.append({key: self._csv_cell(row.get(key)) for key in fieldnames})
+        return rows
+
     def save_json(self, output_path: str | Path) -> Path:
         out = Path(output_path)
         out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(self.model_dump_json(indent=2), encoding="utf-8")
+        return out
+
+    def save_extraction_csv(self, output_path: str | Path) -> Path:
+        out = Path(output_path)
+        out.parent.mkdir(parents=True, exist_ok=True)
+        fieldnames = self.extraction_csv_fieldnames()
+        with out.open("w", newline="", encoding="utf-8") as handle:
+            writer = csv.DictWriter(handle, fieldnames=fieldnames, extrasaction="ignore")
+            writer.writeheader()
+            for row in self.to_extraction_rows():
+                writer.writerow(row)
         return out
 
     @classmethod

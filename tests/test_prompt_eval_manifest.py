@@ -191,10 +191,12 @@ class TestPromptEvalModes:
             )
 
         assert output_path.exists()
+        assert output_path.with_suffix(".csv").exists()
         loaded = RunArtifact.load_json(output_path)
         assert loaded.mode.value == "abstract"
         assert loaded.evaluation is not None
         assert getattr(report, "saved_path") == str(output_path)
+        assert getattr(report, "extraction_csv_path") == str(output_path.with_suffix(".csv"))
 
     def test_run_eval_forwards_parallelism(self, tiny_gt_xlsx, tiny_manifest_csv):
         from llm_metadata.prompt_eval import run_eval

@@ -173,6 +173,12 @@ def _run_record_safe(
     try:
         return runner(record, config=config, system_message=system_message, skip_cache=skip_cache)
     except Exception as exc:
+        logger.exception(
+            "Extraction failed gt_record_id={} mode={} title={}",
+            record.gt_record_id,
+            mode.value,
+            record.title or "<untitled>",
+        )
         return RunRecord(
             **_record_result_base(record, mode),
             status="error",
@@ -346,9 +352,10 @@ def run_manifest_extraction(
     prompt_module = prompt_module or DEFAULT_PROMPT_MODULES[mode]
     system_message = _load_system_message(prompt_module) if prompt_module else _default_system_message(mode)
     logger.info(
-        "Starting manifest extraction mode={} records={} model={} prompt_module={} skip_cache={}",
+        "Starting manifest extraction mode={} records={} parallelism={} model={} prompt_module={} skip_cache={}",
         mode.value,
         len(manifest.records),
+        parallelism,
         config.model,
         prompt_module,
         skip_cache,
@@ -372,8 +379,18 @@ def run_manifest_extraction(
     runner = runners[mode]
 
     if parallelism == 1 or len(manifest.records) < 2:
-        artifact.records = [
-            _run_record_safe(
+        artifact.records = []
+        total_records = len(manifest.records)
+        for index, record in enumerate(manifest.records, start=1):
+            logger.info(
+                "[{}/{}] Extracting gt_record_id={} record_id={} title={}",
+                index,
+                total_records,
+                record.gt_record_id,
+                record.canonical_id(),
+                record.title or "<untitled>",
+            )
+            run_record = _run_record_safe(
                 record,
                 mode=mode,
                 runner=runner,
@@ -381,13 +398,30 @@ def run_manifest_extraction(
                 system_message=system_message,
                 skip_cache=skip_cache,
             )
-            for record in manifest.records
-        ]
+            artifact.records.append(run_record)
+            logger.info(
+                "[{}/{}] Finished gt_record_id={} status={} method={} cost={}",
+                index,
+                total_records,
+                record.gt_record_id,
+                run_record.status,
+                run_record.extraction_method or "n/a",
+                _usage_cost_total(run_record),
+            )
     else:
         ordered_results: list[Optional[RunRecord]] = [None] * len(manifest.records)
         with ThreadPoolExecutor(max_workers=parallelism) as executor:
-            future_to_index = {
-                executor.submit(
+            future_to_index = {}
+            for index, record in enumerate(manifest.records):
+                logger.info(
+                    "[{}/{}] Queueing gt_record_id={} record_id={} title={}",
+                    index + 1,
+                    len(manifest.records),
+                    record.gt_record_id,
+                    record.canonical_id(),
+                    record.title or "<untitled>",
+                )
+                future = executor.submit(
                     _run_record_safe,
                     record,
                     mode=mode,
@@ -395,15 +429,34 @@ def run_manifest_extraction(
                     config=config,
                     system_message=system_message,
                     skip_cache=skip_cache,
-                ): index
-                for index, record in enumerate(manifest.records)
-            }
+                )
+                future_to_index[future] = index
             for future in as_completed(future_to_index):
-                ordered_results[future_to_index[future]] = future.result()
+                index = future_to_index[future]
+                record = manifest.records[index]
+                run_record = future.result()
+                ordered_results[index] = run_record
+                logger.info(
+                    "[{}/{}] Finished gt_record_id={} status={} method={} cost={}",
+                    index + 1,
+                    len(manifest.records),
+                    record.gt_record_id,
+                    run_record.status,
+                    run_record.extraction_method or "n/a",
+                    _usage_cost_total(run_record),
+                )
         artifact.records = [record for record in ordered_results if record is not None]
 
     if output_path is not None:
         artifact.save_json(output_path)
+        artifact.save_extraction_csv(Path(output_path).with_suffix(".csv"))
+        logger.info("Saved extraction artifact to {}", output_path)
+    logger.info(
+        "Completed manifest extraction mode={} records={} total_cost=${:.4f}",
+        mode.value,
+        len(artifact.records),
+        artifact.total_cost_usd,
+    )
     return artifact
 
 
@@ -415,4 +468,3 @@ __all__ = [
     "collect_relevant_sections",
     "build_section_prompt",
 ]
-
