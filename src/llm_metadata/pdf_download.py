@@ -9,16 +9,12 @@ Designed for batch downloading of open access scientific papers.
 import os
 import requests
 import time
-import logging
 from pathlib import Path
 from typing import Optional, Dict, List
 from urllib.parse import urlparse
 
 from llm_metadata import doi_utils
-
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+from llm_metadata.logging_utils import logger
 
 # Default storage directory
 PDF_STORAGE_DIR = Path("data/pdfs")

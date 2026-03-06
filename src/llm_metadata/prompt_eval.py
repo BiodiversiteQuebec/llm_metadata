@@ -18,6 +18,7 @@ from llm_metadata.groundtruth_eval import (
     evaluate_indexed,
 )
 from llm_metadata.extraction import ExtractionConfig, ExtractionMode, run_manifest_extraction
+from llm_metadata.logging_utils import configure_extraction_logging, logger
 from llm_metadata.schemas.data_paper import DataPaperManifest, RunArtifact
 from llm_metadata.schemas.fuster_features import DatasetFeatures, DatasetFeaturesNormalized
 
@@ -125,7 +126,16 @@ def run_eval(
 ) -> EvaluationReport:
     """Run extraction + evaluation for one explicit mode over one manifest."""
 
+    configure_extraction_logging()
+    logger.info(
+        "Starting prompt_eval mode={} manifest_path={} model={} skip_cache={}",
+        ExtractionMode(mode).value,
+        manifest_path,
+        model,
+        skip_cache,
+    )
     manifest = DataPaperManifest.load_csv(manifest_path)
+    logger.info("Loaded manifest records={}", len(manifest.records))
     eval_config = config or (
         EvaluationConfig.from_json(config_path)
         if config_path is not None
@@ -143,11 +153,17 @@ def run_eval(
         skip_cache=skip_cache,
     )
 
+    logger.info("Loading ground truth from {}", gt_path)
     gt_df = _load_ground_truth(gt_path)
     true_by_id = _build_true_by_id(gt_df, {record.gt_record_id for record in manifest.records})
     if not true_by_id:
         raise ValueError("No valid GT rows matched the manifest.")
 
+    logger.info(
+        "Evaluating predictions matched_records={} fields={}",
+        len(true_by_id),
+        ",".join(fields) if fields else "default",
+    )
     report = evaluate_indexed(
         true_by_id=true_by_id,
         pred_by_id=run_artifact.predictions_by_id(DatasetFeatures),
@@ -161,7 +177,14 @@ def run_eval(
     if output_path is not None:
         run_artifact.save_json(output_path)
         report.saved_path = str(output_path)  # type: ignore[attr-defined]
+        logger.info("Saved prompt_eval artifact to {}", output_path)
 
+    logger.info(
+        "Completed prompt_eval mode={} records={} total_cost=${:.4f}",
+        ExtractionMode(mode).value,
+        len(run_artifact.records),
+        run_artifact.total_cost_usd,
+    )
     return report
 
 

@@ -11,6 +11,7 @@ from joblib import Memory
 from openai.types.responses.parsed_response import ParsedResponse
 from pydantic import BaseModel
 
+from llm_metadata.logging_utils import logger
 from llm_metadata.openai_io import get_openai_client
 from llm_metadata.prompts.abstract import SYSTEM_MESSAGE as ABSTRACT_SYSTEM_MESSAGE
 from llm_metadata.prompts.pdf_file import SYSTEM_MESSAGE as PDF_SYSTEM_MESSAGE
@@ -34,6 +35,23 @@ MODEL = "gpt-5-mini"
 MAX_OUTPUT_TOKENS = 4096
 TEMPERATURE = None
 REASONING = {"effort": "low"}
+
+
+def _cache_state(cached_callable: Any, *args: Any, **kwargs: Any) -> str:
+    check_call_in_cache = getattr(cached_callable, "check_call_in_cache", None)
+    if check_call_in_cache is None:
+        return "unknown"
+    try:
+        return "hit" if check_call_in_cache(*args, **kwargs) else "miss"
+    except Exception:
+        return "unknown"
+
+
+def _cost_summary(usage_cost: Optional[dict[str, Any]]) -> str:
+    if not usage_cost:
+        return "n/a"
+    total_cost = usage_cost.get("total_cost")
+    return "n/a" if total_cost is None else f"${total_cost:.4f}"
 
 
 def _response_usage_cost(usage: dict[str, Any], model: str = MODEL) -> dict[str, Any]:
@@ -100,6 +118,11 @@ def extract_from_text(
     def _response_parse(parameters_json_dump: str) -> dict[str, Any]:
         del parameters_json_dump
         client = get_openai_client()
+        logger.debug(
+            "Calling OpenAI Responses API for text extraction model={} schema={}",
+            model,
+            text_format.__name__,
+        )
         response = client.responses.parse(
             model=model,
             input=[
@@ -112,9 +135,17 @@ def extract_from_text(
         )
         return response.model_dump()
 
+    cache_state = "bypass" if skip_cache else _cache_state(_response_parse, parameters)
+    logger.info(
+        "Starting text extraction model={} schema={} chars={} cache={}",
+        model,
+        text_format.__name__,
+        len(text),
+        cache_state,
+    )
     response_dict = _response_parse.func(parameters) if skip_cache else _response_parse(parameters)  # type: ignore[attr-defined]
     response = _build_parse_response(response_dict=response_dict, text_format=text_format)
-    return {
+    result = {
         "prompt": system_message,
         "text": text,
         "model": model,
@@ -124,18 +155,30 @@ def extract_from_text(
         "temperature": temperature,
         "reasoning": reasoning,
     }
+    logger.info(
+        "Completed text extraction model={} schema={} cache={} cost={} output_tokens={}",
+        model,
+        text_format.__name__,
+        cache_state,
+        _cost_summary(result["usage_cost"]),
+        result["usage_cost"].get("output_tokens") if result["usage_cost"] else "n/a",
+    )
+    return result
 
 
 @memory.cache
 def extract_pdf_text(pdf_path: Union[str, Path], max_pages: Optional[int] = None) -> str:
     """Extract text from a local PDF using pypdf."""
     path = Path(pdf_path)
+    logger.debug("Reading PDF text from {} max_pages={}", path, max_pages)
     reader = pypdf.PdfReader(str(path))
     page_limit = max_pages if max_pages is not None else len(reader.pages)
     text_pages: list[str] = []
     for page in reader.pages[:page_limit]:
         text_pages.append(page.extract_text() or "")
-    return "\n".join(text_pages)
+    text = "\n".join(text_pages)
+    logger.info("Extracted PDF text from {} pages={} chars={}", path, page_limit, len(text))
+    return text
 
 
 def extract_from_pdf_text(
@@ -151,6 +194,13 @@ def extract_from_pdf_text(
     skip_cache: bool = False,
 ) -> dict[str, Any]:
     """Extract text from a PDF and extract structured information from the extracted text."""
+    cache_state = _cache_state(extract_pdf_text, pdf_path, max_pages=max_pages)
+    logger.info(
+        "Starting pdf_text extraction pdf_path={} max_pages={} text_cache={}",
+        pdf_path,
+        max_pages,
+        cache_state,
+    )
     pdf_text = extract_pdf_text(pdf_path, max_pages=max_pages)
     result = extract_from_text(
         pdf_text,
@@ -164,13 +214,20 @@ def extract_from_pdf_text(
     )
     result["pdf_path"] = str(pdf_path)
     result["extraction_method"] = "pdf_text"
+    logger.info(
+        "Completed pdf_text extraction pdf_path={} cost={}",
+        pdf_path,
+        _cost_summary(result.get("usage_cost")),
+    )
     return result
 
 
 def upload_pdf_to_openai(pdf_path: Union[str, Path], purpose: str = "user_data") -> str:
     client = get_openai_client()
+    logger.info("Uploading PDF to OpenAI path={} purpose={}", pdf_path, purpose)
     with Path(pdf_path).open("rb") as handle:
         uploaded = client.files.create(file=handle, purpose=purpose)
+    logger.debug("Uploaded PDF to OpenAI file_id={}", uploaded.id)
     return uploaded.id
 
 
@@ -178,8 +235,10 @@ def delete_openai_file(file_id: str) -> bool:
     client = get_openai_client()
     try:
         client.files.delete(file_id)
+        logger.debug("Deleted OpenAI file file_id={}", file_id)
         return True
     except Exception:
+        logger.warning("Failed to delete OpenAI file file_id={}", file_id)
         return False
 
 
@@ -224,6 +283,12 @@ def extract_from_pdf_file(
     def _response_parse_pdf(parameters_json_dump: str, uploaded_file_id: str) -> dict[str, Any]:
         del parameters_json_dump
         client = get_openai_client()
+        logger.debug(
+            "Calling OpenAI Responses API for native PDF extraction model={} schema={} file_id={}",
+            model,
+            text_format.__name__,
+            uploaded_file_id,
+        )
         response = client.responses.parse(
             model=model,
             input=[
@@ -245,6 +310,15 @@ def extract_from_pdf_file(
         )
         return response.model_dump()
 
+    cache_state = "bypass" if skip_cache else _cache_state(_response_parse_pdf, parameters, file_id)
+    logger.info(
+        "Starting pdf_native extraction pdf_path={} file_id={} model={} schema={} cache={}",
+        pdf_path,
+        file_id,
+        model,
+        text_format.__name__,
+        cache_state,
+    )
     response_dict = (
         _response_parse_pdf.func(parameters, file_id)  # type: ignore[attr-defined]
         if skip_cache
@@ -265,6 +339,13 @@ def extract_from_pdf_file(
     }
     if cleanup_file:
         delete_openai_file(file_id)
+    logger.info(
+        "Completed pdf_native extraction pdf_path={} file_id={} cache={} cost={}",
+        pdf_path,
+        file_id,
+        cache_state,
+        _cost_summary(result.get("usage_cost")),
+    )
     return result
 
 
@@ -297,6 +378,11 @@ def extract_from_pdf_url(
     def _response_parse_pdf_url(parameters_json_dump: str) -> dict[str, Any]:
         del parameters_json_dump
         client = get_openai_client()
+        logger.debug(
+            "Calling OpenAI Responses API for PDF URL extraction model={} schema={}",
+            model,
+            text_format.__name__,
+        )
         response = client.responses.parse(
             model=model,
             input=[
@@ -318,9 +404,17 @@ def extract_from_pdf_url(
         )
         return response.model_dump()
 
+    cache_state = _cache_state(_response_parse_pdf_url, parameters)
+    logger.info(
+        "Starting pdf_url extraction pdf_url={} model={} schema={} cache={}",
+        pdf_url,
+        model,
+        text_format.__name__,
+        cache_state,
+    )
     response_dict = _response_parse_pdf_url(parameters)
     response = _build_parse_response(response_dict=response_dict, text_format=text_format)
-    return {
+    result = {
         "prompt": system_message,
         "pdf_url": pdf_url,
         "model": model,
@@ -331,6 +425,13 @@ def extract_from_pdf_url(
         "temperature": temperature,
         "reasoning": reasoning,
     }
+    logger.info(
+        "Completed pdf_url extraction pdf_url={} cache={} cost={}",
+        pdf_url,
+        cache_state,
+        _cost_summary(result.get("usage_cost")),
+    )
+    return result
 
 
 __all__ = [

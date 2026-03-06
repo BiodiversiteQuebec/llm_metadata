@@ -12,7 +12,6 @@ Forked from https://github.com/zaytoun/scihub.py/
 import re
 import argparse
 import hashlib
-import logging
 import os
 
 import requests
@@ -20,10 +19,7 @@ import urllib3
 from bs4 import BeautifulSoup
 from retrying import retry
 
-# log config
-logging.basicConfig()
-logger = logging.getLogger('Sci-Hub')
-logger.setLevel(logging.DEBUG)
+from llm_metadata.logging_utils import configure_logging, logger
 
 #
 urllib3.disable_warnings()
@@ -99,7 +95,7 @@ class SciHub(object):
             raise Exception('Ran out of valid sci-hub urls')
         del self.available_base_url_list[0]
         self.base_url = self.available_base_url_list[0] + '/'
-        logger.info("I'm changing to {}".format(self.available_base_url_list[0]))
+        logger.info("I'm changing to {}", self.available_base_url_list[0])
 
     def search(self, query, limit=10, download=False):
         """
@@ -182,10 +178,14 @@ class SciHub(object):
 
             if res.headers['Content-Type'] != 'application/pdf':
                 self._change_base_url()
-                logger.info('Failed to fetch pdf with identifier %s '
-                                           '(resolved url %s) due to captcha' % (identifier, url))
-                raise CaptchaNeedException('Failed to fetch pdf with identifier %s '
-                                           '(resolved url %s) due to captcha' % (identifier, url))
+                logger.info(
+                    "Failed to fetch pdf with identifier {} (resolved url {}) due to captcha",
+                    identifier,
+                    url,
+                )
+                raise CaptchaNeedException(
+                    f"Failed to fetch pdf with identifier {identifier} (resolved url {url}) due to captcha"
+                )
                 # return {
                 #     'err': 'Failed to fetch pdf with identifier %s (resolved url %s) due to captcha'
                 #            % (identifier, url)
@@ -198,12 +198,15 @@ class SciHub(object):
                 }
 
         except requests.exceptions.ConnectionError:
-            logger.info('Cannot access {}, changing url'.format(self.available_base_url_list[0]))
+            logger.info("Cannot access {}, changing url", self.available_base_url_list[0])
             self._change_base_url()
 
-        except requests.exceptions.RequestException as e:
-            logger.info('Failed to fetch pdf with identifier %s (resolved url %s) due to request exception.'
-                       % (identifier, url))
+        except requests.exceptions.RequestException:
+            logger.info(
+                "Failed to fetch pdf with identifier {} (resolved url {}) due to request exception.",
+                identifier,
+                url,
+            )
             return {
                 'err': 'Failed to fetch pdf with identifier %s (resolved url %s) due to request exception.'
                        % (identifier, url)
@@ -336,44 +339,44 @@ def main():
     args = parser.parse_args()
 
     if args.verbose:
-        logger.setLevel(logging.DEBUG)
+        configure_logging("DEBUG")
     if args.proxy:
         sh.set_proxy(args.proxy)
 
     if args.download:
         result = sh.download(args.download, args.output)
         if 'err' in result:
-            logger.debug('%s', result['err'])
+            logger.debug("{}", result['err'])
         else:
-            logger.debug('Successfully downloaded file with identifier %s', args.download)
+            logger.debug("Successfully downloaded file with identifier {}", args.download)
     elif args.search:
         results = sh.search(args.search, args.limit)
         if 'err' in results:
-            logger.debug('%s', results['err'])
+            logger.debug("{}", results['err'])
         else:
-            logger.debug('Successfully completed search with query %s', args.search)
+            logger.debug("Successfully completed search with query {}", args.search)
         print(results)
     elif args.search_download:
         results = sh.search(args.search_download, args.limit)
         if 'err' in results:
-            logger.debug('%s', results['err'])
+            logger.debug("{}", results['err'])
         else:
-            logger.debug('Successfully completed search with query %s', args.search_download)
+            logger.debug("Successfully completed search with query {}", args.search_download)
             for paper in results['papers']:
                 result = sh.download(paper['url'], args.output)
                 if 'err' in result:
-                    logger.debug('%s', result['err'])
+                    logger.debug("{}", result['err'])
                 else:
-                    logger.debug('Successfully downloaded file with identifier %s', paper['url'])
+                    logger.debug("Successfully downloaded file with identifier {}", paper['url'])
     elif args.file:
         with open(args.file, 'r') as f:
             identifiers = f.read().splitlines()
             for identifier in identifiers:
                 result = sh.download(identifier, args.output)
                 if 'err' in result:
-                    logger.debug('%s', result['err'])
+                    logger.debug("{}", result['err'])
                 else:
-                    logger.debug('Successfully downloaded file with identifier %s', identifier)
+                    logger.debug("Successfully downloaded file with identifier {}", identifier)
 
 
 if __name__ == '__main__':

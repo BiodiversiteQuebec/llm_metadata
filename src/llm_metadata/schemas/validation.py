@@ -11,7 +11,8 @@ from typing import Any, Optional
 
 import pandas as pd
 from pydantic import ValidationError as PydanticValidationError
-from loguru import logger
+
+from llm_metadata.logging_utils import logger
 
 from llm_metadata.schemas.fuster_features import (
     DatasetFeatures,

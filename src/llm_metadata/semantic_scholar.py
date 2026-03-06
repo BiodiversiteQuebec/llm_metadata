@@ -11,13 +11,11 @@ API Documentation: https://api.semanticscholar.org/graph/v1
 
 import os
 import time
-import logging
 import requests
 from typing import Optional, List, Dict, Any
 from joblib import Memory
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+from llm_metadata.logging_utils import logger
 
 # Setup cache
 memory = Memory("./cache", verbose=0)
@@ -67,7 +65,7 @@ def _get(url: str, params: Dict[str, Any]) -> requests.Response:
     headers = _build_headers()
     for attempt, wait in enumerate([0] + _RETRY_DELAYS):
         if wait:
-            logger.warning("Rate limited (429), retrying in %ss...", wait)
+            logger.warning("Rate limited (429), retrying in {}s...", wait)
             time.sleep(wait)
         response = requests.get(url, params=params, headers=headers, timeout=REQUEST_TIMEOUT)
         if response.status_code != 429:
@@ -115,7 +113,7 @@ def get_paper_by_doi(doi: str) -> Optional[Dict[str, Any]]:
     response = _get(endpoint, params)
 
     if response.status_code == 404:
-        logger.debug("Paper not found in Semantic Scholar for DOI: %s", doi)
+        logger.debug("Paper not found in Semantic Scholar for DOI: {}", doi)
         return None
 
     response.raise_for_status()
@@ -148,7 +146,7 @@ def get_paper_by_title(title: str) -> Optional[Dict[str, Any]]:
     response = _get(endpoint, params)
 
     if response.status_code == 404:
-        logger.debug("No papers found for title: %s", title)
+        logger.debug("No papers found for title: {}", title)
         return None
 
     response.raise_for_status()
@@ -183,7 +181,7 @@ def get_paper_citations(paper_id: str, limit: int = 100) -> List[Dict[str, Any]]
     response = _get(endpoint, params)
 
     if response.status_code == 404:
-        logger.debug("Paper not found for citations lookup: %s", paper_id)
+        logger.debug("Paper not found for citations lookup: {}", paper_id)
         return []
 
     response.raise_for_status()
@@ -222,7 +220,7 @@ def get_paper_references(paper_id: str, limit: int = 100) -> List[Dict[str, Any]
     response = _get(endpoint, params)
 
     if response.status_code == 404:
-        logger.debug("Paper not found for references lookup: %s", paper_id)
+        logger.debug("Paper not found for references lookup: {}", paper_id)
         return []
 
     response.raise_for_status()

@@ -12,10 +12,8 @@ Data Format: https://unpaywall.org/data-format
 import os
 import requests
 from typing import Optional, Dict, Any
-import logging
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+from llm_metadata.logging_utils import logger
 
 BASE_URL = "https://api.unpaywall.org/v2"
 UNPAYWALL_EMAIL = os.getenv('UNPAYWALL_EMAIL', os.getenv('OPENALEX_EMAIL'))

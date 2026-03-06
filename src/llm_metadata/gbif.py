@@ -15,16 +15,14 @@ applied between requests to be considerate of the public API.
 """
 
 import time
-import logging
 from dataclasses import dataclass
 from typing import Optional
 
 import requests
 from joblib import Memory
 
+from llm_metadata.logging_utils import logger
 from llm_metadata.species_parsing import ParsedTaxon
-
-logger = logging.getLogger(__name__)
 
 # Setup joblib cache for deterministic re-runs
 memory = Memory("./cache", verbose=0)
@@ -141,17 +139,17 @@ def match_species(
         response.raise_for_status()
         data = response.json()
     except requests.RequestException as exc:
-        logger.warning("GBIF API request failed for %r: %s", name, exc)
+        logger.warning("GBIF API request failed for {!r}: {}", name, exc)
         return None
 
     match_type = data.get("matchType", "NONE")
 
     if match_type == "NONE":
-        logger.debug("No GBIF match for %r", name)
+        logger.debug("No GBIF match for {!r}", name)
         return None
 
     if strict and match_type not in ("EXACT",):
-        logger.debug("Strict mode: skipping %s match for %r", match_type, name)
+        logger.debug("Strict mode: skipping {} match for {!r}", match_type, name)
         return None
 
     usage_key = data.get("usageKey")
@@ -212,12 +210,10 @@ def resolve_species_list(
             if match is None:
                 continue
             if match.confidence < confidence_threshold:
-                logger.debug(
-                    "Skipping low-confidence match (%d) for %r", match.confidence, name
-                )
+                logger.debug("Skipping low-confidence match ({}) for {!r}", match.confidence, name)
                 continue
             if not accept_higherrank and match.match_type == "HIGHERRANK":
-                logger.debug("Skipping HIGHERRANK match for %r", name)
+                logger.debug("Skipping HIGHERRANK match for {!r}", name)
                 continue
             gbif_match = match
             break  # First acceptable match wins

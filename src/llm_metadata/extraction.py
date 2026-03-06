@@ -18,6 +18,7 @@ from llm_metadata.gpt_extract import (
     extract_from_pdf_text,
     extract_from_text,
 )
+from llm_metadata.logging_utils import configure_extraction_logging, logger
 from llm_metadata.pdf_parsing import ParsedDocument, Section, process_pdf
 from llm_metadata.schemas import DatasetAbstractMetadata
 from llm_metadata.schemas.chunk_metadata import SectionType
@@ -37,6 +38,13 @@ DEFAULT_PROMPT_MODULES = {
     ExtractionMode.PDF_NATIVE: "prompts.pdf_file",
     ExtractionMode.SECTIONS: "prompts.section",
 }
+
+
+def _usage_cost_total(record: RunRecord) -> str:
+    if not record.usage_cost:
+        return "n/a"
+    total_cost = record.usage_cost.get("total_cost")
+    return "n/a" if total_cost is None else f"${total_cost:.4f}"
 
 @dataclass
 class SectionSelectionConfig:
@@ -278,6 +286,12 @@ def _run_sections_mode(
         grobid_url=config.grobid_url,
     )
     sections = collect_relevant_sections(document.sections, config.section_config)
+    logger.debug(
+        "Collected sections gt_record_id={} relevant_sections={} include_abstract={}",
+        record.gt_record_id,
+        len(sections),
+        config.section_config.include_abstract,
+    )
     if config.section_config.include_abstract and document.abstract:
         has_abstract = any(extract_from_section(section.title) == SectionType.ABSTRACT for section in sections)
         if not has_abstract:
@@ -324,12 +338,21 @@ def run_manifest_extraction(
 ) -> RunArtifact:
     """Run one explicit extraction mode across a manifest."""
 
+    configure_extraction_logging()
     config = config or ExtractionConfig()
     mode = ExtractionMode(mode)
     if parallelism < 1:
         raise ValueError("parallelism must be at least 1.")
     prompt_module = prompt_module or DEFAULT_PROMPT_MODULES[mode]
     system_message = _load_system_message(prompt_module) if prompt_module else _default_system_message(mode)
+    logger.info(
+        "Starting manifest extraction mode={} records={} model={} prompt_module={} skip_cache={}",
+        mode.value,
+        len(manifest.records),
+        config.model,
+        prompt_module,
+        skip_cache,
+    )
     artifact = RunArtifact(
         name=name or f"{mode.value}_run",
         mode=mode,
