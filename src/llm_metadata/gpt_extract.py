@@ -221,7 +221,7 @@ def extract_from_pdf_text(
     )
     return result
 
-
+@memory.cache
 def upload_pdf_to_openai(pdf_path: Union[str, Path], purpose: str = "user_data") -> str:
     client = get_openai_client()
     logger.info("Uploading PDF to OpenAI path={} purpose={}", pdf_path, purpose)

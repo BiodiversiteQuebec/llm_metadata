@@ -54,6 +54,7 @@ include = ["llm_metadata*"]
 
 [project.scripts]
 app = "llm_metadata.app.app_eval_viewer:run"
+prompt_eval = "llm_metadata.prompt_eval:main"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
