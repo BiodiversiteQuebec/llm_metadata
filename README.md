@@ -337,7 +337,7 @@ Output conventions:
 **Inspect runs in the Streamlit Eval Viewer**
 
 ```bash
-uv run streamlit run app/app_eval_viewer.py
+uv run app
 ```
 
 **Run the Eval Viewer in Docker (distinct compose stack, Streamlit only)**
@@ -356,7 +356,7 @@ docker compose -f docker-compose.viewer.yml up --build
 Example local override:
 
 ```bash
-EVAL_VIEWER_RESULTS_DIR=artifacts/runs uv run streamlit run app/app_eval_viewer.py
+EVAL_VIEWER_RESULTS_DIR=artifacts/runs uv run app
 ```
 
 In `Overview`, expand:
@@ -438,7 +438,7 @@ llm_metadata/
 └── groundtruth_eval.py         # Evaluation framework (field strategies, metrics)
 ```
 
-Viewer app path: `app/app_eval_viewer.py`
+Viewer app path: `src/llm_metadata/app/app_eval_viewer.py`
 
 ## License
 
