@@ -22,13 +22,13 @@ pip install -e .[dev]
 ### Testing
 ```bash
 # Run all tests
-python -m pytest tests/
+uv run python -m pytest tests/
 
 # Run specific test file
-python -m pytest tests/test_evaluation.py
+uv run python -m pytest tests/test_evaluation.py
 
 # Run specific test
-python -m pytest tests/test_evaluation.py::TestEvaluation::test_evaluate_pairs_scalar_and_list_fields
+uv run python -m pytest tests/test_evaluation.py::TestEvaluation::test_evaluate_pairs_scalar_and_list_fields
 ```
 
 ### Running Scripts
@@ -114,7 +114,10 @@ Data Ingestion → Schema & Prompt Engineering → LLM Inference → Evaluation 
 **Modules:**
 - **[Stage 2]** `schemas/fuster_features.py` — Detailed EBV feature extraction following Fuster et al. methodology
   - Controlled vocabularies: `EBVDataType`, `GeospatialInfoType`, `ValidationStatus`, `FeatureLocation`
-  - Main model: `DatasetFeatureExtraction` with field validators for data cleaning (European decimals, placeholder suppression, list splitting)
+  - Model hierarchy: `CoreFeatureModel` → `DatasetFeaturesExtraction` / `DatasetFeaturesNormalized` / `DatasetFeaturesEvaluation`
+  - `DatasetFeaturesExtraction` is the LLM output contract shown to `responses.parse()`
+  - `DatasetFeaturesNormalized` adds GT/spreadsheet normalization validators (European decimals, placeholder suppression, list splitting)
+  - `DatasetFeaturesEvaluation` carries enrichment-only derived fields used after preprocessing
   - Vocabulary normalization mappings: `DATA_TYPE_MAPPING`, `GEO_TYPE_MAPPING`
 - **[Stage 2]** `schemas/abstract_metadata.py` — High-level dataset metadata for quick categorization
 - **[Stage 2]** `schemas/chunk_metadata.py` — Section-aware chunk metadata for full-text processing (section types, token counts, content flags)
@@ -124,7 +127,7 @@ Data Ingestion → Schema & Prompt Engineering → LLM Inference → Evaluation 
 - **[Stage 2]** `embedding.py` — OpenAI embedding generation with local caching (text-embedding-3-large)
 - **[Stage 2]** `vector_store.py` — Qdrant vector store client for chunk indexing and semantic search
 
-**Key Pattern:** Pydantic models serve dual purpose: (1) structured output format for LLM via `responses.parse()`, (2) validation layer for ground truth data.
+**Key Pattern:** Feature contracts are role-specific: (1) `DatasetFeaturesExtraction` for LLM structured output, (2) `DatasetFeaturesNormalized` for GT validation/cleaning, (3) `DatasetFeaturesEvaluation` for derived enrichment fields used during evaluation.
 
 ### Stage 3: LLM Inference & Batch Processing
 
@@ -214,9 +217,11 @@ When `field_strategies` is populated on `EvaluationConfig`:
 
 **Evaluation Normalization**: The evaluation module uses configurable normalization strategies (case-folding, whitespace collapse, set-based list comparison) to handle semantic equivalence between manual and automated extractions.
 
-**Enrichment Pattern**: For fields that benefit from external resolution (e.g., species strings → GBIF taxon keys, locations → GADM codes), add a derived field to the model (like `gbif_keys: Optional[list[int]]`) alongside the original, then evaluate both independently in a single `evaluate_indexed()` call. This avoids complex matcher abstractions — strategy comparison is just `report.metrics_for("species")` vs `report.metrics_for("gbif_keys")`. Precedent: source-tracking fields (`source`, `is_oa`, etc.) in `fuster_features.py`.
+**Enrichment Pattern**: For fields that benefit from external resolution (e.g., species strings → GBIF taxon keys, locations → GADM codes), keep the raw semantic field on `DatasetFeaturesExtraction` / `DatasetFeaturesNormalized`, then add the derived field to `DatasetFeaturesEvaluation` (for example `gbif_keys: Optional[list[int]]`). Evaluate both independently in a single `evaluate_indexed()` call. This avoids complex matcher abstractions — strategy comparison is just `report.metrics_for("species")` vs `report.metrics_for("gbif_keys")`.
 
-**Validator Boundary**: Pydantic validators handle pure, fast normalization only — delimiter splitting, whitespace stripping, vocabulary mapping. Never put network I/O or external API calls in validators. Enrichment from external services (GBIF, GADM, etc.) is a separate preprocessing step that runs *after* model construction.
+**Source Metadata Boundary**: Source/provenance metadata (`source`, `source_url`, `journal_url`, `pdf_url`, `is_oa`, article DOI fields) belongs on `DataPaperRecord`, not on the feature extraction/evaluation models.
+
+**Validator Boundary**: Pydantic validators handle pure, fast normalization only — delimiter splitting, whitespace stripping, vocabulary mapping. Never put network I/O or external API calls in validators. Enrichment from external services (GBIF, GADM, etc.) is a separate preprocessing step that runs *after* model construction, and the final typed assembly should happen through pure constructors/copy helpers on `DatasetFeaturesEvaluation`.
 
 **Contract Construction Rule**: Build and mutate data contracts only through routines on the contract module itself. Use constructor/classmethod/setter patterns like `DataPaperManifest.build(...)`, `DataPaperManifest.load_csv(...)`, `manifest.save_csv(...)`, and `manifest.with_pdf_path(...)`. Do not hand-roll manifests or run artifacts from loose dict/DataFrame logic outside the contract module.
 
