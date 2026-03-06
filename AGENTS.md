@@ -297,10 +297,10 @@ This creates a research journal that documents the evolution of the project's me
 
 ## Eval Viewer App
 
-`app/app_eval_viewer.py` — Streamlit app for interactive exploration of `prompt_eval` results.
+`src/llm_metadata/app/app_eval_viewer.py` — Streamlit app for interactive exploration of `prompt_eval` results.
 
 ```bash
-uv run streamlit run app/app_eval_viewer.py
+uv run app
 ```
 
 ### Tabs

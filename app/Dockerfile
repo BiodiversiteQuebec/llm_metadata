@@ -12,4 +12,4 @@ RUN pip install --upgrade pip && \
 
 EXPOSE 8501
 
-CMD ["streamlit", "run", "app/app_eval_viewer.py", "--server.address=0.0.0.0", "--server.port=8501"]
+CMD ["streamlit", "run", "src/llm_metadata/app/app_eval_viewer.py", "--server.address=0.0.0.0", "--server.port=8501"]

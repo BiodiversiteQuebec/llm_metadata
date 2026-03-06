@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "llm_metadata"
 version = "0.1.0"
-description = "A Python package to interact with Dryad and zenodo datasets and extract ecological metadata using GPT-4."
+description = "A Python package to interact with Dryad and zenodo datasets and extract ecological metadata using GPT."
 authors = [
     { name = "Vincent Beauregard", email = "vincent.beauregard@usherbrooke.ca" }
 ]
@@ -51,6 +51,9 @@ dev = [
 [tool.setuptools.packages.find]
 where = ["src"]
 include = ["llm_metadata*"]
+
+[project.scripts]
+app = "llm_metadata.app.app_eval_viewer:run"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
