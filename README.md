@@ -161,11 +161,11 @@ print(f"Sections: {len(doc.sections)}")
 **Define Extraction Schema**
 
 ```python
-from llm_metadata.schemas.fuster_features import DatasetFeatureExtraction, EBVDataType
+from llm_metadata.schemas.fuster_features import DatasetFeaturesExtraction, EBVDataType
 from llm_metadata.schemas.abstract_metadata import DatasetAbstractMetadata
 
 # Detailed EBV features (following Fuster et al. methodology)
-features_schema = DatasetFeatureExtraction
+features_schema = DatasetFeaturesExtraction
 
 # High-level metadata for quick categorization
 metadata_schema = DatasetAbstractMetadata
@@ -213,7 +213,7 @@ store.upsert_chunks(chunks, embeddings)
 
 ```python
 from llm_metadata.gpt_extract import extract_from_text
-from llm_metadata.schemas.fuster_features import DatasetFeatures
+from llm_metadata.schemas.fuster_features import DatasetFeaturesExtraction
 
 text = """
 We monitored caribou populations in northern Quebec from 1999 to 2015
@@ -224,7 +224,7 @@ habitat use data for 45 individuals across three herds.
 # Extract detailed EBV features from arbitrary text
 result = extract_from_text(
     text,
-    text_format=DatasetFeatures,
+    text_format=DatasetFeaturesExtraction,
 )
 
 features = result['output']
@@ -260,14 +260,14 @@ print(artifact.records[0].status)
 
 ```python
 from llm_metadata.schemas.validation import DataFrameValidator
-from llm_metadata.schemas.fuster_features import DatasetFeatureExtraction
+from llm_metadata.schemas.fuster_features import DatasetFeaturesNormalized
 import pandas as pd
 
 # Load manual annotations
 df = pd.read_excel("data/dataset_092624.xlsx")
 
 # Validate against Pydantic schema
-validator = DataFrameValidator(DatasetFeatureExtraction)
+validator = DataFrameValidator(DatasetFeaturesNormalized)
 validation_result = validator.validate_dataframe(df)
 
 if validation_result.is_valid:
