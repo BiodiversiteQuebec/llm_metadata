@@ -65,6 +65,8 @@ class TestDatasetFeaturesEvaluationAssembly:
         assert enriched.taxon_richness_mentions is not None
         assert enriched.taxon_richness_counts == [73]
         assert enriched.taxon_richness_group_keys == ["73|weevil"]
+        assert enriched.species_stripped_richness is None
+        assert enriched.gbif_key_stripped_richness is None
 
     def test_evaluation_model_defaults_to_none_gbif_keys(self):
         model = DatasetFeaturesEvaluation()

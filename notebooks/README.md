@@ -1507,6 +1507,11 @@ Goal : Manual deep dive into the Fuster dataset to understand the data and its s
 - **Parsing extensions:** expanded `species_parsing.py` with `TaxonRichnessMention`, group normalization, count-bearing richness parsing, and projection helpers
 - **Notebook workflow:** loads a saved `RunArtifact` or older `prompt_eval_reports/*.json`, rebuilds aligned GT/pred dictionaries, enriches both sides with derived taxonomic views, evaluates a field subset, and frames the analysis/discussion explicitly around the mismatch problem
 - **Model hierarchy follow-up:** updated the notebook to load predictions as `DatasetFeaturesExtraction` and describe derived comparison views as `DatasetFeaturesEvaluation`-only fields after the model split
+- **Notebook framing update:** expanded the introduction with concrete GT-vs-prediction examples (coarse groups, richness summaries, scientific vs vernacular naming, community labels) so the evaluation problem is explicit before the metrics
+- **Notebook documentation update:** added per-table explanatory paragraphs describing how each strategy dataframe is calculated, including metric aggregation, mismatch filtering, derived-view inspection tables, and recovery-bucket summaries
+- **Notebook interpretation update:** revised the analysis/discussion to make the comparison coverage-aware, distinguish whole-dataset relevance strategies from residue-only diagnostics, and state the current recommendation more explicitly
+- **New stripped-richness strategies:** added `species_stripped_richness` (split on common delimiters, then drop any fragment containing numbers entirely) and `gbif_key_stripped_richness` (same filtered residue resolved to GBIF backbone keys when possible and compared exactly)
+- **Strategy applicability update:** `species_stripped_richness` now skips records unless the ground-truth side retains stripped residue, and `gbif_key_stripped_richness` skips records unless both sides resolve at least one stripped-residue GBIF key
 - **Second derivation:** added a broad-group projection derived from explicit group mentions plus GBIF hierarchy mappings for enumerated predictions
 - **Tests:** added focused parsing and evaluation coverage in `tests/test_species_parsing.py` and `tests/test_taxonomy_eval.py`
 
@@ -1514,12 +1519,16 @@ Goal : Manual deep dive into the Fuster dataset to understand the data and its s
 - Raw `species` is no longer the only taxonomic comparison surface in notebook experiments
 - New derived fields support side-by-side comparison of:
   - raw string matching (`species`)
+  - non-richness residue only (`species_stripped_richness`)
+  - GBIF-key normalized non-richness residue (`gbif_key_stripped_richness`)
   - count-only relevance signal (`taxon_richness_counts`)
   - count + normalized group signal (`taxon_richness_group_keys`)
   - broad relevance-oriented group labels (`taxon_broad_group_labels`)
   - taxon identity via enrichment (`gbif_keys`)
 - Executed notebook on `20260305_135009_dev_subset_pdf_file`:
   - `species`: F1 `0.217`
+  - `species_stripped_richness`: F1 `0.567` on `23` applicable records
+  - `gbif_key_stripped_richness`: F1 `0.864` on `13` applicable records
   - `taxon_richness_counts`: F1 `0.516`
   - `taxon_richness_group_keys`: no matches
   - `taxon_broad_group_labels`: F1 `0.542`
@@ -1530,9 +1539,13 @@ Goal : Manual deep dive into the Fuster dataset to understand the data and its s
 
 **Key Issues Identified:**
 - `taxon_richness_counts` helps with count-vs-enumeration mismatches, but it intentionally discards group identity when predictions do not emit explicit group counts
+- `species_stripped_richness` is much more interpretable once GT-gated, but the strict fragment-drop rule can still leave non-taxon residue such as `others)` or `analysed` when those fragments contain no digits
+- `gbif_key_stripped_richness` becomes the strongest subset strategy once applicability is enforced, but its high F1 is on a narrow set of resolvable residue-bearing records rather than the full 30-record subset
+- The stripped-richness metrics are now computed on applicable records only, which is the correct denominator for these strategies but means their `n` is not directly comparable to strategies evaluated on all 30 records
 - `taxon_richness_group_keys` remains strict and will not rescue cases where the prediction enumerates taxa but never states the broader group label
-- `taxon_broad_group_labels` is the strongest relevance-oriented derivation so far, but it is deliberately looser and can over-match broad categories
+- `taxon_broad_group_labels` remains the strongest relevance-oriented derivation evaluated on all 30 records, but it is deliberately looser and can over-match broad categories
 - `gbif_keys` addresses vernacular/scientific equivalence, but not coarse-group or richness-only annotations
+- The current discussion now treats `taxon_broad_group_labels` as the most defensible whole-run relevance view on this slice, while keeping stripped-richness strategies as narrower diagnostic tools rather than headline replacements
 
 **Next Steps:**
 - Audit the `taxon_broad_group_labels` false positives to decide whether the GBIF-to-group mapping is too permissive

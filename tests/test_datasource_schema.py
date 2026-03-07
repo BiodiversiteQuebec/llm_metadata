@@ -77,6 +77,8 @@ class TestExtractionSchemaIsSemanticOnly:
             "taxon_richness_counts",
             "taxon_richness_group_keys",
             "taxon_broad_group_labels",
+            "species_stripped_richness",
+            "gbif_key_stripped_richness",
             "gbif_keys",
         ):
             assert field_name not in props

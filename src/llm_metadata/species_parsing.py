@@ -48,6 +48,11 @@ _GROUP_STOPWORDS_RE = re.compile(
     re.IGNORECASE,
 )
 _WHITESPACE_RE = re.compile(r"\s+")
+_COMMON_DELIMITER_RE = re.compile(r"\s*(?:,|;|/|\||&|\+|\band\b)\s*", re.IGNORECASE)
+_NUMERIC_FRAGMENT_RE = re.compile(
+    r"\b(?:(?:c(?:irca)?\.?|ca\.?|approx(?:\.|imately)?|about|around)\s*)?\d+(?:\.\d+)?\b",
+    re.IGNORECASE,
+)
 
 
 def _strip_count(s: str) -> tuple[str, Optional[int]]:
@@ -328,6 +333,46 @@ def project_taxon_richness_group_keys(
         }
     )
     return keys or None
+
+
+def project_species_stripped_richness(
+    species: Optional[Sequence[str]],
+) -> Optional[list[str]]:
+    """Project species strings into taxon labels after dropping count-bearing fragments.
+
+    Pipeline:
+    1. Split each raw item on common delimiters such as commas, semicolons, slashes, and "and".
+    2. Drop any delimited part that contains a numeric richness/count signal.
+    3. Collapse whitespace and drop empty parts.
+
+    Examples:
+        ["73 weevil species"] -> None
+        ["c.32 ground-dwelling beetles, Acer saccharum"] -> ["Acer saccharum"]
+    """
+    if not species:
+        return None
+
+    out: list[str] = []
+    seen: set[str] = set()
+
+    for item in species:
+        if not isinstance(item, str) or not item.strip():
+            continue
+        parts = _COMMON_DELIMITER_RE.split(item.strip())
+        for part in parts:
+            if _NUMERIC_FRAGMENT_RE.search(part):
+                continue
+            cleaned = part
+            cleaned = _WHITESPACE_RE.sub(" ", cleaned).strip(" ,.;:-")
+            if not cleaned or not re.search(r"[A-Za-z]", cleaned):
+                continue
+            dedupe_key = cleaned.casefold()
+            if dedupe_key in seen:
+                continue
+            seen.add(dedupe_key)
+            out.append(cleaned)
+
+    return out or None
 
 
 class ParsedTaxon(BaseModel):

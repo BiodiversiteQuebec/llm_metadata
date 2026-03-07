@@ -15,6 +15,7 @@ from llm_metadata.species_parsing import (
     TaxonRichnessMention,
     extract_parsed_taxa,
     extract_taxon_richness_mentions,
+    project_species_stripped_richness,
     project_taxon_richness_counts,
     project_taxon_richness_group_keys,
 )
@@ -516,6 +517,16 @@ class DatasetFeaturesEvaluation(CoreFeatureModel):
         None,
         description="Broad taxonomic group labels derived during preprocessing.",
     )
+    species_stripped_richness: Optional[list[str]] = Field(
+        None,
+        description="Species strings split on common delimiters with count/richness fragments removed.",
+    )
+    gbif_key_stripped_richness: Optional[list[int]] = Field(
+        None,
+        description=(
+            "GBIF backbone taxon keys resolved from the richness-stripped species residue."
+        ),
+    )
     gbif_keys: Optional[list[int]] = Field(
         None,
         description="GBIF backbone taxon keys resolved from the species field.",
@@ -546,6 +557,8 @@ class DatasetFeaturesEvaluation(CoreFeatureModel):
         taxon_richness_counts: Optional[list[int]] = None,
         taxon_richness_group_keys: Optional[list[str]] = None,
         taxon_broad_group_labels: Optional[list[str]] = None,
+        species_stripped_richness: Optional[list[str]] = None,
+        gbif_key_stripped_richness: Optional[list[int]] = None,
         gbif_keys: Optional[list[int]] = None,
     ) -> "DatasetFeaturesEvaluation":
         species = getattr(model, "species", None)
@@ -570,6 +583,12 @@ class DatasetFeaturesEvaluation(CoreFeatureModel):
                     else project_taxon_richness_group_keys(mentions)
                 ),
                 "taxon_broad_group_labels": taxon_broad_group_labels,
+                "species_stripped_richness": (
+                    species_stripped_richness
+                    if species_stripped_richness is not None
+                    else project_species_stripped_richness(species)
+                ),
+                "gbif_key_stripped_richness": gbif_key_stripped_richness,
                 "gbif_keys": gbif_keys if gbif_keys is not None else cls._gbif_keys_from_payload(gbif),
             }
         )

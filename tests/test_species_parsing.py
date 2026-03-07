@@ -10,6 +10,7 @@ from llm_metadata.species_parsing import (
     normalize_taxon_group,
     parse_species_string,
     parse_taxon_richness,
+    project_species_stripped_richness,
     project_taxon_richness_counts,
     project_taxon_richness_group_keys,
 )
@@ -217,3 +218,15 @@ class TestTaxonRichnessProjection:
         )
         keys = project_taxon_richness_group_keys(mentions)
         assert keys == ["240|flying-beetle", "73|weevil"]
+
+    def test_project_species_stripped_richness_drops_numeric_fragments(self):
+        stripped = project_species_stripped_richness(
+            ["73 weevil species", "c.32 ground-dwelling beetles, Acer saccharum"]
+        )
+        assert stripped == ["Acer saccharum"]
+
+    def test_project_species_stripped_richness_splits_common_delimiters(self):
+        stripped = project_species_stripped_richness(
+            ["Caribou; moose and wolves / bears"]
+        )
+        assert stripped == ["Caribou", "moose", "wolves", "bears"]

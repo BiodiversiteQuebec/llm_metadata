@@ -39,10 +39,16 @@ class FieldEvalStrategy:
 			- "enhanced_species": Enhanced vernacular/scientific name matching using `threshold`.
 		threshold: Similarity threshold (0-100) used by "fuzzy" and "enhanced_species" algorithms.
 			Default: 80. Lower values are more permissive.
+		applicability: Whether to score all records or only records where the field has usable values.
+			- "always": score every record.
+			- "true_present": score only when the ground-truth side has a non-empty value.
+			- "any_present": score only when at least one side has a non-empty value.
+			- "both_present": score only when both sides have non-empty values.
 	"""
 
 	match: str = "exact"
 	threshold: int = 80
+	applicability: str = "always"
 
 
 @dataclass(frozen=True)
@@ -129,7 +135,7 @@ class EvaluationConfig:
 				for k, v in self.fuzzy_match_fields.items()
 			},
 			"field_strategies": {
-				k: {"match": v.match, "threshold": v.threshold}
+				k: {"match": v.match, "threshold": v.threshold, "applicability": v.applicability}
 				for k, v in self.field_strategies.items()
 			},
 		}
@@ -143,7 +149,11 @@ class EvaluationConfig:
 			for k, v in d.get("fuzzy_match_fields", {}).items()
 		}
 		field_strategies = {
-			k: FieldEvalStrategy(match=v["match"], threshold=v.get("threshold", 80))
+			k: FieldEvalStrategy(
+				match=v["match"],
+				threshold=v.get("threshold", 80),
+				applicability=v.get("applicability", "always"),
+			)
 			for k, v in d.get("field_strategies", {}).items()
 		}
 		return cls(
@@ -532,6 +542,17 @@ def _is_set_like(value: Any) -> bool:
 	return isinstance(value, (set, frozenset))
 
 
+def _has_comparable_value(value: Any) -> bool:
+	"""Return True when a value contains something that should be scored."""
+	if value is None:
+		return False
+	if isinstance(value, str):
+		return bool(value.strip())
+	if isinstance(value, (list, tuple, set, frozenset)):
+		return any(_has_comparable_value(item) for item in value)
+	return True
+
+
 def compare_models(
 	*,
 	true_model: BaseModel,
@@ -568,6 +589,15 @@ def compare_models(
 		# --- Strategy-registry dispatch (takes priority when field_strategies is populated) ---
 		if config.field_strategies:
 			strategy = config.field_strategies[field]
+			true_present = _has_comparable_value(true_raw)
+			pred_present = _has_comparable_value(pred_raw)
+
+			if strategy.applicability == "true_present" and not true_present:
+				continue
+			if strategy.applicability == "any_present" and not (true_present or pred_present):
+				continue
+			if strategy.applicability == "both_present" and not (true_present and pred_present):
+				continue
 
 			if strategy.match == "enhanced_species":
 				if isinstance(true_raw, (list, tuple)) or isinstance(pred_raw, (list, tuple)):
