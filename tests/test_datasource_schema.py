@@ -73,12 +73,10 @@ class TestExtractionSchemaIsSemanticOnly:
         props = schema["properties"]
         for field_name in (
             "parsed_species",
-            "taxon_richness_mentions",
-            "taxon_richness_counts",
-            "taxon_richness_group_keys",
+            "species_richness_mentions",
+            "species_richness_counts",
+            "species_richness_group_keys",
             "taxon_broad_group_labels",
-            "species_stripped_richness",
-            "gbif_key_stripped_richness",
             "gbif_keys",
         ):
             assert field_name not in props

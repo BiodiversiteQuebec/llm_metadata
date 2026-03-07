@@ -4,6 +4,35 @@ This folder contains analysis and validation notebooks for ecological dataset ch
 
 ## Recent Activity
 
+### 2026-03-07: Taxonomy Eval Cleanup, Rename & Notebook Archive
+
+**Task:** Walk back over-committed taxonomy experiment scaffolding, fix field naming, archive notebook while preserving observations.
+
+**Work Performed:**
+- Removed `species_stripped_richness` and `gbif_key_stripped_richness` fields from `DatasetFeaturesEvaluation` and `DEFAULT_TAXONOMY_FIELD_STRATEGIES` — these were experimental fields from the taxonomy notebook that proved under-designed
+- Removed `project_gbif_key_stripped_richness()` function and double GBIF resolution path in `enrich_with_taxonomy()`
+- Removed `applicability` concept from `FieldEvalStrategy` — silent skip with no introspection was under-designed; if needed later, should be re-implemented with proper reporting
+- Renamed eval-facing fields: `taxon_richness_mentions` → `species_richness_mentions`, `taxon_richness_counts` → `species_richness_counts`, `taxon_richness_group_keys` → `species_richness_group_keys`
+- Renamed corresponding functions: `extract_taxon_richness_mentions` → `extract_species_richness_mentions`, `project_taxon_richness_counts` → `project_species_richness_counts`, `project_taxon_richness_group_keys` → `project_species_richness_group_keys`
+- Internal model class names (`TaxonRichnessMention`, `ParsedTaxon`) kept unchanged — they represent taxonomic concepts, not eval views
+- Archived `taxonomic_relevance_evaluation.ipynb` to `notebooks/archives/`, created clean version keeping problem description, analysis, discussion, and personal observations
+- Updated all tests (65 pass)
+
+**Results:**
+- `DEFAULT_TAXONOMY_FIELD_STRATEGIES` now contains 5 fields: `species`, `species_richness_counts`, `species_richness_group_keys`, `taxon_broad_group_labels`, `gbif_keys`
+- `DatasetFeaturesEvaluation` no longer carries experimental stripped-richness fields
+- `project_species_stripped_richness()` kept as utility in `species_parsing.py` for future notebook use
+
+**Key Learnings from Archived Notebook:**
+- GT species values encode 3 distinct signals: species richness, taxonomic identity, and group membership
+- `taxon_broad_group_labels` is the strongest relevance-oriented view for whole-dataset screening
+- Extraction prompt needs improvement to reduce non-taxon goop in species output ("analysed", "others)")
+- Taxonomic signals should be evaluated independently, not collapsed into one metric
+
+**Next Steps:**
+- Phase D: Improve species extraction prompt to reduce non-taxon goop, run prompt_eval comparison
+- Phase E (if needed): Add `species_richness` as structured field on `DatasetFeaturesExtraction`
+
 ### 2026-03-06: Model Hierarchy & Enrichment Refactor
 
 **Task:** Split the overloaded `DatasetFeatures` contract into extraction, ground-truth normalization, and evaluation-time models so source metadata and enrichment fields no longer leak into the LLM schema.

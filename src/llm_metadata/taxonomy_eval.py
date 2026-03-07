@@ -22,25 +22,18 @@ from llm_metadata.schemas.fuster_features import (
 )
 from llm_metadata.species_parsing import (
     extract_parsed_taxa,
-    extract_taxon_richness_mentions,
+    extract_species_richness_mentions,
     normalize_taxon_group,
-    project_species_stripped_richness,
-    project_taxon_richness_counts,
-    project_taxon_richness_group_keys,
+    project_species_richness_counts,
+    project_species_richness_group_keys,
 )
 
 _LIST_COLS = ["data_type", "geospatial_info_dataset", "species"]
 
 DEFAULT_TAXONOMY_FIELD_STRATEGIES: dict[str, FieldEvalStrategy] = {
     "species": FieldEvalStrategy(match="enhanced_species", threshold=70),
-    "species_stripped_richness": FieldEvalStrategy(
-        match="enhanced_species",
-        threshold=70,
-        applicability="true_present",
-    ),
-    "gbif_key_stripped_richness": FieldEvalStrategy(match="exact", applicability="both_present"),
-    "taxon_richness_counts": FieldEvalStrategy(match="exact"),
-    "taxon_richness_group_keys": FieldEvalStrategy(match="exact"),
+    "species_richness_counts": FieldEvalStrategy(match="exact"),
+    "species_richness_group_keys": FieldEvalStrategy(match="exact"),
     "taxon_broad_group_labels": FieldEvalStrategy(match="exact"),
     "gbif_keys": FieldEvalStrategy(match="exact"),
 }
@@ -144,7 +137,7 @@ def project_taxon_broad_group_labels(
     labels: set[str] = set()
 
     parsed_species = extract_parsed_taxa(model.species) or []
-    richness_mentions = extract_taxon_richness_mentions(model.species) or []
+    richness_mentions = extract_species_richness_mentions(model.species) or []
 
     for mention in richness_mentions:
         if mention.normalized_group:
@@ -183,39 +176,6 @@ def project_taxon_broad_group_labels(
     return sorted(labels) or None
 
 
-def project_gbif_key_stripped_richness(
-    stripped_species: Optional[Collection[str]],
-    *,
-    confidence_threshold: int = 80,
-    accept_higherrank: bool = True,
-    resolved_taxa: Optional[list[ResolvedTaxon]] = None,
-) -> Optional[list[int]]:
-    """Resolve richness-stripped species residue to GBIF backbone keys."""
-    if not stripped_species:
-        return None
-
-    stripped_list = [item for item in stripped_species if isinstance(item, str) and item.strip()]
-    if not stripped_list:
-        return None
-
-    payload = resolved_taxa
-    if payload is None:
-        payload = resolve_species_list(
-            stripped_list,
-            confidence_threshold=confidence_threshold,
-            accept_higherrank=accept_higherrank,
-        )
-
-    keys: set[int] = set()
-    for resolved in payload:
-        match = resolved.gbif_match
-        if match is None:
-            continue
-        keys.add(match.gbif_key)
-
-    return sorted(keys) or None
-
-
 def enrich_with_taxonomy(
     model: CoreFeatureModel,
     *,
@@ -225,20 +185,12 @@ def enrich_with_taxonomy(
 ) -> DatasetFeaturesEvaluation:
     """Build an evaluation model populated with taxonomy-derived fields."""
     parsed_species = extract_parsed_taxa(model.species)
-    richness_mentions = extract_taxon_richness_mentions(model.species)
-    stripped_species = project_species_stripped_richness(model.species)
+    richness_mentions = extract_species_richness_mentions(model.species)
     resolved_taxa: Optional[list[ResolvedTaxon]] = None
-    stripped_resolved_taxa: Optional[list[ResolvedTaxon]] = None
 
     if include_gbif and model.species:
         resolved_taxa = resolve_species_list(
             list(model.species),
-            confidence_threshold=gbif_confidence_threshold,
-            accept_higherrank=accept_higherrank,
-        )
-    if include_gbif and stripped_species:
-        stripped_resolved_taxa = resolve_species_list(
-            list(stripped_species),
             confidence_threshold=gbif_confidence_threshold,
             accept_higherrank=accept_higherrank,
         )
@@ -255,19 +207,10 @@ def enrich_with_taxonomy(
         model,
         gbif=resolved_taxa,
         parsed_species=parsed_species,
-        taxon_richness_mentions=richness_mentions,
-        taxon_richness_counts=project_taxon_richness_counts(model.species, richness_mentions),
-        taxon_richness_group_keys=project_taxon_richness_group_keys(richness_mentions),
+        species_richness_mentions=richness_mentions,
+        species_richness_counts=project_species_richness_counts(model.species, richness_mentions),
+        species_richness_group_keys=project_species_richness_group_keys(richness_mentions),
         taxon_broad_group_labels=broad_group_labels,
-        species_stripped_richness=stripped_species,
-        gbif_key_stripped_richness=project_gbif_key_stripped_richness(
-            stripped_species,
-            confidence_threshold=gbif_confidence_threshold,
-            accept_higherrank=accept_higherrank,
-            resolved_taxa=stripped_resolved_taxa,
-        )
-        if include_gbif
-        else None,
     )
 
 

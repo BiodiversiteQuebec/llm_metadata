@@ -14,10 +14,9 @@ from llm_metadata.species_parsing import (
     ParsedTaxon,
     TaxonRichnessMention,
     extract_parsed_taxa,
-    extract_taxon_richness_mentions,
-    project_species_stripped_richness,
-    project_taxon_richness_counts,
-    project_taxon_richness_group_keys,
+    extract_species_richness_mentions,
+    project_species_richness_counts,
+    project_species_richness_group_keys,
 )
 
 if TYPE_CHECKING:
@@ -501,31 +500,21 @@ class DatasetFeaturesEvaluation(CoreFeatureModel):
         None,
         description="Structured parse of the raw species field. Populated during evaluation preprocessing.",
     )
-    taxon_richness_mentions: Optional[list[TaxonRichnessMention]] = Field(
+    species_richness_mentions: Optional[list[TaxonRichnessMention]] = Field(
         None,
         description="Structured count-bearing taxonomic mentions parsed from species.",
     )
-    taxon_richness_counts: Optional[list[int]] = Field(
+    species_richness_counts: Optional[list[int]] = Field(
         None,
         description="Comparison-oriented projection of taxonomic richness counts.",
     )
-    taxon_richness_group_keys: Optional[list[str]] = Field(
+    species_richness_group_keys: Optional[list[str]] = Field(
         None,
         description="Comparison-oriented projection formatted as '<count>|<normalized_group>'.",
     )
     taxon_broad_group_labels: Optional[list[str]] = Field(
         None,
         description="Broad taxonomic group labels derived during preprocessing.",
-    )
-    species_stripped_richness: Optional[list[str]] = Field(
-        None,
-        description="Species strings split on common delimiters with count/richness fragments removed.",
-    )
-    gbif_key_stripped_richness: Optional[list[int]] = Field(
-        None,
-        description=(
-            "GBIF backbone taxon keys resolved from the richness-stripped species residue."
-        ),
     )
     gbif_keys: Optional[list[int]] = Field(
         None,
@@ -553,42 +542,34 @@ class DatasetFeaturesEvaluation(CoreFeatureModel):
         *,
         gbif: Optional[Sequence["ResolvedTaxon"]] = None,
         parsed_species: Optional[list[ParsedTaxon]] = None,
-        taxon_richness_mentions: Optional[list[TaxonRichnessMention]] = None,
-        taxon_richness_counts: Optional[list[int]] = None,
-        taxon_richness_group_keys: Optional[list[str]] = None,
+        species_richness_mentions: Optional[list[TaxonRichnessMention]] = None,
+        species_richness_counts: Optional[list[int]] = None,
+        species_richness_group_keys: Optional[list[str]] = None,
         taxon_broad_group_labels: Optional[list[str]] = None,
-        species_stripped_richness: Optional[list[str]] = None,
-        gbif_key_stripped_richness: Optional[list[int]] = None,
         gbif_keys: Optional[list[int]] = None,
     ) -> "DatasetFeaturesEvaluation":
         species = getattr(model, "species", None)
         mentions = (
-            taxon_richness_mentions
-            if taxon_richness_mentions is not None
-            else extract_taxon_richness_mentions(species)
+            species_richness_mentions
+            if species_richness_mentions is not None
+            else extract_species_richness_mentions(species)
         )
         return cls.model_validate(
             {
                 **cls._core_payload(model),
                 "parsed_species": parsed_species if parsed_species is not None else extract_parsed_taxa(species),
-                "taxon_richness_mentions": mentions,
-                "taxon_richness_counts": (
-                    taxon_richness_counts
-                    if taxon_richness_counts is not None
-                    else project_taxon_richness_counts(species, mentions)
+                "species_richness_mentions": mentions,
+                "species_richness_counts": (
+                    species_richness_counts
+                    if species_richness_counts is not None
+                    else project_species_richness_counts(species, mentions)
                 ),
-                "taxon_richness_group_keys": (
-                    taxon_richness_group_keys
-                    if taxon_richness_group_keys is not None
-                    else project_taxon_richness_group_keys(mentions)
+                "species_richness_group_keys": (
+                    species_richness_group_keys
+                    if species_richness_group_keys is not None
+                    else project_species_richness_group_keys(mentions)
                 ),
                 "taxon_broad_group_labels": taxon_broad_group_labels,
-                "species_stripped_richness": (
-                    species_stripped_richness
-                    if species_stripped_richness is not None
-                    else project_species_stripped_richness(species)
-                ),
-                "gbif_key_stripped_richness": gbif_key_stripped_richness,
                 "gbif_keys": gbif_keys if gbif_keys is not None else cls._gbif_keys_from_payload(gbif),
             }
         )

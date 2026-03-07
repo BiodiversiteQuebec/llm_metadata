@@ -62,11 +62,9 @@ class TestDatasetFeaturesEvaluationAssembly:
         extracted = DatasetFeaturesExtraction(species=["73 weevil species"])
         enriched = DatasetFeaturesEvaluation.from_extraction(extracted)
         assert enriched.parsed_species is not None
-        assert enriched.taxon_richness_mentions is not None
-        assert enriched.taxon_richness_counts == [73]
-        assert enriched.taxon_richness_group_keys == ["73|weevil"]
-        assert enriched.species_stripped_richness is None
-        assert enriched.gbif_key_stripped_richness is None
+        assert enriched.species_richness_mentions is not None
+        assert enriched.species_richness_counts == [73]
+        assert enriched.species_richness_group_keys == ["73|weevil"]
 
     def test_evaluation_model_defaults_to_none_gbif_keys(self):
         model = DatasetFeaturesEvaluation()

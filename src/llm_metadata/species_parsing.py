@@ -275,7 +275,7 @@ def extract_parsed_taxa(species: Optional[Sequence[str]]) -> Optional[list["Pars
     return parsed or None
 
 
-def extract_taxon_richness_mentions(
+def extract_species_richness_mentions(
     species: Optional[Sequence[str]],
 ) -> Optional[list["TaxonRichnessMention"]]:
     """Extract only count-bearing taxonomic mentions from a `species` list."""
@@ -291,7 +291,7 @@ def extract_taxon_richness_mentions(
     return mentions or None
 
 
-def project_taxon_richness_counts(
+def project_species_richness_counts(
     species: Optional[Sequence[str]],
     mentions: Optional[Sequence["TaxonRichnessMention"]] = None,
 ) -> Optional[list[int]]:
@@ -305,7 +305,7 @@ def project_taxon_richness_counts(
     that enumerates 73 species names even when no count string was emitted.
     """
     if mentions is None:
-        mentions = extract_taxon_richness_mentions(species)
+        mentions = extract_species_richness_mentions(species)
 
     if mentions:
         counts = sorted({mention.count for mention in mentions if mention.count is not None})
@@ -318,7 +318,7 @@ def project_taxon_richness_counts(
     return [len(cleaned)] if cleaned else None
 
 
-def project_taxon_richness_group_keys(
+def project_species_richness_group_keys(
     mentions: Optional[Sequence["TaxonRichnessMention"]],
 ) -> Optional[list[str]]:
     """Project richness mentions into exact-match comparison keys."""

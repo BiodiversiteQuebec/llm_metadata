@@ -5,14 +5,14 @@ Unit tests for species_parsing module.
 from llm_metadata.species_parsing import (
     ParsedTaxon,
     TaxonRichnessMention,
-    extract_taxon_richness_mentions,
+    extract_species_richness_mentions,
     looks_scientific,
     normalize_taxon_group,
     parse_species_string,
     parse_taxon_richness,
+    project_species_richness_counts,
+    project_species_richness_group_keys,
     project_species_stripped_richness,
-    project_taxon_richness_counts,
-    project_taxon_richness_group_keys,
 )
 
 
@@ -194,29 +194,29 @@ class TestTaxonRichnessMention:
 class TestTaxonRichnessProjection:
 
     def test_extract_count_bearing_mentions(self):
-        mentions = extract_taxon_richness_mentions(
+        mentions = extract_species_richness_mentions(
             ["73 weevil species", "Tamias striatus", "240 flying-beetles species"]
         )
         assert mentions is not None
         assert [mention.count for mention in mentions] == [73, 240]
 
     def test_project_counts_prefers_explicit_counts(self):
-        counts = project_taxon_richness_counts(
+        counts = project_species_richness_counts(
             ["73 weevil species", "240 flying-beetles species"]
         )
         assert counts == [73, 240]
 
     def test_project_counts_falls_back_to_species_list_length(self):
-        counts = project_taxon_richness_counts(
+        counts = project_species_richness_counts(
             ["Tamias striatus", "Rangifer tarandus", "Glyptemys insculpta"]
         )
         assert counts == [3]
 
     def test_project_group_keys(self):
-        mentions = extract_taxon_richness_mentions(
+        mentions = extract_species_richness_mentions(
             ["73 weevil species", "240 flying-beetles species"]
         )
-        keys = project_taxon_richness_group_keys(mentions)
+        keys = project_species_richness_group_keys(mentions)
         assert keys == ["240|flying-beetle", "73|weevil"]
 
     def test_project_species_stripped_richness_drops_numeric_fragments(self):

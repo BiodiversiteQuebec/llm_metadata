@@ -22,12 +22,10 @@ class TestEnrichWithTaxonomy:
 
         assert isinstance(enriched, DatasetFeaturesEvaluation)
         assert enriched.parsed_species is not None
-        assert enriched.taxon_richness_mentions is not None
-        assert enriched.taxon_richness_counts == [73]
-        assert enriched.taxon_richness_group_keys == ["73|weevil"]
+        assert enriched.species_richness_mentions is not None
+        assert enriched.species_richness_counts == [73]
+        assert enriched.species_richness_group_keys == ["73|weevil"]
         assert enriched.taxon_broad_group_labels == ["weevil"]
-        assert enriched.species_stripped_richness == ["Tamias striatus"]
-        assert enriched.gbif_key_stripped_richness is None
         assert enriched.gbif_keys is None
 
     def test_falls_back_to_species_list_length(self):
@@ -35,9 +33,9 @@ class TestEnrichWithTaxonomy:
 
         enriched = enrich_with_taxonomy(model, include_gbif=False)
 
-        assert enriched.taxon_richness_mentions is None
-        assert enriched.taxon_richness_counts == [2]
-        assert enriched.taxon_richness_group_keys is None
+        assert enriched.species_richness_mentions is None
+        assert enriched.species_richness_counts == [2]
+        assert enriched.species_richness_group_keys is None
 
     def test_can_derive_broad_groups_from_gbif_taxonomy(self, monkeypatch: pytest.MonkeyPatch):
         model = DatasetFeaturesExtraction(species=["Tamias striatus"])
@@ -76,12 +74,10 @@ class TestBuildTaxonomyEvalConfig:
         config = build_taxonomy_eval_config()
         assert isinstance(config, EvaluationConfig)
         assert set(config.field_strategies.keys()) == set(DEFAULT_TAXONOMY_FIELDS)
-        assert config.field_strategies["species_stripped_richness"].applicability == "true_present"
-        assert config.field_strategies["gbif_key_stripped_richness"].applicability == "both_present"
 
     def test_can_focus_to_subset(self):
-        config = build_taxonomy_eval_config(["taxon_richness_counts"])
-        assert list(config.field_strategies.keys()) == ["taxon_richness_counts"]
+        config = build_taxonomy_eval_config(["species_richness_counts"])
+        assert list(config.field_strategies.keys()) == ["species_richness_counts"]
 
 
 class TestEvaluateTaxonomyFields:
@@ -96,177 +92,14 @@ class TestEvaluateTaxonomyFields:
         report = evaluate_taxonomy_fields(
             true_by_id=true_by_id,
             pred_by_id=pred_by_id,
-            fields=["taxon_richness_counts"],
+            fields=["species_richness_counts"],
             include_gbif=False,
         )
 
-        metrics = report.metrics_for("taxon_richness_counts")
+        metrics = report.metrics_for("species_richness_counts")
         assert metrics.tp == 1
         assert metrics.fp == 0
         assert metrics.fn == 0
-
-    def test_species_stripped_richness_keeps_non_numeric_fragments_only(self):
-        true_by_id = {
-            "1": DatasetFeaturesExtraction(species=["c.32 ground-dwelling beetles, Acer saccharum"]),
-        }
-        pred_by_id = {
-            "1": DatasetFeaturesExtraction(species=["Acer saccharum"]),
-        }
-
-        report = evaluate_taxonomy_fields(
-            true_by_id=true_by_id,
-            pred_by_id=pred_by_id,
-            fields=["species_stripped_richness"],
-            include_gbif=False,
-        )
-
-        metrics = report.metrics_for("species_stripped_richness")
-        assert metrics.tp == 1
-        assert metrics.fp == 0
-        assert metrics.fn == 0
-        assert metrics.n == 1
-
-    def test_species_stripped_richness_skips_when_both_sides_strip_to_none(self):
-        true_by_id = {
-            "1": DatasetFeaturesExtraction(species=["73 weevil species"]),
-        }
-        pred_by_id = {
-            "1": DatasetFeaturesExtraction(species=["30 bird species"]),
-        }
-
-        report = evaluate_taxonomy_fields(
-            true_by_id=true_by_id,
-            pred_by_id=pred_by_id,
-            fields=["species_stripped_richness"],
-            include_gbif=False,
-        )
-
-        assert "species_stripped_richness" not in report.field_metrics
-
-    def test_species_stripped_richness_skips_when_true_side_strips_to_none(self):
-        true_by_id = {
-            "1": DatasetFeaturesExtraction(species=["73 weevil species"]),
-        }
-        pred_by_id = {
-            "1": DatasetFeaturesExtraction(species=["Acer saccharum"]),
-        }
-
-        report = evaluate_taxonomy_fields(
-            true_by_id=true_by_id,
-            pred_by_id=pred_by_id,
-            fields=["species_stripped_richness"],
-            include_gbif=False,
-        )
-
-        assert "species_stripped_richness" not in report.field_metrics
-
-    def test_gbif_key_stripped_richness_uses_resolved_keys(self, monkeypatch: pytest.MonkeyPatch):
-        def fake_resolve_species_list(species, confidence_threshold=80, accept_higherrank=True):
-            resolved = []
-            for item in species:
-                if item.lower() in {"caribou", "rangifer tarandus"}:
-                    resolved.append(
-                        ResolvedTaxon(
-                            original=item,
-                            parsed=ParsedTaxon.model_validate(item),
-                            gbif_match=GBIFMatch(
-                                gbif_key=2435099,
-                                scientific_name="Rangifer tarandus",
-                                canonical_name="Rangifer tarandus",
-                                rank="SPECIES",
-                                confidence=100,
-                                match_type="EXACT",
-                                kingdom="Animalia",
-                                phylum="Chordata",
-                                class_name="MAMMALIA",
-                                order="ARTIODACTYLA",
-                                family="CERVIDAE",
-                                genus="Rangifer",
-                            ),
-                        )
-                    )
-                else:
-                    resolved.append(
-                        ResolvedTaxon(
-                            original=item,
-                            parsed=ParsedTaxon.model_validate(item),
-                            gbif_match=None,
-                        )
-                    )
-            return resolved
-
-        monkeypatch.setattr("llm_metadata.taxonomy_eval.resolve_species_list", fake_resolve_species_list)
-        true_by_id = {
-            "1": DatasetFeaturesExtraction(species=["Caribou"]),
-        }
-        pred_by_id = {
-            "1": DatasetFeaturesExtraction(species=["Rangifer tarandus"]),
-        }
-
-        report = evaluate_taxonomy_fields(
-            true_by_id=true_by_id,
-            pred_by_id=pred_by_id,
-            fields=["gbif_key_stripped_richness"],
-            include_gbif=True,
-        )
-
-        metrics = report.metrics_for("gbif_key_stripped_richness")
-        assert metrics.tp == 1
-        assert metrics.fp == 0
-        assert metrics.fn == 0
-        assert metrics.n == 1
-
-    def test_gbif_key_stripped_richness_skips_when_only_one_side_has_keys(self, monkeypatch: pytest.MonkeyPatch):
-        def fake_resolve_species_list(species, confidence_threshold=80, accept_higherrank=True):
-            resolved = []
-            for item in species:
-                if item.lower() == "caribou":
-                    resolved.append(
-                        ResolvedTaxon(
-                            original=item,
-                            parsed=ParsedTaxon.model_validate(item),
-                            gbif_match=GBIFMatch(
-                                gbif_key=2435099,
-                                scientific_name="Rangifer tarandus",
-                                canonical_name="Rangifer tarandus",
-                                rank="SPECIES",
-                                confidence=100,
-                                match_type="EXACT",
-                                kingdom="Animalia",
-                                phylum="Chordata",
-                                class_name="MAMMALIA",
-                                order="ARTIODACTYLA",
-                                family="CERVIDAE",
-                                genus="Rangifer",
-                            ),
-                        )
-                    )
-                else:
-                    resolved.append(
-                        ResolvedTaxon(
-                            original=item,
-                            parsed=ParsedTaxon.model_validate(item),
-                            gbif_match=None,
-                        )
-                    )
-            return resolved
-
-        monkeypatch.setattr("llm_metadata.taxonomy_eval.resolve_species_list", fake_resolve_species_list)
-        true_by_id = {
-            "1": DatasetFeaturesExtraction(species=["Caribou"]),
-        }
-        pred_by_id = {
-            "1": DatasetFeaturesExtraction(species=["unresolved residue"]),
-        }
-
-        report = evaluate_taxonomy_fields(
-            true_by_id=true_by_id,
-            pred_by_id=pred_by_id,
-            fields=["gbif_key_stripped_richness"],
-            include_gbif=True,
-        )
-
-        assert "gbif_key_stripped_richness" not in report.field_metrics
 
     def test_group_keys_are_evaluated_as_exact_projected_fields(self):
         true_by_id = {
@@ -279,11 +112,11 @@ class TestEvaluateTaxonomyFields:
         report = evaluate_taxonomy_fields(
             true_by_id=true_by_id,
             pred_by_id=pred_by_id,
-            fields=["taxon_richness_group_keys"],
+            fields=["species_richness_group_keys"],
             include_gbif=False,
         )
 
-        metrics = report.metrics_for("taxon_richness_group_keys")
+        metrics = report.metrics_for("species_richness_group_keys")
         assert metrics.tp == 1
         assert metrics.fp == 0
         assert metrics.fn == 0
