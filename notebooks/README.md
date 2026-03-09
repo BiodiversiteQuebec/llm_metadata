@@ -4,6 +4,34 @@ This folder contains analysis and validation notebooks for ecological dataset ch
 
 ## Recent Activity
 
+### 2026-03-09: Claim Grounding Pilot Design (WU-E1)
+
+**Task:** Define a notebook-first claim-grounding pilot that is reviewable without fresh API calls and narrows the scope to the first five dev-subset records plus the three mismatch-heavy fields.
+
+**Work Performed:**
+- **Notebook:** `notebooks/claim_grounding_pilot.ipynb`
+- Fixed the pilot inputs to the first five rows of `data/dev_subset.csv` (GT ids `9`, `19`, `27`, `29`, `30`)
+- Bound the notebook to the saved PDF-file run artifact `artifacts/runs/20260306_124634_dev_subset_pdf_file.json` so GT versus prediction comparison is reproducible offline
+- Restricted the review surface to `geospatial_info_dataset`, `data_type`, and `species`
+- Built a side-by-side atomic-claim comparison table with `match`, GT claim columns, prediction claim columns, and draft grounding slots (`support_type`, `quote`, `rationale`) for each side
+- Added lightweight lexical grounding heuristics in the notebook as a pilot-only placeholder so the table is immediately reviewable before WU-E2 introduces the proper LLM grounding pass
+- Added notebook-first exploration views: bucket summaries, support-type summaries, and curated record examples for ids `9`, `27`, and `30`
+
+**Results:**
+- The pilot now has a concrete notebook and a stable output shape for the first five-record review
+- The notebook writes a reusable review table to `artifacts/claim_grounding_pilot_first5.csv` when executed
+- The chosen records include the intended mismatch patterns for this work: geospatial over-prediction, `data_type` disagreement, and species naming granularity mismatches
+- The notebook is now easier to inspect directly because it starts with summaries and then jumps into a few representative examples instead of forcing review through the full flat table
+
+**Key Issues Identified:**
+- The notebook grounding is intentionally shallow and should not be treated as an evaluation artifact; it is only a design scaffold for WU-E2
+- Exact atomic-value matching keeps vernacular/scientific variants and enum paraphrases visible, which is useful for diagnosis but will overstate mismatch counts relative to the current evaluation registry
+
+**Next Steps:**
+- Implement WU-E1B as a notebook-only LLM grounding pilot in `notebooks/claim_grounding_from_llm.ipynb`
+- Use WU-E1B findings to finalize WU-E2 atomic claim schemas and prompt builder behavior
+- Reuse the notebook table shape in `prompt_eval` and the viewer so evidence review stays consistent across the stack
+
 ### 2026-03-07: Taxonomy Eval Cleanup, Rename & Notebook Archive
 
 **Task:** Walk back over-committed taxonomy experiment scaffolding, fix field naming, archive notebook while preserving observations.

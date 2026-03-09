@@ -171,9 +171,10 @@ Expected output:
 ## Execution Rounds
 
 Round 1: WU-E0 || WU-E1  
-Round 2: WU-E2  
-Round 3: WU-E3 || WU-E4  
-Round 4: WU-E5
+Round 2: WU-E1B  
+Round 3: WU-E2  
+Round 4: WU-E3 || WU-E4  
+Round 5: WU-E5
 
 #### WU-E0: Research Synthesis `opus`
 
@@ -190,6 +191,64 @@ Round 4: WU-E5
 - Define a notebook-first pilot on the first 5 dev-subset records
 - Restrict scope to `geospatial_info_dataset`, `data_type`, and `species`
 - Produce a comparison table with GT claim grounding and prediction claim grounding
+
+Pilot decisions captured in `notebooks/claim_grounding_pilot.ipynb`:
+
+- Use the first five rows of `data/dev_subset.csv`, which currently resolve to GT record ids `9`, `19`, `27`, `29`, and `30`
+- Use saved PDF-file predictions from `artifacts/runs/20260306_124634_dev_subset_pdf_file.json` so the pilot is runnable without fresh API calls
+- Keep the unit of review as one row per atomic value in the union of GT and prediction claims for the three target fields
+- Materialize a side-by-side comparison table with:
+  - `gt_record_id`, `doi`, `title`, `field`, `target_value`, `match`
+- `gt_value`, `pred_value`
+- `gt_support_type`, `gt_quote`, `gt_rationale`
+- `pred_support_type`, `pred_quote`, `pred_rationale`
+- Treat notebook grounding outputs as lexical pilot candidates only; WU-E2 should replace them with the real claim-grounding pass and preserve the same table shape
+
+#### WU-E1B: Notebook LLM Grounding Pilot `sonnet`
+
+**deps:** WU-E0, WU-E1 | **files:** `notebooks/claim_grounding_from_llm.ipynb`, `plans/claim-grounding.md`
+
+This is a new phase before production code.
+
+Justification:
+
+- The current pilot notebook is useful for table shape and example selection, but it does not answer the real question of whether an LLM can produce claim-conditioned evidence that is better than lexical heuristics
+- A notebook-only LLM pilot lets us test prompt shape, field instructions, and support labels on saved PDF-file runs without prematurely freezing `src/llm_metadata/evidence.py`
+- This de-risks WU-E2 by validating the minimum useful artifact before we commit to production contracts, CLI flags, and viewer integration
+- It also gives us a direct baseline comparison: lexical scaffold versus actual LLM grounding on the same atomic claims
+
+Proposed notebook scope:
+
+- Input records: same first five `dev_subset` rows used in `claim_grounding_pilot.ipynb`
+- Prediction source: `artifacts/runs/20260306_124634_dev_subset_pdf_file.json`
+- Claim sources: run at least `pred`; ideally `gt` and `pred` side by side for the same atomic claims
+- Fields: `geospatial_info_dataset`, `data_type`, `species`
+- Output artifact: notebook-written CSV or parquet in `artifacts/` so the result can be inspected outside the notebook
+
+Proposed notebook-local schema:
+
+```python
+class NotebookGroundingRow(BaseModel):
+    gt_record_id: int
+    doi: str
+    title: str
+    field_name: str
+    claim_source: Literal["gt", "pred"]
+    target_value: str
+    match: bool | None = None
+    support_type: Literal["explicit", "paraphrase", "inferred", "ambiguous", "unsupported"]
+    quote: str | None = None
+    source_section: str | None = None
+    rationale: str | None = None
+    is_contradicted: bool = False
+    run_name: str | None = None
+```
+
+Notebook-specific notes:
+
+- Keep this schema notebook-local until WU-E2 confirms it is sufficient
+- One row per atomic claim per `claim_source`; GT and prediction can then be joined for side-by-side review in notebook code
+- `source_section` may be heuristic in the notebook pilot (`abstract`, `body`, `references`, `unknown`) if exact section recovery is not yet available from the saved run artifact
 
 #### WU-E2: Grounding Contracts + Prompt Builder `sonnet`
 

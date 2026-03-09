@@ -19,6 +19,20 @@
 
 ---
 
+## Claim Grounding
+
+> **Plan:** [`plans/claim-grounding.md`](plans/claim-grounding.md)
+
+- [x] Phase 0: Research synthesis (`WU-E0`)
+- [x] Phase 1: Notebook pilot design (`WU-E1`) — `notebooks/claim_grounding_pilot.ipynb`
+- [ ] Phase 1B: Notebook LLM grounding pilot (`WU-E1B`) — `notebooks/claim_grounding_from_llm.ipynb`
+- [ ] Phase 2: Grounding contracts + prompt builder (`WU-E2`)
+- [ ] Phase 3: `prompt_eval` integration (`WU-E3`)
+- [ ] Phase 4: Viewer integration (`WU-E4`)
+- [ ] Phase 5: Lab logging + plan update (`WU-E5`)
+
+---
+
 ## Assemble article outline materials `opus`
 
 - [ ] Three-way comparison table: Abstract vs Full-text (PDF API) vs Section-based

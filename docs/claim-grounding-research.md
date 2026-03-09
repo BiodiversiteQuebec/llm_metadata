@@ -122,6 +122,28 @@ Ranked by relevance to this project:
    - Useful as domain-near evidence that the field is still focused on retrieval and agreement, not claim-level evidence artifacts.
    - Source: [Automating Information Retrieval from Biodiversity Literature Using Large Language Models: A Case Study](https://zenodo.org/records/13751744)
 
+## Four Most Important Papers To Read
+
+If the goal is to understand claim grounding for this repo's design, these are the four highest-value papers to read first:
+
+1. **Lehman et al. 2019**
+   - [Inferring Which Medical Treatments Work from Reports of Clinical Trials](https://aclanthology.org/N19-1371/)
+   - Best first paper because the task shape is very close to ours: document + target claim + supporting evidence.
+
+2. **DeYoung et al. 2020**
+   - [Evidence Inference 2.0: More Data, Better Models](https://aclanthology.org/2020.bionlp-1.13/)
+   - Best follow-up because it extends the same task family and is more directly useful for thinking about scale, dataset design, and model behavior.
+
+3. **Wadden et al. 2020**
+   - [Fact or Fiction: Verifying Scientific Claims](https://aclanthology.org/2020.emnlp-main.609/)
+   - Best scientific-abstract paper for support / contradiction framing and rationale selection over compact scientific text.
+
+4. **DeYoung et al. 2020**
+   - [ERASER: A Benchmark to Evaluate Rationalized NLP Models](https://aclanthology.org/2020.acl-main.408/)
+   - Best evaluation paper because it gives the strongest vocabulary for assessing whether evidence is faithful and useful, not just plausible.
+
+If you want a fifth paper after those four, read [DocRED](https://aclanthology.org/P19-1074/) for document-level evidence-aware extraction structure, then [Gougherty and Clipp 2024](https://www.nature.com/articles/s44185-024-00043-9) for the ecology-specific extraction context.
+
 ## What Product Documentation Suggests
 
 ### OpenAI
