@@ -1,22 +1,8 @@
 # TODO
 
-## Prompt Engineering — Phase 2 ✅
+## Prompt Engineering — Phase 3
 
-> **Plan:** [`plans/prompt-engineering-flow.md`](plans/prompt-engineering-flow.md)
->
-> Phase 1 eval hardening (WU-EH1, WU-EH2) and Phase 2 prompt infrastructure complete.
-
-- [x] WU-EH1: `FieldEvalStrategy` + `field_strategies` + `DEFAULT_FIELD_STRATEGIES` added to `groundtruth_eval.py`
-- [x] WU-EH2: `compare_models` dispatches by `field_strategies` when populated; backward compat preserved
-- [x] WU-2.1: `src/llm_metadata/prompts/` package — `common.py`, `abstract.py`, `section.py`, `pdf_file.py`; `gpt_extract.py` now imports from prompts
-- [x] WU-2.2: `EvaluationConfig.to_dict/from_dict/to_json/from_json` + `EvaluationReport.save/load` methods
-- [x] WU-2.3: `src/llm_metadata/prompt_eval.py` — `run_eval()` Python API + CLI (`python -m llm_metadata.prompt_eval --help`)
-- [x] WU-2.4: `configs/eval_default.json`, `configs/eval_fuzzy_species.json`, `configs/eval_strict.json`
-- [x] WU-2.5: `data/dev_subset.csv` — 30 curated records (10/source: Dryad/Zenodo/SS); covers time_series, threatened_species, bias_north_south positives
-- [x] WU-2.6: `notebooks/prompt_eval_results.ipynb` viewer + `app/app_eval_viewer.py` Streamlit app
-- [x] WU-2.7: "Prompt Engineering Workflow" section added to `CLAUDE.md`
-
-**Next:** Phase 3 — Per-Field Prompt Iteration (WU-3.1 baseline run requires API key)
+- [ ] Phase 3 — Per-Field Prompt Iteration (WU-3.1 baseline run requires API key)
 
 ---
 
@@ -55,22 +41,6 @@
 ---
 
 ## Feature Extraction — Advanced Schema
-
-### GBIF Species Matching
-
-> **Plan:** [`plans/gbif_species_matching.md`](plans/gbif_species_matching.md)
-
-- [x] WU-1: `species_parsing.py` — ParsedTaxon model + shared preprocessing
-- [x] WU-2: `gbif.py` — GBIF Species Match API wrapper
-- [x] WU-3: Schema `gbif_keys` field + enrichment function
-- [ ] WU-4: Demo notebook — GBIF vs enhanced_species evaluation comparison `sonnet`
-  - Template: `notebooks/species_recall_improvement.ipynb` (same 10 OA PDF extractions)
-  - Reuse existing extracted predictions (load from artifacts, no re-extraction)
-  - Enrich both ground truth and predictions with `enrich_with_gbif()`
-  - Run `evaluate_indexed()` with `fields=["species", "gbif_keys"]`
-  - Side-by-side P/R/F1 table: enhanced_species matching vs GBIF key set comparison
-  - Qualitative analysis: which species strings GBIF resolves vs fails (vernacular, groups, count+name)
-  - Save notebook as `notebooks/eval_gbif_vs_enhanced_species_test.ipynb`
 
 ### Backlog
 
@@ -144,6 +114,8 @@
 - [x] Task 1.2: Audit validation and schema modules
 - [x] Task 1.3: Audit PDF download pipeline
 </details>
+
+
 
 ---
 
