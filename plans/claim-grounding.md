@@ -1,11 +1,11 @@
-# Evidence Mode
+# Post-Hoc Claim Grounding
 
 **Status:** Draft  
 **Date:** 2026-03-09
 
 ## Problem Statement
 
-We need an **opt-in post-hoc explanation flow** that helps analysts understand why a field/value was annotated or extracted from a paper.
+We need an **opt-in post-hoc claim grounding flow** that helps analysts understand why a field/value was annotated or extracted from a paper.
 
 The goal is not to improve primary extraction directly in v1. The goal is to produce **value-level grounding artifacts** that support:
 
@@ -23,17 +23,21 @@ An evidence result should answer:
 
 ## Key Decisions
 
-- Evidence is **not** a new extraction `mode`.
+- Claim grounding is **not** a new extraction `mode`.
   Extraction mode already means text source (`abstract`, `pdf_text`, `pdf_native`, `sections`).
-- Evidence is a **separate optional explanation step** run after extraction or annotation loading.
-- Evidence should be generated for **atomic claims** (`field_name` + one target value), not whole-record blobs.
+- Claim grounding is a **separate optional explanation step** run after extraction or annotation loading.
+- Grounding should be generated for **atomic claims** (`field_name` + one target value), not whole-record blobs.
 - v1 should focus on **positive claims only**. Null / negative claims are out of scope initially.
 - v1 should prioritize mismatch-heavy fields:
   - `geospatial_info_dataset`
   - `data_type`
   - `species`
-- Evidence should live in a **separate artifact/model**, not be dynamically injected into extraction schemas.
+- Grounding should live in a **separate artifact/model**, not be dynamically injected into extraction schemas.
 - Numeric confidence is not the primary signal. Use a qualitative support label instead.
+- v1 should return the **single best quote per claim**.
+- `is_contradicted` should remain a **separate boolean**, not a support label.
+- Precise locators such as page numbers or character offsets are a **future extension**. v1 should use `source_section`.
+- The safer architecture is still a **two-pass design**, not because structure and citations are universally incompatible, but because mixing strict extraction and quote-grounding weakens the contract.
 
 ## Non-Goals
 
@@ -56,7 +60,7 @@ An evidence result should answer:
 
 ### Outputs
 
-One evidence row per atomic claim:
+One grounding row per atomic claim:
 
 - `doi`
 - `claim_source`
@@ -143,7 +147,7 @@ Useful derived counters:
 
 ## Research Questions
 
-Phase 0 should produce `docs/evidence-research.md` and answer:
+Phase 0 should produce `docs/claim-grounding-research.md` and answer:
 
 - What adjacent concepts are most relevant?
   - evidence extraction
@@ -173,7 +177,7 @@ Round 4: WU-E5
 
 #### WU-E0: Research Synthesis `opus`
 
-**deps:** none | **files:** `docs/evidence-research.md`, `plans/evidence-mode.md`
+**deps:** none | **files:** `docs/claim-grounding-research.md`, `plans/claim-grounding.md`
 
 - Review adjacent concepts, prior art, and evaluation patterns
 - Rank concepts and sources by relevance to this repository
@@ -181,13 +185,13 @@ Round 4: WU-E5
 
 #### WU-E1: Notebook Pilot Design `sonnet`
 
-**deps:** none | **files:** `notebooks/`, `plans/evidence-mode.md`
+**deps:** none | **files:** `notebooks/`, `plans/claim-grounding.md`
 
 - Define a notebook-first pilot on the first 5 dev-subset records
 - Restrict scope to `geospatial_info_dataset`, `data_type`, and `species`
-- Produce a comparison table with GT claim evidence and prediction claim evidence
+- Produce a comparison table with GT claim grounding and prediction claim grounding
 
-#### WU-E2: Evidence Contracts + Prompt Builder `sonnet`
+#### WU-E2: Grounding Contracts + Prompt Builder `sonnet`
 
 **deps:** WU-E0, WU-E1 | **files:** `src/llm_metadata/schemas/evidence.py`, `src/llm_metadata/evidence.py`
 
@@ -217,7 +221,7 @@ Round 4: WU-E5
 
 #### WU-E5: Lab Logging + Plan Update `haiku`
 
-**deps:** WU-E3, WU-E4 | **files:** `notebooks/README.md`, `TODO.md`, `plans/evidence-mode.md`
+**deps:** WU-E3, WU-E4 | **files:** `notebooks/README.md`, `TODO.md`, `plans/claim-grounding.md`
 
 - Log pilot findings and implementation outcomes
 - Add or update TODO references only after the pilot scope is confirmed
@@ -241,10 +245,13 @@ Round 4: WU-E5
 ## Open Questions
 
 - Should v1 pass only field descriptions, or also pass enum vocabularies/examples per field?
-- Should a claim support multiple quotes in v1, or just the single best quote?
 - Should `match` be stored on the claim or derived later from eval outputs?
 - Should the evidence artifact be embedded inside run JSON, or saved as a sibling file?
 - When evidence is generated from GT, how much annotation context should be shown to the model?
+
+## Publication Note
+
+This work is most publishable as part of the broader biodiversity extraction paper unless we later add a manually annotated grounding benchmark or a more rigorous evidence-quality evaluation protocol.
 
 ## Out of Scope
 
