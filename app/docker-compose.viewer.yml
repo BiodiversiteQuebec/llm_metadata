@@ -13,4 +13,5 @@ services:
       - PYTHONPATH=/llm_metadata/src
       - PROMPT_EVAL_OUTPUT_DIR=${PROMPT_EVAL_OUTPUT_DIR:-artifacts/runs}
       - EVAL_VIEWER_RESULTS_DIR=${EVAL_VIEWER_RESULTS_DIR:-}
+      - STREAMLIT_SERVER_BASE_URL_PATH=llm_extraction_results
     restart: unless-stopped
