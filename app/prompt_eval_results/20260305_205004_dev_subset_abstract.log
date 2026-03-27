@@ -1,0 +1,89 @@
+Logging to: data\prompt_eval_reports\20260305_205004_dev_subset_abstract.log
+Recreate command: uv run python -m llm_metadata.prompt_eval --mode abstract --manifest data/manifests/dev_subset_data_paper.csv --parallelism 1 --model gpt-5-mini --gt data/dataset_092624_validated.xlsx --name dev_subset_abstract
+2026-03-05 20:50:05 | INFO     | __main__:run_eval:137 | Starting prompt_eval mode=abstract manifest_path=data/manifests/dev_subset_data_paper.csv parallelism=1 model=gpt-5-mini skip_cache=False
+2026-03-05 20:50:05 | INFO     | __main__:run_eval:146 | Loaded manifest records=30
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:354 | Starting manifest extraction mode=abstract records=30 parallelism=1 model=gpt-5-mini prompt_module=prompts.abstract skip_cache=False
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:385 | [1/30] Extracting gt_record_id=5 record_id=10.1093/jhered/esx103 title=<untitled>
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:402 | [1/30] Finished gt_record_id=5 status=skipped method=n/a cost=n/a
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:385 | [2/30] Extracting gt_record_id=9 record_id=10.1371/journal.pone.0128238 title=<untitled>
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:402 | [2/30] Finished gt_record_id=9 status=skipped method=n/a cost=n/a
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:385 | [3/30] Extracting gt_record_id=11 record_id=10.1371/journal.pone.0073695 title=<untitled>
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:402 | [3/30] Finished gt_record_id=11 status=skipped method=n/a cost=n/a
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:385 | [4/30] Extracting gt_record_id=12 record_id=10.1002/ece3.4685 title=<untitled>
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:402 | [4/30] Finished gt_record_id=12 status=skipped method=n/a cost=n/a
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:385 | [5/30] Extracting gt_record_id=19 record_id=10.1093/jhered/esw073 title=<untitled>
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:402 | [5/30] Finished gt_record_id=19 status=skipped method=n/a cost=n/a
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:385 | [6/30] Extracting gt_record_id=24 record_id=10.1002/ece3.3906 title=<untitled>
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:402 | [6/30] Finished gt_record_id=24 status=skipped method=n/a cost=n/a
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:385 | [7/30] Extracting gt_record_id=27 record_id=10.1111/ddi.12496 title=<untitled>
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:402 | [7/30] Finished gt_record_id=27 status=skipped method=n/a cost=n/a
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:385 | [8/30] Extracting gt_record_id=29 record_id=10.1002/ece3.1476 title=<untitled>
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:402 | [8/30] Finished gt_record_id=29 status=skipped method=n/a cost=n/a
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:385 | [9/30] Extracting gt_record_id=30 record_id=10.1186/s40462-016-0079-4 title=<untitled>
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:402 | [9/30] Finished gt_record_id=30 status=skipped method=n/a cost=n/a
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:385 | [10/30] Extracting gt_record_id=31 record_id=10.1111/eva.12028 title=<untitled>
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:402 | [10/30] Finished gt_record_id=31 status=skipped method=n/a cost=n/a
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:385 | [11/30] Extracting gt_record_id=37 record_id=10.1002/ece3.1029 title=<untitled>
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:402 | [11/30] Finished gt_record_id=37 status=skipped method=n/a cost=n/a
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:385 | [12/30] Extracting gt_record_id=38 record_id=10.1371/journal.pone.0204445 title=<untitled>
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:402 | [12/30] Finished gt_record_id=38 status=skipped method=n/a cost=n/a
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:385 | [13/30] Extracting gt_record_id=39 record_id=10.1098/rspb.2014.0649 title=<untitled>
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:402 | [13/30] Finished gt_record_id=39 status=skipped method=n/a cost=n/a
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:385 | [14/30] Extracting gt_record_id=56 record_id=10.1111/eva.12315 title=<untitled>
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:402 | [14/30] Finished gt_record_id=56 status=skipped method=n/a cost=n/a
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:385 | [15/30] Extracting gt_record_id=71 record_id=10.1111/1365-2664.12675 title=<untitled>
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:402 | [15/30] Finished gt_record_id=71 status=skipped method=n/a cost=n/a
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:385 | [16/30] Extracting gt_record_id=89 record_id=10.1890/12-2118.1 title=<untitled>
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:402 | [16/30] Finished gt_record_id=89 status=skipped method=n/a cost=n/a
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:385 | [17/30] Extracting gt_record_id=91 record_id=10.1002/ece3.1266 title=<untitled>
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:402 | [17/30] Finished gt_record_id=91 status=skipped method=n/a cost=n/a
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:385 | [18/30] Extracting gt_record_id=101 record_id=10.1371/journal.pone.0077514 title=<untitled>
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:402 | [18/30] Finished gt_record_id=101 status=skipped method=n/a cost=n/a
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:385 | [19/30] Extracting gt_record_id=104 record_id=10.1038/s41598-018-34822-9 title=<untitled>
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:402 | [19/30] Finished gt_record_id=104 status=skipped method=n/a cost=n/a
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:385 | [20/30] Extracting gt_record_id=123 record_id=10.1098/rspb.2014.0502 title=<untitled>
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:402 | [20/30] Finished gt_record_id=123 status=skipped method=n/a cost=n/a
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:385 | [21/30] Extracting gt_record_id=175 record_id=10.5558/tfc76653-4 title=<untitled>
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:402 | [21/30] Finished gt_record_id=175 status=skipped method=n/a cost=n/a
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:385 | [22/30] Extracting gt_record_id=201 record_id=10.1086/671900 title=<untitled>
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:402 | [22/30] Finished gt_record_id=201 status=skipped method=n/a cost=n/a
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:385 | [23/30] Extracting gt_record_id=208 record_id=10.3389/fmars.2021.637546 title=<untitled>
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:402 | [23/30] Finished gt_record_id=208 status=skipped method=n/a cost=n/a
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:385 | [24/30] Extracting gt_record_id=225 record_id=10.1371/journal.pone.0109261 title=<untitled>
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:402 | [24/30] Finished gt_record_id=225 status=skipped method=n/a cost=n/a
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:385 | [25/30] Extracting gt_record_id=253 record_id=10.1111/eva.13248 title=<untitled>
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:402 | [25/30] Finished gt_record_id=253 status=skipped method=n/a cost=n/a
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:385 | [26/30] Extracting gt_record_id=258 record_id=10.1111/ecog.00997 title=<untitled>
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:402 | [26/30] Finished gt_record_id=258 status=skipped method=n/a cost=n/a
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:385 | [27/30] Extracting gt_record_id=271 record_id=10.1603/0013-8746%282006%2999%5b536%3aiopmiq%5d2.0.co%3b2 title=<untitled>
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:402 | [27/30] Finished gt_record_id=271 status=skipped method=n/a cost=n/a
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:385 | [28/30] Extracting gt_record_id=315 record_id=10.1603/en10045 title=<untitled>
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:402 | [28/30] Finished gt_record_id=315 status=skipped method=n/a cost=n/a
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:385 | [29/30] Extracting gt_record_id=343 record_id=10.3390/ijgi7090335 title=<untitled>
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:402 | [29/30] Finished gt_record_id=343 status=skipped method=n/a cost=n/a
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:385 | [30/30] Extracting gt_record_id=351 record_id=10.1603/0013-8746%282005%29098%5b0565%3awccdaa%5d2.0.co%3b2 title=<untitled>
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:402 | [30/30] Finished gt_record_id=351 status=skipped method=n/a cost=n/a
+2026-03-05 20:50:05 | INFO     | llm_metadata.extraction:run_manifest_extraction:454 | Completed manifest extraction mode=abstract records=30 total_cost=$0.0000
+2026-03-05 20:50:05 | INFO     | __main__:run_eval:164 | Loading ground truth from data/dataset_092624_validated.xlsx
+2026-03-05 20:50:11 | INFO     | __main__:run_eval:170 | Evaluating predictions matched_records=30 fields=default
+2026-03-05 20:50:11 | INFO     | __main__:run_eval:189 | Saved prompt_eval artifact to data\prompt_eval_reports\20260305_205004_dev_subset_abstract.json
+2026-03-05 20:50:11 | INFO     | __main__:run_eval:190 | Saved extraction results CSV to data\prompt_eval_reports\20260305_205004_dev_subset_abstract.csv
+2026-03-05 20:50:11 | INFO     | __main__:run_eval:192 | Completed prompt_eval mode=abstract records=30 total_cost=$0.0000
+Field                         N       P       R      F1
+-------------------------------------------------------
+bias_north_south             30     N/A   0.000     N/A
+data_type                    30     N/A   0.000     N/A
+geospatial_info_dataset      30     N/A   0.000     N/A
+multispecies                 30     N/A   0.000     N/A
+new_species_region           30     N/A   0.000     N/A
+new_species_science          30     N/A   0.000     N/A
+spatial_range_km2            30     N/A   0.000     N/A
+species                      30     N/A   0.000     N/A
+temp_range_f                 30     N/A   0.000     N/A
+temp_range_i                 30     N/A   0.000     N/A
+threatened_species           30     N/A   0.000     N/A
+time_series                  30     N/A   0.000     N/A
+
+Total API cost: $0.0000
+
+Run artifact saved to: data\prompt_eval_reports\20260305_205004_dev_subset_abstract.json
