@@ -7,6 +7,10 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=1 \
     PYTHONPATH=/llm_metadata/src
 
+COPY pyproject.toml README.md /llm_metadata/
+COPY src /llm_metadata/src
+COPY app/requirements.txt /llm_metadata/app/requirements.txt
+
 RUN pip install --upgrade pip && \
     pip install -r app/requirements.txt
 
