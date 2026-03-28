@@ -219,17 +219,17 @@ def _overall_metrics_cards(report: EvaluationReport, *, key_suffix: str = "",
     cols = st.columns(4)
     cols[0].metric("Micro P", _fmt(micro.precision),
                    delta=_delta(micro, micro_base, "precision"),
-                   help="Micro-averaged precision across all fields")
+                   help="Of everything the model extracted across all fields, how much was correct? Higher = fewer false alarms. Weighted toward high-count fields.")
     cols[1].metric("Micro R", _fmt(micro.recall),
                    delta=_delta(micro, micro_base, "recall"),
-                   help="Micro-averaged recall across all fields")
+                   help="Of everything the human annotators found across all fields, how much did the model also find? Higher = fewer missed items. Weighted toward high-count fields.")
     cols[2].metric("Micro F1", _fmt(micro.f1),
                    delta=_delta(micro, micro_base, "f1"),
-                   help="Micro-averaged F1 across all fields")
+                   help="Harmonic mean of Micro P and Micro R. Single number balancing false alarms vs missed items, weighted toward high-count fields like species.")
     macro_delta = round(macro - macro_base, 3) if macro is not None and macro_base is not None else None
     cols[3].metric("Macro F1", _fmt(macro),
                    delta=macro_delta,
-                   help="Macro-averaged F1 (mean of per-field F1)")
+                   help="Average F1 across all fields, treating every field equally regardless of how many items it has. Low Macro F1 with higher Micro F1 means some rare fields are dragging performance down.")
 
 
 def _report_from_doc(doc: dict) -> Optional[EvaluationReport]:
@@ -830,12 +830,47 @@ def main() -> None:
             st.subheader("Overall metrics")
             _overall_metrics_cards(report_a, key_suffix="detailed")
 
+            with st.expander("What do these metrics mean?", expanded=False):
+                st.markdown(
+                    "**Precision** — Of everything the model extracted, how much was correct? "
+                    "High precision means few false alarms.\n\n"
+                    "**Recall** — Of everything the human annotator found, how much did the model "
+                    "also find? High recall means few missed items.\n\n"
+                    "**F1** — Harmonic mean of Precision and Recall. Balances both into a single score "
+                    "(0 = worst, 1 = perfect).\n\n"
+                    "**Micro** averages count all items across fields together (dominated by high-count fields like species). "
+                    "**Macro** averages treat every field equally (sensitive to rare fields like `bias_north_south`).\n\n"
+                    "| F1 range | Interpretation |\n"
+                    "|----------|----------------|\n"
+                    "| > 0.70 | Good — reliable for automated use |\n"
+                    "| 0.40 – 0.70 | Moderate — useful with human review |\n"
+                    "| < 0.40 | Poor — needs prompt or GT improvement |"
+                )
+
             st.divider()
             st.subheader("Per-field metrics")
 
             _sorted_metrics_df = metrics_df.sort_values("f1", ascending=False).reset_index(drop=True)
+
+            def _f1_color(val):
+                """Color-code F1 values: green > 0.7, yellow 0.4–0.7, red < 0.4."""
+                if pd.isna(val) or val is None:
+                    return "color: gray"
+                if val >= 0.7:
+                    return "color: #2e7d32"  # green
+                if val >= 0.4:
+                    return "color: #f57f17"  # amber
+                return "color: #c62828"  # red
+
+            styled_metrics = _sorted_metrics_df.style.map(
+                _f1_color, subset=["f1"]
+            ).format(
+                {col: "{:.3f}" for col in ["precision", "recall", "f1", "accuracy", "exact_match_rate"]
+                 if col in _sorted_metrics_df.columns},
+                na_rep="N/A",
+            )
             metrics_event = st.dataframe(
-                _sorted_metrics_df,
+                styled_metrics,
                 use_container_width=True,
                 selection_mode="multi-row",
                 on_select="rerun",
