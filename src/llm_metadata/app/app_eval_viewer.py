@@ -657,8 +657,8 @@ def main() -> None:
     coverage_df = _field_coverage_df(artifact_a)
 
     # ── Tabs ─────────────────────────────────────────────────────────────────
-    tab_overview, tab_output, tab_metrics, tab_records, tab_compare = st.tabs(
-        ["Overview", "Extraction Output", "Detailed Metrics", "Dataset Results", "Compare Runs"]
+    tab_overview, tab_output, tab_metrics, tab_records, tab_compare, tab_trends = st.tabs(
+        ["Overview", "Extraction Output", "Detailed Metrics", "Dataset Results", "Compare Runs", "Trends"]
     )
 
     # ════════════════════════════════════════════════════════════════════════
@@ -1242,7 +1242,113 @@ def main() -> None:
                                 event=compare_event)
 
     # ════════════════════════════════════════════════════════════════════════
-    # TAB 6 — Notes
+    # TAB 6 — Trends
+    # ════════════════════════════════════════════════════════════════════════
+    with tab_trends:
+        # Load all runs with evaluation data
+        trend_rows: list[dict] = []
+        for label in file_labels:
+            path = result_file_map[label]
+            art, rpt, _ = load_run_payload(str(path))
+            if rpt is None:
+                continue
+            run_name = path.stem
+            # Extract timestamp from filename (YYYYMMDD_HHMMSS prefix)
+            ts_str = run_name[:15] if len(run_name) >= 15 else run_name
+            micro_m = micro_average(rpt.field_metrics.values())
+            macro_val = macro_f1(rpt.field_metrics.values())
+            mode = art.mode.value if art is not None else "unknown"
+            for field_name, fm in rpt.field_metrics.items():
+                trend_rows.append({
+                    "run": run_name,
+                    "timestamp": ts_str,
+                    "mode": mode,
+                    "field": field_name,
+                    "f1": fm.f1,
+                    "precision": fm.precision,
+                    "recall": fm.recall,
+                })
+            # Add overall rows
+            trend_rows.append({
+                "run": run_name, "timestamp": ts_str, "mode": mode,
+                "field": "__micro__",
+                "f1": micro_m.f1, "precision": micro_m.precision, "recall": micro_m.recall,
+            })
+            trend_rows.append({
+                "run": run_name, "timestamp": ts_str, "mode": mode,
+                "field": "__macro_f1__",
+                "f1": macro_val, "precision": None, "recall": None,
+            })
+
+        if len(trend_rows) < 2:
+            st.info("Need at least 2 runs with evaluation data to show trends.")
+        else:
+            trend_df = pd.DataFrame(trend_rows)
+
+            # Mode filter
+            available_modes = sorted(trend_df["mode"].unique())
+            selected_modes = st.multiselect(
+                "Filter by mode", available_modes, default=available_modes, key="trend_modes"
+            )
+            if selected_modes:
+                trend_df = trend_df[trend_df["mode"].isin(selected_modes)]
+
+            if trend_df.empty:
+                st.warning("No runs match the selected mode filter.")
+            else:
+                # Sort by timestamp for correct line ordering
+                trend_df = trend_df.sort_values("timestamp")
+
+                all_trend_fields = sorted(
+                    trend_df["field"].unique(),
+                    key=lambda f: (0 if f.startswith("__") else 1, f),
+                )
+
+                st.subheader("F1 across runs")
+                st.caption(
+                    "Each line tracks one field's F1 score across runs (sorted chronologically). "
+                    "Use the mode filter above to compare within or across extraction modes."
+                )
+
+                # Overall metrics chart (micro + macro)
+                overall_df = trend_df[trend_df["field"].isin(["__micro__", "__macro_f1__"])]
+                if not overall_df.empty:
+                    st.markdown("**Overall metrics**")
+                    st.line_chart(
+                        overall_df.pivot(index="run", columns="field", values="f1"),
+                        use_container_width=True,
+                        height=250,
+                    )
+
+                # Per-field charts
+                per_field_df = trend_df[~trend_df["field"].str.startswith("__")]
+                if not per_field_df.empty:
+                    st.markdown("**Per-field F1**")
+                    st.line_chart(
+                        per_field_df.pivot(index="run", columns="field", values="f1"),
+                        use_container_width=True,
+                        height=400,
+                    )
+
+                    # Precision and Recall charts in columns
+                    pr_col_left, pr_col_right = st.columns(2)
+                    with pr_col_left:
+                        st.markdown("**Per-field Precision**")
+                        st.line_chart(
+                            per_field_df.pivot(index="run", columns="field", values="precision"),
+                            use_container_width=True,
+                            height=300,
+                        )
+                    with pr_col_right:
+                        st.markdown("**Per-field Recall**")
+                        st.line_chart(
+                            per_field_df.pivot(index="run", columns="field", values="recall"),
+                            use_container_width=True,
+                            height=300,
+                        )
+
+    # ════════════════════════════════════════════════════════════════════════
+    # TAB 7 — Notes
     # ════════════════════════════════════════════════════════════════════════
     # with tab_notes:
     #     from streamlit_lexical import streamlit_lexical
