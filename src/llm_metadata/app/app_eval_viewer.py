@@ -232,6 +232,47 @@ def _overall_metrics_cards(report: EvaluationReport, *, key_suffix: str = "",
                    help="Average F1 across all fields, treating every field equally regardless of how many items it has. Low Macro F1 with higher Micro F1 means some rare fields are dragging performance down.")
 
 
+def _classify_mismatch(r) -> str:
+    """Heuristic root-cause tag for a FieldResult mismatch.
+
+    Categories:
+    - under_extraction: model missed items the annotator found (fn > 0, fp == 0)
+    - over_extraction: model produced extras not in ground truth (fp > 0, fn == 0)
+    - mixed: both false positives and false negatives
+    - vocab_gap: pred and true are non-empty but no overlap — likely synonym/format issue
+    - empty_pred: model returned nothing
+    - GT_empty: ground truth is empty but model extracted something
+    """
+    true_val = r.true_value
+    pred_val = r.pred_value
+
+    # Normalize to sets for comparison
+    def _to_set(v):
+        if v is None:
+            return set()
+        if isinstance(v, (list, tuple, set)):
+            return {str(x).strip().lower() for x in v if x is not None and str(x).strip()}
+        s = str(v).strip().lower()
+        return {s} if s and s not in ("none", "[]", "nan", "") else set()
+
+    true_set = _to_set(true_val)
+    pred_set = _to_set(pred_val)
+
+    if not true_set and pred_set:
+        return "GT_empty"
+    if not pred_set and true_set:
+        return "empty_pred"
+    if true_set and pred_set and not true_set & pred_set:
+        return "vocab_gap"
+    if r.fp > 0 and r.fn == 0:
+        return "over_extraction"
+    if r.fn > 0 and r.fp == 0:
+        return "under_extraction"
+    if r.fp > 0 and r.fn > 0:
+        return "mixed"
+    return "other"
+
+
 def _report_from_doc(doc: dict) -> Optional[EvaluationReport]:
     if not isinstance(doc, dict) or not doc.get("field_results"):
         return None
@@ -918,6 +959,7 @@ def main() -> None:
                 error_rows = [
                     {
                         "doi": _error_doi(r.record_id),
+                        "category": _classify_mismatch(r),
                         "true_value": str(r.true_value),
                         "pred_value": str(r.pred_value),
                         "tp": r.tp,
@@ -927,6 +969,11 @@ def main() -> None:
                     for r in errors
                 ]
                 error_df = pd.DataFrame(error_rows)
+
+                # Category distribution summary
+                cat_counts = error_df["category"].value_counts()
+                cat_parts = [f"{cat}: {cnt}" for cat, cnt in cat_counts.items()]
+                st.caption("**Mismatch breakdown:** " + " · ".join(cat_parts))
 
                 mismatch_event = st.dataframe(
                     error_df,
