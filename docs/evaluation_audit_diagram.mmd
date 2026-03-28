@@ -1,0 +1,31 @@
+flowchart TD
+    A[Scientific papers and dataset records] --> B[Ground truth annotations<br/>validated spreadsheet]
+    A --> C[Extraction pipeline<br/>abstract | sections | pdf_native]
+    C --> D[LLM predictions<br/>structured fields]
+    B --> E[Local evaluation engine<br/>groundtruth_eval.py]
+    D --> E
+
+    E --> F[Field-specific graders]
+    F --> F1[Exact match<br/>booleans, numeric, controlled vocab]
+    F --> F2[Enhanced species matching<br/>vernacular and scientific names]
+    F --> F3[Optional fuzzy matching<br/>experimental / fallback]
+
+    E --> G[Metrics and error records]
+    G --> G1[Precision]
+    G --> G2[Recall]
+    G --> G3[F1]
+    G --> G4[Exact-match rate]
+
+    G --> H[Run artifacts and review]
+    H --> H1[JSON run artifacts]
+    H --> H2[Notebook analysis]
+    H --> H3[Streamlit eval viewer]
+
+    H --> I[Prompt and pipeline iteration]
+    I --> C
+
+    J[Recommended next layer] -.-> K[Locked holdout set]
+    J -.-> L[Confidence intervals]
+    J -.-> M[Human calibration loop]
+    J -.-> N[CI-style continuous eval]
+    J -.-> O[Optional OpenAI / HF hosted eval tooling]
