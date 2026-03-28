@@ -991,10 +991,22 @@ def main() -> None:
                 ]
                 error_df = pd.DataFrame(error_rows)
 
-                # Category distribution summary
+                # Category distribution summary + legend
                 cat_counts = error_df["category"].value_counts()
                 cat_parts = [f"{cat}: {cnt}" for cat, cnt in cat_counts.items()]
                 st.caption("**Mismatch breakdown:** " + " · ".join(cat_parts))
+
+                with st.expander("Category definitions", expanded=False):
+                    st.markdown(
+                        "| Category | Meaning | Likely cause |\n"
+                        "|----------|---------|---------------|\n"
+                        "| `under_extraction` | Model missed items the annotator found (FN only) | Prompt too conservative, or field description too vague |\n"
+                        "| `over_extraction` | Model produced extras not in ground truth (FP only) | Prompt over-generates, or GT annotation is incomplete |\n"
+                        "| `mixed` | Both false positives and false negatives | Model extracts different items, not a subset/superset |\n"
+                        "| `vocab_gap` | Pred and GT are both non-empty but share no items | Synonym or format mismatch — consider vocabulary normalization |\n"
+                        "| `empty_pred` | Model returned nothing, GT is non-empty | Model abstains when it shouldn't — check PHILOSOPHY prompt |\n"
+                        "| `GT_empty` | GT is empty but model extracted something | Possible over-extraction, or GT annotation is missing |\n"
+                    )
 
                 mismatch_event = st.dataframe(
                     error_df,
