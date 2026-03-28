@@ -360,6 +360,8 @@ class RunRecord(BaseModel):
 class RunArtifact(BaseModel):
     """Canonical persisted output for extraction and prompt-eval runs."""
 
+    model_config = {"populate_by_name": True}
+
     name: str
     mode: ExtractionMode
     manifest_path: Optional[str] = None
@@ -367,6 +369,7 @@ class RunArtifact(BaseModel):
     system_message: str
     model: str
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    output_schema: Optional[dict[str, Any]] = Field(default=None, alias="schema")
     records: list[RunRecord] = Field(default_factory=list)
     evaluation: Optional[dict[str, Any]] = None
 
@@ -432,7 +435,7 @@ class RunArtifact(BaseModel):
     def save_json(self, output_path: str | Path) -> Path:
         out = Path(output_path)
         out.parent.mkdir(parents=True, exist_ok=True)
-        out.write_text(self.model_dump_json(indent=2), encoding="utf-8")
+        out.write_text(self.model_dump_json(indent=2, by_alias=True), encoding="utf-8")
         return out
 
     def save_extraction_csv(self, output_path: str | Path) -> Path:

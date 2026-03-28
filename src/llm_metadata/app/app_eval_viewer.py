@@ -36,7 +36,7 @@ from streamlit.runtime.scriptrunner_utils.script_run_context import get_script_r
 from streamlit.web.bootstrap import run as streamlit_bootstrap_run
 
 from llm_metadata.gpt_extract import MODEL_COST_PER_1M_TOKENS
-from llm_metadata.groundtruth_eval import EvaluationConfig, EvaluationReport, FieldMetrics, FieldResult
+from llm_metadata.groundtruth_eval import EvaluationConfig, EvaluationReport, FieldMetrics, FieldResult, micro_average, macro_f1
 from llm_metadata.schemas.data_paper import DataPaperManifest, RunArtifact, RunRecord
 
 RESULTS_DIR = os.getenv("EVAL_VIEWER_RESULTS_DIR") or os.getenv("PROMPT_EVAL_OUTPUT_DIR") or "artifacts/runs"
@@ -186,6 +186,50 @@ def _export_buttons(df: pd.DataFrame, key: str, label: str,
         elif show == "md":
             caption_line = f"<!-- Rows sampled from: {label} — {count} -->"
             st.code(_df_to_markdown(export_df) + f"\n\n{caption_line}", language="markdown")
+
+
+def _overall_metrics_cards(report: EvaluationReport, *, key_suffix: str = "",
+                           delta_report: Optional[EvaluationReport] = None) -> None:
+    """Render st.metric cards for micro P/R/F1 and macro F1.
+
+    If *delta_report* is provided, deltas are shown relative to that baseline.
+    """
+    micro = micro_average(report.field_metrics.values())
+    macro = macro_f1(report.field_metrics.values())
+
+    if delta_report is not None:
+        micro_base = micro_average(delta_report.field_metrics.values())
+        macro_base = macro_f1(delta_report.field_metrics.values())
+    else:
+        micro_base = None
+        macro_base = None
+
+    def _delta(current, base_metric, attr):
+        if base_metric is None:
+            return None
+        cur = getattr(current, attr) if hasattr(current, attr) else current
+        bas = getattr(base_metric, attr) if hasattr(base_metric, attr) else base_metric
+        if cur is None or bas is None:
+            return None
+        return round(cur - bas, 3)
+
+    def _fmt(val):
+        return f"{val:.3f}" if val is not None else "N/A"
+
+    cols = st.columns(4)
+    cols[0].metric("Micro P", _fmt(micro.precision),
+                   delta=_delta(micro, micro_base, "precision"),
+                   help="Micro-averaged precision across all fields")
+    cols[1].metric("Micro R", _fmt(micro.recall),
+                   delta=_delta(micro, micro_base, "recall"),
+                   help="Micro-averaged recall across all fields")
+    cols[2].metric("Micro F1", _fmt(micro.f1),
+                   delta=_delta(micro, micro_base, "f1"),
+                   help="Micro-averaged F1 across all fields")
+    macro_delta = round(macro - macro_base, 3) if macro is not None and macro_base is not None else None
+    cols[3].metric("Macro F1", _fmt(macro),
+                   delta=macro_delta,
+                   help="Macro-averaged F1 (mean of per-field F1)")
 
 
 def _report_from_doc(doc: dict) -> Optional[EvaluationReport]:
@@ -615,7 +659,7 @@ def main() -> None:
                 st.caption("No record metadata available for this run.")
 
         with st.expander("Output schema (DatasetFeaturesExtraction)", expanded=False):
-            schema_data = meta_a.get("schema")
+            schema_data = meta_a.get("output_schema") or meta_a.get("schema")
             if isinstance(schema_data, dict) and schema_data:
                 st.code(json.dumps(schema_data, indent=2), language="json")
             else:
@@ -783,6 +827,10 @@ def main() -> None:
         else:
             metrics_df = report_a.metrics_to_pandas()
 
+            st.subheader("Overall metrics")
+            _overall_metrics_cards(report_a, key_suffix="detailed")
+
+            st.divider()
             st.subheader("Per-field metrics")
 
             _sorted_metrics_df = metrics_df.sort_values("f1", ascending=False).reset_index(drop=True)
@@ -1044,6 +1092,19 @@ def main() -> None:
             if report_cmp_a is None or report_cmp_b is None:
                 st.info("Both selected runs must include evaluation payloads to compare.")
             else:
+                # Overall metric cards — Run B deltas relative to Run A
+                st.subheader("Overall comparison")
+                side_a, side_b = st.columns(2)
+                with side_a:
+                    st.caption(f"**Run A:** {_fmt_run(run_a_cmp)}")
+                    _overall_metrics_cards(report_cmp_a, key_suffix="cmp_a")
+                with side_b:
+                    st.caption(f"**Run B:** {_fmt_run(run_b_cmp)}")
+                    _overall_metrics_cards(report_cmp_b, key_suffix="cmp_b",
+                                           delta_report=report_cmp_a)
+
+                st.divider()
+
                 metrics_cmp_a = report_cmp_a.metrics_to_pandas()
                 metrics_cmp_b = report_cmp_b.metrics_to_pandas()
 

@@ -367,6 +367,7 @@ def run_manifest_extraction(
         prompt_module=prompt_module,
         system_message=system_message,
         model=config.model,
+        schema=config.text_format.model_json_schema(),
         records=[],
     )
 
