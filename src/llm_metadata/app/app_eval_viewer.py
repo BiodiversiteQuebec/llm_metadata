@@ -231,6 +231,27 @@ def _overall_metrics_cards(report: EvaluationReport, *, key_suffix: str = "",
                    delta=macro_delta,
                    help="Average F1 across all fields, treating every field equally regardless of how many items it has. Low Macro F1 with higher Micro F1 means some rare fields are dragging performance down.")
 
+    # Dynamic interpretive guidance
+    if micro.f1 is not None and macro is not None:
+        gap = micro.f1 - macro
+        if abs(gap) < 0.05:
+            guidance = (
+                f"Micro F1 ({micro.f1:.2f}) and Macro F1 ({macro:.2f}) are close — "
+                "performance is relatively uniform across fields."
+            )
+        elif gap > 0:
+            guidance = (
+                f"Micro F1 ({micro.f1:.2f}) is higher than Macro F1 ({macro:.2f}) — "
+                "high-count fields (e.g. species) perform better than rare fields. "
+                "Check low-F1 fields in the table below for improvement targets."
+            )
+        else:
+            guidance = (
+                f"Macro F1 ({macro:.2f}) exceeds Micro F1 ({micro.f1:.2f}) — "
+                "the model struggles on high-volume fields but handles rare ones well."
+            )
+        st.caption(guidance)
+
 
 def _classify_mismatch(r) -> str:
     """Heuristic root-cause tag for a FieldResult mismatch.
