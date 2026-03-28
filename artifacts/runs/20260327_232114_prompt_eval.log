@@ -1,0 +1,4 @@
+Logging to: artifacts\runs\20260327_232114_prompt_eval.log
+Recreate command: uv run python -m llm_metadata.prompt_eval --mode pdf_native --manifest 'C:\Users\beav3503\AppData\Local\Temp\pytest-of-beav3503\pytest-41\test_cli_passes_mode_and_manif0\manifest.csv' --parallelism 5 --model gpt-5-mini --gt 'C:\Users\beav3503\AppData\Local\Temp\pytest-of-beav3503\pytest-41\test_cli_passes_mode_and_manif0\gt_validated.xlsx'
+
+Run artifact saved to: artifacts\runs\20260327_232114_prompt_eval.json
