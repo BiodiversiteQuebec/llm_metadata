@@ -12,7 +12,6 @@
 - [ ] WU-T1b — Mode-specific species overrides for `section.py` + `pdf_file.py` `sonnet`
 - [ ] WU-3.4 — Boolean cue expansion: `time_series` neg examples, `threatened_species` cue list, `bias_north_south` dual-trigger (geographic + bias language) `sonnet`
 - [ ] WU-3.4b — Mode-specific tuning: `data_type` sections rule, `time_series` sections/PDF rules, `new_species_*` PDF cues `sonnet`
-- [ ] WU-3.5 — Batch validation on full 418-record dataset `sonnet`
 
 ---
 

@@ -614,18 +614,6 @@ Sections and PDF mode prompts share the `common.py` blocks but need additional m
 
 **Run order:** Run sections and PDF mode evals against their respective baselines (March 27 runs) after shared `common.py` changes from WU-3.2–3.4 are applied. Evaluate shared-block improvements first to avoid confounding.
 
----
-
-### 3.5 Batch validation `sonnet`
-
-**deps:** 3.2, 3.4 | **files:** `artifacts/runs/batch_*.json`, `notebooks/README.md`
-
-- Run winning prompts on the **full** validated dataset (418 records)
-- Compare against the March 27 dev-subset baseline per-field metrics
-- Per-field delta table: which fields improved, which regressed
-- Cost comparison
-- Final lab log entry with comprehensive results
-
 ### Phase 3 Execution Rounds
 
 ```
