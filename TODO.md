@@ -2,13 +2,16 @@
 
 ## Prompt Engineering — Phase 3 ← **CURRENT FOCUS**
 
-> **Plan:** [`plans/prompt-engineering-flow.md`](plans/prompt-engineering-flow.md)
+> **Plans:** [`plans/prompt-engineering-flow.md`](plans/prompt-engineering-flow.md) · [`plans/taxonomic-relevance-refactor.md`](plans/taxonomic-relevance-refactor.md)
+> **Sequencing:** WU-3.2 and WU-T1 both modify `common.py` — run in the same session or sequentially.
 
 - [x] WU-3.1 — Baseline runs (abstract / sections / pdf_native) on dev subset, 2026-03-27
 - [x] WU-3.1 audit — Per-field mismatch analysis documented in run notes (2026-03-28)
-- [ ] WU-3.2 — Expand VOCABULARY block: full `data_type` + `geospatial_info_dataset` enum coverage + contrastive examples `sonnet`
-- [ ] WU-3.3 — Species hygiene + SCOPING block: context-taxa exclusion rule `sonnet`
-- [ ] WU-3.4 — Boolean cue expansion: `time_series` neg examples, `threatened_species` cue list, `bias_north_south` triggers `sonnet`
+- [ ] WU-3.2 — Expand VOCABULARY block: full `data_type` (13 values) + `geospatial_info_dataset` (9 values) with definitions + contrastive examples `sonnet`
+- [ ] WU-T1 — Add `SPECIES_EXTRACTION` block to `common.py`: decorated strings, count signals, broad groups, focal-taxa scoping `sonnet`
+- [ ] WU-T1b — Mode-specific species overrides for `section.py` + `pdf_file.py` `sonnet`
+- [ ] WU-3.4 — Boolean cue expansion: `time_series` neg examples, `threatened_species` cue list, `bias_north_south` dual-trigger (geographic + bias language) `sonnet`
+- [ ] WU-3.4b — Mode-specific tuning: `data_type` sections rule, `time_series` sections/PDF rules, `new_species_*` PDF cues `sonnet`
 - [ ] WU-3.5 — Batch validation on full 418-record dataset `sonnet`
 
 ---
@@ -60,16 +63,19 @@
 
 ## Feature Extraction — Advanced Schema
 
+### Taxonomic Relevance Features Refactor — Phase 2+ (after Phase 3 prompt work stable)
+
+> **Plan:** [`plans/taxonomic-relevance-refactor.md`](plans/taxonomic-relevance-refactor.md) · Phase 1 items (WU-T1, WU-T1b) are in Prompt Engineering Phase 3 above.
+
+- [ ] WU-T2: `ExtractedTaxon` Pydantic model — `{name, taxon_type, count, scientific_name, common_name}` replacing flat `list[str]` `sonnet`
+- [ ] WU-T3: Eval matcher refactor — eliminate 3× TP/FP/FN duplication, `ParsedTaxonComparator`, delete orphaned `EnhancedSpeciesMatchConfig` `sonnet`
+- [ ] WU-T4: GBIF enrichment on clean `scientific_name` field (backlog) `sonnet`
+
 ### Backlog
 
 - [ ] Geographic information model incl subnational admin units (MRCs, admin regions, cities), protected areas, ecosystem
   > **Plan:** [`plans/nominatim_enrichment.md`](plans/nominatim_enrichment.md) — `location_text` extraction field + `location_ids` enrichment via Nominatim (Wikidata QID primary, `osm_type:osm_id` fallback)
 - [ ] Demo notebook `notebooks/eval_nominatim_location_test.ipynb` — modelled on `notebooks/species_recall_improvement.ipynb`; reuse existing extractions (no new LLM calls); compare `location_text` fuzzy string vs `location_ids` set-comparison P/R/F1
-- [ ] Taxonomic information model incl species, paraphyletic groups
-- [ ] Taxonomic & geographic referencing pipeline
-- [ ] `ExtractedTaxon` structured schema — LLM extracts `{name, type, count}` instead of flat `list[str]` (improves GBIF preprocessing, requires prompt + ground truth changes)
-- [ ] Evaluation matcher refactor — strategy pattern to eliminate 3x duplicated TP/FP/FN logic in `compare_models()` + delete orphaned `EnhancedSpeciesMatchConfig`
-- [ ] *(ready, out of scope)* Species eval via `ParsedTaxon` — replace fuzzy enhanced_species matching with structured comparator in `evaluate_indexed()`: parse both GT and predictions through `ParsedTaxon`, match on normalized `scientific_name`/`common_name` fields; more principled than heuristic fuzzy, improves precision; requires custom comparator hook in `EvaluationConfig` `sonnet`
 - [ ] Pipeline enrichment — use `gbif_keys` beyond evaluation for data gap analysis with real taxon IDs
 
 ### Model Hierarchy & Enrichment Pattern

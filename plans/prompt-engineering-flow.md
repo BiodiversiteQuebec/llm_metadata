@@ -423,11 +423,17 @@ Mode comparison (from 2026-03-28 lab log): `abstract` best for `data_type`/`time
 
 **deps:** 3.1 (done) | **files:** `src/llm_metadata/prompts/common.py` (`VOCABULARY` block)
 
+> **Sequencing note:** This work unit and WU-T1 in `plans/taxonomic-relevance-refactor.md` both modify `common.py`. Run them in the same session or sequentially — not in parallel.
+
 **Problem:** Prompt VOCABULARY only documents 8 `data_type` values and 5 `geospatial_info` values. The schema accepts additional values (`presence-absence`, `density`, `distribution`, `traits`, `ecosystem_function`, etc.) that are completely absent from the vocabulary guidance.
 
+**Enum audit (already done — do not re-derive):**
+
+`EBVDataType` — 13 valid values: `abundance`, `presence-absence`, `presence-only`, `density`, `distribution`, `traits`, `ecosystem_function`, `ecosystem_structure`, `genetic_analysis`, `time_series`, `species_richness`, `other`, `unknown`. Current prompt documents only 3 of these correctly; 5 values it documents (`tracking`, `remote_sensing`, `acoustic`, `morphological`, `environmental`) do not exist in the schema.
+
+`GeospatialInfoType` — 9 valid values: `sample`, `site`, `range`, `distribution`, `geographic_features`, `administrative_units`, `maps`, `site_ids`, `unknown`. Current prompt is missing: `distribution`, `geographic_features`, `site_ids`, `unknown`.
+
 **Work:**
-- Audit `EBVDataType` and `GeospatialInfoType` enums in `schemas/fuster_features.py` — list every accepted value
-- Compare to the `VOCABULARY` block in `prompts/common.py` — identify gaps
 - Expand each `data_type` value with:
   - 1-sentence ecological definition
   - 2–3 examples from dev subset GT
@@ -439,30 +445,6 @@ Mode comparison (from 2026-03-28 lab log): `abstract` best for `data_type`/`time
 - Log delta + mismatch analysis in run notes
 
 **Success criterion:** `data_type` F1 ≥ 0.50 without regressing other fields.
-
----
-
-### 3.3 Species hygiene + scoping iteration `sonnet`
-
-**deps:** 3.1 (done) | **files:** `src/llm_metadata/prompts/common.py` (`SCOPING` + task-specific block in `abstract.py`)
-
-**Problem:** Two intertwined issues — (1) decorated species strings (`woodland caribou (Rangifer tarandus caribou)`) instead of canonical names, and (2) context/referenced taxa leaking in (predators, vegetation, cited-study organisms).
-
-**Work (SCOPING block):**
-- Define "primary dataset taxa" = species that are the direct subject of data collection
-- Define "context taxa" = organisms mentioned in habitat description, diet, predator, or compared study
-- Explicit rule: "Extract ONLY taxa from the primary dataset. Ignore context taxa."
-- 2–3 concrete examples drawn from dev subset showing the distinction
-
-**Work (species hygiene):**
-- Add species hygiene block in `abstract.py` or as a named block in `common.py`:
-  - Use canonical scientific name where possible; common name only if scientific absent
-  - Strip count qualifiers (`41 fish species` → `fish sp.` or individual names if listed), sex qualifiers, adjectives
-  - No parenthetical alternates — choose one form
-- Re-run `prompt_eval`, compare `species` F1; also check `data_type` and `geospatial_info_dataset` for regressions
-- Log observations
-
-**Success criterion:** `species` precision ≥ 0.45 (currently 0.29).
 
 ---
 
@@ -603,7 +585,7 @@ Also note: if a well-known threatened species is named (e.g., polar bear, beluga
 
 ### 3.4b Mode-specific prompt tuning `sonnet`
 
-**deps:** 3.2, 3.3, 3.4 | **files:** `src/llm_metadata/prompts/section.py`, `src/llm_metadata/prompts/pdf_file.py`
+**deps:** 3.2, 3.4 | **files:** `src/llm_metadata/prompts/section.py`, `src/llm_metadata/prompts/pdf_file.py`
 
 Sections and PDF mode prompts share the `common.py` blocks but need additional mode-specific rules. These were identified in the March 27 baseline run notes.
 
@@ -625,10 +607,7 @@ Sections and PDF mode prompts share the `common.py` blocks but need additional m
 **`new_species_region`** (F1=0.59, P=0.73, R=0.50): Full text helps recall but some false positives remain from confusing known-range discussion with first records. Add contrastive guidance:
 > "True only for a first confirmed record in a defined region — explicit language like 'first record for', 'new to', 'not previously recorded in'. NOT: general range expansion discussion, recolonization, modeled range extension, or species known to occur nearby."
 
-**`species`** (F1=0.17, P=0.10 — PDF mode collapses on precision): Prompt-only fix is likely insufficient. Full-text mode pulls in predators, vegetation, cited taxa from every section. Add a hard full-text scoping rule:
-> "In full-text mode: extract ONLY taxa that are explicitly stated as part of the dataset collected by this study. Ignore all taxa mentioned in: introduction/background, literature review, discussion, comparisons with other studies, habitat descriptions."
->
-> Note: if species precision in PDF mode does not improve above 0.20 after this change, flag for evidence-gated extraction (two-stage: identify dataset-description sections first, then extract taxa) rather than continuing prompt iteration.
+**`species`** (F1=0.17, P=0.10 — PDF mode): Handled in [`plans/taxonomic-relevance-refactor.md`](taxonomic-relevance-refactor.md) WU-T1b — out of scope here.
 
 **`time_series`** (F1=0.33, P=0.20 — worst mode): Any repeated year or appendix in the full text triggers True. Add:
 > "In full-text mode: base the `time_series` judgment ONLY on the dataset description, sampling design section, or explicit data collection methodology. Repeated analyses, model runs, or appendix tables do not constitute a time series."
@@ -639,7 +618,7 @@ Sections and PDF mode prompts share the `common.py` blocks but need additional m
 
 ### 3.5 Batch validation `sonnet`
 
-**deps:** 3.2, 3.3, 3.4 | **files:** `artifacts/runs/batch_*.json`, `notebooks/README.md`
+**deps:** 3.2, 3.4 | **files:** `artifacts/runs/batch_*.json`, `notebooks/README.md`
 
 - Run winning prompts on the **full** validated dataset (418 records)
 - Compare against the March 27 dev-subset baseline per-field metrics
@@ -651,11 +630,13 @@ Sections and PDF mode prompts share the `common.py` blocks but need additional m
 
 ```
 Round 1: ~~WU-3.1~~ ✅ done
-Round 2: WU-3.2 || WU-3.3              (independent blocks in common.py — parallel)
+Round 2: WU-3.2                         (VOCABULARY block — data_type + geospatial_info_dataset)
 Round 3: WU-3.4                         (MODULATOR_FIELDS — after 3.2 to avoid interactions)
-Round 4: WU-3.4b                        (mode-specific section.py + pdf_file.py tweaks — after shared blocks stable)
+Round 4: WU-3.4b                        (mode-specific section.py + pdf_file.py — after shared blocks stable)
 Round 5: WU-3.5                         (batch validation on full 418-record dataset)
 ```
+
+> Species prompt work (previously WU-3.3) is now tracked separately in [`plans/taxonomic-relevance-refactor.md`](taxonomic-relevance-refactor.md) WU-T1/T1b and runs in parallel with this plan.
 
 **Mode-field priority matrix** (from March 27 baseline notes):
 
