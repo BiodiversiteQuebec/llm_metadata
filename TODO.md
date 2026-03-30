@@ -1,21 +1,15 @@
 # TODO
 
-## Prompt Engineering — Phase 3
+## Prompt Engineering — Phase 3 ← **CURRENT FOCUS**
 
-- [ ] Phase 3 — Per-Field Prompt Iteration (WU-3.1 baseline run requires API key)
+> **Plan:** [`plans/prompt-engineering-flow.md`](plans/prompt-engineering-flow.md)
 
----
-
-## Prompt-Eval & Viewer Improvements
-
-> **Plan:** [`plans/prompt-eval-viewer-improvements.md`](plans/prompt-eval-viewer-improvements.md)
-
-- [x] Phase 1: `EvaluationReport.abstracts` field; `run_id` in `run_eval()` + CLI; abstracts persisted in JSON
-- [x] Phase 2: `app_eval_viewer.py` bug fixes — `0.0→N/A` display; abstract text in mismatch expanders
-- [x] Phase 3: F1 bar chart; Run B mismatch explorer; Run B metadata sidebar
-- [x] Phase 4: Record Explorer — all field results for a selected record
-- [ ] Phase 5: Re-evaluate from saved predictions (`--pred-from`) — WU-5.1, 5.2, 5.3
-- [ ] Phase 6: Multi-run comparison (`compare` CLI subcommand) — WU-6.1, 6.2
+- [x] WU-3.1 — Baseline runs (abstract / sections / pdf_native) on dev subset, 2026-03-27
+- [x] WU-3.1 audit — Per-field mismatch analysis documented in run notes (2026-03-28)
+- [ ] WU-3.2 — Expand VOCABULARY block: full `data_type` + `geospatial_info_dataset` enum coverage + contrastive examples `sonnet`
+- [ ] WU-3.3 — Species hygiene + SCOPING block: context-taxa exclusion rule `sonnet`
+- [ ] WU-3.4 — Boolean cue expansion: `time_series` neg examples, `threatened_species` cue list, `bias_north_south` triggers `sonnet`
+- [ ] WU-3.5 — Batch validation on full 418-record dataset `sonnet`
 
 ---
 
@@ -42,6 +36,16 @@
 - [ ] Lab log entry in `notebooks/README.md`
 - **Tag:** `CLOUD` | **Deps:** WU-B, WU-C3, WU-C4 | **Files:** `docs/article_outline.md`
 
+
+---
+
+## Automated Relevance Classification
+
+> **Plan:** [`plans/automated_relevance_classification.md`](plans/automated_relevance_classification.md)
+
+- [ ] WU-R1: `notebooks/relevance_mechanistic.ipynb` — rule-based scoring (Part A: GT features ceiling test; Part B: LLM features end-to-end)
+- [ ] WU-R2: `notebooks/relevance_llm_direct.ipynb` — direct LLM classification with extended schema
+- [ ] Combined comparison table + lab log entry
 
 ---
 
@@ -137,6 +141,7 @@
 
 | Branch | Task ID | Description | Model | Finished |
 |---|---|---|---|---|
+| main | WU-3.1 | Baseline runs (abstract/sections/pdf_native) + per-field audit | sonnet | 2026-03-28 |
 | `claude/wu-a1-dlX7N` | WU-A1 | Extend schema — modulators + DataSource | opus | 2026-02-18 |
 | `claude/implement-wu-a2-ePym7` | WU-A2 | Validate all-source ground truth | sonnet | 2026-02-18 |
 | `claude/implement-wu-a3-Y1iX9` | WU-A3 | Enrich URL metadata (source_url, journal_url, pdf_url, is_oa) | sonnet | 2026-02-18 |

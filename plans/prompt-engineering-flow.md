@@ -6,7 +6,7 @@ Running full batch extraction with unrefined prompts wastes API spend and produc
 
 ---
 
-## Phase 1: Evaluation Hardening
+## Phase 1: Evaluation Hardening ✅ COMPLETE
 
 ### Decisions (from discussion 2026-02-19)
 
@@ -60,6 +60,20 @@ List comparison mechanism unchanged: set-based TP/FP/FN via intersection/differe
 ---
 
 ### Work Units
+
+#### ~~WU-EH1: FieldEvalStrategy + EvaluationConfig extension~~ ✅
+
+#### ~~WU-EH2: Update compare_models dispatch logic~~ ✅
+
+#### ~~WU-EH3: Tests~~ ✅
+
+#### ~~WU-EH4: CLAUDE.md — evaluation section~~ ✅
+
+#### ~~WU-EH5: Per-field audit~~ ✅ (done via March 27 baseline run notes)
+
+> Audit completed 2026-03-28 via `20260327_172654_dev_subset_abstract.json`. Key findings documented in run notes. See Phase 3 for action items.
+
+---
 
 #### WU-EH1: FieldEvalStrategy + EvaluationConfig extension `sonnet`
 
@@ -138,11 +152,21 @@ Round 4: WU-EH5                              (deps: EH1, EH2, EH3)
 
 ---
 
-## Phase 2: Prompt Infrastructure
+## Phase 2: Prompt Infrastructure ✅ COMPLETE
 
 ### Goals
 
 Build the tooling that makes prompt iteration fast and measurable: versioned prompts, a CLI/API evaluation harness, a curated dev subset, and a visualization layer for results.
+
+### ~~2.1 Prompt Refactor — `prompts/` package~~ ✅
+### ~~2.2 EvaluationReport serialization~~ ✅
+### ~~2.3 `prompt_eval` module — CLI + Python API~~ ✅
+### ~~2.4 Versioned eval configs~~ ✅
+### ~~2.5 Curate dev manifest subset~~ ✅ (30 records, `data/manifests/dev_subset_data_paper.csv`)
+### ~~2.6 Results visualization — Streamlit app~~ ✅ (`app/app_eval_viewer.py`, 5 tabs)
+### ~~2.7 Document agentic workflow in CLAUDE.md~~ ✅
+
+---
 
 ### 2.1 Prompt Refactor — `prompts/` package `sonnet`
 
@@ -364,84 +388,261 @@ Round 4: WU-2.6 || WU-2.7                   (deps: 2.2+2.3)
 
 ---
 
-## Phase 3: Per-Field Prompt Iteration
+## Phase 3: Per-Field Prompt Iteration ← **CURRENT PHASE**
 
 ### Goals
 
 Use the infrastructure from Phase 2 to systematically improve extraction quality, field by field. Each iteration follows the loop: extract → evaluate → analyze mismatches → modify prompt → re-extract.
 
-### 3.1 Baseline run on dev subset `sonnet`
+### ~~3.1 Baseline run on dev subset~~ ✅
 
-**deps:** Phase 2 complete | **files:** `results/baseline_*.json`
+Three baseline runs completed 2026-03-27:
 
-- Run `prompt_eval` with current prompts (post-refactor from 2.1) on dev subset
-- Save results as the baseline for all subsequent comparisons
-- Log per-field metrics in `notebooks/README.md`
+| Run artifact | Mode | Notes file |
+|---|---|---|
+| `artifacts/runs/20260327_172654_dev_subset_abstract.json` | abstract | `data/20260327_172654_dev_subset_abstract_notes.md` |
+| `artifacts/runs/20260327_172653_dev_subset_sections.json` | sections | `data/20260327_172653_dev_subset_sections_notes.md` |
+| `artifacts/runs/20260327_172656_dev_subset_pdf_file.json` | pdf_native | `data/20260327_172656_dev_subset_pdf_file_notes.md` |
 
-### 3.2 `data_type` vocabulary iteration `sonnet`
+**Abstract baseline metrics (fields with diagnosis):**
 
-**deps:** 3.1 | **files:** `prompts/common.py` (`VOCABULARY` block)
+| Field | F1 | P | R | Root cause |
+|---|---|---|---|---|
+| `data_type` | 0.34 | 0.24 | 0.58 | vocab gap — schema enums absent from prompt |
+| `geospatial_info_dataset` | 0.14 | 0.09 | 0.43 | prompt — place names over-trigger predictions |
+| `species` | 0.40 | 0.29 | 0.65 | prompt — decorated forms + context taxa leak |
+| `time_series` | 0.53 | 0.36 | 1.00 | prompt — over-prediction, multi-year ≠ time series |
+| `threatened_species` | 0.38 | 1.00 | 0.24 | prompt — missing recall cues (IUCN, red-listed, etc.) |
+| `bias_north_south` | N/A | N/A | 0.00 | prompt — no lexical triggers defined |
 
-The `data_type` enum values (`abundance`, `presence-only`, `genetic_analysis`, etc.) currently appear as bare names in the prompt. The LLM lacks ecological context to distinguish them reliably.
+Mode comparison (from 2026-03-28 lab log): `abstract` best for `data_type`/`time_series`/`temp_range`; `sections` best for `species`/`spatial_range`; `pdf_native` best for `new_species_*` fields.
 
-**Work:**
-- In `prompts/common.py` `VOCABULARY` block, expand each `data_type` enum value with:
-  - A 1-sentence ecological definition
-  - 2–3 concrete examples from real abstracts (drawn from dev subset GT)
-  - Negative examples where useful ("NOT abundance if only presence/absence is recorded")
-- Similarly review `geospatial_info` enum — same treatment if WU-EH5 audit identified vocab gaps
-- Re-run `prompt_eval`, compare `data_type` F1 against baseline
-- Log delta and mismatch analysis
+---
 
-**Expected format in prompt:**
+### 3.2 `data_type` + `geospatial_info_dataset` vocabulary iteration `sonnet`
 
-```
-data_type values:
-- abundance: Count or density of individuals per area/time. Examples: "population counts of 12 bird species",
-  "density estimates from transect surveys". NOT: presence/absence records, genetic samples.
-- presence-only: Records of species occurrence without abundance. Examples: "occurrence records from
-  citizen science platforms", "species checklists from field surveys".
-- genetic_analysis: Molecular/genomic data. Examples: "microsatellite genotyping of 200 individuals",
-  "eDNA metabarcoding of water samples".
-...
-```
+**deps:** 3.1 (done) | **files:** `src/llm_metadata/prompts/common.py` (`VOCABULARY` block)
 
-### 3.3 Dataset scoping iteration `sonnet`
-
-**deps:** 3.1 | **files:** `prompts/common.py` (`SCOPING` block)
-
-Address the core scoping problem: LLM extracts features from cited/referenced datasets instead of restricting to the primary dataset(s) produced or analyzed by the study.
+**Problem:** Prompt VOCABULARY only documents 8 `data_type` values and 5 `geospatial_info` values. The schema accepts additional values (`presence-absence`, `density`, `distribution`, `traits`, `ecosystem_function`, etc.) that are completely absent from the vocabulary guidance.
 
 **Work:**
-- Draft the `SCOPING` instruction block in `prompts/common.py`:
-  - Define "primary dataset" = data collected, generated, or curated by the study authors
-  - Define "referenced dataset" = previously published data used for context, calibration, or comparison
-  - Explicit instruction: "Extract features ONLY from primary datasets. Ignore referenced datasets."
-  - Include 2–3 examples from dev subset showing the distinction
-- Re-run `prompt_eval`, compare `species`, `data_type`, `geospatial_info` against baseline
-- These three fields are most affected by scoping confusion
-- Log which mismatches were resolved vs persisted
+- Audit `EBVDataType` and `GeospatialInfoType` enums in `schemas/fuster_features.py` — list every accepted value
+- Compare to the `VOCABULARY` block in `prompts/common.py` — identify gaps
+- Expand each `data_type` value with:
+  - 1-sentence ecological definition
+  - 2–3 examples from dev subset GT
+  - Negative contrastive examples (`presence-only` vs `distribution`, `abundance` vs `density`)
+- Expand `geospatial_info_dataset` section with:
+  - Negative rule: named places in background text do not imply dataset geography
+  - Positive examples: coordinates, site identifiers, explicit distribution output
+- Re-run `prompt_eval --mode abstract`, compare `data_type` and `geospatial_info_dataset` F1 vs baseline
+- Log delta + mismatch analysis in run notes
 
-### 3.4 Field-priority iterations `sonnet`
+**Success criterion:** `data_type` F1 ≥ 0.50 without regressing other fields.
 
-**deps:** 3.1, WU-EH5 (audit results) | **files:** `prompts/common.py`, `prompts/abstract.py`
+---
 
-Address field-specific issues identified by the Phase 1 audit (WU-EH5). Work on fields in priority order based on F1 impact and actionability:
+### 3.3 Species hygiene + scoping iteration `sonnet`
 
-**Likely priorities** (to be confirmed by audit):
-- `time_series`: over-prediction — LLM infers temporal data implies time series; add negative examples
-- `threatened_species`: under-prediction — LLM misses conservation status cues; add positive signal words
-- `multispecies`: threshold ambiguity — does "2 species" count? Clarify in prompt
-- `new_species_science` / `new_species_region`: rare positives, may need few-shot examples
+**deps:** 3.1 (done) | **files:** `src/llm_metadata/prompts/common.py` (`SCOPING` + task-specific block in `abstract.py`)
 
-Each iteration: modify prompt → `prompt_eval` → compare to baseline → log observations.
+**Problem:** Two intertwined issues — (1) decorated species strings (`woodland caribou (Rangifer tarandus caribou)`) instead of canonical names, and (2) context/referenced taxa leaking in (predators, vegetation, cited-study organisms).
+
+**Work (SCOPING block):**
+- Define "primary dataset taxa" = species that are the direct subject of data collection
+- Define "context taxa" = organisms mentioned in habitat description, diet, predator, or compared study
+- Explicit rule: "Extract ONLY taxa from the primary dataset. Ignore context taxa."
+- 2–3 concrete examples drawn from dev subset showing the distinction
+
+**Work (species hygiene):**
+- Add species hygiene block in `abstract.py` or as a named block in `common.py`:
+  - Use canonical scientific name where possible; common name only if scientific absent
+  - Strip count qualifiers (`41 fish species` → `fish sp.` or individual names if listed), sex qualifiers, adjectives
+  - No parenthetical alternates — choose one form
+- Re-run `prompt_eval`, compare `species` F1; also check `data_type` and `geospatial_info_dataset` for regressions
+- Log observations
+
+**Success criterion:** `species` precision ≥ 0.45 (currently 0.29).
+
+---
+
+### 3.4 Boolean field cue expansion `sonnet`
+
+**deps:** 3.1 (done), 3.2 | **files:** `src/llm_metadata/prompts/common.py` (`MODULATOR_FIELDS` block)
+
+**Confirmed issues from audit:**
+
+| Field | F1 | Issue | Action |
+|---|---|---|---|
+| `time_series` | 0.53 (P=0.36) | Over-prediction: multi-year window ≠ repeated monitoring | Add negative examples |
+| `threatened_species` | 0.38 (R=0.24) | Under-prediction: misses IUCN/red-list cues | Expand cue list |
+| `bias_north_south` | N/A (R=0.00) | Two missing trigger types: geographic AND explicit-bias language | Add both trigger classes |
+
+---
+
+#### `time_series`
+
+**Current text** (already partially correct but too weak):
+> "true if the dataset contains repeated measurements at the same locations/populations over time (e.g. 'annual surveys from 2005 to 2015', 'monitored monthly'). A single snapshot is NOT a time series."
+
+**Problem:** The model fires on any multi-year phrasing. The distinction that matters is **longitudinal intent** — same sites/populations re-visited to track change — vs **temporal coverage** — data collected across multiple years as a cross-sectional effort.
+
+**What to add — negative anchors:**
+- "Data collected in 2006 and 2007" → NOT a time series (two-year window, no stated repeat)
+- "Samples collected across three field seasons" → NOT a time series unless same sites revisited
+- "Data from 1990–2020 compiled from multiple studies" → NOT a time series (compilation, not repeated monitoring)
+- Multi-treatment experimental repeats → NOT a time series
+
+**Revised anchor text for prompt:**
+```
+- **time_series**: true if the dataset contains repeated measurements at the SAME locations
+  or populations across multiple time periods, with the explicit intent to track change over
+  time (e.g., "annual surveys 2005–2015 at 12 fixed plots", "monthly water quality monitoring",
+  "long-term population census"). NOT a time series: data collected across multiple years
+  as independent snapshots, multi-year compilations from different sites, short study windows
+  ("sampled in 2006 and 2007"), or experimental treatment repeats.
+```
+
+---
+
+#### `threatened_species`
+
+**Current text** (keywords present but incomplete):
+> "true if any studied species are described as threatened, endangered, vulnerable, at-risk, or listed under IUCN/CITES/national red lists."
+
+**Problem:** Model has perfect precision (P=1.00) but low recall (R=0.24). It fires conservatively only on exact keyword matches. Real abstracts use indirect or regulatory-framework language.
+
+**What to add — expanded cue list:**
+
+| Framework | Trigger language |
+|---|---|
+| IUCN Red List | "IUCN-listed", "Red List", "critically endangered", "endangered", "vulnerable", "near threatened" |
+| CITES | "CITES Appendix I/II/III", "CITES-listed", "international trade restriction" |
+| Canada (federal) | "Species at Risk Act", "SARA", "COSEWIC", "Committee on the Status of Endangered Wildlife" |
+| Canada (BC/QC/provincial) | "provincial red list", "species of concern", "conservation status" |
+| General | "at-risk species", "conservation concern", "listed species", "protected species", "declining population" |
+
+Also note: if a well-known threatened species is named (e.g., polar bear, beluga whale, woodland caribou, monarch butterfly), the model may infer threatened status from its ecological knowledge when no explicit status language appears — this is acceptable but should be noted in the prompt as an exception to the conservative philosophy.
+
+**Revised anchor text for prompt:**
+```
+- **threatened_species**: true if any studied species are described as threatened, endangered,
+  vulnerable, at-risk, or conservation-listed. Explicit cues include: IUCN Red List categories
+  (critically endangered, endangered, vulnerable, near threatened), CITES Appendix listings,
+  Species at Risk Act (SARA) / COSEWIC designations, provincial red lists, "species of
+  conservation concern", "at-risk", "declining", "protected species". If a well-known
+  threatened taxon is named without explicit status language, use ecological knowledge
+  to confirm status only when you are certain.
+```
+
+---
+
+#### `bias_north_south`
+
+**Root cause of zero recall:** The field actually has **two distinct trigger conditions** that the current prompt collapses into one narrow description. The Fuster et al. (2025) paper defines the field as a Quebec-specific modulator where **either** condition qualifies:
+
+1. **Geographic criterion**: The dataset is from **northern Quebec** — defined in the paper as "the territory that extends north of the 49th parallel and north of the St. Lawrence River and the Gulf of St. Lawrence" (Fuster et al., sec. 7). These regions are systematically under-sampled due to the south-north human population density gradient (sec. 2).
+
+2. **Explicit bias criterion**: The paper explicitly discusses north-south sampling bias, geographic underrepresentation, or data gaps in northern/undersampled regions — at any spatial scale (Quebec, Canada, or global).
+
+**Current prompt** only mentions the explicit-bias criterion ("explicitly discusses geographic bias toward the Global North") and misses the geographic criterion entirely.
+
+**Geographic keywords for trigger 1 (northern Quebec / northern Canada):**
+
+| Category | Keywords |
+|---|---|
+| Named territories | "Nunavik", "James Bay" / "Baie James", "Hudson Bay" / "Baie d'Hudson", "Ungava", "Labrador", "Côte-Nord" |
+| Political/administrative | "northern Quebec" / "nord du Québec", "northern Canada", "Canadian Arctic", "Northwest Territories", "Nunavut", "Yukon" |
+| Latitude thresholds | "north of the 49th parallel", "above 49°N", "above 50°N", "above 55°N", "above 60°N", explicit lat > 49 |
+| Ecosystem types | "tundra", "taiga", "subarctic", "arctic", "boreal" (only when combined with northern or remote framing) |
+| Geographic references | "north of the St. Lawrence", "north shore", "Laurentian", "Shield" (northern Precambrian Shield contexts) |
+
+**Caution:** "boreal" alone is too broad (covers southern Quebec too). Require geographic modifier or latitude context. "Arctic" alone is a strong signal. "Nunavik" is unambiguous.
+
+**Explicit-bias keywords for trigger 2:**
+
+| Category | Keywords |
+|---|---|
+| Sampling gaps | "undersampled", "data gap", "poorly documented", "lack of data", "data deficiency" |
+| Geographic bias | "geographic bias", "sampling bias", "spatial bias", "north-south gradient", "north-south bias" |
+| Representation | "underrepresented region", "underrepresented area", "uneven distribution", "Global North", "Global South" |
+| Climate/zone framing | "temperate overrepresentation", "tropical underrepresentation", "biodiversity hotspot bias" |
+| Explicit context match | "south-north human population density gradient", "remote areas", "northern territories poorly documented" |
+
+**Revised anchor text for prompt:**
+```
+- **bias_north_south**: true under EITHER of two conditions:
+  (1) GEOGRAPHIC — the dataset is located in northern Quebec or northern Canada, defined as
+  territory north of the 49th parallel, or north of the St. Lawrence River/Gulf. Trigger on
+  named regions (Nunavik, James Bay, Hudson Bay, Ungava, Côte-Nord, northern Quebec), latitude
+  references (above 49°N, above 55°N), ecosystem types in northern context (tundra, subarctic,
+  Arctic), or explicit "northern Quebec" / "north of the St. Lawrence" framing.
+  (2) EXPLICIT BIAS — the text explicitly discusses north-south sampling bias, underrepresentation
+  of northern or tropical regions, data gaps in remote areas, or Global North/South disparities.
+  Trigger on: "undersampled", "data gap", "geographic bias", "north-south gradient",
+  "underrepresented region", "Global North/South", "poorly documented northern territories".
+  A dataset located in northern Quebec automatically qualifies regardless of whether it mentions bias.
+```
+
+**Implementation note:** This field has 10 positive cases in the dev subset (confirmed in audit notes). After adding these triggers, if recall remains below 0.30 across two prompt iterations, consider whether the GT annotations require more information than is present in the abstract (in which case sections/pdf_native mode would be needed for this field, not just prompt changes).
+
+---
+
+**Work steps:**
+1. Revise each of the three fields in `MODULATOR_FIELDS` block in `common.py` using the text above
+2. Re-run `prompt_eval --mode abstract`, compare each field vs baseline independently
+3. If `bias_north_south` recall improves with abstract mode, also test sections mode (geographic cues often appear in study area descriptions, not abstracts)
+4. Log per-field observations in run notes
+
+**Success criteria:**
+- `time_series`: precision ≥ 0.55 (currently 0.36); F1 net positive vs 0.53 baseline
+- `threatened_species`: recall ≥ 0.50 (currently 0.24); precision stays ≥ 0.80
+- `bias_north_south`: F1 > 0 (currently N/A); recall ≥ 0.30 after 1–2 iterations
+
+---
+
+### 3.4b Mode-specific prompt tuning `sonnet`
+
+**deps:** 3.2, 3.3, 3.4 | **files:** `src/llm_metadata/prompts/section.py`, `src/llm_metadata/prompts/pdf_file.py`
+
+Sections and PDF mode prompts share the `common.py` blocks but need additional mode-specific rules. These were identified in the March 27 baseline run notes.
+
+#### Sections mode (`section.py`)
+
+**`data_type`** (F1=0.30, worse than abstract): Methods text causes the model to pile on secondary labels for every analytical concept mentioned (e.g., `ecosystem_function` because an ecosystem analysis is described, `time_series` because repeated sampling is mentioned). Add a sections-specific instruction:
+> "Classify `data_type` for the primary data *collected or stored*, not downstream analyses or derived products. Ignore methods that describe analysis techniques; focus on what kind of observations or measurements are in the dataset."
+
+**`spatial_range_km2`** (F1=0.69, P=0.92, R=0.55 — sections is the strongest mode for this field): No change needed. Note this as the preferred mode for spatial range extraction — the information is usually explicit in methods text and rarely in abstracts. This observation should inform mode selection logic in future pipeline design.
+
+**`time_series`** (F1=0.42 vs 0.53 abstract — worse in sections): Experimental repeats and multi-period sampling windows in methods text trigger the model more aggressively than in abstract mode. Add a section-mode exclusion:
+> "Experimental treatment periods, field seasons, or sampling rounds within a single study are NOT time series unless the study design explicitly states repeated observation of the same sites or populations over successive years."
+
+#### PDF native mode (`pdf_file.py`)
+
+**`new_species_science`** (F1=0.61, P=0.79, R=0.50): Full text is clearly the best mode for this rare field. Add positive trigger cues:
+> "Positive signals: 'sp. nov.', 'new species', 'described here for the first time', 'holotype', 'taxonomic diagnosis', 'new to science', formal species description language."
+
+**`new_species_region`** (F1=0.59, P=0.73, R=0.50): Full text helps recall but some false positives remain from confusing known-range discussion with first records. Add contrastive guidance:
+> "True only for a first confirmed record in a defined region — explicit language like 'first record for', 'new to', 'not previously recorded in'. NOT: general range expansion discussion, recolonization, modeled range extension, or species known to occur nearby."
+
+**`species`** (F1=0.17, P=0.10 — PDF mode collapses on precision): Prompt-only fix is likely insufficient. Full-text mode pulls in predators, vegetation, cited taxa from every section. Add a hard full-text scoping rule:
+> "In full-text mode: extract ONLY taxa that are explicitly stated as part of the dataset collected by this study. Ignore all taxa mentioned in: introduction/background, literature review, discussion, comparisons with other studies, habitat descriptions."
+>
+> Note: if species precision in PDF mode does not improve above 0.20 after this change, flag for evidence-gated extraction (two-stage: identify dataset-description sections first, then extract taxa) rather than continuing prompt iteration.
+
+**`time_series`** (F1=0.33, P=0.20 — worst mode): Any repeated year or appendix in the full text triggers True. Add:
+> "In full-text mode: base the `time_series` judgment ONLY on the dataset description, sampling design section, or explicit data collection methodology. Repeated analyses, model runs, or appendix tables do not constitute a time series."
+
+**Run order:** Run sections and PDF mode evals against their respective baselines (March 27 runs) after shared `common.py` changes from WU-3.2–3.4 are applied. Evaluate shared-block improvements first to avoid confounding.
+
+---
 
 ### 3.5 Batch validation `sonnet`
 
-**deps:** 3.2, 3.3, 3.4 | **files:** `results/batch_*.json`, `notebooks/README.md`
+**deps:** 3.2, 3.3, 3.4 | **files:** `artifacts/runs/batch_*.json`, `notebooks/README.md`
 
-- Run winning prompts on the **full** validated dataset (not just dev subset)
-- Compare against the original batch baseline (Micro F1 0.202)
+- Run winning prompts on the **full** validated dataset (418 records)
+- Compare against the March 27 dev-subset baseline per-field metrics
 - Per-field delta table: which fields improved, which regressed
 - Cost comparison
 - Final lab log entry with comprehensive results
@@ -449,11 +650,26 @@ Each iteration: modify prompt → `prompt_eval` → compare to baseline → log 
 ### Phase 3 Execution Rounds
 
 ```
-Round 1: WU-3.1                              (baseline)
-Round 2: WU-3.2 || WU-3.3                   (independent prompt changes)
-Round 3: WU-3.4                              (deps: audit + baseline)
-Round 4: WU-3.5                              (deps: all iterations done)
+Round 1: ~~WU-3.1~~ ✅ done
+Round 2: WU-3.2 || WU-3.3              (independent blocks in common.py — parallel)
+Round 3: WU-3.4                         (MODULATOR_FIELDS — after 3.2 to avoid interactions)
+Round 4: WU-3.4b                        (mode-specific section.py + pdf_file.py tweaks — after shared blocks stable)
+Round 5: WU-3.5                         (batch validation on full 418-record dataset)
 ```
+
+**Mode-field priority matrix** (from March 27 baseline notes):
+
+| Field | Best mode | Notes |
+|---|---|---|
+| `data_type` | abstract | sections adds noise from methods text |
+| `geospatial_info_dataset` | abstract | PDF mode over-predicts heavily |
+| `species` | sections | abstract best for precision; sections best for recall |
+| `time_series` | abstract | sections/PDF both worse due to contamination |
+| `spatial_range_km2` | **sections** | rarely in abstract; explicit in methods |
+| `new_species_science` | **pdf_native** | full text needed for rare positives |
+| `new_species_region` | **pdf_native** | full text needed for rare positives |
+| `threatened_species` | abstract | status language usually in abstract |
+| `bias_north_south` | abstract (test sections too) | geographic cues may appear in study area section |
 
 ---
 
