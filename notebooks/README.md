@@ -4,6 +4,48 @@ This folder contains analysis and validation notebooks for ecological dataset ch
 
 ## Recent Activity
 
+### 2026-03-28: Dev-Subset Run Audit and Prompt Iteration Ladder
+
+**Task:** Inspect the latest dev-subset run artifacts across abstract, section-based, and native-PDF modes, then turn the observed failure patterns into a practical prompt-engineering and eval-improvement roadmap ordered from easier to harder work.
+
+**Work Performed:**
+- **Artifacts reviewed:** `artifacts/runs/20260327_172654_dev_subset_abstract.json`, `artifacts/runs/20260327_172653_dev_subset_sections.json`, `artifacts/runs/20260327_172656_dev_subset_pdf_file.json`
+- Compared per-field metrics and mode tradeoffs, then inspected recurring false-positive / false-negative value patterns directly from `field_results`
+- Cross-checked the current prompt blocks in `src/llm_metadata/prompts/common.py` and found a major vocabulary mismatch: the prompt currently documents only a subset of the enum values actually accepted by `DatasetFeaturesExtraction`
+- Wrote mode-specific analyst notes for the three latest runs:
+  - `data/20260327_172654_dev_subset_abstract_notes.md`
+  - `data/20260327_172653_dev_subset_sections_notes.md`
+  - `data/20260327_172656_dev_subset_pdf_file_notes.md`
+
+**Results:**
+- The March 27 run set is effectively a stable baseline; its metrics match the March 6 run set exactly, so no prompt improvement has landed yet
+- Mode comparison on the 30-record dev subset:
+  - `abstract` is best for `data_type` (F1 `0.34`), `time_series` (F1 `0.53`), and `temp_range_i` (F1 `0.74`)
+  - `sections` is best for `species` (F1 `0.42`) and materially improves `spatial_range_km2` over abstract mode (F1 `0.69` vs `0.10`)
+  - `pdf_native` is best for `new_species_science` (F1 `0.61`), `new_species_region` (F1 `0.59`), `threatened_species` (F1 `0.65`), and `multispecies` (F1 `0.75`), but it is catastrophically over-inclusive for `species` (precision `0.10`)
+- The strongest prompt-level issue is a schema/prompt vocabulary gap:
+  - `data_type` prompt docs omit valid labels such as `presence-absence`, `density`, `distribution`, `traits`, `ecosystem_function`, `ecosystem_structure`, `time_series`, `species_richness`, `other`, and `unknown`
+  - `geospatial_info_dataset` prompt docs omit valid labels such as `distribution`, `geographic_features`, `site_ids`, and `unknown`
+- Recurrent mismatch patterns:
+  - `data_type`: over-prediction of broad labels, under-recovery of `presence-only` and `density`
+  - `geospatial_info_dataset`: place names in prose are being over-read as dataset geography
+  - `species`: incidental taxa, decorated taxa strings, and count-bearing phrases leak into outputs, especially in PDF mode
+  - `time_series`: any multi-year wording is being interpreted as repeated monitoring
+  - `bias_north_south`: zero recall in all modes
+
+**Key Issues Identified:**
+- Prompt vocabulary is incomplete relative to the schema, which likely explains part of the persistent `data_type` and `geospatial_info_dataset` noise
+- Full-text mode improves rare positive fields but badly increases contextual contamination for `species`, `geospatial_info_dataset`, and `time_series`
+- Evaluation hardening is still needed alongside prompt work:
+  - checked-in config JSONs still use stale `geospatial_info` instead of `geospatial_info_dataset`
+  - `accuracy` remains invalid for multi-value fields like `species`
+  - boolean scoring should be re-audited because GT `False` and model `None` currently behave like missed positives in the saved artifacts
+
+**Next Steps:**
+- Easy: expand `VOCABULARY` to the full schema enum surface and add contrastive negative examples for `time_series`, `species`, and geography scoping
+- Medium: run one-block-at-a-time prompt experiments by mode instead of global rewrites, starting with abstract/sections for `data_type` and species hygiene, then PDF-only iterations for rare positive fields
+- Hard: move full-text extraction toward evidence-gated or two-stage workflows, and harden evaluation with config fixes, boolean semantics review, and a locked holdout set before trusting small deltas
+
 ### 2026-03-09: Claim Grounding Pilot Design (WU-E1)
 
 **Task:** Define a notebook-first claim-grounding pilot that is reviewable without fresh API calls and narrows the scope to the first five dev-subset records plus the three mismatch-heavy fields.
