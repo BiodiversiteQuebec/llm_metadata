@@ -50,5 +50,8 @@
       "Bash(git commit:*)",
       "mcp__jupyter__execute_code"
     ]
+  },
+  "remote": {
+    "defaultEnvironmentId": "env_014N7C57npvhyz87FcTkWsUk"
   }
 }

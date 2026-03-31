@@ -1,0 +1,10 @@
+{
+  "method": "R2: Direct LLM",
+  "model": "gpt-5-mini",
+  "n_records": 30,
+  "macro_f1_4class": 0.297,
+  "binary_f1_relevant": 0.75,
+  "binary_precision": 0.682,
+  "binary_recall": 0.833,
+  "total_cost_usd": 0.0909
+}

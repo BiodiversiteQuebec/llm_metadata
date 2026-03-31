@@ -4,6 +4,201 @@ This folder contains analysis and validation notebooks for ecological dataset ch
 
 ## Recent Activity
 
+### 2026-03-31: Automated Relevance Classification — WU-R1 (Mechanistic) + WU-R2 (Direct LLM)
+
+**Task:** Implement and evaluate two automated approaches to replicating Fuster et al.'s manual dataset relevance scoring (H/M/L/X) on the 30-record dev subset.
+
+**Work Performed:**
+- **WU-R1A** (`notebooks/relevance_mechanistic.ipynb` Part A): Applied Fuster scoring rules to GT (human-annotated) features — ceiling test. No LLM.
+- **WU-R1B** (`notebooks/relevance_mechanistic.ipynb` Part B): Applied same rules to LLM-extracted features (`DatasetFeaturesExtraction`, `gpt-5-mini`, cache hits from prior runs).
+- **WU-R2** (`notebooks/relevance_llm_direct.ipynb`): Direct LLM classification — single call that extracts features AND outputs a relevance verdict with reasoning.
+
+**Results (30-record dev subset):**
+
+| Method | 4-class macro F1 | Binary F1 (relevant) | Binary P | Binary R |
+|---|---|---|---|---|
+| R1-A: Rules on GT features | 0.394 | 0.773 | 0.654 | 0.944 |
+| R1-B: Rules on LLM features | 0.189 | 0.667 | 0.583 | 0.778 |
+| R2: Direct LLM (gpt-5-mini) | 0.297 | 0.750 | 0.682 | 0.833 |
+| Authors' MC_relevance_modifiers (ref) | 0.491 | 0.850 | 0.773 | 0.944 |
+
+**Saved outputs:**
+- `notebooks/results/relevance_mechanistic_part_a_confusion.png`
+- `notebooks/results/relevance_mechanistic_comparison.png`
+- `notebooks/results/relevance_mechanistic_summary.csv`
+- `notebooks/results/relevance_llm_direct_confusion.png`
+- `notebooks/results/relevance_llm_direct_predictions.csv`
+- `notebooks/results/relevance_llm_direct_summary.json`
+
+---
+
+#### Comparison to Fuster et al. Automated Approach
+
+The paper's automated relevance classification (Methods §"Automatic relevance classification", Results §"Automatic relevance classification") is a **binary TF-IDF + ML classifier** — not the feature-extraction + rule pipeline we implemented. They trained Logistic Regression, Random Forest, and SVM on bag-of-words text from title + repository description, collapsing H+M → relevant, L+X → not relevant. Our three approaches are different in kind.
+
+**Paper's results (Table 3, from full-corpus 5-fold cross-validation, n=418):**
+
+| Approach | Relevant Precision | Relevant Recall | Relevant F1 | Weighted F1 |
+|---|---|---|---|---|
+| Main Classifier only (best: Logistic Regression, stop-words, unigrams) | 0.57 | 0.44 | 0.50 | 0.68 |
+| MC + Modulators (best: Random Forest, lemmatised, unigrams+bigrams) | 0.62 | 0.71 | 0.67 | 0.61 |
+
+**Our results on 30-record dev subset (binary, H+M = relevant):**
+
+| Method | Relevant Precision | Relevant Recall | Relevant F1 |
+|---|---|---|---|
+| R1-A: Rules on GT features | 0.654 | 0.944 | 0.773 |
+| R1-B: Rules on LLM features | 0.583 | 0.778 | 0.667 |
+| **R2: Direct LLM (gpt-5-mini)** | **0.682** | **0.833** | **0.750** |
+| Authors' MC_relevance_modifiers (reference) | 0.773 | 0.944 | 0.850 |
+
+**Comparison notes:**
+- R2 (Direct LLM) outperforms the paper's best ML classifier on all binary metrics (P: 0.682 vs 0.62, R: 0.833 vs 0.71, F1: 0.750 vs 0.67), on a 30-record subset. Results are not directly comparable (different corpus split, n=30 vs full dataset), but the direction is consistent with the paper's own suggestion in Discussion: *"an alternative approach would be to directly extract key features from the texts (e.g., data type, temporal extent, etc.) without relying on a supervised approach. These features may be combined a posteriori in the same framework as described for manual evaluation"* — which is exactly what R1 implements, and what R2 does end-to-end.
+- The paper's ML approach has notably low recall on relevant (0.44–0.71). The Discussion attributes this to: (1) spatio-temporal features often absent from abstracts/repository pages, (2) taxon/ecosystem overfitting in the training data, (3) small corpus size (418 records).
+- Our R1-B independently confirms issue (1): `spatial_range_km2` is mostly None from abstract text, making the spatial Main Classifier return X for ~25/30 records.
+
+#### Rule Reconstruction Errors Found
+
+By comparing our `score_data_type()` function against the paper's Table 2, we identified two systematic errors in our data type scoring:
+
+**Error 1 — "distribution" and "presence-absence" should be Moderate, not Low.**
+
+Paper's Table 2 (exact categories):
+- **High:** abundance, density, EBV genetic analysis
+- **Moderate:** distribution, presence-absence
+- **Low:** presence-only, relative abundance, species richness, non-EBV genetic analysis
+
+Our implementation classifies both "distribution" and "presence-absence" as L (they match the "presence"/"distribution" keywords in the L branch). This is wrong.
+
+Impact: id=38 (pred=X, GT=H) is the most dramatic consequence. With the correct M score for "presence-absence": mc = majority(M, M, X) = M, x_count=1 → M becomes L, modulators → L becomes M. Still pred=M vs GT=H — not fully fixed, but closes 2 of the 3 levels of error.
+
+Impact on other records: any record with `data_type` containing "distribution" or "presence-absence" will be mis-scored in our R1 rules.
+
+**Error 2 — Multispecies restricts which modulators apply.**
+
+Paper (Methods §"Dataset relevance assignment"): *"For multispecies datasets, only the north-south modulator was noted."*
+
+Our implementation applies all five modulators regardless of the `multispecies` flag. When `multispecies=True`, we should suppress `threatened_species`, `new_species_science`, and `new_species_region`, and only allow `bias_north_south` to upgrade. This likely explains several over-predictions where `multispecies=True` triggers upgrades that the authors' system would not have applied (e.g., ids 71, 225, 258, 271, 315).
+
+**Error 3 — Tiebreaker rule is wrong (now reconstructed).**
+
+Paper: *"In case of non-majority value, we create decision rules as indicated in Table S2. By default, the relevance score of the dataset type was selected as the final relevance category, **penalized if the spatio-temporal relevance was Non-relevant, Low, or Moderate**."*
+
+Table S2 is not in the main PDF or TEI XML. We reconstructed it empirically from all 55 tiebreaker cases in the full 418-record dataset (see [`docs/fuster_et_al_2024/table_S2.md`](../docs/fuster_et_al_2024/table_S2.md)). The rule matches 100% of cases:
+
+**Step 1 — Special case:** If `data_type = H` AND (`temporal = X` OR `spatial = X`) → **result = L**
+
+**Step 2 — General rule:** `result = min(data_type, max(temporal, spatial))`
+
+Where score order is: H > M > L > X.
+
+Our implementation uses a simple majority vote with data_type as tiebreaker, which is fundamentally wrong. The correct rule **caps the result at the best spatio-temporal score**, meaning a high data_type cannot carry the vote when both temporal and spatial are weak. This explains the systematic over-prediction on H+M+X, H+L+X, and H+X+L patterns (ids 9, 27, 31, 91, 175 in the dev subset).
+
+---
+
+#### R1-A Mismatch Analysis (rules on GT features, 18/30 wrong)
+
+18 of 30 records are misclassified: **16 over-predictions, 2 under-predictions**. The rules have a strong upward bias. All row IDs below refer to the `id` column in `data/dataset_092624.xlsx`.
+
+##### Pattern 1 — Modulators fire too aggressively (10 of 16 over-predictions)
+
+The modulator upgrade (L→M, M→H) is triggered by a single True flag in any of the five fields. In practice `threatened_species=True` is common in the GT and reliably pushes the score one level above GT. Examples to inspect:
+
+| id | data_type | temp | spatial | mc → pred | GT | auth | modulator |
+|---|---|---|---|---|---|---|---|
+| 5 | EBV genetic analysis | 1y | not given | M → **H** | M | M | threatened_species |
+| 12 | other | 7y | 7250 km² | M → **H** | M | H | threatened_species |
+| 27 | presence only, EBV genetic analysis | 4y | not given | M → **H** | M | M | threatened_species |
+| 71 | density | 0y | 200 km² | L → **M** | L | M | multispecies |
+| 91 | EBV genetic analysis | 2y | not given | M → **H** | L | M | threatened_species |
+| 101 | other | 6y | 31000 km² | L → **M** | L | L | threatened_species + bias_north_south |
+| 258 | abundance, presence only | — | 40 km² | M → **H** | L | M | multispecies |
+| 271 | abundance, presence only | 1y | not given | M → **H** | L | M | multispecies + new_species_region |
+| 315 | abundance | — | not given | M → **H** | L | L | multispecies |
+
+**With Error 2 fixed** (multispecies restricts modulators to only `bias_north_south`): ids 71, 258, 271, 315 would no longer be upgraded by `multispecies` alone, resolving 4 of 10 cases in this pattern. The remaining 6 are `threatened_species`-driven, which is not restricted by Error 2.
+
+**What to check in the xlsx (id column):** For ids 91, 258, 271, 315 the modulator fires but the human annotator gave L. Check whether the threatened/multispecies annotation reflects the dataset's own characteristics or a species *mentioned* in context — the authors may have applied the modulator more conservatively than the rule text implies.
+
+For id=12 and id=104, *both our system and the authors got H* but the human gave M — suggesting the rule and the annotator disagreed on whether the modulator should apply.
+
+##### Pattern 2 — data_type=H dominates the majority vote with weak temporal/spatial
+
+When `data_type` is genetic or abundance/density (→ H), the H score wins the majority vote even against two X/L classifiers. Our incorrect tiebreaker then favours data_type. This inflates the base score before modulators.
+
+**With the correct tiebreaker** (see Error 3 above), most of these would be scored correctly:
+
+| id | data_type | temp_score | spatial_score | Our mc | Correct mc | pred | GT | auth |
+|---|---|---|---|---|---|---|---|---|
+| 9 | density | L (0y) | X | M | **L** (H+X special case) | M | L | L |
+| 19 | presence only, EBV genetic analysis | M (3y) | L | H | **M** (min(H, max(M,L))) | H | M | M |
+| 31 | EBV genetic analysis | L (2y) | X | M | **L** (H+X special case) | M | L | L |
+| 175 | density | X (no dates) | L (35 km²) | M | **L** (H+X special case) | M | L | L |
+
+The correct tiebreaker resolves **all 4 records** in this pattern: ids 9, 31, 175 hit the H+X→L special case, and id=19 is capped at M by `min(H, max(M,L))=M`. This is the single highest-impact fix available.
+
+For id=19: mixed data type "presence only, EBV genetic analysis". The rule picks the first token matching a keyword ("genetic") and scores H. The authors scored it H too, but GT=M. Check whether the EBV genetic component is the primary dataset contribution or a minor ancillary.
+
+##### Pattern 3 — Modulators fire but authors' system did not upgrade
+
+In several cases our system and the authors' system diverge on whether modulators apply, even with identical GT feature flags. The authors' `MC_relevance_modifiers` is the ground truth for their own system. Where our result matches authors and both differ from GT, the annotation is genuinely ambiguous; where we differ from authors too, we have a rule reconstruction error.
+
+| id | pred | auth | GT | Note |
+|---|---|---|---|---|
+| 101 | M | L | L | threatened_species + bias_north_south fire in our system; authors did not upgrade |
+| 225 | H | L | M | multispecies fires; authors scored L, GT=M — authors may have skipped the modulator here |
+| 315 | H | L | L | multispecies fires; authors scored L — authors and GT agree, we over-upgrade |
+
+**What to check:** For id=101, the data_type is "other" which is a non-EBV type — possibly authors applied modulators only to records with meaningful base data, not to "other". Check whether there is an implicit rule that modulators only apply when mc_relevance ≥ L (i.e., X blocks them but "other" → L base may also have been treated differently).
+
+##### Pattern 4 — X-penalty cascades to block modulators (2 under-predictions)
+
+When at least one classifier score is X, the majority-vote result is pulled down by one level. If this produces X, modulators are blocked. This is the only mechanism producing under-predictions:
+
+| id | data_type | temp | spatial | mc | pred | GT | auth |
+|---|---|---|---|---|---|---|---|
+| 38 | presence-absence | M (4y) | X | X | **X** | H | H |
+| 201 | presence only | X | L (0.5 km²) | X | **X** | L | L |
+
+**id=38 is the most severe miss: pred=X, GT=H.** Data type scores L ("presence-absence" matches "presence"), temporal scores M (4 years), spatial is X (not given). Our majority vote gives L, x_count=1 → pulls L down to X. Modulators cannot fire.
+
+**With Error 1 fixed** ("presence-absence" → M instead of L): scores become M, M, X. The correct tiebreaker gives `min(M, max(M,X)) = min(M,M) = M`. Modulators (multispecies + bias_north_south) fire → M becomes H. **This fully resolves the worst miss** (pred goes from X to H, matching GT=H).
+
+Note: this requires *both* Error 1 (data_type scoring) *and* Error 3 (tiebreaker) to be fixed. With only one fix, id=38 stays wrong.
+
+**What to check for id=38:** Verify that "presence-absence" should indeed be M per the paper's Table 2 categories. Also check the spatial claim — "not given" in the GT might mean the authors estimated a spatial range from text.
+
+**id=201:** tiny spatial (0.5 km²), no temporal data. Both pred=X and GT=L — the miss is only 1 level and the authors also got L. The X-penalty from temporal=X is the cause. Since GT=L and authors=L, the rule is wrong in how it handles the case where only one classifier is X with two L scores (should stay L, not drop to X).
+
+##### Summary of root causes
+
+| Root cause | Mismatches caused | Direction | Fix available |
+|---|---|---|---|
+| Modulator fires when GT stays lower | ~9 | Over | Error 2 (multispecies restriction) resolves ~5 |
+| data_type H dominates weak temp/spatial | ~5 | Over | **Error 3 (tiebreaker) resolves all 4–5** |
+| Both rule and authors differ from GT (annotation subjectivity) | ~3 | Over | None — inherent GT ambiguity |
+| X-penalty drops score below modulator threshold | 2 | Under | Errors 1+3 combined resolve id=38 |
+
+##### Expected impact of all three fixes combined
+
+The three errors interact. Fixing the tiebreaker alone (Error 3) resolves Pattern 2 entirely (4 records). Fixing multispecies modulator restriction (Error 2) resolves ~5 records in Pattern 1. Fixing data_type scoring (Error 1) combined with the tiebreaker resolves the worst under-prediction (id=38, Pattern 4). Conservative estimate: **10–12 of the 18 mismatches would be resolved**, bringing R1-A from 40% accuracy (12/30) to roughly 70–73% (22/30).
+
+The remaining ~6 mismatches are likely irreducible with a rule-based approach — they stem from annotation subjectivity (where rules and authors both disagree with GT) or edge cases in modulator application that the paper doesn't fully specify.
+
+The key design question: **should modulators apply unconditionally, or only when the base data quality (data_type, spatial, temporal) meets a minimum bar?** The annotators appear to have applied a higher contextual threshold than the binary flag rule implies.
+
+---
+
+#### R1-B and R2 Summary
+
+- **R1-B severe degradation (F1=0.189):** LLM extracts `spatial_range_km2` as None for most records (no explicit km² figure in the abstract text), so spatial classifier returns X for ~25 of 30 records. Combined with vocabulary mismatch on `data_type` ("genetic_analysis" vs "EBV genetic analysis"), the mechanistic scoring pipeline breaks down further.
+- **R2 outperforms R1-B** despite using the same LLM: end-to-end LLM reasoning tolerates imperfect intermediate representations better than rule application on imperfect features. Binary recall 0.833 is workable for screening.
+
+**Next Steps:**
+- For R1-A: test whether removing the X-penalty (or replacing it with a softer penalization) improves recall without tanking precision.
+- For modulators: restrict upgrades to records where mc_relevance ≥ L (i.e., data type must not be X) — this may close most of the over-prediction gap.
+- For R2: prompt-tune the relevance block, especially the modulator threshold description; compare to R1-A ceiling.
+
 ### 2026-03-28: Dev-Subset Run Audit and Prompt Iteration Ladder
 
 **Task:** Inspect the latest dev-subset run artifacts across abstract, section-based, and native-PDF modes, then turn the observed failure patterns into a practical prompt-engineering and eval-improvement roadmap ordered from easier to harder work.

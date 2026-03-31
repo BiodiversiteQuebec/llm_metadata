@@ -1,0 +1,4 @@
+Method,4-class macro F1,Binary F1 (relevant),Binary P,Binary R
+R1-A: Rules on GT features,0.394,0.773,0.654,0.944
+R1-B: Rules on LLM features,0.189,0.667,0.583,0.778
+Authors' MC_relevance_modifiers (reference),0.491,0.85,0.773,0.944

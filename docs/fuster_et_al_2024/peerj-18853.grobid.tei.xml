@@ -1,0 +1,2481 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TEI xml:space="preserve" xmlns="http://www.tei-c.org/ns/1.0" 
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xsi:schemaLocation="http://www.tei-c.org/ns/1.0 https://raw.githubusercontent.com/kermitt2/grobid/master/grobid-home/schemas/xsd/Grobid.xsd"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+	<teiHeader xml:lang="en">
+		<fileDesc>
+			<titleStmt>
+				<title level="a" type="main">Evaluating the feasibility of automating dataset retrieval for biodiversity monitoring</title>
+			</titleStmt>
+			<publicationStmt>
+				<publisher/>
+				<availability status="unknown"><licence/></availability>
+				<date type="published" when="2025-01-29">29 January 2025</date>
+			</publicationStmt>
+			<sourceDesc>
+				<biblStruct>
+					<analytic>
+						<author>
+							<persName><forename type="first">Alexandre</forename><surname>Fuster-Calvo</surname></persName>
+							<affiliation key="aff0">
+								<orgName type="department">Biology Department</orgName>
+								<orgName type="institution">University of Sherbrooke</orgName>
+								<address>
+									<settlement>Sherbrooke</settlement>
+									<region>Quebec</region>
+									<country key="CA">Canada</country>
+								</address>
+							</affiliation>
+						</author>
+						<author>
+							<persName><forename type="first">Sarah</forename><surname>Valentin</surname></persName>
+							<affiliation key="aff1">
+								<orgName type="department">French Agricultural Research Centre for International Development (CIRAD)</orgName>
+								<orgName type="laboratory">Joint Research Unit Land, Remote Sensing and Spatial Information (UMR TETIS)</orgName>
+								<address>
+									<settlement>Montpellier</settlement>
+									<country key="FR">France</country>
+								</address>
+							</affiliation>
+						</author>
+						<author>
+							<persName><forename type="first">William</forename><forename type="middle">C</forename><surname>Tamayo</surname></persName>
+							<affiliation key="aff0">
+								<orgName type="department">Biology Department</orgName>
+								<orgName type="institution">University of Sherbrooke</orgName>
+								<address>
+									<settlement>Sherbrooke</settlement>
+									<region>Quebec</region>
+									<country key="CA">Canada</country>
+								</address>
+							</affiliation>
+						</author>
+						<author>
+							<persName><forename type="first">Dominique</forename><surname>Gravel</surname></persName>
+							<affiliation key="aff0">
+								<orgName type="department">Biology Department</orgName>
+								<orgName type="institution">University of Sherbrooke</orgName>
+								<address>
+									<settlement>Sherbrooke</settlement>
+									<region>Quebec</region>
+									<country key="CA">Canada</country>
+								</address>
+							</affiliation>
+						</author>
+						<author>
+							<persName><forename type="first">Diogo</forename><surname>Provete</surname></persName>
+						</author>
+						<title level="a" type="main">Evaluating the feasibility of automating dataset retrieval for biodiversity monitoring</title>
+					</analytic>
+					<monogr>
+						<imprint>
+							<date type="published" when="2025-01-29">29 January 2025</date>
+						</imprint>
+					</monogr>
+					<idno type="MD5">B76A7CA5F31AC3D400024B633475B803</idno>
+					<idno type="DOI">10.7717/peerj.18853</idno>
+					<note type="submission">Submitted 7 June 2024 Accepted 20 December 2024</note>
+				</biblStruct>
+			</sourceDesc>
+		</fileDesc>
+		<encodingDesc>
+			<appInfo>
+				<application version="0.8.0" ident="GROBID" when="2026-03-30T18:38+0000">
+					<desc>GROBID - A machine learning software for extracting information from scholarly documents</desc>
+					<ref target="https://github.com/kermitt2/grobid"/>
+				</application>
+			</appInfo>
+		</encodingDesc>
+		<profileDesc>
+			<textClass>
+				<keywords>
+					<term>Automated data retrieval</term>
+					<term>Biodiversity monitoring</term>
+					<term>Data repositories</term>
+					<term>Ecological data</term>
+					<term>Machine learning</term>
+				</keywords>
+			</textClass>
+			<abstract>
+<div xmlns="http://www.tei-c.org/ns/1.0"><p>Aim: Effective management strategies for conserving biodiversity and mitigating the impacts of global change rely on access to comprehensive and up-to-date biodiversity data. However, manual search, retrieval, evaluation, and integration of this information into databases present a significant challenge to keeping pace with the rapid influx of large amounts of data, hindering its utility in contemporary decision-making processes. Automating these tasks through advanced algorithms holds immense potential to revolutionize biodiversity monitoring. Innovation: In this study, we investigate the potential for automating the retrieval and evaluation of biodiversity data from Dryad and Zenodo repositories. We have designed an evaluation system based on various criteria, including the type of data provided and its spatio-temporal range, and applied it to manually assess the relevance for biodiversity monitoring of datasets retrieved through an application programming interface (API). We evaluated a supervised classification to identify potentially relevant datasets and investigate the feasibility of automatically ranking the relevance. Additionally, we applied the same appraoch on a scientific literature source, using data from Semantic Scholar for reference. Our evaluation centers on the database utilized by a national biodiversity monitoring system in Quebec, Canada. Main conclusions: We retrieved 89 (55%) relevant datasets for our database, showing the value of automated dataset search in repositories. Additionally, we find that scientific publication sources offer broader temporal coverage and can serve as conduits guiding researchers toward other valuable data sources. Our automated classification system showed moderate performance in detecting relevant datasets (with an F-score up to 0.68) and signs of overfitting, emphasizing the need for further refinement. A key challenge identified in our manual evaluation is the scarcity and uneven distribution of metadata in the texts, especially pertaining to spatial and temporal extents. Our evaluative framework, based on predefined criteria, can be adopted by automated algorithms for streamlined prioritization, and we make our manually evaluated data publicly available, serving as a benchmark for improving classification techniques.</p></div>
+			</abstract>
+		</profileDesc>
+	</teiHeader>
+	<text xml:lang="en">
+		<body>
+<div xmlns="http://www.tei-c.org/ns/1.0"><p>for these databases with an accuracy rate exceeding 90%, all based solely on the content of titles and abstracts. Recently, prompt-based approaches leveraging large language models such as GPT have demonstrated promising effectiveness in extracting biodiversity data, offering further advancements in automated systems for biodiversity research <ref type="bibr" target="#b2">(Castro et al., 2024)</ref>.</p><p>While these findings mark significant progress, further refinements are essential to realize truly effective automatic retrieval systems. In particular, an automated system should extend beyond merely distinguishing between relevant and non-relevant publications; it should also have the capacity to assign varying degrees of relevance based on metadata, hence aiding in prioritizing the most pertinent studies and expediting their integration into databases. At the same time, the growing trend among scientific journals to mandate the deposition of data used in publications into online repositories reflects a progressive move toward fostering openness in science. Consequently, repositories are anticipated to witness exponential growth, encompassing an ever-expanding volume of published data. In this context, we assess the feasibility of automating the retrieval and classification of datasets from the Dryad and Zenodo repositories. We first introduce a flexible classification framework designed to assign relevance levels to datasets for biodiversity monitoring programs based on features extracted from publication text. This system is adaptable, accommodating both global attributes and specific database requirements. Using this framework, we manually annotated the extracted datasets and then evaluated the performance of a supervised classifier in predicting dataset relevance, using the descriptive textual content of the dataset as input. The automatic approach depends heavily on the availability of explicit metadata in the text, which serves as features for the classification algorithm (such as data type and spatio-temporal range). Our analysis, therefore, examines the distribution of relevant metadata across various sections of dataset publications-such as repository texts and the dataset itself-providing key insights into limits that may hamper the effectiveness of automated search algorithms. Additionally, we compared datasets sourced from Semantic Scholar articles to those from repositories, highlighting the strengths and limitations of each.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head>Case study-biodiversity monitoring in Quebec</head><p>The province of Quebec has recently introduced a dedicated national geographic information system aimed at biodiversity monitoring, known as Biodiversité Québec (https://biodiversite-quebec.ca). Our study is tailored to evaluate the integration of relevant data into this information system, which is designed to play a pivotal role in influencing decision-making processes. Additionally, by situating our research within this dataset, we can showcase the design of specific criteria that are not only globally applicable but also regionally relevant, addressing the unique circumstances at a regional scale. In the context of Quebec, and more broadly in Canada, biodiversity records are particularly affected by spatial bias, correlated to the South-North human population density gradient. Thus, tundra-type ecosystems and northern territories are very poorly documented and data from these regions should have higher priority. This information system leverages the ATLAS data infrastructure, a relational database for the aggregation of biodiversity observations and time series for the province of Quebec. It standardizes various data types (abundances, occurrences, surveys, population time series, and taxonomy) for integration into monitoring and modeling workflows. Data is sourced from open science repositories (e.g., GBIF, eBird, iNaturalist, Living Planet Database) and direct partnerships with local and national organizations. The database is undergoing active expansion, currently aggregating over 53 million occurrences, covering over 23 thousand species from 616 data sources.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head>METHODS</head><p>Our methodology involved three key steps. First, we automatically retrieved datasets from repositories using search algorithms that interact with application programming interfaces (API). Second, we manually annotated each dataset, identifying and recording critical features-such as data type, spatiotemporal extent, and taxon information-to evaluate its relevance for biodiversity monitoring. Based on these features, we developed a classification system that assigns the relevance level of datasets for biodiversity monitoring and the ATLAS database. Finally, we applied this classification to evaluate a supervised approach for detecting relevant datasets.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head>Corpus retrieval</head><p>Among the available datasets repositories used to store scientific data for biodiversity research (Nature, 2024), we selected two generalist ones, Dryad and Zenodo. Because Zenodo now hosts a preservation copy of Dryad datasets, it enables the retrieval of datasets from both repositories through a single API. We restricted the number of datasets repositories to two to limit the amount of manual evaluation. The approach is easily transferable to other repositories providing a search API, such as FigShare. To search and extract relevant information, we created a list of queries to interact with Zenodo's API. The queries, executed in December 2022, were formulated using Boolean "and" operators between keywords selected manually (Fig. <ref type="figure" target="#fig_0">1</ref>). The keywords correspond to data type or method corresponding to targeted Essential Biodiversity Variables (EBVs) data (e.g., "presence-only", "abundance"). We added "Québec/Quebec" to each query to target Quebec-relevant datasets. The API processed each search query, ensuring that all specified keywords appeared within the repository pages, including the title, abstract, or associated metadata. Additionally, the search utilized a Zenodo filter for publications of resource type "dataset". The detailed approach (queries and code) is provided as Supplemental Material (Fig. <ref type="figure" target="#fig_1">S2</ref>). Once relevant records were identified, key details such as titles and keywords were extracted and organized in a structured format.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head>Dataset manual annotation</head><p>Each query generated multiple datasets, all of which were evaluated according to pre-established annotation guidelines. These guidelines encompassed all variables of interest and criteria for assigning feature categories (Table <ref type="table" target="#tab_0">1</ref>; refer to the explanations below and consult the complete annotated dataset in the Supplemental Materials).</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head>Dataset features</head><p>We manually identified dataset features essential for evaluating data type categories, spatiotemporal extent, taxon numbers and identities, and other specific attributes. We also recorded where the features were located because it influences the feasibility of automated retrieval. Locations include the abstract or additional text within the repository page (referred to as repository text), the source publication text (i.e., the article), or within the dataset itself.   <ref type="table" target="#tab_0">S1</ref>). Notably, we marked instances when data were time series, as these held unique significance. We quantified the frequency of EBV-related terms in titles and abstracts using the "str_detect" function from the "stringr" R package, ensuring we accurately identified relevant features.</p><p>Geospatial data in the datasets were provided at varying levels of precision. We classified this information into distinct categories, ranked from most to least precise: sample, site, or range coordinates, species distribution models (SDMs; thereafter "distribution"), geographic features (e.g., Mont Mégantic), administrative units, maps, and site IDs (where sampling sites were identified, but precise locations were known only to the authors).</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head>Dataset relevance assignment</head><p>Datasets were categorized as "High," "Moderate," "Low," or "Non-relevant" based on their relevance to biodiversity monitoring. Our classification system relied on two groups of criteria. The first group, termed Main Classifiers, captured fundamental features of biodiversity data, including data type, temporal extent, and spatial extent. This categorization was informed by the literature on Essential Biodiversity <ref type="bibr" target="#b38">(Pereira et al., 2013;</ref><ref type="bibr" target="#b40">Schmeller et al., 2018;</ref><ref type="bibr" target="#b22">Jetz et al., 2019)</ref> and the importance of temporal and spatial dimensions. For example, temporal extent was categorized as follows: less than 3 years as Low, 3 to 10 years as Moderate, and more than 10 years as High (see Table <ref type="table" target="#tab_1">2</ref>). Each dataset was assigned a relevance category for each Main Classifier. For instance, a dataset could be classified as Low for data type (e.g., presence-only), Moderate for temporal extent (e.g., 5 years), and Moderate for spatial extent (e.g., 10,000 km 2 ). The overall relevance score for a dataset was computed using a majority rule. In this example, the dataset's relevance by Main Classifiers would be Moderate (Low, Moderate, Moderate = Moderate). Datasets deemed "Non-relevant" provided no valuable information for biodiversity monitoring. In case of non-majority value, we create decision rules as indicated in Table <ref type="table" target="#tab_1">S2</ref>. By default, the relevance score of the dataset type was selected as the final relevance category, penalized if the spatio-temporal relevance was Non-relevant, Low, or Moderate.</p><p>The second group of criteria consisted of Modulators-features that, while less critical than Main Classifiers, added context that could slightly modify a dataset's relevance. Modulators addressed regional or specific database needs, such as a first record for a given taxon in a region or data from under-sampled areas. For example, in the context of Quebec's biodiversity monitoring strategies, data from northern regions (the territory that extends north of the 49th parallel and north of the St. Lawrence River and the Gulf of St. Lawrence) are prioritized due to the lack of studies in these areas, making the north-south sampling bias a key modulator for Quebec-focused datasets. Modulators then allow flexibility to accommodate specific databases' requirements.</p><p>We introduced the following Modulators, each of which could be marked as true or false: multispecies (containing data for more than 10 species), presence of threatened species (as assigned by the IUCN), new species to science, new species to Quebec (explicitly mentioned in the title or abstract), and location in northern Quebec (Table <ref type="table" target="#tab_1">2</ref>). For multispecies datasets, only the north-south modulator was noted. If a dataset met any of these modulator criteria, its relevance category based on Main Classifiers would increase by one level. For instance, if the example dataset mentioned earlier included data from an endangered species, the "Threatened species" modulator would apply, and its relevance would increase from Moderate to High (Table <ref type="table" target="#tab_1">2</ref>). Only relevant datasets (those classified as Low, Moderate, or High by the Main Classifiers) could be upgraded by Modulators.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head>Extension to scientific articles</head><p>We expanded our dataset retrieval beyond repositories to include articles sourced from Semantic Scholar, covering the period from 1980 to 2022. Semantic Scholar relies on a search relevance algorithm. Briefly, the provided query is to Elasticsearch, where about 190 million scientific articles are indexed. We provide in Table <ref type="table" target="#tab_2">S3</ref> the approximate number of results matching with the studied queries obtained through Semantic Scholar websites, ranging from 23,200 to 3,490,000 results. Through the API, the top 1,000 results are re-ranked by a machine learning ranker. To ensure a manageable analysis, we therefore had to limit the retrieved publications to a maximum of 50 positives (top 50 found publications). Due to potential API request limitations, some queries retrieved more publications than others, with an average of 23 publications per query. Subsequently, we assessed the relevance of the datasets and publication years in the same manner as with repositories, facilitating comparisons between these two sources. * For our study case, the ATLAS database, we prioritize areas from Northern Quebec. First, the main classifiers determine whether the dataset relevance is "High", "Moderate", "Low", or "Non-relevant" based on a majority vote (see Table <ref type="table" target="#tab_1">S2</ref> in case of disagreement), and then Modulators increase one relevance category if any of them is present (e.g., "Low" to "Moderate" but not "Low" to "High"). Modulators do not affect datasets classified as "Non-relevant" by the Main Classifiers.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head>Automatic relevance classification</head><p>To evaluate the feasibility of automating the relevance classification process, we trained binary classification algorithms to predict the relevance. As input, we use the text from the title and repository descriptive content of the dataset (for Zenodo and Dryad datasets) and from the title and abstract (for Semantic Scholar datasets). The text was first cleaned by removing special characters and converted to lowercase. We then applied different text pre-processing steps, including stop-words removal, lemmatisation and selection of n-grams range, as detailed in Supplemental Material S1. Stop-words are frequently used words which generally do not hold any significant semantic value, such as 'the', 'for', etc. We filtered them using a predefined list of 39 English stop words from the python NLTK library <ref type="bibr" target="#b1">(Bird &amp; et Edward, 2004)</ref>. N-grams are contiguous sequences of n words or characters from a text. Unigrams are sequences of a single word (e.g., 'ecology'), and bigrams are sequences of two consecutive words (e.g., 'arctic ecology'). Taking into account bigrams might help capture local relationships between words. We represented the texts either with unigrams alone or with unigrams and bigrams, using the ngram_range parameter of the TfidfVectorizer() function from python scikit-learn library <ref type="bibr" target="#b37">(Pedregosa et al., 2011)</ref>. Lemmatisation converts each word into a base form (i.e., lemma), to ensure that all variations (e.g., singular and plural form) of a word are represented uniformly. We used the WordNetLemmatizer from the NLTK library.</p><p>To transform the text into numerical form, we employed a frequency-based representation, combining bag-of-words with TF-IDF (term frequency-inverse document frequency) weighting. In the bag-of-words representation, each document is represented by an n-dimensional vector where each component represents the absence or presence of a word i in the document d and n is the vocabulary length <ref type="bibr" target="#b48">(Zhang, Jin &amp; Zhou, 2010)</ref>. TF-IDF adjusts this by assigning higher weight to terms that are more frequent in a document relative to their frequency across the collection of documents <ref type="bibr" target="#b39">(Salton &amp; Buckley, 1988)</ref>. We used the TF-IDF vectorizer function from the scikit-learn library <ref type="bibr" target="#b37">(Pedregosa et al., 2011)</ref> and ignored terms with a document frequency lower than 3.</p><p>We compared three classifiers: Logistic Regression <ref type="bibr" target="#b21">(Ifrim, Bakir &amp; Weikum, 2008)</ref>, Random Forest and a linear Support Vector Machine classifier (SVM) <ref type="bibr" target="#b24">(Joachims, 1998)</ref>. For all classifiers, we used the implementation from the scikit-learn library. We set the class_weight parameter to « balanced », which adjusts the class weights inversely proportional to their frequencies (i.e., classification performances of the majority class are penalized during the training), addressing the class imbalance in our data.</p><p>Due to the small size of the corpus, we merged the non-relevant and low-relevance classes (treated as non-relevant, the negative class), and the medium-relevance and high-relevance classes (treated as relevant, the positive class).</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head>Evaluation</head></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head>Queries</head><p>We analyzed the performance of each query by noting the amount of retrieved, not found, and not accessible datasets and their relevance categories. For each dataset, we the precision and recall metrics and their harmonic mean, known as F-score <ref type="bibr" target="#b12">(Goutte &amp; Gaussier, 2005)</ref>, as follows:</p><formula xml:id="formula_0">F score ¼ 2 Á Precision Á Recall Precision þ Recall</formula><p>where:</p><formula xml:id="formula_1">Precision ¼ True Positive True Positive þ False Positive Recall ¼ True Positive True Positive þ False negative</formula><p>Positive refers to those datasets assigned a high or moderate relevance, and negative to low or negligible relevance.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head>Features and accessibility</head><p>Our assessment encompassed both the content and accessibility of datasets. To gauge the spatiotemporal extent and the representation of Essential Biodiversity Variable (EBV) categories within the datasets, we conducted visual inspections to discern the alignment between dataset duration and spatial range frequencies, and their assigned relevance categories.</p><p>In parallel, we assessed the accessibility of features, a crucial factor for automated retrieval. To this end, we tallied the occurrences of feature locations within the datasets, distinguishing between repository text, articles, and dataset contents, for dataset type, temporal, spatial, and taxon features. Additionally, we cataloged the frequency of occurrences for each geospatial information category to gain insights into the level of precision provided in this regard.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head>Semantic scholar-repositories evaluation</head><p>We evaluated the textual content of abstracts retrieved from Semantic Scholar and the repositories, examining various aspects This entailed evaluating the relevance, number, and accessibility of datasets obtained from both sources. To delve deeper into the temporal dimension, we quantified the frequencies of publication years for the datasets.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head>Automatic relevance classification</head><p>We used five-folds cross-validation and calculated the average precision, recall and F-score as previously defined. We then evaluated the classifier's performance in predicting the relevance of the Main Classifiers, as well as the relevance of the Main Classifiers combined with the Modulators.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head>RESULTS</head></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head>Datasets annotation evaluation</head><p>Out of the initial 161 datasets retrieved through our queries, 57 were subsequently excluded for various reasons: 37 due to incorrect locations, five categorized as laboratory studies, and 13 for miscellaneous reasons. Notably, many datasets with incorrect locations resulted from the matching of the keyword "Quebec" with the affiliations of the authors.</p><p>From the remaining 104 datasets we kept, the classification based on relevance yielded 89 relevant datasets categorized as either highly, moderately, or low in relevance, which we will refer to as "relevant datasets": 36 datasets (22%) categorized as highly relevant, 26 (16%) as moderately relevant, 27 (17%) as having low relevance, and 15 (9%) as nonrelevant.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head>Queries</head><p>The most simple query, "species", is the one showing the highest performance (Fscore = 0.28), followed by "population + species" (F-score = 0.23) and "sites + species" (Fscore = 0.16). "Occurrence + species" was the query with the highest precision (0.39) (Fig. <ref type="figure" target="#fig_0">1</ref>). The mean overlap between queries was 11% (Fig. <ref type="figure" target="#fig_0">S1</ref>).</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head>Features</head><p>Among the 89 relevant datasets, presence-only data emerged as the most common EBV data category, encompassing 31 publications (29%), followed by genetic and abundance data with 27 (25%) each. In contrast, data from species distribution models (SDMs), referred to as "distribution" data, was the least common, featured in only four publications (3%) (Fig. <ref type="figure" target="#fig_1">2C</ref>). The temporal ranges of these datasets span from the 1930s to the present, although the majority fall within the last two decades (Fig. <ref type="figure" target="#fig_1">2A</ref>). Notable outliers include <ref type="bibr" target="#b11">Favret et al. (2020)</ref>, which offers data on Odonata specimens from various entomological collections dating back to 1875. On average, the temporal duration was 10.9 years, ranging from less than 1 year to 50 years (Fig. <ref type="figure" target="#fig_1">2B</ref>). Short-term studies, less than 1 year in duration, constituted the most common category, accounting for 19% of the datasets. A total of 12 datasets (13%) contained time series data (Fig. <ref type="figure" target="#fig_1">2A</ref>). Spatial extents varied widely, ranging from 0.2 to 24.706.834 km 2 , with a mean of 1,369,232 km 2 : 25 datasets (28%) covered less than 5,000 km 2 , 9 (10%) fell between 5,000 and 15,000 km 2 , and 27 (30%) exceeded 15,000 km 2 (Figs. <ref type="figure" target="#fig_1">2B</ref> and<ref type="figure" target="#fig_1">2D</ref>).</p><p>The datasets cover a diverse array of taxa, spanning 13 classes (not counting those within zooplankton). Among these, 66 (74%) datasets were associated with one to ten species, with mammals (21), fish (13), birds (11), and angiosperms (10) being the most frequently represented. In contrast, 23 (26%) datasets pertained to communities comprising 10 to 439 species, with an average of 58 species per dataset. Notably, datasets of this nature were more prevalent for plants (13 datasets) and insects (six datasets) (Fig. <ref type="figure" target="#fig_1">2E</ref>).</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head>Features accessibility</head><p>Within the 89 relevant datasets, at least one comprehensive metadata (features) belonging to Main Classifiers was automatically accessible for 81 of them (91%), typically within the repository page's abstract or additional text. These encompassed explicit mentions of temporal range in 26 publications (29%), temporal duration in 14 publications (16%), and spatial range in seven publications (8%) (Fig. <ref type="figure">3A</ref>). For species-level studies (involving 1 to 10 species), species names were consistently present in the title or abstract. Additionally, dataset types or synonyms were included in the title for 22 of them (25%) and in the abstract for 80 (90%). Only two publications contained all these features together in the repository text. Furthermore, a total of five (6%) did not explicitly report the temporal range, 30 (34%) the spatial range, and 60 (67%) the data duration in any location (repository text, source article, appendix, or dataset) (Fig. <ref type="figure">3A</ref>).</p><p>Geospatial information, essential for biodiversity monitoring, was unavailable within the repository text in 65 publications (73%), and no location data, including the dataset, was provided for 33 (37%) of them (Fig. <ref type="figure">3B</ref>). Site IDs were given in the dataset of 23 (26%) publications, but in most cases, it required consulting a map in the article, with no specific coordinates, to interpret them.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head>Semantic scholar</head><p>Our queries yielded 254 datasets from Semantic Scholar without overlap, of which 62 were excluded due to incorrect locations (33), unrelated fields outside of biodiversity (21), experimental data (six), or microbial communities (two). Among the valid datasets, classification by relevance resulted in 36 (19%) high, 26 (14%) moderate, 27 low (14%), and 15 (8%) non-relevant datasets, alongside 28 (15%) inaccessible datasets and 84 (44%) publications without datasets (Fig. <ref type="figure" target="#fig_3">4A</ref>). A comparison of publication years between Dryad and Zenodo vs. Semantic Scholar revealed that retrieving from repositories yielded datasets published from 2010 onwards while retrieving from Semantic Scholar included older datasets dating back to 1981 (Fig. <ref type="figure" target="#fig_3">4B</ref>). Furthermore, while one highly relevant dataset, the Neotoma Paleoecology Database (www.neotomadb.org), was referenced in publications extracted from repositories, we identified a total of six highly relevant datasets referenced in articles retrieved from Semantic Scholar. These datasets originated from sources such as the Canadian National Forest Inventory, the Canadian Wildlife Service, and the Québec Ministry of Environment and Wildlife.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head>Automatic relevance classification</head><p>The classification of the Main Classifier shows moderate overall performance, with a weighted F-score ranging from 0.63 to 0.68 depending on the pre-processing steps and classifiers (Supplemental Material S1). Pre-processing steps had limited impact on the evaluation metrics. We highlight in Table <ref type="table" target="#tab_2">3</ref> the detailed performances of the Logistic Regression algorithm which obtained the highest F-score (0.68) when applied after stop-words removal and considering only unigrams. We note that the classifier struggles to correctly identify relevant datasets, as indicated by the low recall of 0.44-meaning it correctly detects less than half of the relevant datasets. The Main Classifier + Modulators relevance prediction overall performance in terms of F-score ranged from 0.53 to 0.61. The performances metrics shown in Table <ref type="table" target="#tab_2">3</ref> correspond to the use of Random Forest classifier on the lemmatised text, using both unigrams and bigrams. The recall of the relevant texts reaches 0.71. We outline the most important features identified by the Support Vector Machine and Random Forest models in Tables <ref type="table">S4</ref> and<ref type="table">S5</ref>. The features specific to certain taxa (e.g., tree, fish, carex) or ecosystem (e.g., arctic, boreal forest, peatlands) show higher weights, whereas vocabulary describing dataset types in a more precise way (e.g., range, distribution, specimen, etc.) and responses to climate change (e.g., climate, change) had lower weights. We also noted spurrious correlations in Random Forest results with unrelevant textual features such as adverbs (e.g., particularly) or figures (e.g., 16).</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head>DISCUSSION</head><p>We have introduced a classification system, designed to serve as a logical framework for automated algorithms, streamlining the evaluation process by categorizing data based on its relevance. This system draws upon globally applicable biodiversity classifiers, making it adaptable to various data types, while also allowing for the incorporation of dataset-specific nuances. To support future advancements, we have also published our high-quality, manually annotated dataset (available alongside this article), providing a benchmark for developing new classifiers. Using this dataset, we trained an automated algorithm that showed moderate performance in identifying relevant datasets. Despite this, our study highlights both the feasibility and the potential value of automating the retrieval and classification of biodiversity datasets, offering a strong foundation for further refinement and improvement in this area.</p><p>Assigning relevance categories, whether through our system or alternative approaches, necessitates a meticulous analysis of features (i.e., metadata) within the publication text. Our study highlights that this task poses a considerable challenge for automated processes, often stemming from the absence or scarcity of these features and their sparsity across different sections of the publication (repository page, dataset, article, Supplemental Materials). This challenge is particularly pronounced in the case of spatio-temporal features, which are pivotal for guiding relevance assessments. Furthermore, our study demonstrates that repositories present a valuable source of readily accessible, publicly available data, surpassing scientific articles in terms of speed and efficiency for data retrieval. However, we also emphasize the significance of designing automated processes for data extraction from articles. These offer a substantial temporal depth of publications and serve as gateways that can guide researchers to other pertinent and valuable data sources.</p><p>Remarkably, a high percentage of datasets contained genetic data, an area where greater collection efforts have been advocated <ref type="bibr" target="#b19">(Hoban et al., 2021</ref><ref type="bibr" target="#b18">(Hoban et al., , 2022))</ref>. Moreover, following presence-only data, abundance data was the most frequently encountered, being information that can aid in constructing time series and elucidating population trends. These are promising findings for the repositories' potential as pivotal resources for automating the retrieval of biodiversity data.</p><p>We have devised a comprehensive classification system aimed at assigning relevance categories to datasets, grounded in a set of criteria. We advocate for the adoption of similar schemes by automated dataset detection algorithms to aid in prioritizing datasets and maintaining pace with the relentless surge in published data. A critical aspect of our system involves the distinction between criteria as either Main Classifiers or Modulators: the former encompasses fundamental, overarching aspects pertinent to biodiversity data on a global scale, while the latter encompasses secondary criteria that retain significance, potentially at regional scales. This distinction enabled our framework to underscore the vital importance of data concerning plants and animals in boreal (e.g., <ref type="bibr" target="#b28">Lait &amp; Burg, 2013;</ref><ref type="bibr" target="#b43">Thiffault et al., 2015;</ref><ref type="bibr" target="#b32">Martin et al., 2022)</ref> and arctic ecosystems (e.g., <ref type="bibr" target="#b30">Leblond, St-Laurent &amp; Côté, 2017;</ref><ref type="bibr" target="#b29">Lamarre et al., 2018;</ref><ref type="bibr" target="#b3">Chagnon, Simard &amp; Boudreau, 2021)</ref>, which face heightened vulnerability and remain underexplored in Quebec, along with the inclusion of new species <ref type="bibr" target="#b0">(Anderson &amp; Lendemer, 2016)</ref>. Our assessment, however, has revealed a significant challenge in identifying the information essential for automated algorithms to assign categories of relevance to publications. This challenge stems from the absence and dispersion of critical features throughout various sections of the publication, making it particularly problematic for detecting Main Classifiers related to temporal and spatial extents. In the majority of datasets we examined, these details were either entirely missing or exclusively located within the article text, neglecting inclusion in the abstract or repository page.</p><p>The automated classification process, while showing moderate performance, provided valuable insights into the key features driving the relevance predictions. We had anticipated higher weights for more precise vocabulary related to dataset types, and the fact that features specific to certain taxa and ecosystems were identified as more important suggests some degree of overfitting. The limited size and geographic focus of the training dataset likely introduced biases toward particular taxa or ecosystems, potentially leading to spurious correlations and explaining the model's lack of generalization to the validation dataset. However, the identification of key terms such as "changes," "genetic," and "population" indicates that relevant descriptors were detected by the classifier. This suggests that expanding the dataset or applying data augmentation methods <ref type="bibr" target="#b42">(Tang, Kamei &amp; Morimoto, 2023)</ref> could improve the performance of the supervised approach. An avenue for improvement would be to use a list of taxa and ecosystems-related terms and filter them from the vocabulary used by the model to focus on the more meaningful terms. In the context of data scarcity, an alternative approach would be to directly extract key features from the texts (e.g., data type, temporal extent, etc.) without relying on a supervised approach. These features may be combined a posteriori in the same framework as described for manual evaluation. Eventually, we could adopt the strategy of <ref type="bibr" target="#b6">Cornford et al. (2021)</ref> who automatically created a set of irrelevant documents by extracting 125,000 articles about ecology from a national database. This strategy allows for a drastic increase in the training dataset, but as the set of irrelevant documents is not manually evaluated, there is a risk that they contain irrelevant elements. The different pre-processing steps and classifiers had a limited impact on the performance metrics. We, therefore, conclude that either our dataset is too small to enable a robust comparison, or the lack of availability of important features in the textual content is an incompressible limit to the model's performance.</p><p>We only evaluated classification performance with a traditional bag-of-words representation and machine learning algorithms, specifically logistic regression, Random Forest and a linear support vector machine (SVM). Recently, pre-trained large language models (LLMs), such as bidirectional encoder representations from transformers (BERT) <ref type="bibr" target="#b7">(Devlin, 2019)</ref>, which require minimal feature engineering, have gained widespread use in many natural language processing tasks. While they do not always outperform bag-ofwords approaches <ref type="bibr" target="#b44">(Wahba, Madhavji &amp; Steinbacher, 2022)</ref>, including them in a more comprehensive assessment would be valuable. LLMs' ability to better account for semantics may improve the detection of dataset types through implicit descriptors. However, like the bag-of-words approach, they would still be limited by the absence of spatiotemporal information. Therefore, search algorithms should be designed to scan all parts of a publication, including the dataset itself, to capture these essential features.</p><p>This underscores the urgency of applying general and standardized frameworks within publication guidelines to ensure the necessary metadata is provided for automatic detection and extraction. Presently, various global frameworks and initiatives, such as the FAIR Data Principles and GBIF standards, advocate for accompanying data with comprehensive metadata using standardized formats such as Darwin Core <ref type="bibr" target="#b47">(Wieczorek et al., 2012)</ref>. However, the way metadata is currently presented in scientific articles and repositories often falls short of meeting these needs, posing a significant obstacle to retrieving relevant biodiversity data <ref type="bibr" target="#b25">(Jones et al., 2019;</ref><ref type="bibr" target="#b31">Löffler et al., 2021)</ref>.</p><p>Our findings highlight that repositories like Dryad and Zenodo, as well as scientific literature search engines such as Semantic Scholar, offer distinct advantages and disadvantages when it comes to automated data retrieval. Sources of scientific literature may exhibit a relatively high percentage of publications that lack data or render it inaccessible as it was observed for Semantic Scholar, which can potentially pose challenges when retrieving datasets and assessing their relevance. Filtering whether or not an article is associated with a dataset would allow to filter out irrelevant articles before the relevance assessment. In practice, we believe that this task would not be as trivial, as datasets are sometimes provided through a link towards a repository, or supplemental material. Such information is not accessible through the title and abstract only and would require retrieving the entire article content. Moreover, the quality of the retrieval also depends on Semantic Scholar's relevance ranking model. Since we restricted our evaluation to 50 results per query, our evaluation does not reflect the intrinsic value of the Semantic Scholar database. Increasing this limit would contribute to a more robust evaluation. Conversely, repositories offer readily accessible datasets and prove to be highly efficient sources for data retrieval. However, repositories may exhibit a limited temporal depth of datasets, typically spanning only the past decade, given their contemporary nature. In contrast, sources of scientific literature have the potential to provide a more extensive historical dataset archive. Moreover, articles may refer to and cite other data sources, such as the six distinct highly relevant databases we found referenced in retrieved articles, thereby facilitating the identification of unknown relevant datasets. These substantial differences underscore the importance of conducting data retrieval from both types of sources to ensure a comprehensive approach.</p><p>In the realm of automated algorithm development, manual evaluations, such as the one conducted in this study (publicly available; see Data Availability statement), will remain invaluable. They serve both as training data for automated algorithms to learn to identify relevant datasets and as a crucial benchmark that enables the assessment of automated processes by drawing comparisons with the results from manual evaluations. Furthermore, it's imperative to acknowledge the need for specialized strategies when dealing with diverse data sources. For instance, one we did not assess here is the increasingly digitized collections of museums, which might require specific automated search and evaluation approaches. An exciting avenue for future research lies in these sources, which harbor invaluable historical data often absent from contemporary global information systems or databases <ref type="bibr" target="#b13">(Graham et al., 2004;</ref><ref type="bibr" target="#b15">Guralnick, Hill &amp; Lane, 2007;</ref><ref type="bibr" target="#b36">Page et al., 2015;</ref><ref type="bibr" target="#b46">Wen et al., 2015)</ref>.</p><p>While the development of literature classification algorithms is advancing vertiginously, especially with artificial intelligence (AI) systems (see Google Gemini, www.deepmind. google), it is imperative to recognize that the challenges surrounding information structure and metadata organization within scientific literature persist regardless of technological evolution. The effectiveness of automated systems relies not only on the sophistication of algorithms but also on the clarity and consistency of metadata standards, the accessibility of data repositories, and the interoperability of databases. Our work not only identifies significant challenges for forthcoming automated algorithms tasked with dataset retrieval for biodiversity but also underscores the relatively surmountable nature of these challenges. These foundational issues transcend the current state of AI technology and are central to ensuring the long-term viability and utility of automated systems for biodiversity data retrieval. As such, efforts to address these structural challenges as well as standardized schemes for prioritization such as the one we proposed, must remain a priority alongside advancements in AI capabilities. To move forward effectively, prioritizing the applications of global frameworks and guidelines that streamline the workflow for automated data retrieval systems is essential. These initiatives carry the transformative potential to reshape our data acquisition capabilities profoundly, greatly bolstering our capacity for biodiversity monitoring and informed decision-making, with far-reaching positive ecological implications.</p></div><figure xmlns="http://www.tei-c.org/ns/1.0" xml:id="fig_0"><head>Figure 1</head><label>1</label><figDesc>Figure 1 Queries performance retrieving relevant datasets from repositories (Dryad and Zenodo). (A) Number of publications and counts of relevant categories per query. Colors indicate relevance categories: H (High), M (Moderate), L (Low), and X (Negligible). (B) F scores, precision, and recall metrics for each query. All queries also account for the word "Quebec". Full-size  DOI: 10.7717/peerj.18853/fig-1</figDesc><graphic coords="5,186.86,87.70,390.27,179.21" type="bitmap" /></figure>
+<figure xmlns="http://www.tei-c.org/ns/1.0" xml:id="fig_1"><head>Figure 2</head><label>2</label><figDesc>Figure 2 Features of retrieved datasets from repositories Dryad and Zenodo and results of the relevance evaluation. (A) Temporal duration and ranges. Red range bars indicate datasets with time series data. The first dataset extends to 1875. (B) Duration, spatial rage, and relevance category. (C) Publication counts by EBV data types. (D) Spatial range counts in the low, medium, and high range</figDesc><graphic coords="11,186.86,87.70,368.50,577.64" type="bitmap" /></figure>
+<figure xmlns="http://www.tei-c.org/ns/1.0" xml:id="fig_2"><head>Figure 3 Figure 2</head><label>32</label><figDesc>Figure 3 Location of features (i.e., metadata) in the publication spaces. (A) Spatiotemporal features and (B) geospatial features. Full-size  DOI: 10.7717/peerj.18853/fig-3</figDesc><graphic coords="12,33.85,166.11,535.69,201.94" type="bitmap" /></figure>
+<figure xmlns="http://www.tei-c.org/ns/1.0" xml:id="fig_3"><head>Figure 4</head><label>4</label><figDesc>Figure 4 Comparison between semantic scholar and repositories (Dryad and Zenodo). (A) Relevance and accessibility of datasets. (B) Temporal depth of retrieved publications. Full-size  DOI: 10.7717/peerj.18853/fig-4</figDesc><graphic coords="13,186.86,87.70,384.38,386.59" type="bitmap" /></figure>
+<figure xmlns="http://www.tei-c.org/ns/1.0" type="table" xml:id="tab_0"><head>Table 1</head><label>1</label><figDesc>Manually evaluated features from retrieved datasets.</figDesc><table><row><cell>Feature</cell><cell>Type</cell><cell>Example</cell></row><row><cell>EBV data type</cell><cell>Categorical</cell><cell>Abundance</cell></row><row><cell>Geospatial information</cell><cell>Continuous</cell><cell>Sample coordinates</cell></row><row><cell>Spatial range</cell><cell>Continuous</cell><cell>100.000 km 2</cell></row><row><cell>Temporal range</cell><cell>String</cell><cell>From 1999 to 2008</cell></row><row><cell>Temporal duration</cell><cell>Continuous</cell><cell>9 years</cell></row><row><cell>Taxons</cell><cell>String</cell><cell>Black-legged tick</cell></row></table></figure>
+<figure xmlns="http://www.tei-c.org/ns/1.0" type="table" xml:id="tab_1"><head>Table 2</head><label>2</label><figDesc>Evaluation criteria used to assign the relevance category to the datasets.</figDesc><table><row><cell>Classifier group</cell><cell>Classifier</cell><cell>Relevance assignment</cell></row></table><note><p>Low: Presence-only, relative abundance, species richness, non-EBV genetic analysis. * Data from a geographic area of special interest. FALSE Assigned relevance by Main Classifiers + Modulators (criteria: if any TRUE, relevance by Main Classifiers increases one category) H Note:</p></note></figure>
+<figure xmlns="http://www.tei-c.org/ns/1.0" type="table" xml:id="tab_2"><head>Table 3</head><label>3</label><figDesc>Performances metrics of the classification to predict the Main Classifier (left) and the Main Classifier + Modulars (right) classes (relevant/non-relevant), in terms of precision, recall and F-score.</figDesc><table><row><cell></cell><cell cols="2">Main classifier relevance</cell><cell></cell><cell cols="2">Main classifier + Modulators relevance</cell><cell></cell></row><row><cell></cell><cell cols="3">Classifier: logistic regression, pre-processing:</cell><cell cols="3">Classifier: random forest, pre-processing: lemmatised text, no</cell></row><row><cell></cell><cell cols="2">stop-words removal, unigrams</cell><cell></cell><cell cols="2">stop-words removal, unigrams and bigrams</cell><cell></cell></row><row><cell></cell><cell>Precision</cell><cell>Recall</cell><cell>F-score</cell><cell>Precision</cell><cell>Recall</cell><cell>F-score</cell></row><row><cell>Relevant</cell><cell>0.57</cell><cell>0.44</cell><cell>0.50</cell><cell>0.62</cell><cell>0.71</cell><cell>0.67</cell></row><row><cell>Not relevant</cell><cell>0.73</cell><cell>0.82</cell><cell>0.77</cell><cell>0.59</cell><cell>0.49</cell><cell>0.53</cell></row><row><cell>Weighted average</cell><cell>0.68</cell><cell>0.69</cell><cell>0.68</cell><cell>0.61</cell><cell>0.61</cell><cell>0.61</cell></row></table></figure>
+			<note xmlns="http://www.tei-c.org/ns/1.0" place="foot" xml:id="foot_0"><p>Fuster-Calvo et al. (2025), PeerJ, DOI 10.7717/peerj.18853</p></note>
+			<note xmlns="http://www.tei-c.org/ns/1.0" place="foot" xml:id="foot_1"><p>Fuster-Calvo et al. (2025), PeerJ, DOI 10.7717/peerj.18853 20/22</p></note>
+		</body>
+		<back>
+
+			<div type="acknowledgement">
+<div><head>ACKNOWLEDGEMENTS</head><p>We thank <rs type="person">Vincent Beauregard</rs> for his feedback on the algorithms and the ATLAS database. We sincerely thank the reviewers for their insightful comments and suggestions, which have greatly improved the quality and clarity of this manuscript. We acknowledge the use of ChatGPT to help improve the fluency and grammar of the manuscript text.</p></div>
+			</div>
+			<div type="availability">
+<div xmlns="http://www.tei-c.org/ns/1.0"><head>Data Availability</head><p>The following information was supplied regarding data availability:</p><p>The data and script are available at GitHub and Zenodo:</p><p>-https://github.com/Alex-Fuster/automated_datset_retrieval.git.</p><p>-Fuster-Calvo, A., Valentin, S., C Tamayo, W., &amp; Gravel, D. (2024). Evaluating the feasibility of automating dataset retrieval for biodiversity monitoring. https://doi.org/10. 5281/zenodo.13881796.</p></div>
+			</div>
+
+			<div type="annex">
+<div xmlns="http://www.tei-c.org/ns/1.0"><head>ADDITIONAL INFORMATION AND DECLARATIONS Funding</head><p>This study was supported by an NSERC Alliance grant to DG. The funders had no role in study design, data collection and analysis, decision to publish, or preparation of the manuscript.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head>Grant Disclosures</head><p>The following grant information was disclosed by the authors: NSERC Alliance.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head>Competing Interests</head><p>The authors declare that they have no competing interests.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head>Author Contributions</head><p>. Alexandre Fuster-Calvo conceived and designed the experiments, performed the experiments, analyzed the data, prepared figures and/or tables, authored or reviewed drafts of the article, and approved the final draft. . Sarah Valentin conceived and designed the experiments, performed the experiments, prepared figures and/or tables, and approved the final draft. . William C. Tamayo performed the experiments, authored or reviewed drafts of the article, and approved the final draft. . Dominique Gravel conceived and designed the experiments, authored or reviewed drafts of the article, and approved the final draft.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head>Supplemental Information</head><p>Supplemental information for this article can be found online at http://dx.doi.org/10.7717/ peerj.18853#supplemental-information.</p></div>			</div>
+			<div type="references">
+
+				<listBibl>
+
+<biblStruct xml:id="b0">
+	<analytic>
+		<title level="a" type="main">Aspicilia bicensis (Megasporaceae), a new sterile, pustulose lichen from eastern Canada</title>
+		<author>
+			<persName><forename type="first">F</forename><surname>Anderson</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><forename type="middle">C</forename><surname>Lendemer</surname></persName>
+		</author>
+		<idno type="DOI">10.1639/0007-2745-119.1.008</idno>
+	</analytic>
+	<monogr>
+		<title level="j">The Bryologist</title>
+		<imprint>
+			<biblScope unit="volume">119</biblScope>
+			<biblScope unit="issue">1</biblScope>
+			<biblScope unit="page" from="8" to="15" />
+			<date type="published" when="2016">2016</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b1">
+	<analytic>
+		<title level="a" type="main">NLTK: the natural language Toolkit</title>
+		<author>
+			<persName><forename type="first">S</forename><surname>Bird</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Edward</forename><forename type="middle">L</forename></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m">Proceedings of the ACL Interactive Poster and Demonstration Sessions</title>
+		<meeting>the ACL Interactive Poster and Demonstration Sessions<address><addrLine>Barcelona, Spain</addrLine></address></meeting>
+		<imprint>
+			<publisher>Association for Computational Linguistics</publisher>
+			<date type="published" when="2004">2004</date>
+			<biblScope unit="page" from="214" to="217" />
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b2">
+	<monogr>
+		<title level="m" type="main">Large language models overcome the challenges of unstructured text data in ecology</title>
+		<author>
+			<persName><forename type="first">A</forename><surname>Castro</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><surname>Pinto</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">L</forename><surname>Reino</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">P</forename><surname>Pipek</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">C</forename><surname>Capinha</surname></persName>
+		</author>
+		<idno type="DOI">10.1101/2024.01.23.576654</idno>
+		<imprint>
+			<date type="published" when="2024">2024</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b3">
+	<analytic>
+		<title level="a" type="main">Patterns and determinants of lichen abundance and diversity across a subarctic to arctic latitudinal gradient</title>
+		<author>
+			<persName><forename type="first">C</forename><surname>Chagnon</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">M</forename><surname>Simard</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">S</forename><surname>Boudreau</surname></persName>
+		</author>
+		<idno type="DOI">10.5061/dryad.9w0vt4bg8</idno>
+	</analytic>
+	<monogr>
+		<title level="j">Journal of Biogeography</title>
+		<imprint>
+			<biblScope unit="volume">48</biblScope>
+			<biblScope unit="issue">11</biblScope>
+			<biblScope unit="page" from="2742" to="2754" />
+			<date type="published" when="2021">2021</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b4">
+	<analytic>
+		<title level="a" type="main">The data paper: a mechanism to incentivize data publishing in biodiversity science</title>
+		<author>
+			<persName><forename type="first">V</forename><surname>Chavan</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">L</forename><surname>Penev</surname></persName>
+		</author>
+		<idno type="DOI">10.1186/1471-2105-12-s15-s2</idno>
+	</analytic>
+	<monogr>
+		<title level="j">BMC Bioinformatics</title>
+		<imprint>
+			<biblScope unit="volume">12</biblScope>
+			<date type="published" when="2011">2011</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b5">
+	<analytic>
+		<title level="a" type="main">Data gaps and opportunities for comparative and conservation biology</title>
+		<author>
+			<persName><forename type="first">D</forename><forename type="middle">A</forename><surname>Conde</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><surname>Staerk</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">F</forename><surname>Colchero</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">R</forename><surname>Da Silva</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><surname>Schöley</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">H</forename><forename type="middle">M</forename><surname>Baden</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">L</forename><surname>Jouvet</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><forename type="middle">E</forename><surname>Fa</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">H</forename><surname>Syed</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">E</forename><surname>Jongejans</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">S</forename><surname>Meiri</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J-M</forename><surname>Gaillard</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">S</forename><surname>Chamberlain</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><surname>Wilcken</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">O</forename><forename type="middle">R</forename><surname>Jones</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><forename type="middle">P</forename><surname>Dahlgren</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">U</forename><forename type="middle">K</forename><surname>Steiner</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">L</forename><forename type="middle">M</forename><surname>Bland</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">I</forename><surname>Gomez-Mestre</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J-D</forename><surname>Lebreton</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">González</forename><surname>Vargas</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><surname>Flesness</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">N</forename><surname>Canudas-Romo</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">V</forename><surname>Salguero-Gómez</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">R</forename><surname>Byers</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">O</forename><surname>Berg</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">T</forename><forename type="middle">B</forename><surname>Scheuerlein</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">A</forename><surname>Devillard</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">S</forename><surname>Schigel</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">D</forename><forename type="middle">S</forename><surname>Ryder</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">O</forename><forename type="middle">A</forename><surname>Possingham</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">H</forename><forename type="middle">P</forename><surname>Baudisch</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">A</forename><surname>Vaupel</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><forename type="middle">W</forename></persName>
+		</author>
+		<idno type="DOI">10.1073/pnas.1816367116</idno>
+	</analytic>
+	<monogr>
+		<title level="j">Proceedings of the National Academy of Sciences of the United States of America</title>
+		<imprint>
+			<biblScope unit="volume">116</biblScope>
+			<biblScope unit="page" from="9658" to="9664" />
+			<date type="published" when="2019">2019. 19</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b6">
+	<analytic>
+		<title level="a" type="main">Fast, scalable, and automated identification of articles for biodiversity and macroecological datasets</title>
+		<author>
+			<persName><forename type="first">R</forename><surname>Cornford</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">S</forename><surname>Deinet</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">De</forename><surname>Palma</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">A</forename><surname>Hill</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">S</forename><forename type="middle">L</forename><surname>Mcrae</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">L</forename><surname>Pettit</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">B</forename><surname>Marconi</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">V</forename><surname>Purvis</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">A</forename><surname>Freeman</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">R</forename></persName>
+		</author>
+		<idno type="DOI">10.1111/geb.13219</idno>
+	</analytic>
+	<monogr>
+		<title level="j">Global Ecology and Biogeography</title>
+		<imprint>
+			<biblScope unit="volume">30</biblScope>
+			<biblScope unit="issue">1</biblScope>
+			<biblScope unit="page" from="339" to="347" />
+			<date type="published" when="2021">2021</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b7">
+	<monogr>
+		<title level="m" type="main">Bert: pre-training of deep bidirectional transformers for language understanding</title>
+		<author>
+			<persName><forename type="first">J</forename><surname>Devlin</surname></persName>
+		</author>
+		<idno type="DOI">10.48550/arXiv.1810.04805</idno>
+		<imprint>
+			<date type="published" when="2019">2019</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b8">
+	<analytic>
+		<title/>
+		<author>
+			<persName><forename type="first">M</forename><surname>Dornelas</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">L</forename><forename type="middle">H</forename><surname>Antão</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">F</forename><surname>Moyes</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">A</forename><forename type="middle">E</forename><surname>Bates</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">A</forename><forename type="middle">E</forename><surname>Magurran</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">D</forename><surname>Adam</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">A</forename><forename type="middle">A</forename><surname>Akhmetzhanova</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">W</forename><surname>Appeltans</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><forename type="middle">M</forename><surname>Arcos</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">H</forename><surname>Arnold</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">N</forename><surname>Ayyappan</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">G</forename><surname>Badihi</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">A</forename><forename type="middle">H</forename><surname>Baird</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">M</forename><surname>Barbosa</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">T</forename><forename type="middle">E</forename><surname>Barreto</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">C</forename><surname>Bässler</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">A</forename><surname>Bellgrove</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><surname>Belmaker</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">L</forename><surname>Benedetti-Cecchi</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">B</forename><forename type="middle">J</forename><surname>Bett</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">A</forename><forename type="middle">D</forename><surname>Bjorkman</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">M</forename><surname>Błażewicz</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">S</forename><forename type="middle">A</forename><surname>Blowes</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">C</forename><forename type="middle">P</forename><surname>Bloch</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">T</forename><forename type="middle">C</forename><surname>Bonebrake</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">S</forename><surname>Boyd</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">M</forename><surname>Bradford</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">A</forename><forename type="middle">J</forename><surname>Brooks</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><forename type="middle">H</forename><surname>Brown</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">H</forename><surname>Bruelheide</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">P</forename><surname>Budy</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">F</forename><surname>Carvalho</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">E</forename><surname>Castañeda-Moya</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">C</forename><forename type="middle">A</forename><surname>Chen</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><forename type="middle">F</forename><surname>Chamblee</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">T</forename><forename type="middle">J</forename><surname>Chase</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Siegwart</forename><surname>Collier</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">L</forename><surname>Collinge</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">S</forename><forename type="middle">K</forename><surname>Condit</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">R</forename><surname>Cooper</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">E</forename><forename type="middle">J</forename><surname>Cornelissen</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jhc</forename><surname>Cotano</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">U</forename></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Kyle</forename><surname>Crow</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">S</forename><surname>Damasceno</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">G</forename><surname>Davies</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">C</forename><forename type="middle">H</forename><surname>Davis</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">R</forename><forename type="middle">A</forename><surname>Day</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">F</forename><forename type="middle">P</forename><surname>Degraer</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">S</forename><surname>Doherty</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">T</forename><forename type="middle">S</forename><surname>Dunn</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">T</forename><forename type="middle">E</forename><surname>Durigan</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">G</forename><surname>Duffy</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><forename type="middle">E</forename><surname>Edelist</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">D</forename><surname>Edgar</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">G</forename><forename type="middle">J</forename><surname>Elahi</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">R</forename><surname>Elmendorf</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">S</forename><forename type="middle">C</forename><surname>Enemar</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">A</forename><surname>Ernest</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Skm</forename><surname>Escribano</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">R</forename><surname>Estiarte</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">M</forename><surname>Evans</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">B</forename><forename type="middle">S</forename><surname>Fan</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">T-Y</forename></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Turini</forename><surname>Farah</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">F</forename></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Loureiro</forename><surname>Fernandes</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">L</forename><surname>Farneda</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">F</forename><forename type="middle">Z</forename><surname>Fidelis</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">A</forename><surname>Fitt</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">R</forename><surname>Fosaa</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">A</forename><forename type="middle">M</forename></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Daher</forename><surname>Correa Franco</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">G</forename><forename type="middle">A</forename><surname>Frank</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">G</forename><forename type="middle">E</forename><surname>Fraser</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">W</forename><forename type="middle">R</forename><surname>García</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">H</forename></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Cazzolla</forename><surname>Gatti</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">R</forename><surname>Givan</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">O</forename><surname>Gorgone-Barbosa</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">E</forename><surname>Gould</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">W</forename><forename type="middle">A</forename><surname>Gries</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">C</forename><surname>Grossman</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">G</forename><forename type="middle">D</forename><surname>Gutierréz</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><forename type="middle">R</forename><surname>Hale</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">S</forename><surname>Harmon</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">M</forename><forename type="middle">E</forename><surname>Harte</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><surname>Haskins</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">G</forename><surname>Henshaw</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">D</forename><forename type="middle">L</forename><surname>Hermanutz</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">L</forename><surname>Hidalgo</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">P</forename><surname>Higuchi</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">P</forename><surname>Hoey</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">A</forename><surname>Van Hoey</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">G</forename><surname>Hofgaard</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">A</forename><surname>Holeck</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">K</forename><surname>Hollister</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">R</forename><forename type="middle">D</forename><surname>Holmes</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">R</forename><surname>Hoogenboom</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">M</forename><surname>Hsieh</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">C-H</forename><surname>Hubbell</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">S</forename><forename type="middle">P</forename><surname>Huettmann</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">F</forename><surname>Huffard</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">C</forename><forename type="middle">L</forename><surname>Hurlbert</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">A</forename><forename type="middle">H</forename></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Macedo</forename><surname>Ivanauskas</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">N</forename><surname>Janík</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">D</forename><surname>Jandt</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">U</forename><surname>Jażdżewska</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">A</forename><surname>Johannessen</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">T</forename><surname>Johnstone</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><surname>Jones</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><surname>Jones</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Fam</forename><surname>Kang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><surname>Kartawijaya</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">T</forename><surname>Keeley</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">E</forename><forename type="middle">C</forename><surname>Kelt</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">D</forename><forename type="middle">A</forename><surname>Kinnear</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">R</forename><surname>Klanderud</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">K</forename><surname>Knutsen</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">H</forename><surname>Koenig</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">C</forename><forename type="middle">C</forename><surname>Kortz</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">A</forename><forename type="middle">R</forename><surname>Král</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">K</forename><surname>Kuhnz</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">L</forename><forename type="middle">A</forename><surname>Kuo</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">C-Y</forename><surname>Kushner</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">D</forename><forename type="middle">J</forename><surname>Laguionie-Marchais</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">C</forename><surname>Lancaster</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">L</forename><forename type="middle">T</forename></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Min</forename><surname>Lee</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">C</forename><surname>Lefcheck</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><forename type="middle">S</forename><surname>Lévesque</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">E</forename><surname>Lightfoot</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">D</forename><surname>Lloret</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">F</forename><surname>Lloyd</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><forename type="middle">D</forename><surname>López-Baucells</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">A</forename><surname>Louzao</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">M</forename><surname>Madin</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><forename type="middle">S</forename><surname>Magnússon</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">B</forename><surname>Malamud</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">S</forename><surname>Matthews</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">I</forename><surname>Mcfarland</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">K</forename><forename type="middle">P</forename><surname>Mcgill</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">B</forename><surname>Mcknight</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">D</forename><surname>Mclarney</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">W</forename><forename type="middle">O</forename><surname>Meador</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><surname>Meserve</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">P</forename><forename type="middle">L</forename><surname>Metcalfe</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">D</forename><forename type="middle">J</forename><surname>Meyer</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Cfj</forename><surname>Michelsen</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">A</forename><surname>Milchakova</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">N</forename><surname>Moens</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">T</forename><surname>Moland</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">E</forename><surname>Moore</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Mathias</forename><surname>Moreira</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">C</forename><surname>Müller</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><surname>Murphy</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">G</forename><surname>Myers-Smith</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">I</forename><forename type="middle">H</forename><surname>Myster</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">R</forename><forename type="middle">W</forename><surname>Naumov</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">A</forename><surname>Neat</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">F</forename><surname>Nelson</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><forename type="middle">A</forename></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Paul</forename><surname>Nelson</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">M</forename><surname>Newton</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">S</forename><forename type="middle">F</forename><surname>Norden</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">N</forename><surname>Oliver</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><forename type="middle">C</forename><surname>Olsen</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">E</forename><forename type="middle">M</forename><surname>Onipchenko</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">V</forename><forename type="middle">G</forename><surname>Pabis</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">K</forename><surname>Pabst</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">R</forename><forename type="middle">J</forename><surname>Paquette</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">A</forename><surname>Pardede</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">S</forename><surname>Paterson</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">D</forename><forename type="middle">M</forename><surname>Pélissier</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">R</forename><surname>Peñuelas</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><surname>Pérez-Matus</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">A</forename><surname>Pizarro</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">O</forename><surname>Pomati</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">F</forename><surname>Post</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">E</forename><surname>Prins</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Hht</forename><surname>Priscu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><forename type="middle">C</forename><surname>Provoost</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">P</forename><surname>Prudic</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">K</forename><forename type="middle">L</forename><surname>Pulliainen</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">E</forename><surname>Ramesh</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">B</forename><forename type="middle">R</forename></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Mendivil</forename><surname>Ramos</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">O</forename><surname>Rassweiler</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">A</forename><surname>Rebelo</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><forename type="middle">E</forename><surname>Reed</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">D</forename><forename type="middle">C</forename><surname>Reich</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">P</forename><forename type="middle">B</forename><surname>Remillard</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">S</forename><forename type="middle">M</forename><surname>Richardson</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">A</forename><forename type="middle">J</forename><surname>Richardson</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><forename type="middle">P</forename><surname>Van Rijn</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">I</forename><surname>Rocha</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">R</forename><surname>Rivera-Monroy</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">V</forename><forename type="middle">H</forename><surname>Rixen</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">C</forename><surname>Robinson</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">K</forename><forename type="middle">P</forename></persName>
+		</author>
+		<idno type="DOI">10.1111/geb.12729</idno>
+	</analytic>
+	<monogr>
+		<title level="j">Global Ecology and Biogeography</title>
+		<imprint>
+			<biblScope unit="volume">27</biblScope>
+			<biblScope unit="issue">7</biblScope>
+			<biblScope unit="page" from="760" to="786" />
+			<pubPlace>Ribeiro Rodrigues R, de Cerqueira Rossa-Feres D, Rudstam L, Ruhl H, Ruz CS</pubPlace>
+		</imprint>
+	</monogr>
+	<note>Sampaio EM, Rybicki N, Rypel A, Sal S, et al. 2018. BioTIME: a database of biodiversity time series for the Anthropocene</note>
+</biblStruct>
+
+<biblStruct xml:id="b9">
+	<analytic>
+		<title level="a" type="main">Past and future uses of text mining in ecology and evolution</title>
+		<author>
+			<persName><forename type="first">M</forename><forename type="middle">J</forename><surname>Farrell</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">L</forename><surname>Brierley</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">A</forename><surname>Willoughby</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">A</forename><surname>Yates</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">N</forename><surname>Mideo</surname></persName>
+		</author>
+		<idno type="DOI">10.1098/rspb.2021.2721</idno>
+	</analytic>
+	<monogr>
+		<title level="j">Proceedings of the Royal Society B: Biological Sciences</title>
+		<imprint>
+			<biblScope unit="volume">289</biblScope>
+			<date type="published" when="1975">2022. 1975</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b10">
+	<monogr>
+		<title level="m" type="main">The changing landscape of text mining-a review of approaches for ecology and evolution</title>
+		<author>
+			<persName><forename type="first">M</forename><forename type="middle">J</forename><surname>Farrell</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Le</forename><surname>Guillarme</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">N</forename><surname>Brierley</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">L</forename><surname>Hunter</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">B</forename><surname>Scheepens</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">D</forename><surname>Willoughby</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">A</forename><surname>Yates</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">A</forename><surname>Mideo</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">N</forename></persName>
+		</author>
+		<idno type="DOI">10.1098/rspb.2024.0423</idno>
+		<imprint>
+			<date type="published" when="2024">2024</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b11">
+	<analytic>
+		<title level="a" type="main">The odonata of quebec: specimen data from seven collections</title>
+		<author>
+			<persName><forename type="first">C</forename><surname>Favret</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Moisan-De</forename><surname>Serres</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><surname>Larrivée</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">M</forename><surname>Lessard</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><forename type="middle">P</forename></persName>
+		</author>
+		<idno type="DOI">10.3897/BDJ.8.e49450</idno>
+	</analytic>
+	<monogr>
+		<title level="j">Biodiversity Data Journal</title>
+		<imprint>
+			<biblScope unit="volume">8</biblScope>
+			<biblScope unit="issue">8</biblScope>
+			<date type="published" when="2020">2020</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b12">
+	<analytic>
+		<title level="a" type="main">A probabilistic interpretation of precision, recall and F-score, with implication for evaluation</title>
+		<author>
+			<persName><forename type="first">C</forename><surname>Goutte</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">E</forename><surname>Gaussier</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m">European Conference on Information Retrieval</title>
+		<meeting><address><addrLine>Berlin, Heidelberg; Berlin Heidelberg</addrLine></address></meeting>
+		<imprint>
+			<publisher>Springer</publisher>
+			<date type="published" when="2005">2005</date>
+			<biblScope unit="page" from="345" to="359" />
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b13">
+	<analytic>
+		<title level="a" type="main">New developments in museum-based informatics and applications in biodiversity analysis</title>
+		<author>
+			<persName><forename type="first">C</forename><forename type="middle">H</forename><surname>Graham</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">S</forename><surname>Ferrier</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">F</forename><surname>Huettman</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">C</forename><surname>Moritz</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">A</forename><forename type="middle">T</forename><surname>Peterson</surname></persName>
+		</author>
+		<idno type="DOI">10.1016/j.tree.2004.07.006</idno>
+	</analytic>
+	<monogr>
+		<title level="j">Trends in Ecology &amp; Evolution</title>
+		<imprint>
+			<biblScope unit="volume">19</biblScope>
+			<biblScope unit="issue">9</biblScope>
+			<biblScope unit="page" from="497" to="503" />
+			<date type="published" when="2004">2004</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b14">
+	<analytic>
+		<title level="a" type="main">Biodiversity informatics: automated approaches for documenting global biodiversity patterns and processes</title>
+		<author>
+			<persName><forename type="first">R</forename><surname>Guralnick</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">A</forename><surname>Hill</surname></persName>
+		</author>
+		<idno type="DOI">10.1093/bioinformatics/btn659</idno>
+	</analytic>
+	<monogr>
+		<title level="j">Bioinformatics</title>
+		<imprint>
+			<biblScope unit="volume">25</biblScope>
+			<biblScope unit="issue">4</biblScope>
+			<biblScope unit="page" from="421" to="428" />
+			<date type="published" when="2009">2009</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b15">
+	<analytic>
+		<title level="a" type="main">Towards a collaborative, global infrastructure for biodiversity assessment</title>
+		<author>
+			<persName><forename type="first">R</forename><forename type="middle">P</forename><surname>Guralnick</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">A</forename><forename type="middle">W</forename><surname>Hill</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">M</forename><surname>Lane</surname></persName>
+		</author>
+		<idno type="DOI">10.1111/j.1461-0248.2007.01063.x</idno>
+	</analytic>
+	<monogr>
+		<title level="j">Ecology Letters</title>
+		<imprint>
+			<biblScope unit="volume">10</biblScope>
+			<biblScope unit="issue">8</biblScope>
+			<biblScope unit="page" from="663" to="672" />
+			<date type="published" when="2007">2007</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b16">
+	<analytic>
+		<title level="a" type="main">The changing uses of herbarium data in an era of global change: an overview using automated content analysis</title>
+		<author>
+			<persName><forename type="first">J</forename><forename type="middle">M</forename><surname>Heberling</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">L</forename><forename type="middle">A</forename><surname>Prather</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">S</forename><forename type="middle">J</forename><surname>Tonsor</surname></persName>
+		</author>
+		<idno type="DOI">10.1093/biosci/biz094</idno>
+	</analytic>
+	<monogr>
+		<title level="j">BioScience</title>
+		<imprint>
+			<biblScope unit="volume">69</biblScope>
+			<biblScope unit="issue">10</biblScope>
+			<biblScope unit="page" from="812" to="822" />
+			<date type="published" when="2019">2019</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b17">
+	<analytic>
+		<title level="a" type="main">Allocation of effort and imbalances in biodiversity research</title>
+		<author>
+			<persName><forename type="first">I</forename><forename type="middle">E</forename><surname>Hendriks</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">C</forename><forename type="middle">M</forename><surname>Duarte</surname></persName>
+		</author>
+		<idno type="DOI">10.1016/j.jembe.2008.03.004</idno>
+	</analytic>
+	<monogr>
+		<title level="j">Journal of Experimental Marine Biology and Ecology</title>
+		<imprint>
+			<biblScope unit="volume">360</biblScope>
+			<biblScope unit="issue">1</biblScope>
+			<biblScope unit="page" from="15" to="20" />
+			<date type="published" when="2008">2008</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b18">
+	<analytic>
+		<title level="a" type="main">Global genetic diversity status and trends: towards a suite of essential biodiversity variables (EBVs) for genetic composition</title>
+		<author>
+			<persName><forename type="first">S</forename><surname>Hoban</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">F</forename><forename type="middle">I</forename><surname>Archer</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">L</forename><forename type="middle">D</forename><surname>Bertola</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><forename type="middle">G</forename><surname>Bragg</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">M</forename><forename type="middle">F</forename><surname>Breed</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">M</forename><forename type="middle">W</forename><surname>Bruford</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">M</forename><forename type="middle">A</forename><surname>Coleman</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">R</forename><surname>Ekblom</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">W</forename><forename type="middle">C</forename><surname>Funk</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">C</forename><forename type="middle">E</forename><surname>Grueber</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">B</forename><forename type="middle">K</forename><surname>Hand</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">R</forename><surname>Jaffé</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">E</forename><surname>Jensen</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><forename type="middle">S</forename><surname>Johnson</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">F</forename><surname>Kershaw</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">L</forename><surname>Liggins</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">A</forename><forename type="middle">J</forename><surname>Macdonald</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><surname>Mergeay</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><forename type="middle">M</forename><surname>Miller</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">F</forename><surname>Muller-Karger</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">O</forename><surname>'brien</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">D</forename></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Paz</forename><forename type="middle">-</forename><surname>Vinas</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">I</forename><surname>Potter</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">K</forename><forename type="middle">M</forename><surname>Razgour</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">O</forename><surname>Vernesi</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">C</forename><surname>Hunter</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">M</forename><forename type="middle">E</forename></persName>
+		</author>
+		<idno type="DOI">10.1111/brv.12852</idno>
+	</analytic>
+	<monogr>
+		<title level="j">Biological Reviews</title>
+		<imprint>
+			<biblScope unit="volume">97</biblScope>
+			<biblScope unit="issue">4</biblScope>
+			<biblScope unit="page" from="1511" to="1538" />
+			<date type="published" when="2022">2022</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b19">
+	<analytic>
+		<title level="a" type="main">Global commitments to conserving and monitoring genetic diversity are now necessary and feasible</title>
+		<author>
+			<persName><forename type="first">S</forename><surname>Hoban</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">M</forename><forename type="middle">W</forename><surname>Bruford</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">W</forename><forename type="middle">C</forename><surname>Funk</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">P</forename><surname>Galbusera</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">M</forename><forename type="middle">P</forename><surname>Griffith</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">C</forename><forename type="middle">E</forename><surname>Grueber</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">M</forename><surname>Heuertz</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">M</forename><forename type="middle">E</forename><surname>Hunter</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">C</forename><surname>Hvilsom</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">B</forename><forename type="middle">K</forename><surname>Stroil</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">F</forename><surname>Kershaw</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">C</forename><forename type="middle">K</forename><surname>Khoury</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">L</forename><surname>Laikre</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">M</forename><surname>Lopes-Fernandes</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">A</forename><forename type="middle">J</forename><surname>Macdonald</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><surname>Mergeay</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">M</forename><surname>Meek</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">C</forename><surname>Mittan</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">T</forename><forename type="middle">A</forename><surname>Mukassabi</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">O</forename><surname>'brien</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">D</forename><surname>Ogden</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">R</forename><surname>Palma-Silva</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">C</forename><surname>Ramakrishnan</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">U</forename><surname>Segelbacher</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">G</forename><surname>Shaw</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">R</forename><forename type="middle">E</forename><surname>Sjögren-Gulve</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">P</forename><surname>Veličković</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">N</forename><surname>Vernesi</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">C</forename></persName>
+		</author>
+		<idno type="DOI">10.1093/biosci/biab054</idno>
+	</analytic>
+	<monogr>
+		<title level="j">Bioscience</title>
+		<imprint>
+			<biblScope unit="volume">71</biblScope>
+			<biblScope unit="issue">9</biblScope>
+			<biblScope unit="page" from="964" to="976" />
+			<date type="published" when="2021">2021</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b20">
+	<analytic>
+		<title level="a" type="main">Seven shortfalls that beset large-scale knowledge of biodiversity</title>
+		<author>
+			<persName><forename type="first">J</forename><surname>Hortal</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">F</forename><surname>De Bello</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jaf</forename><surname>Diniz-Filho</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">T</forename><forename type="middle">M</forename><surname>Lewinsohn</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><forename type="middle">M</forename><surname>Lobo</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">R</forename><forename type="middle">J</forename><surname>Ladle</surname></persName>
+		</author>
+		<idno type="DOI">10.1146/annurev-ecolsys-112414-054400</idno>
+	</analytic>
+	<monogr>
+		<title level="j">Annual Review of Ecology, Evolution, and Systematics</title>
+		<imprint>
+			<biblScope unit="volume">46</biblScope>
+			<biblScope unit="issue">1</biblScope>
+			<biblScope unit="page" from="523" to="549" />
+			<date type="published" when="2015">2015</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b21">
+	<analytic>
+		<title level="a" type="main">Fast logistic regression for text categorization with variablelength n-grams</title>
+		<author>
+			<persName><forename type="first">G</forename><surname>Ifrim</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">G</forename><surname>Bakir</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">G</forename><surname>Weikum</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m">Proceedings of the 14th ACM SIGKDD International Conference on Knowledge Discovery and Data Mining</title>
+		<meeting>the 14th ACM SIGKDD International Conference on Knowledge Discovery and Data Mining<address><addrLine>New York</addrLine></address></meeting>
+		<imprint>
+			<publisher>ACM</publisher>
+			<date type="published" when="2008">2008</date>
+			<biblScope unit="page" from="354" to="362" />
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b22">
+	<analytic>
+		<title level="a" type="main">Essential biodiversity variables for mapping and monitoring species populations</title>
+		<author>
+			<persName><forename type="first">W</forename><surname>Jetz</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">M</forename><forename type="middle">A</forename><surname>Mcgeoch</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">R</forename><surname>Guralnick</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">S</forename><surname>Ferrier</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><surname>Beck</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">M</forename><forename type="middle">J</forename><surname>Costello</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">M</forename><surname>Fernandez</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">G</forename><forename type="middle">N</forename><surname>Geller</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">P</forename><surname>Keil</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">C</forename><surname>Merow</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">C</forename><surname>Meyer</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">F</forename><forename type="middle">E</forename><surname>Muller-Karger</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">H</forename><forename type="middle">M</forename><surname>Pereira</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">E</forename><forename type="middle">C</forename><surname>Regan</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">D</forename><forename type="middle">S</forename><surname>Schmeller</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">E</forename><surname>Turak</surname></persName>
+		</author>
+		<idno type="DOI">10.1038/s41559-019-0826-1</idno>
+	</analytic>
+	<monogr>
+		<title level="j">Nature Ecology &amp; Evolution</title>
+		<imprint>
+			<biblScope unit="volume">3</biblScope>
+			<biblScope unit="issue">4</biblScope>
+			<biblScope unit="page" from="539" to="551" />
+			<date type="published" when="2019">2019</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b23">
+	<analytic>
+		<title level="a" type="main">Integrating biodiversity distribution knowledge: toward a global map of life</title>
+		<author>
+			<persName><forename type="first">W</forename><surname>Jetz</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><forename type="middle">M</forename><surname>Mcpherson</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">R</forename><forename type="middle">P</forename><surname>Guralnick</surname></persName>
+		</author>
+		<idno type="DOI">10.1016/j.tree.2011.09.007</idno>
+	</analytic>
+	<monogr>
+		<title level="j">Trends in Ecology &amp; Evolution</title>
+		<imprint>
+			<biblScope unit="volume">27</biblScope>
+			<biblScope unit="issue">3</biblScope>
+			<biblScope unit="page" from="151" to="159" />
+			<date type="published" when="2012">2012</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b24">
+	<analytic>
+		<title level="a" type="main">Text categorization with support vector machines: learning with many relevant features</title>
+		<author>
+			<persName><forename type="first">T</forename><surname>Joachims</surname></persName>
+		</author>
+		<idno type="DOI">10.1007/BFb0026683</idno>
+	</analytic>
+	<monogr>
+		<title level="m">Machine Learning: ECML-98</title>
+		<editor>
+			<persName><forename type="first">C</forename><surname>Nédellec</surname></persName>
+		</editor>
+		<editor>
+			<persName><forename type="first">C</forename><surname>Rouveirol</surname></persName>
+		</editor>
+		<meeting><address><addrLine>Berlin, Heidelberg; Berlin Heidelberg</addrLine></address></meeting>
+		<imprint>
+			<publisher>Springer</publisher>
+			<date type="published" when="1998">1998</date>
+			<biblScope unit="volume">1398</biblScope>
+			<biblScope unit="page" from="137" to="142" />
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b25">
+	<monogr>
+		<title level="m" type="main">Ecological metadata language version 2.2. 0. KNB data repository</title>
+		<author>
+			<persName><forename type="first">M</forename><forename type="middle">B</forename><surname>Jones</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">O</forename><surname>'brien</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">M</forename><surname>Mecum</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">B</forename><surname>Boettiger</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">C</forename><surname>Schildhauer</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">M</forename><surname>Maier</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">M</forename><surname>Whiteaker</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">T</forename><surname>Earl</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">S</forename><surname>Chong</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">S</forename></persName>
+		</author>
+		<idno type="DOI">10.5063/F11834T2</idno>
+		<imprint>
+			<date type="published" when="2019">2019</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b26">
+	<analytic>
+		<title level="a" type="main">Text-mined fossil biodiversity dynamics using machine learning</title>
+		<author>
+			<persName><forename type="first">B</forename><forename type="middle">T</forename><surname>Kopperud</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">S</forename><surname>Lidgard</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">L</forename><forename type="middle">H</forename><surname>Liow</surname></persName>
+		</author>
+		<idno type="DOI">10.1098/rspb.2019.0022</idno>
+	</analytic>
+	<monogr>
+		<title level="j">Proceedings of the Royal Society B: Biological Sciences</title>
+		<imprint>
+			<biblScope unit="volume">286</biblScope>
+			<date type="published" when="1901">2019. 1901</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b27">
+	<analytic>
+		<title level="a" type="main">Automated retrieval of information on threatened species from online sources using machine learning</title>
+		<author>
+			<persName><forename type="first">R</forename><surname>Kulkarni</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Di</forename><surname>Minin</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">E</forename></persName>
+		</author>
+		<idno type="DOI">10.1111/2041-210X.13608</idno>
+	</analytic>
+	<monogr>
+		<title level="j">Methods in Ecology and Evolution</title>
+		<imprint>
+			<biblScope unit="volume">12</biblScope>
+			<biblScope unit="issue">7</biblScope>
+			<biblScope unit="page" from="1226" to="1239" />
+			<date type="published" when="2021">2021</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b28">
+	<analytic>
+		<title level="a" type="main">When east meets west: population structure of a high-latitude resident species, the boreal chickadee (Poecile hudsonicus)</title>
+		<author>
+			<persName><forename type="first">L</forename><forename type="middle">A</forename><surname>Lait</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">T</forename><forename type="middle">M</forename><surname>Burg</surname></persName>
+		</author>
+		<idno type="DOI">10.5061/dryad.82hs7</idno>
+	</analytic>
+	<monogr>
+		<title level="j">Heredity</title>
+		<imprint>
+			<biblScope unit="volume">111</biblScope>
+			<biblScope unit="issue">4</biblScope>
+			<biblScope unit="page" from="321" to="329" />
+			<date type="published" when="2013">2013</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b29">
+	<analytic>
+		<title level="a" type="main">Predator-mediated negative effects of overabundant snow geese on arctic-nesting shorebirds</title>
+		<author>
+			<persName><forename type="first">J</forename><forename type="middle">F</forename><surname>Lamarre</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">P</forename><surname>Legagneux</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">G</forename><surname>Gauthier</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">E</forename><forename type="middle">T</forename><surname>Reed</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><surname>Bêty</surname></persName>
+		</author>
+		<idno type="DOI">10.5061/dryad.796t8</idno>
+	</analytic>
+	<monogr>
+		<title level="j">Ecosphere</title>
+		<imprint>
+			<biblScope unit="volume">8</biblScope>
+			<biblScope unit="issue">5</biblScope>
+			<date type="published" when="2018">2018</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b30">
+	<analytic>
+		<title level="a" type="main">Caribou, water, and ice-fine-scale movements of a migratory arctic ungulate in the context of climate change</title>
+		<author>
+			<persName><forename type="first">M</forename><surname>Leblond</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">M-H</forename><surname>St-Laurent</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">S</forename><forename type="middle">D</forename><surname>Côté</surname></persName>
+		</author>
+		<idno type="DOI">10.1186/s40462-016-0079-4</idno>
+	</analytic>
+	<monogr>
+		<title level="j">Movement Ecology</title>
+		<imprint>
+			<biblScope unit="volume">4</biblScope>
+			<date type="published" when="2017">2017</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b31">
+	<analytic>
+		<title level="a" type="main">Dataset search in biodiversity research: do metadata in data repositories reflect scholarly information needs?</title>
+		<author>
+			<persName><forename type="first">F</forename><surname>Löffler</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">V</forename><surname>Wesp</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">B</forename><surname>König-Ries</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">F</forename><surname>Klan</surname></persName>
+		</author>
+		<idno type="DOI">10.1371/journal.pone.0246099</idno>
+	</analytic>
+	<monogr>
+		<title level="j">PLOS ONE</title>
+		<imprint>
+			<biblScope unit="volume">16</biblScope>
+			<biblScope unit="issue">3</biblScope>
+			<date type="published" when="2021">2021</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b32">
+	<analytic>
+		<title level="a" type="main">Irregular forest structures originating after fire: an opportunity to promote alternatives to even-aged management in boreal forests</title>
+		<author>
+			<persName><forename type="first">M</forename><surname>Martin</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">A</forename><surname>Leduc</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">N</forename><forename type="middle">J</forename><surname>Fenton</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Montoro</forename><surname>Girona</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">M</forename><surname>Bergeron</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Y</forename><surname>Valeria</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">O</forename></persName>
+		</author>
+		<idno type="DOI">10.1111/1365-2664.14186</idno>
+	</analytic>
+	<monogr>
+		<title level="j">Journal of Applied Ecology</title>
+		<imprint>
+			<biblScope unit="volume">59</biblScope>
+			<biblScope unit="issue">7</biblScope>
+			<biblScope unit="page" from="1792" to="1803" />
+			<date type="published" when="2022">2022</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b33">
+	<analytic>
+		<title level="a" type="main">Trends in ecology: shifts in ecological research themes over the past four decades</title>
+		<author>
+			<persName><forename type="first">E</forename><surname>Mccallen</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><surname>Knott</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">G</forename><surname>Nunez-Mir</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">B</forename><surname>Taylor</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">I</forename><surname>Jo</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">S</forename><surname>Fei</surname></persName>
+		</author>
+		<idno type="DOI">10.1002/fee.1993</idno>
+	</analytic>
+	<monogr>
+		<title level="j">Frontiers in Ecology and the Environment</title>
+		<imprint>
+			<biblScope unit="volume">17</biblScope>
+			<biblScope unit="issue">2</biblScope>
+			<biblScope unit="page" from="109" to="116" />
+			<date type="published" when="2019">2019</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b34">
+	<analytic>
+		<title level="a" type="main">Scientific data, recommended data repositories</title>
+		<ptr target="https://www.nature.com/sdata/policies/repositories" />
+	</analytic>
+	<monogr>
+		<title level="j">Nature</title>
+		<imprint>
+			<date type="published" when="2024-01">2024. January 2024</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b35">
+	<analytic>
+		<title level="a" type="main">Automated content analysis: addressing the big literature challenge in ecology and evolution</title>
+		<author>
+			<persName><forename type="first">G</forename><forename type="middle">C</forename><surname>Nunez-Mir</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">B</forename><forename type="middle">V</forename><surname>Iannone</surname></persName>
+		</author>
+		<author>
+			<persName><surname>Iii</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">B</forename><forename type="middle">C</forename><surname>Pijanowski</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">N</forename><surname>Kong</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">S</forename><surname>Fei</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">R</forename><surname>Fitzjohn</surname></persName>
+		</author>
+		<idno type="DOI">10.1111/2041-210X.12602</idno>
+	</analytic>
+	<monogr>
+		<title level="j">Methods in Ecology and Evolution</title>
+		<imprint>
+			<biblScope unit="volume">7</biblScope>
+			<biblScope unit="issue">11</biblScope>
+			<biblScope unit="page" from="1262" to="1272" />
+			<date type="published" when="2016">2016</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b36">
+	<analytic>
+		<title level="a" type="main">Digitization of biodiversity collections reveals biggest data on biodiversity</title>
+		<author>
+			<persName><forename type="first">L</forename><forename type="middle">M</forename><surname>Page</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">B</forename><forename type="middle">J</forename><surname>Macfadden</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><forename type="middle">A</forename><surname>Fortes</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">P</forename><forename type="middle">S</forename><surname>Soltis</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">G</forename><surname>Riccardi</surname></persName>
+		</author>
+		<idno type="DOI">10.1093/biosci/biv104</idno>
+	</analytic>
+	<monogr>
+		<title level="j">BioScience</title>
+		<imprint>
+			<biblScope unit="volume">65</biblScope>
+			<biblScope unit="issue">9</biblScope>
+			<biblScope unit="page" from="841" to="842" />
+			<date type="published" when="2015">2015</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b37">
+	<analytic>
+		<title level="a" type="main">Scikit-learn: machine learning in Python</title>
+		<author>
+			<persName><forename type="first">F</forename><surname>Pedregosa</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">G</forename><surname>Varoquaux</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">A</forename><surname>Gramfort</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">V</forename><surname>Michel</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">B</forename><surname>Thirion</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">O</forename><surname>Grisel</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">M</forename><surname>Blondel</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">P</forename><surname>Prettenhofer</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">R</forename><surname>Weiss</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">V</forename><surname>Dubourg</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><surname>Vanderplass</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">A</forename><surname>Passos</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">D</forename><surname>Cournapeau</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">M</forename><surname>Brucher</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">M</forename><surname>Perrot</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">É</forename><surname>Duchesnay</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">The Journal of Machine Learning Research</title>
+		<imprint>
+			<biblScope unit="volume">12</biblScope>
+			<biblScope unit="page" from="2825" to="2830" />
+			<date type="published" when="2011">2011</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b38">
+	<analytic>
+		<author>
+			<persName><forename type="first">H</forename><forename type="middle">M</forename><surname>Pereira</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">S</forename><surname>Ferrier</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">M</forename><surname>Walters</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">G</forename><forename type="middle">N</forename><surname>Geller</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">R</forename><forename type="middle">H</forename><surname>Jongman</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">R</forename><forename type="middle">J</forename><surname>Scholes</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">N</forename><forename type="middle">W</forename><surname>Bruford</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">N</forename><surname>Brummitt</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Shm</forename><surname>Butchart</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">A</forename><forename type="middle">C</forename><surname>Cardoso</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">N</forename><forename type="middle">C</forename><surname>Coops</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">E</forename><surname>Dulloo</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">D</forename><forename type="middle">P</forename><surname>Faith</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><surname>Freyhof</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">R</forename><forename type="middle">D</forename><surname>Gregory</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">C</forename><surname>Heip</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">R</forename><surname>Höft</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">G</forename><surname>Hurtt</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">W</forename><surname>Jetz</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">D</forename><forename type="middle">S</forename><surname>Kartp</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">M</forename><surname>Wegmann</surname></persName>
+		</author>
+		<idno type="DOI">10.1126/science.1229931</idno>
+	</analytic>
+	<monogr>
+		<title level="m">Essential biodiversity variables</title>
+		<imprint>
+			<date type="published" when="2013">2013</date>
+			<biblScope unit="volume">339</biblScope>
+			<biblScope unit="page" from="277" to="278" />
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b39">
+	<analytic>
+		<title level="a" type="main">Term-weighting approaches in automatic text retrieval</title>
+		<author>
+			<persName><forename type="first">G</forename><surname>Salton</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">C</forename><surname>Buckley</surname></persName>
+		</author>
+		<idno type="DOI">10.1016/0306-4573(88)90021-0</idno>
+	</analytic>
+	<monogr>
+		<title level="j">Information Processing &amp; Management</title>
+		<imprint>
+			<biblScope unit="volume">24</biblScope>
+			<biblScope unit="issue">5</biblScope>
+			<biblScope unit="page" from="513" to="523" />
+			<date type="published" when="1988">1988</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b40">
+	<analytic>
+		<title level="a" type="main">A suite of essential biodiversity variables for detecting critical biodiversity change</title>
+		<author>
+			<persName><forename type="first">D</forename><forename type="middle">S</forename><surname>Schmeller</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">L</forename><forename type="middle">V</forename><surname>Weatherdon</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">A</forename><surname>Loyau</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">A</forename><surname>Bondeau</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">L</forename><surname>Brotons</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">N</forename><surname>Brummitt</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">I</forename><forename type="middle">R</forename><surname>Geijzendorffer</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">P</forename><surname>Haase</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">M</forename><surname>Kuemmerlen</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">C</forename><forename type="middle">S</forename><surname>Martin</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J-B</forename><surname>Mihoub</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">D</forename><surname>Rocchini</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">H</forename><surname>Saarenmaa</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">S</forename><surname>Stoll</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">E</forename><forename type="middle">C</forename><surname>Regan</surname></persName>
+		</author>
+		<idno type="DOI">10.1111/brv.12332</idno>
+	</analytic>
+	<monogr>
+		<title level="j">Biological Reviews</title>
+		<imprint>
+			<biblScope unit="volume">93</biblScope>
+			<biblScope unit="issue">1</biblScope>
+			<biblScope unit="page" from="55" to="71" />
+			<date type="published" when="2018">2018</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b41">
+	<analytic>
+		<title level="a" type="main">Trends in biodiversity research-a bibliometric assessment</title>
+		<author>
+			<persName><forename type="first">H</forename><surname>Stork</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><forename type="middle">J</forename><surname>Astrin</surname></persName>
+		</author>
+		<idno type="DOI">10.4236/oje.2014.47033</idno>
+	</analytic>
+	<monogr>
+		<title level="j">Open Journal of Ecology</title>
+		<imprint>
+			<biblScope unit="volume">4</biblScope>
+			<biblScope unit="issue">07</biblScope>
+			<biblScope unit="page" from="354" to="370" />
+			<date type="published" when="2014">2014</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b42">
+	<analytic>
+		<title level="a" type="main">Data augmentation methods for enhancing robustness in text classification tasks</title>
+		<author>
+			<persName><forename type="first">H</forename><surname>Tang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">S</forename><surname>Kamei</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Y</forename><surname>Morimoto</surname></persName>
+		</author>
+		<idno type="DOI">10.3390/a16010059</idno>
+	</analytic>
+	<monogr>
+		<title level="j">Algorithms</title>
+		<imprint>
+			<biblScope unit="volume">16</biblScope>
+			<biblScope unit="issue">1</biblScope>
+			<date type="published" when="2023">2023</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b43">
+	<analytic>
+		<title level="a" type="main">Ecological gradients driving the distribution of four Ericaceae in boreal Quebec</title>
+		<author>
+			<persName><forename type="first">N</forename><surname>Thiffault</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">P</forename><surname>Grondin</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><surname>Noël</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">V</forename><surname>Poirier</surname></persName>
+		</author>
+		<idno type="DOI">10.1002/ece3.1476</idno>
+	</analytic>
+	<monogr>
+		<title level="j">Canada. Ecology and Evolution</title>
+		<imprint>
+			<biblScope unit="volume">5</biblScope>
+			<biblScope unit="issue">9</biblScope>
+			<date type="published" when="2015">2015</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b44">
+	<analytic>
+		<title level="a" type="main">A comparison of svm against pre-trained language models (plms) for text classification tasks</title>
+		<author>
+			<persName><forename type="first">Y</forename><surname>Wahba</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">N</forename><surname>Madhavji</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">J</forename><surname>Steinbacher</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m">International Conference on Machine Learning, Optimization, and Data Science</title>
+		<meeting><address><addrLine>Cham</addrLine></address></meeting>
+		<imprint>
+			<publisher>Springer Nature Switzerland</publisher>
+			<date type="published" when="2022">2022</date>
+			<biblScope unit="page" from="304" to="313" />
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b45">
+	<analytic>
+		<title level="a" type="main">Developing integrative systematics in the informatics and genomic era, and calling for a global Biodiversity Cyberbank</title>
+		<author>
+			<persName><forename type="first">J</forename><surname>Wen</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">A</forename><forename type="middle">J</forename><surname>Harris</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">S</forename><forename type="middle">M</forename><surname>Ickert-Bond</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">R</forename><surname>Dikow</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">K</forename><surname>Wurdack</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">E</forename><forename type="middle">A</forename><surname>Zimmer</surname></persName>
+		</author>
+		<idno type="DOI">10.1111/jse.12270</idno>
+	</analytic>
+	<monogr>
+		<title level="j">Journal of Systematics and Evolution</title>
+		<imprint>
+			<biblScope unit="volume">55</biblScope>
+			<biblScope unit="issue">4</biblScope>
+			<biblScope unit="page" from="308" to="321" />
+			<date type="published" when="2017">2017</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b46">
+	<analytic>
+		<title level="a" type="main">Collections-based systematics: opportunities and outlook for 2050</title>
+		<author>
+			<persName><forename type="first">J</forename><surname>Wen</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">S</forename><forename type="middle">M</forename><surname>Ickert-Bond</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">M</forename><forename type="middle">S</forename><surname>Appelhans</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">L</forename><forename type="middle">J</forename><surname>Dorr</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">V</forename><forename type="middle">A</forename><surname>Funk</surname></persName>
+		</author>
+		<idno type="DOI">10.1111/jse.12181</idno>
+	</analytic>
+	<monogr>
+		<title level="j">Journal of Systematics and Evolution</title>
+		<imprint>
+			<biblScope unit="volume">53</biblScope>
+			<biblScope unit="issue">6</biblScope>
+			<biblScope unit="page" from="477" to="488" />
+			<date type="published" when="2015">2015</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b47">
+	<analytic>
+		<title level="a" type="main">Darwin Core: an evolving community-developed biodiversity data standard</title>
+		<author>
+			<persName><forename type="first">J</forename><surname>Wieczorek</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">D</forename><surname>Bloom</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">R</forename><surname>Guralnick</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">S</forename><surname>Blum</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">M</forename><surname>Döring</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">R</forename><surname>Giovanni</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">T</forename><surname>Robertson</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">D</forename><surname>Vieglais</surname></persName>
+		</author>
+		<idno type="DOI">10.1371/journal.pone.0029715</idno>
+	</analytic>
+	<monogr>
+		<title level="j">PLOS ONE</title>
+		<imprint>
+			<biblScope unit="volume">7</biblScope>
+			<biblScope unit="issue">1</biblScope>
+			<date type="published" when="2012">2012</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b48">
+	<analytic>
+		<title level="a" type="main">Understanding bag-of-words model: a statistical framework</title>
+		<author>
+			<persName><forename type="first">Y</forename><surname>Zhang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jin</forename><forename type="middle">R</forename><surname>Zhou</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Z</forename><forename type="middle">H</forename></persName>
+		</author>
+		<idno type="DOI">10.1007/s13042-010-0001-0</idno>
+	</analytic>
+	<monogr>
+		<title level="j">International Journal of Machine Learning and Cybernetics</title>
+		<imprint>
+			<biblScope unit="volume">1</biblScope>
+			<biblScope unit="issue">1-4</biblScope>
+			<biblScope unit="page" from="43" to="52" />
+			<date type="published" when="2010">2010</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+				</listBibl>
+			</div>
+		</back>
+	</text>
+</TEI>
