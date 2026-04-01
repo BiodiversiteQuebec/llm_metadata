@@ -46,11 +46,11 @@ Both are notebook-only. No modifications to `src/`.
 
 ### Main Classifiers
 
-**Data type** (EBV hierarchy):
+<!-- **Data type** (EBV hierarchy, from paper Table 2): -->
 | Score | Types |
 |---|---|
-| H | abundance, genetic (EBV-compliant) |
-| M | species richness, relative abundance |
+| H | abundance, density, EBV genetic analysis |
+| M | distribution, presence-absence, species richness, relative abundance |
 | L | presence-only, non-EBV genetic analysis |
 | X | no species/biodiversity data |
 
@@ -72,9 +72,14 @@ Both are notebook-only. No modifications to `src/`.
 
 ### Aggregation
 
-Majority vote across the three Main Classifiers → `MC_relevance`. Tiebreaker: data type score takes precedence. If any classifier is X, it pulls toward a lower score.
+Majority vote across the three Main Classifiers → `MC_relevance`. When all three differ (no majority), apply tiebreaker from Table S2 (see [`docs/fuster_et_al_2024/table_S2.md`](../docs/fuster_et_al_2024/table_S2.md)):
 
-### Modulators (each upgrades final score by one level; cannot upgrade X)
+1. **Special case:** If `data_type = H` AND (`temporal = X` OR `spatial = X`) → **L**
+2. **General rule:** `result = min(data_type, max(temporal, spatial))`
+
+Score order: H > M > L > X.
+
+### Modulators
 
 | Modulator field | Paper criterion |
 |---|---|
@@ -84,7 +89,9 @@ Majority vote across the three Main Classifiers → `MC_relevance`. Tiebreaker: 
 | `new_species_region` | Species new to Quebec |
 | `bias_north_south` | Location in northern Quebec (≥ 49th parallel) |
 
-Upgrade: L → M, M → H. Already H stays H.
+Upgrade: L → M, M → H. Already H stays H. Cannot upgrade X.
+
+**Multispecies restriction** (paper Methods §"Dataset relevance assignment"): *"For multispecies datasets, only the north-south modulator was noted."* When `multispecies=True`, only `bias_north_south` can trigger an upgrade; `threatened_species`, `new_species_science`, `new_species_region` are suppressed.
 
 ---
 

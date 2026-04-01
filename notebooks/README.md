@@ -84,7 +84,7 @@ Our implementation applies all five modulators regardless of the `multispecies` 
 
 Paper: *"In case of non-majority value, we create decision rules as indicated in Table S2. By default, the relevance score of the dataset type was selected as the final relevance category, **penalized if the spatio-temporal relevance was Non-relevant, Low, or Moderate**."*
 
-Table S2 is not in the main PDF or TEI XML. We reconstructed it empirically from all 55 tiebreaker cases in the full 418-record dataset (see [`docs/fuster_et_al_2024/table_S2.md`](../docs/fuster_et_al_2024/table_S2.md)). The rule matches 100% of cases:
+The actual Table S2 (from `Table_S2.docx` supplementary material) contains 4 compact rules. We verified them empirically against all 55 tiebreaker cases in the full 418-record dataset — 100% match. See [`docs/fuster_et_al_2024/table_S2.md`](../docs/fuster_et_al_2024/table_S2.md) for the full table, algorithmic equivalent, and validation. The equivalent algorithm:
 
 **Step 1 — Special case:** If `data_type = H` AND (`temporal = X` OR `spatial = X`) → **result = L**
 
