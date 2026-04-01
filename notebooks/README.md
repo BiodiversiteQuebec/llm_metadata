@@ -4,6 +4,37 @@ This folder contains analysis and validation notebooks for ecological dataset ch
 
 ## Recent Activity
 
+### 2026-04-01: Automated Relevance Classification Plan Refresh
+
+**Task:** Reconcile `plans/automated_relevance_classification.md` with the notebook work already completed, and document what remains to implement.
+
+**Work Performed:**
+- Audited the current plan against the saved notebook state and outputs in:
+  - `notebooks/relevance_mechanistic.ipynb`
+  - `notebooks/relevance_llm_direct.ipynb`
+  - `notebooks/results/relevance_mechanistic_summary.csv`
+  - `notebooks/results/relevance_llm_direct_summary.json`
+- Updated the plan so the primary target is now stated consistently as `MC_relevance_modifiers`, with `dataset_relevance` retained only as a diagnostic human label.
+- Marked `WU-R1A` and `WU-R1B` as implemented, and narrowed the remaining implementation work to `WU-R2` target alignment plus the final comparison/synthesis step.
+
+**Results:**
+- `WU-R1` is no longer the open item in this initiative:
+  - `R1-A` exactly reconstructs the annotated mechanistic system on the dev subset (`30/30` on all audited `MC_*` columns; macro F1 `1.00`).
+  - `R1-B` is implemented and currently scores macro F1 `0.125` against `MC_relevance_modifiers`.
+- The remaining implementation work is now explicit:
+  - `notebooks/relevance_llm_direct.ipynb` still evaluates against `dataset_relevance` and needs to be reframed to use `MC_relevance_modifiers` as `gt_relevance`.
+  - After that rerun, the final comparison table and lab log should be refreshed so all headline rows use the same target definition.
+
+**Key Issues Identified:**
+- The initiative had drifted into two target definitions:
+  - mechanistic notebook: `MC_relevance_modifiers`
+  - direct-LLM notebook: `dataset_relevance`
+- Leaving that inconsistency in the plan makes cross-method comparisons hard to interpret, even when the notebooks themselves are working.
+
+**Next Steps:**
+- Update and rerun `notebooks/relevance_llm_direct.ipynb` against `MC_relevance_modifiers`.
+- Refresh the final cross-method comparison table after the R2 rerun.
+
 ### 2026-04-01: Relevance Mechanistic Notebook — Fuster Rule Reconstruction Fix
 
 **Task:** Correct `notebooks/relevance_mechanistic.ipynb` so the mechanistic scoring logic reproduces the Fuster paper's annotated rule system, with `R1-A` evaluated against the authors' mechanistic reference rather than the separate `dataset_relevance` label.
