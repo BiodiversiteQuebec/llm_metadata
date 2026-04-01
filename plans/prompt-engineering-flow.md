@@ -402,9 +402,9 @@ Three baseline runs completed 2026-03-27:
 
 | Run artifact | Mode | Notes file |
 |---|---|---|
-| `artifacts/runs/20260327_172654_dev_subset_abstract.json` | abstract | `data/20260327_172654_dev_subset_abstract_notes.md` |
-| `artifacts/runs/20260327_172653_dev_subset_sections.json` | sections | `data/20260327_172653_dev_subset_sections_notes.md` |
-| `artifacts/runs/20260327_172656_dev_subset_pdf_file.json` | pdf_native | `data/20260327_172656_dev_subset_pdf_file_notes.md` |
+| `artifacts/runs/20260327_172654_dev_subset_abstract.json` | abstract | `artifacts/runs/20260327_172654_dev_subset_abstract_notes.md` |
+| `artifacts/runs/20260327_172653_dev_subset_sections.json` | sections | `artifacts/runs/20260327_172653_dev_subset_sections_notes.md` |
+| `artifacts/runs/20260327_172656_dev_subset_pdf_file.json` | pdf_native | `artifacts/runs/20260327_172656_dev_subset_pdf_file_notes.md` |
 
 **Abstract baseline metrics (fields with diagnosis):**
 

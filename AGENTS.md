@@ -328,16 +328,16 @@ All dataframes in tabs 2–4 support multi-row selection. The CSV/Markdown expor
 | `data/*.log` | Optional | Run logs shown in Overview → Logs |
 | `data/dataset_092624_validated.xlsx` | Optional (fallback only) | Paper title, DOI, links, validity metadata for older JSON files |
 | `data/dataset_092624.xlsx` | Optional (fallback only) | Abstract text (`full_text` column) for older JSON files |
-| `data/{run}_notes.md` | Optional (created on first save/open) | Per-run analyst notes |
+| `{run_dir}/{run_stem}_notes.md` | Optional (created on first save/open) | Per-run analyst notes stored next to the run artifact |
 
 ### Notes files
 
-Notes are stored as `data/{run_stem}_notes.md`. On first creation (via Save or Open in VS Code), the file is seeded with a metadata header:
+Notes are stored as `{run_dir}/{run_stem}_notes.md`, in the same directory as the run artifact JSON. On first creation (via Save or Open in VS Code), the file is seeded with a metadata header:
 
 ```markdown
 # Notes — {run_name}
 
-**Prompt:** `prompts.abstract` · **Model:** gpt-5-mini · **Cost:** $0.1266 · **Timestamp:** 2026-02-19T18:47:37+00:00 · **Run file:** `data/{run_name}`
+**Prompt:** `prompts.abstract` · **Model:** gpt-5-mini · **Reasoning:** low · **Cost:** $0.1266 · **Timestamp:** 2026-02-19T18:47:37+00:00 · **Run file:** `artifacts/runs/{run_name}`
 
 ---
 ```
@@ -401,7 +401,7 @@ Cache behavior:
 | Raw abstract | Extracted from xlsx `abstract` column | What text the LLM saw |
 | Parsed PDF | `artifacts/tei/{doi}.md` or GROBID output | Full-text context — was information available? |
 | Extraction output | `data/{run}.json` → `field_results` | What the LLM produced |
-| Analyst notes | `data/{run}_notes.md` | Prior observations, field-level analysis |
+| Analyst notes | `{run_dir}/{run_stem}_notes.md` | Prior observations, field-level analysis stored next to the run artifact |
 
 **Analyst guidelines:**
 - Read raw data (xlsx, parsed PDFs) to diagnose — don't rely solely on metrics
@@ -414,7 +414,7 @@ Cache behavior:
 
 When an agent (Analyst role) analyzes prompt eval results, it **must** write observations to the run's notes file:
 
-1. **Check for existing notes** — read `data/{run}_notes.md` if it exists
+1. **Check for existing notes** — read `{run_dir}/{run_stem}_notes.md` if it exists
 2. **Create if missing** — use the Eval Viewer app's Notes tab (which seeds the metadata header), or create manually with the header format documented in the Eval Viewer section above
 3. **Write per-field observations** using the format below, appending under the `---` separator
 4. **Save** — either via the Eval Viewer's Save button or by writing the file directly
@@ -423,7 +423,7 @@ The notes file is the persistent record of analysis. `notebooks/README.md` is fo
 
 ### Observation Log Format (per-field, after each eval run)
 
-Add to the run's notes file (`data/{run}_notes.md`) under the metadata header:
+Add to the run's notes file (`{run_dir}/{run_stem}_notes.md`) under the metadata header:
 
 ```markdown
 ### field_name (F1=X.XX, P=X.XX, R=X.XX)
@@ -471,6 +471,7 @@ Also add a summary to `notebooks/README.md` under a dated session header per the
 - `TODO.md` references plans; plans hold the detail
 - Keep plans concise — prefer actionable work units over prose
 - Do not create multiple files for a single initiative (no separate "agent plan", "visual overview", "execution guide")
+- **Work-unit ID boundary**: `WU-*` identifiers belong only in plan files (and `TODO.md` when referencing plan status). Outside plan files, always use plain-language titles and descriptions. Do not use `WU-*` identifiers in `notebooks/README.md`, notes files, docs, run descriptions, PR text, or commit messages.
 - **Progressive elaboration**: fully spec Phase 1 before detailing later phases — earlier work always changes what later phases need
 - **Measure before optimizing**: when pipeline output looks bad, harden evaluation first; unreliable metrics make prompt/model changes uninterpretable
 
@@ -516,4 +517,5 @@ When launching subagents via the Task tool, pass the `model` parameter matching 
 ### Session End
 - Update `TODO.md`: mark tasks complete, clear Active Sessions entry
 - If notebook work was done, update `notebooks/README.md` per Lab Logging Protocol
+- Use plain-language commit messages; do not include `WU-*` identifiers outside plan files / `TODO.md`
 - Commit and push
