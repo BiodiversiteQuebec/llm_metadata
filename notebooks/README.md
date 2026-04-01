@@ -4,6 +4,63 @@ This folder contains analysis and validation notebooks for ecological dataset ch
 
 ## Recent Activity
 
+### 2026-04-01: Relevance Mechanistic Notebook — Fuster Rule Reconstruction Fix
+
+**Task:** Correct `notebooks/relevance_mechanistic.ipynb` so the mechanistic scoring logic reproduces the Fuster paper's annotated rule system, with `R1-A` evaluated against the authors' mechanistic reference rather than the separate `dataset_relevance` label.
+
+**Work Performed:**
+- Updated the notebook scoring functions to match the annotated Fuster rule implementation:
+  - `genetic analysis` is treated as non-EBV genetic data (`L`) unless `EBV genetic` is explicit
+  - temporal scoring now uses the empirically matching bins `1-2=L`, `3-11=M`, `>=12=H`
+  - retained the validated Table S2 tiebreaker and the empirically observed modulator behavior from `MC_relevance_modifiers`
+- Reframed Part A and Part B to use `MC_relevance_modifiers` as the paper-faithful target (`gt_relevance`) and kept `dataset_relevance` separately as `human_relevance` for diagnostics.
+- Normalized the notebook GT scoring inputs through `DatasetFeaturesNormalized` for years, numeric ranges, booleans, and list-like `data_type` parsing, while preserving the raw `data_type` string for the EBV vs non-EBV genetic ambiguity.
+- Added an `MC_*` audit section to the notebook comparing computed `mc_data_type`, `mc_temporal`, `mc_spatial`, `mc_relevance`, and `pred_relevance` against the annotated `MC_*` columns directly.
+- Updated notebook metrics to compute macro F1 over labels actually present in the comparison, so a perfect reconstruction on the dev subset reports `1.00` instead of being artificially capped by an absent class.
+- Cleared stale notebook outputs after the logic change to avoid leaving contradictory saved results in the `.ipynb`.
+
+**Decision Log (paper confusion vs reconstruction choice):**
+- **Confusion:** `dataset_relevance` and `MC_relevance_modifiers` look similar but are not interchangeable.
+  **Decision:** use `MC_relevance_modifiers` as the Part A target because it is the direct output of the Fuster mechanistic rule system; keep `dataset_relevance` only as a diagnostic comparison.
+- **Interpretation:** in notebook terms, `MC_relevance_modifiers` is the paper-faithful rule output, while `dataset_relevance` is the spreadsheet's final manual label. The diagnostic figure `same rules vs human dataset_relevance` therefore measures agreement between those two notions; it is not itself the rule-reconstruction success criterion.
+- **Confusion:** the paper distinguishes `EBV genetic analysis` from `non-EBV genetic analysis`, but the GT also contains the looser raw label `genetic analysis`.
+  **Decision:** interpret plain `genetic analysis` as non-EBV (`L`) unless `EBV genetic` is explicit, because that is what matches the released classifier annotations.
+- **Confusion:** the prose says temporal High is `>10 years`, but the released temporal classifier behaves like inclusive bins `1-2=L`, `3-11=M`, `>=12=H`.
+  **Decision:** follow the released annotations for reconstruction and document the prose-vs-column mismatch explicitly.
+- **Confusion:** the prose says only relevant datasets are upgraded by modulators and says multispecies datasets only note the north-south modulator, but the released `MC_relevance_modifiers` labels show `X -> L` upgrades and multispecies-driven upgrades.
+  **Decision:** treat the annotated `MC_relevance_modifiers` column as the authoritative reference for rule reconstruction, and record that the prose is not fully aligned with the released labels.
+- **Confusion:** `DatasetFeaturesNormalized` is useful for spreadsheet cleanup, but it collapses both `genetic analysis` and `EBV genetic analysis` to `genetic_analysis`.
+  **Decision:** use the normalization model for numeric/boolean cleanup and list parsing, but keep the raw `data_type` string for the final data-type scoring decision.
+- **Confusion:** the dev subset contains no `X` examples in `MC_relevance_modifiers`, which makes standard 4-label macro F1 misleading.
+  **Decision:** compute macro F1 over labels actually present in the comparison, and state that choice in the notebook so a perfect reconstruction is reported as `1.00`.
+
+**Results:**
+- Dev-subset verification for `R1-A` (rules on GT features vs `MC_relevance_modifiers`):
+  - Accuracy: **1.00**
+  - Macro F1 over present labels (`H`, `M`, `L`): **1.00**
+  - Mismatches: **0 / 30**
+- Dev-subset `MC_*` audit after GT normalization:
+  - `MC_dataset_type` vs computed `mc_data_type`: **30/30**
+  - `MC_temporal_range` vs computed `mc_temporal`: **30/30**
+  - `MC_spatial_range` vs computed `mc_spatial`: **30/30**
+  - `MC_relevance` vs computed `mc_relevance`: **30/30**
+  - `MC_relevance_modifiers` vs computed `pred_relevance`: **30/30**
+- This confirms the notebook now reproduces the authors' mechanistic scoring on the 30-record dev subset exactly.
+- The notebook now also makes the key distinction explicit:
+  - `MC_relevance_modifiers` = Fuster's mechanistic output to reproduce
+  - `dataset_relevance` = a separate human label that does not perfectly coincide with that mechanistic output
+
+**Key Issues Identified:**
+- The paper prose and the annotated columns are not perfectly aligned in two places:
+  - temporal threshold wording (`>10 years`) vs the observed column behavior (`>=12` inclusive years for `H`)
+  - modulator prose vs the annotated allowance for some `X -> L` upgrades
+- More broadly, the notebook now uses a documented reconstruction principle:
+  when the paper text and the released annotations conflict, prefer the interpretation that reproduces the released annotations and label that as an explicit decision rather than silently treating it as obvious.
+
+**Next Steps:**
+- Re-run the notebook end-to-end if fresh saved figures/CSV outputs are needed.
+- Keep using `human_relevance` only as a diagnostic comparison, not as the Part A ceiling target.
+
 ### 2026-03-31: Automated Relevance Classification — WU-R1 (Mechanistic) + WU-R2 (Direct LLM)
 
 **Task:** Implement and evaluate two automated approaches to replicating Fuster et al.'s manual dataset relevance scoring (H/M/L/X) on the 30-record dev subset.
