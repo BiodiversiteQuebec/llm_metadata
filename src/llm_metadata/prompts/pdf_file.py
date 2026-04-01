@@ -31,7 +31,15 @@ Scientific papers typically follow this structure — prioritize sections accord
 | Results | Actual measurements, confirmed values |
 | Supplementary | Detailed species lists, coordinate tables, extended methods |
 
-When text and figures contradict, prefer quantitative data from tables/figures."""
+When text and figures contradict, prefer quantitative data from tables/figures.
+
+## PDF Mode — Field-Specific Rules
+
+**time_series**: Base the `time_series` judgment ONLY on the dataset description, sampling design section, or explicit data collection methodology. Repeated analyses, model runs, appendix tables, or supplementary data files do not constitute a time series.
+
+**new_species_science**: Full text provides the strongest signal for this rare field. Positive triggers: "sp. nov.", "new species", "described here for the first time", "holotype", "taxonomic diagnosis", "new to science", "formally described", formal species description language in taxonomy sections.
+
+**new_species_region**: True only for a first confirmed record in a defined region — require explicit language like "first record for", "new to", "not previously recorded in", "first confirmed occurrence". NOT: general range expansion discussion, recolonization, modeled range extension, or species known to occur in a nearby region."""
 
 SYSTEM_MESSAGE: str = build_prompt(
     PERSONA, TASK_INSTRUCTIONS, PHILOSOPHY, SCOPING, VOCABULARY, MODULATOR_FIELDS, OUTPUT_FORMAT

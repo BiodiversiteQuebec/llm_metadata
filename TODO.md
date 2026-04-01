@@ -7,11 +7,11 @@
 
 - [x] WU-3.1 — Baseline runs (abstract / sections / pdf_native) on dev subset, 2026-03-27
 - [x] WU-3.1 audit — Per-field mismatch analysis documented in run notes (2026-03-28)
-- [ ] WU-3.2 — Expand VOCABULARY block: full `data_type` (13 values) + `geospatial_info_dataset` (9 values) with definitions + contrastive examples `sonnet`
+- [x] WU-3.2 — Expand VOCABULARY block: full `data_type` (13 values) + `geospatial_info_dataset` (9 values) with definitions + contrastive examples `sonnet`
 - [ ] WU-T1 — Add `SPECIES_EXTRACTION` block to `common.py`: decorated strings, count signals, broad groups, focal-taxa scoping `sonnet`
 - [ ] WU-T1b — Mode-specific species overrides for `section.py` + `pdf_file.py` `sonnet`
-- [ ] WU-3.4 — Boolean cue expansion: `time_series` neg examples, `threatened_species` cue list, `bias_north_south` dual-trigger (geographic + bias language) `sonnet`
-- [ ] WU-3.4b — Mode-specific tuning: `data_type` sections rule, `time_series` sections/PDF rules, `new_species_*` PDF cues `sonnet`
+- [x] WU-3.4 — Boolean cue expansion: `time_series` neg examples, `threatened_species` cue list, `bias_north_south` dual-trigger (geographic + bias language) `sonnet`
+- [x] WU-3.4b — Mode-specific tuning: `data_type` sections rule, `time_series` sections/PDF rules, `new_species_*` PDF cues `sonnet` *(all 3 modes evaluated 2026-03-31)*
 
 ---
 
@@ -146,6 +146,7 @@
 
 | Branch | Task ID | Description | Model | Finished |
 |---|---|---|---|---|
+| main | WU-3.2,3.4,3.4b | Phase 3 prompt iteration: VOCABULARY + MODULATOR_FIELDS + mode-specific rules | sonnet | 2026-03-31 |
 | main | WU-3.1 | Baseline runs (abstract/sections/pdf_native) + per-field audit | sonnet | 2026-03-28 |
 | `claude/wu-a1-dlX7N` | WU-A1 | Extend schema — modulators + DataSource | opus | 2026-02-18 |
 | `claude/implement-wu-a2-ePym7` | WU-A2 | Validate all-source ground truth | sonnet | 2026-02-18 |
