@@ -4,6 +4,61 @@ This folder contains analysis and validation notebooks for ecological dataset ch
 
 ## Recent Activity
 
+### 2026-04-01: Model Upgrade Experiment — gpt-5-mini/low -> gpt-5.4/medium
+
+**Task:** Test whether upgrading from gpt-5-mini with low reasoning effort to gpt-5.4 with medium reasoning effort improves extraction performance on modulator fields and `data_type`/`geospatial_info_dataset`.
+
+**Work Performed:**
+- Ran two `prompt_eval` runs on the dev subset (30 records) with identical prompts from the 2026-03-31 session, changing only model (`gpt-5.4`) and reasoning effort (`medium`)
+- Compared against the 2026-03-31 baseline runs (gpt-5-mini, effort=low)
+- Runs: `artifacts/runs/20260401_120758_pe_model_medium_change_abstract.json`, `artifacts/runs/20260401_120759_pe_model_medium_pdf_native.json`
+- Launch script: `artifacts/runs/20260401_094700_pe_model_medium_change_launch.py`
+
+**Results — Abstract Mode (gpt-5-mini/low -> gpt-5.4/medium):**
+
+| Field | Baseline F1 | gpt-5.4 F1 | Δ F1 |
+|---|---|---|---|
+| `temp_range_i` | 0.743 | 0.743 | 0.000 |
+| `multispecies` | **0.746** | 0.391 | **-0.355** |
+| `temp_range_f` | 0.629 | 0.629 | 0.000 |
+| `time_series` | 0.471 | 0.500 | +0.029 |
+| `data_type` | 0.424 | 0.469 | +0.046 |
+| `species` | 0.405 | 0.386 | -0.020 |
+| `threatened_species` | 0.385 | **0.500** | **+0.115** |
+| `bias_north_south` | 0.286 | **0.421** | **+0.135** |
+| `geospatial_info_dataset` | 0.255 | 0.197 | -0.057 |
+| `new_species_region` | 0.222 | 0.080 | **-0.142** |
+| `new_species_science` | 0.167 | null | **-0.167** |
+| `spatial_range_km2` | 0.095 | 0.095 | 0.000 |
+
+**Results — PDF Native Mode (gpt-5-mini/low -> gpt-5.4/medium):**
+
+| Field | Baseline F1 | gpt-5.4 F1 | Δ F1 |
+|---|---|---|---|
+| `bias_north_south` | **0.830** | 0.537 | **-0.294** |
+| `new_species_science` | **0.769** | 0.083 | **-0.686** |
+| `new_species_region` | **0.750** | 0.148 | **-0.602** |
+| `threatened_species` | **0.778** | 0.545 | **-0.232** |
+| `multispecies` | **0.767** | 0.510 | **-0.257** |
+| `spatial_range_km2` | 0.703 | 0.632 | -0.071 |
+| `temp_range_i` | 0.694 | 0.653 | -0.041 |
+| `temp_range_f` | 0.694 | 0.653 | -0.041 |
+| `data_type` | 0.370 | 0.392 | +0.021 |
+| `time_series` | 0.250 | **0.588** | **+0.338** |
+| `species` | 0.187 | 0.253 | +0.066 |
+| `geospatial_info_dataset` | 0.230 | 0.135 | -0.095 |
+
+**Key Findings:**
+- **gpt-5.4/medium is a clear regression.** It is systematically more conservative - outputs null where gpt-5-mini correctly extracted values. PDF `new_species_science` TP dropped 15->1, `new_species_region` 15->2, `bias_north_south` 22->11; abstract `multispecies` 22->9.
+- The only field that materially benefited is `time_series` in PDF native mode (F1 0.25->0.59), where gpt-5-mini's FP dropped from 23->7.
+- Cost is ~10x higher per record for negligibly or negatively different quality.
+
+**Verdict:** Stay on gpt-5-mini/low. The "medium" reasoning effort makes the model second-guess itself on signals gpt-5-mini correctly acts on. If model upgrade is revisited, try gpt-5.4 with `effort: low` to isolate whether regression comes from the model or the effort level.
+
+**Next Steps:**
+- Continue prompt engineering on gpt-5-mini/low (species precision, data_type F1 >=0.50 target)
+- Optional: test gpt-5.4/low to isolate model vs effort contribution
+
 ### 2026-04-01: Automated Relevance Classification — Paper Comparison Synthesis
 
 **Task:** Expand the final synthesis so the automated relevance classification write-up explicitly compares our notebook methods to the original paper's automated classification methodology and reported results, with framing that is usable in manuscript drafting.
