@@ -18,7 +18,9 @@ Both are notebook-only. No modifications to `src/`.
 | Work unit | Status | Notes |
 |---|---|---|
 | **WU-R1A** | Complete | `notebooks/relevance_mechanistic.ipynb` now reproduces the annotated Fuster mechanistic system exactly on the 30-record dev subset (`30/30` on all audited `MC_*` columns; macro F1 `1.00` vs `MC_relevance_modifiers`). |
-| **WU-R1B** | Complete | The same notebook evaluates rules on LLM-extracted features against `MC_relevance_modifiers`; current saved dev-subset result is macro F1 `0.125`. |
+| **WU-R1B** | Complete | The same notebook evaluates rules on LLM-extracted features against `MC_relevance_modifiers`; the latest live notebook run under `uv` with `.venv`/`.env` reports macro F1 `0.317`, binary F1 `0.533` on the dev subset. |
+| **WU-R1C** | Complete | `notebooks/relevance_mechanistic_pdf.ipynb` now evaluates the same mechanistic rules on PDF-native feature extraction by reusing `artifacts/runs/20260331_120734_prompt_engineering_pdf_native.json`. Result: macro F1 `0.389`, binary F1 `0.698`, precision `0.714`, recall `0.682`. |
+| **WU-R3** | Complete | Re-scored `R1-B` on the improved 2026-03-31 abstract prompt artifact, then reran the notebook live under `uv`. Historical artifact-only comparison: March 27 baseline `0.317/0.483` vs March 31 artifact `0.289/0.483` (macro/binary F1). Current live notebook result is macro F1 `0.317`, binary F1 `0.533`. |
 | **WU-R2** | Complete | `notebooks/relevance_llm_direct.ipynb` now evaluates primarily against `MC_relevance_modifiers`, retains `dataset_relevance` as `human_relevance`, and writes refreshed `relevance_llm_direct_summary.json`, predictions, confusion figure, and `relevance_comparison_summary.csv`. In this environment the notebook executed via saved-predictions fallback because `OPENAI_API_KEY` was unavailable. |
 | **Final synthesis** | Complete | The cross-method comparison table and notebook lab log now use the same mechanistic target definition throughout. |
 
@@ -57,7 +59,9 @@ Full-dataset `dataset_relevance` distribution for reference:
 - For `MC_relevance_modifiers`: keep only `H/M/L/X`.
 - Check actual dev subset distribution at runtime; the dev subset currently contains no `X` in `MC_relevance_modifiers`.
 
-**Input text:** `full_text` column from raw xlsx — the Dryad/Zenodo repository description. This is identical to what the existing `abstract` extraction mode uses (see `_merge_raw_abstracts()` in `data_paper.py`).
+**Input text by mechanistic variant:**
+- **Abstract/repository-description mechanistic variant (`R1-B`)**: `full_text` column from raw xlsx — the Dryad/Zenodo repository description. This is identical to what the existing `abstract` extraction mode uses (see `_merge_raw_abstracts()` in `data_paper.py`).
+- **PDF-derived mechanistic variant (`R1-C`)**: local PDF files referenced by `pdf_local_path` in `data/manifests/dev_subset_data_paper.csv`, scored from the saved PDF-native extraction artifact `artifacts/runs/20260331_120734_prompt_engineering_pdf_native.json`.
 
 **Notebook normalization rule:**
 - Normalize notebook-relevant GT feature inputs through `DatasetFeaturesNormalized` before scoring.
@@ -125,7 +129,7 @@ Reconstruction note: the released `MC_relevance_modifiers` annotations empirical
 
 ## Notebooks
 
-### WU-R1: `notebooks/relevance_mechanistic.ipynb` `sonnet`
+### WU-R1A: GT Ceiling Test in `notebooks/relevance_mechanistic.ipynb` `sonnet`
 
 **deps:** none | **files:** `notebooks/relevance_mechanistic.ipynb`
 
@@ -150,7 +154,20 @@ Implemented result:
 - Dev subset audit is exact on all five `MC_*` columns (`30/30` each)
 - `R1-A` metrics vs `MC_relevance_modifiers`: accuracy `1.00`, macro F1 `1.00`
 
-**Part B — End-to-end with LLM-extracted features**
+### WU-R1B: Abstract / Repository-Description Mechanistic Variant in `notebooks/relevance_mechanistic.ipynb` `sonnet`
+
+**deps:** none | **files:** `notebooks/relevance_mechanistic.ipynb`
+
+**Status:** Implemented.
+
+This is the **short-text mechanistic variant**. It uses feature extraction from the same abstract/repository-description text that powers the existing `abstract` mode, then applies the deterministic Fuster scoring rules.
+
+**Evidence source:** abstract / repository description (`full_text` column in the raw xlsx; same input used by `abstract` extraction mode)
+
+**Pipeline:**
+- short text → feature extraction (`abstract` mode) → deterministic relevance scoring
+
+**Part B — End-to-end with abstract / repository-description feature extraction**
 
 Run existing extraction on the dev subset, apply the same rules, compare to `MC_relevance_modifiers`.
 
@@ -162,8 +179,55 @@ Steps:
 - Delta table vs Part A: how much does imperfect feature extraction degrade relevance scoring?
 
 Implemented result:
-- Current saved dev-subset result vs `MC_relevance_modifiers`: macro F1 `0.125`, binary F1 `0.00`
+- Historical artifact comparison with corrected scorer:
+  - March 27 baseline abstract prompt artifact (`20260327_172654_dev_subset_abstract.json`): macro F1 `0.317`, binary F1 `0.483`, precision `1.000`, recall `0.318`
+  - March 31 prompt-engineering abstract artifact (`20260331_120539_prompt_engineering_abstract.json`): macro F1 `0.289`, binary F1 `0.483`, precision `1.000`, recall `0.318`
+- Only 4 of 30 dev-subset records changed relevance label between March 27 and March 31:
+  - `11`: `M -> X`
+  - `30`: `X -> M`
+  - `39`: `L -> X`
+  - `253`: `X -> L`
+- Live notebook rerun on the current repo state using `uv` + `.venv` + `.env` now reports:
+  - macro F1 `0.317`
+  - binary F1 `0.533`
+  - precision `1.000`
+  - recall `0.364`
+- Net result:
+  - the saved March 31 artifact still does not show a downstream `R1-B` improvement over March 27
+  - but the current live notebook run is slightly stronger than the artifact-only comparison and is the current source of truth for the repo
 - No additional implementation is pending in `WU-R1` unless we want to refresh outputs after future prompt/model changes
+
+### WU-R1C: PDF-Derived Mechanistic Variant in `notebooks/relevance_mechanistic_pdf.ipynb` `sonnet`
+
+**deps:** none | **files:** `notebooks/relevance_mechanistic_pdf.ipynb`, `notebooks/results/relevance_mechanistic_pdf_summary.csv`
+
+**Status:** Implemented.
+
+This is the **PDF-derived mechanistic variant**. It uses feature extraction from full PDF files through the saved `pdf_native` run artifact, then applies the same deterministic Fuster scoring rules.
+
+**Evidence source:** PDF-native full text via local `pdf_local_path` files, reusing the saved run artifact `artifacts/runs/20260331_120734_prompt_engineering_pdf_native.json`
+
+**Pipeline:**
+- PDF-native extraction artifact → feature table → deterministic relevance scoring
+
+**Execution approach:**
+- Reuse the saved March 31 PDF-native prompt-engineering artifact rather than issuing fresh API calls
+- Build the prediction dataframe from artifact records
+- Apply the same `score_data_type()`, `score_temporal()`, `score_spatial()`, `majority_vote()`, and `apply_modulators()` logic used in `R1-B`
+- Compare resulting relevance labels to `MC_relevance_modifiers`
+
+Implemented result:
+- `R1-C` metrics vs `MC_relevance_modifiers` on the 30-record dev subset:
+  - macro F1 `0.389`
+  - binary F1 `0.698`
+  - precision `0.714`
+  - recall `0.682`
+- Relative to the abstract/repository-description mechanistic variant:
+  - `R1-B` (short text): macro F1 `0.317`, binary F1 `0.533`
+  - `R1-C` (PDF-derived): macro F1 `0.389`, binary F1 `0.698`
+- Interpretation:
+  - the deterministic scoring rules benefit substantially from richer evidence
+  - PDF-derived feature extraction closes much of the gap between the abstract-based mechanistic variant and the paper's supervised bag-of-words baseline
 
 ### WU-R2: `notebooks/relevance_llm_direct.ipynb` `sonnet`
 
@@ -263,13 +327,25 @@ eval_df = df[df["gt_relevance"].isin(["H", "M", "L", "X"])].copy()
 - Confusion matrix heatmap
 - Headline notebook tables use macro F1 over labels present in the target split; on this dev subset `MC_relevance_modifiers` contains `H/M/L` only, so the stricter all-four-label macro for `R2` is `0.374` and is saved in `relevance_llm_direct_summary.json`.
 
-**Comparison table (final output):**
+**Reusable comparison table (paper-facing labels):**
+
+Use the labels below in manuscript text, figures, and tables. Avoid `R1-B`, `R2`, or work-unit shorthand in paper-facing outputs.
+
+| Reusable label | Method family | Relevant-class Precision | Relevant-class Recall | Relevant-class F1 | Four-class macro F1 | Evaluation setting |
+|---|---|---|---|---|---|---|
+| Supervised bag-of-words classifier (Fuster-Calvo et al. 2025 baseline) | TF-IDF text classification with classical ML | 0.62 | 0.71 | 0.67 | not reported | Full annotated corpus, 5-fold cross-validation, binary relevance only |
+| Mechanistic relevance scoring from abstract/repository-description features | LLM feature extraction from abstract or repository description, then deterministic Fuster scoring rules | 1.000 | 0.364 | 0.533 | 0.317 | 30-record dev subset, `MC_relevance_modifiers` target |
+| Mechanistic relevance scoring from PDF-derived features | LLM feature extraction from PDF-native full text, then deterministic Fuster scoring rules | 0.714 | 0.682 | 0.698 | 0.389 | 30-record dev subset, `MC_relevance_modifiers` target, reusing `20260331_120734_prompt_engineering_pdf_native.json` |
+| Direct LLM relevance classification | Single structured-output LLM call for features plus final relevance | 0.773 | 0.773 | 0.773 | 0.498 | 30-record dev subset, `MC_relevance_modifiers` target |
+
+**Internal notebook comparison table (includes ceiling + diagnostic rows):**
 
 | Method | 4-class macro F1 | Binary F1 (relevant) | Binary P | Binary R |
 |---|---|---|---|---|
-| R1-A: Rules on GT features vs Fuster MC+Modulators | 1.000 | 1.000 | 1.000 | 1.000 |
-| R1-B: Rules on LLM features vs Fuster MC+Modulators | 0.125 | 0.000 | 0.000 | 0.000 |
-| R2: Direct LLM vs Fuster MC+Modulators | 0.498 | 0.773 | 0.773 | 0.773 |
+| Rules on GT features vs Fuster MC+Modulators | 1.000 | 1.000 | 1.000 | 1.000 |
+| Mechanistic relevance scoring from abstract/repository-description features | 0.317 | 0.533 | 1.000 | 0.364 |
+| Mechanistic relevance scoring from PDF-derived features | 0.389 | 0.698 | 0.714 | 0.682 |
+| Direct LLM relevance classification | 0.498 | 0.773 | 0.773 | 0.773 |
 | Diagnostic: mechanistic target vs human `dataset_relevance` | 0.491 | 0.850 | 0.773 | 0.944 |
 
 ---
@@ -304,7 +380,9 @@ The original paper's automated relevance classification is a **supervised binary
 - `R1-A`:
   - no model; explicit reconstruction of the paper's mechanistic rules from GT features
 - `R1-B`:
-  - LLM feature extraction first, then deterministic rule scoring
+  - LLM feature extraction from abstract/repository-description text, then deterministic rule scoring
+- `R1-C`:
+  - LLM feature extraction from PDF-native full text, then deterministic rule scoring
 - `R2`:
   - direct LLM structured prediction of both features and final relevance category, with reasoning
 - Target:
@@ -315,7 +393,7 @@ The original paper's automated relevance classification is a **supervised binary
 
 ### Methodology contrast
 
-| Dimension | Fuster et al. automated classifier | `R1` mechanistic pipeline | `R2` direct LLM |
+| Dimension | Fuster et al. automated classifier | `R1` mechanistic pipeline (`R1-B` short text / `R1-C` PDF-derived) | `R2` direct LLM |
 |---|---|---|---|
 | Learning paradigm | Supervised ML on labeled corpus | No learned relevance model; deterministic rules over extracted features | Prompted LLM inference with structured output |
 | Input representation | TF-IDF bag-of-words over cleaned text | Semantic feature schema (`data_type`, temporal, spatial, modulators) | Same text, but end-to-end semantic reasoning in one call |
@@ -333,15 +411,14 @@ The paper reported the following best-performing supervised binary classifiers (
 | Main Classifier only | 0.57 | 0.44 | 0.50 | 0.68 |
 | Main Classifier + Modulators | 0.62 | 0.71 | 0.67 | 0.61 |
 
-Our notebook results are not directly commensurable because they use a 30-record dev subset and a 4-class mechanistic target before binary collapse. Still, the binary collapse offers a useful orientation:
+Our notebook results are not directly commensurable because they use a 30-record dev subset and a 4-class mechanistic target before binary collapse. Still, the binary collapse offers a useful orientation. The table below is the version intended for reuse outside the plan:
 
-| System | Relevant Precision | Relevant Recall | Relevant F1 | Notes |
+| Reusable label | Relevant-class Precision | Relevant-class Recall | Relevant-class F1 | Notes |
 |---|---|---|---|---|
-| Fuster paper: supervised Main Classifier only | 0.57 | 0.44 | 0.50 | Full annotated corpus, 5-fold CV |
-| Fuster paper: supervised Main Classifier + Modulators | 0.62 | 0.71 | 0.67 | Full annotated corpus, 5-fold CV |
-| `R1-A`: rules on GT features | 1.00 | 1.00 | 1.00 | Ceiling test, dev subset |
-| `R1-B`: rules on LLM-extracted features | 0.00 | 0.00 | 0.00 | Dev subset, abstract-mode extracted features |
-| `R2`: direct LLM vs `MC_relevance_modifiers` | 0.773 | 0.773 | 0.773 | Dev subset, same saved predictions now scored on corrected target |
+| Supervised bag-of-words classifier (Fuster-Calvo et al. 2025 baseline) | 0.62 | 0.71 | 0.67 | Best paper baseline: Main Classifier + Modulators, full annotated corpus, 5-fold CV |
+| Mechanistic relevance scoring from abstract/repository-description features | 1.00 | 0.364 | 0.533 | Dev subset, latest live notebook run under current prompt state |
+| Mechanistic relevance scoring from PDF-derived features | 0.714 | 0.682 | 0.698 | Dev subset, reusing `20260331_120734_prompt_engineering_pdf_native.json` |
+| Direct LLM relevance classification | 0.773 | 0.773 | 0.773 | Dev subset, same saved predictions now scored on corrected target |
 
 ### Interpretation for paper writing
 
@@ -351,17 +428,20 @@ The important story is not simply that an LLM number is higher or lower than the
    `R1-A` shows that once the required features are available, the mechanistic framework is perfectly reproducible on the dev subset. This is strong evidence that the annotation framework is internally coherent enough to be operationalized.
 
 2. **Feature availability and feature extraction are the dominant bottleneck.**
-   The collapse from `R1-A` to `R1-B` shows that a deterministic post-processing layer cannot rescue missing or weakly extracted temporal, spatial, and data-type signals. This aligns closely with the paper's discussion that crucial metadata are often absent or sparsely expressed in repository text and abstracts.
+   The drop from `R1-A` to the abstract/repository-description mechanistic variant (`R1-B`) shows that a deterministic post-processing layer still cannot rescue missing or weakly extracted temporal, spatial, and data-type signals. This aligns closely with the paper's discussion that crucial metadata are often absent or sparsely expressed in repository text and abstracts.
 
-3. **Direct LLM prediction partially recovers information lost by the feature pipeline.**
-   `R2` substantially outperforms `R1-B`, suggesting that end-to-end semantic inference can use weak contextual cues that do not survive explicit feature extraction cleanly. In other words, the LLM seems better at latent relevance judgment than at emitting a fully faithful intermediate schema under current prompting.
+3. **Richer evidence materially improves the mechanistic pipeline.**
+   Moving from abstract/repository-description feature extraction (`R1-B`) to PDF-derived feature extraction (`R1-C`) raises the mechanistic pipeline from binary F1 `0.533` to `0.698`. This is a strong indication that the rules themselves are serviceable; what matters is whether the extraction stage sees enough temporal, spatial, and modulator evidence.
 
-4. **The paper's own discussion anticipated this direction.**
+4. **Direct LLM prediction still recovers information beyond the explicit feature pipeline.**
+   `R2` still outperforms both mechanistic variants (`R1-B` short-text and `R1-C` PDF-derived), suggesting that end-to-end semantic inference can use weak contextual cues that do not survive explicit feature extraction cleanly. In other words, the LLM seems better at latent relevance judgment than at emitting a fully faithful intermediate schema under current prompting.
+
+5. **The paper's own discussion anticipated this direction.**
    In the discussion, Fuster et al. explicitly propose an alternative path: directly extracting key features such as data type and temporal extent from text, then combining them afterward in the same manual framework. `R1` is exactly that experiment. The paper also notes that LLM-style models may better capture semantics than bag-of-words approaches, though they would still be constrained by absent spatiotemporal metadata. Our results fit that expectation closely:
    - direct semantic inference helps
    - but absent metadata remain a hard ceiling
 
-5. **The target definition matters.**
+6. **The target definition matters.**
    One of the most important methodological clarifications from this initiative is that `MC_relevance_modifiers` and spreadsheet `dataset_relevance` should not be treated as interchangeable. For paper drafting, this is worth stating explicitly:
    - `MC_relevance_modifiers` is the correct target when evaluating fidelity to the Fuster mechanistic system
    - `dataset_relevance` is better treated as a neighboring human label, useful for diagnostics but not as the primary ceiling target for rule reconstruction
@@ -373,8 +453,8 @@ If you want this section to read well in the manuscript, a strong structure woul
 1. **Reconstruct the authors' logic first.**
    Show that the mechanistic system can be reproduced exactly from GT features (`R1-A`). This establishes methodological fidelity and makes the rest of the comparison interpretable.
 
-2. **Separate rule validity from feature-extraction validity.**
-   Emphasize that `R1-B` fails not because the scoring logic is weak, but because the required evidence is incompletely recoverable from short repository descriptions and abstracts.
+2. **Separate rule validity from evidence availability.**
+   Emphasize that the abstract/repository-description mechanistic variant (`R1-B`) underperforms not because the scoring logic is weak, but because the required evidence is incompletely recoverable from short repository descriptions and abstracts. Then show that the PDF-derived mechanistic variant (`R1-C`) improves once richer evidence is available.
 
 3. **Position `R2` as a semantic shortcut rather than a black-box replacement.**
    The direct LLM approach can be framed as bypassing the fragile intermediate extraction layer. It is not "better than the Fuster framework"; rather, it is a different way of approximating the same relevance construct when metadata are sparse.
@@ -412,6 +492,61 @@ For manuscript phrasing, the central conclusion can be framed as:
 
 ---
 
+## Next Work Units
+
+#### WU-R3: Refresh `R1-B` on improved abstract prompts `sonnet`
+
+**deps:** WU-R1B | **files:** `notebooks/relevance_mechanistic.ipynb`, `notebooks/results/relevance_mechanistic_r1b_prompt_comparison.csv`, `notebooks/results/relevance_mechanistic_r1b_prompt_predictions.csv`
+
+- Re-score the dev-subset mechanistic pipeline on the 2026-03-31 abstract prompt artifact
+- Compare directly against the March 27 baseline artifact
+- Refresh the live notebook under `uv` so saved outputs reflect the current repo state
+- Completed 2026-04-09:
+  - artifact-only comparison: macro F1 `0.317 -> 0.289`; binary F1 unchanged at `0.483`
+  - live notebook result: macro F1 `0.317`; binary F1 `0.533`
+
+#### WU-R4: Full-corpus `R1-A` ceiling audit `sonnet`
+
+**deps:** none | **files:** `notebooks/relevance_mechanistic.ipynb`, `data/dataset_092624.xlsx`, `notebooks/README.md`
+
+- Run the mechanistic scorer on all annotated Fuster records using GT features only
+- Verify whether the exact dev-subset reconstruction generalizes to the full annotated corpus
+- Report any full-corpus mismatches against `MC_*` columns explicitly before using `R1-A` as a paper-wide ceiling
+
+#### WU-R5: Full-corpus `R1-B` abstract/repository-description evaluation `sonnet`
+
+**deps:** WU-R4 | **files:** `notebooks/relevance_mechanistic.ipynb`, `artifacts/runs/*.json`, `notebooks/results/`
+
+- Apply the same mechanistic scorer to abstract/repository-description LLM-extracted features across the complete annotated Fuster corpus
+- Keep `MC_relevance_modifiers` as the primary target and `dataset_relevance` as diagnostic only
+- Segment results by source where useful (Dryad, Zenodo, Semantic Scholar)
+
+#### WU-R6: Fresh `R2` rerun with current prompt `sonnet`
+
+**deps:** none | **files:** `notebooks/relevance_llm_direct.ipynb`, `notebooks/results/relevance_llm_direct_*`, `notebooks/results/relevance_comparison_summary.csv`
+
+- Re-run direct-LLM relevance prediction with valid OpenAI credentials
+- Refresh predictions and metrics so `R2` reflects the current prompt rather than saved fallback predictions
+- Recompare `R2` against the latest `R1-B` after scorer correction
+
+#### WU-R7: Error attribution for `R1-B` and `R1-C` failures `opus`
+
+**deps:** WU-R3 | **files:** `notebooks/relevance_mechanistic.ipynb`, `notebooks/results/relevance_mechanistic_r1b_prompt_predictions.csv`, `notebooks/README.md`
+
+- Attribute each final relevance error primarily to `data_type`, temporal, spatial, or modulator extraction
+- Quantify which upstream feature classes dominate failures in both the abstract/repository-description mechanistic variant (`R1-B`) and the PDF-derived mechanistic variant (`R1-C`)
+- Use the attribution table to prioritize the next prompt-engineering pass
+
+#### WU-R8: Full-text / section relevance comparison `sonnet`
+
+**deps:** WU-R4, WU-R5 | **files:** `notebooks/relevance_mechanistic.ipynb`, `artifacts/runs/20260331_121025_prompt_engineering_sections.json`, `artifacts/runs/20260331_120734_prompt_engineering_pdf_native.json`
+
+- Apply the same mechanistic scorer to section-based and PDF-native run artifacts
+- Compare abstract vs sections vs PDF-native on the same relevance target
+- Test the paper-facing hypothesis that evidence availability, not the scoring rules, is the main bottleneck
+
+---
+
 ## Execution Order
 
 Completed:
@@ -419,6 +554,7 @@ Completed:
 ```
 Round 1: Refresh WU-R2 target/framing/output files
 Round 2: Update combined comparison table + lab log entry using consistent `MC_relevance_modifiers` target
+Round 3: WU-R3 — re-score March 27 vs March 31 abstract artifacts with corrected data-type handoff
 ```
 
 ---
@@ -428,11 +564,15 @@ Round 2: Update combined comparison table + lab log entry using consistent `MC_r
 | File | Purpose |
 |---|---|
 | `notebooks/relevance_mechanistic.ipynb` | WU-R1: rule-based approach |
+| `notebooks/relevance_mechanistic_pdf.ipynb` | WU-R1C: PDF-derived rule-based approach |
 | `notebooks/relevance_llm_direct.ipynb` | WU-R2: direct LLM approach |
 | `notebooks/results/relevance_comparison_summary.csv` | Final cross-method comparison table |
+| `notebooks/results/relevance_mechanistic_r1b_prompt_comparison.csv` | Baseline vs improved abstract-prompt `R1-B` comparison |
+| `notebooks/results/relevance_mechanistic_r1b_prompt_predictions.csv` | Record-level `R1-B` predictions for March 27 vs March 31 |
+| `notebooks/results/relevance_mechanistic_pdf_summary.csv` | PDF-derived mechanistic relevance summary |
 | `data/manifests/dev_subset_data_paper.csv` | 30-record dev subset manifest |
 | `data/dataset_092624.xlsx` | Raw GT (all 418 records) — joined for GT labels + MC columns |
 | `src/llm_metadata/schemas/fuster_features.py` | `DatasetFeaturesExtraction` base schema |
 | `src/llm_metadata/openai_io.py` | `get_openai_client()` factory |
 | `src/llm_metadata/gpt_extract.py` | Reference for `client.responses.parse()` pattern |
-| `src/llm_metadata/extraction.py` | `run_manifest_extraction()` used in WU-R1-B |
+| `src/llm_metadata/extraction.py` | `run_manifest_extraction()` used in the abstract/repository-description mechanistic variant (`R1-B`) |

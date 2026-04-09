@@ -4,6 +4,113 @@ This folder contains analysis and validation notebooks for ecological dataset ch
 
 ## Recent Activity
 
+### 2026-04-09: Automated Relevance Classification — PDF-Derived Mechanistic Notebook
+
+**Task:** Create a PDF-native version of the mechanistic relevance-classification notebook so the same Fuster rule system can be evaluated on features extracted from full PDF files rather than abstract or repository-description text.
+
+**Work Performed:**
+- Created `notebooks/relevance_mechanistic_pdf.ipynb` by adapting the mechanistic relevance notebook to the PDF-native evidence path.
+- Configured the notebook to reuse the saved March 31 PDF-native run artifact instead of making fresh API calls:
+  - `artifacts/runs/20260331_120734_prompt_engineering_pdf_native.json`
+- Executed the notebook under `uv` so the saved outputs were regenerated reproducibly.
+- Wrote PDF-specific outputs:
+  - `notebooks/results/relevance_mechanistic_pdf_summary.csv`
+  - `notebooks/results/relevance_mechanistic_pdf_part_a_confusion.png`
+  - `notebooks/results/relevance_mechanistic_pdf_comparison.png`
+- Updated the plan and manuscript draft so the PDF-derived mechanistic method appears in the reusable comparison tables.
+
+**Results:**
+- PDF-derived mechanistic relevance scoring vs `MC_relevance_modifiers` on the 30-record dev subset:
+  - macro F1 `0.389`
+  - binary relevant-class F1 `0.698`
+  - precision `0.714`
+  - recall `0.682`
+- This is a substantial improvement over the abstract/repository-description mechanistic path:
+  - abstract-derived mechanistic: macro F1 `0.317`, binary F1 `0.533`
+  - PDF-derived mechanistic: macro F1 `0.389`, binary F1 `0.698`
+- The PDF-derived mechanistic pipeline now sits much closer to the paper's supervised bag-of-words baseline (`F1 0.67`) while still trailing the direct-LLM relevance classifier (`F1 0.773`).
+
+**Key Issues Identified:**
+- The main mechanistic limitation is not just the rule system itself; it is the evidence available to the feature extractor.
+- Reusing the March 31 PDF-native artifact keeps this notebook aligned with the prompt-engineering milestone and avoids unnecessary re-execution cost.
+
+**Next Steps:**
+- Use the PDF-derived mechanistic result as the current best mechanistic comparator in paper-facing tables.
+- Extend the same comparison to the full annotated corpus if we want a stronger manuscript result than the 30-record dev subset.
+
+### 2026-04-09: Automated Relevance Classification — Live `uv` Rerun
+
+**Task:** Re-run `notebooks/relevance_mechanistic.ipynb` through `uv` so it uses the project `.venv`, loads `.env`, and refreshes the saved notebook outputs from the live extraction path.
+
+**Work Performed:**
+- Confirmed the active interpreter under `uv` is the project virtual environment:
+  - `C:\\Users\\beav3503\\dev\\llm_metadata\\.venv\\Scripts\\python.exe`
+- Confirmed `.env` exists locally and reran the notebook with:
+  - `UV_ENV_FILE=.env`
+  - `uv run jupyter nbconvert --to notebook --execute --inplace notebooks/relevance_mechanistic.ipynb`
+- Refreshed the live notebook outputs and the saved mechanistic summary table.
+
+**Results:**
+- The notebook executed successfully end to end under `uv`.
+- Current live `R1-B` result in `notebooks/results/relevance_mechanistic_summary.csv`:
+  - macro F1 `0.317`
+  - binary F1 `0.533`
+  - precision `1.000`
+  - recall `0.364`
+- This is now the current repo source of truth for `R1-B`, superseding the earlier artifact-only `0.289 / 0.483` headline in places where the repo was still stale.
+
+**Key Issues Identified:**
+- `uv` was using the correct `.venv` already, but `.env` was not being loaded automatically because `UV_ENV_FILE` was unset in the shell.
+- The Jupyter run still emits the Windows `add_reader` / selector-thread warning from `zmq`, but it did not block notebook execution.
+
+**Next Steps:**
+- Keep using `UV_ENV_FILE=.env` for notebook executions that require API credentials.
+- Re-run `WU-R6` the same way when refreshing the direct-LLM notebook.
+
+### 2026-04-09: Automated Relevance Classification — WU-R3 Prompt Refresh Check
+
+**Task:** Add the next relevance-classification work units to the plan, then refresh `R1-B` on the dev subset using the improved abstract prompt state from 2026-03-31.
+
+**Work Performed:**
+- Audited the current `R1-B` notebook path and found that the prediction-side scoring table was not carrying `data_type_primary` into the mechanistic relevance scorer, which understated the downstream result.
+- Patched `notebooks/relevance_mechanistic.ipynb` so the prediction table preserves both the raw `data_type` list and `data_type_primary`.
+- Instead of depending on a fresh notebook extraction run, compared the saved abstract run artifacts directly:
+  - baseline: `artifacts/runs/20260327_172654_dev_subset_abstract.json`
+  - improved prompt: `artifacts/runs/20260331_120539_prompt_engineering_abstract.json`
+- Wrote refreshed comparison artifacts:
+  - `notebooks/results/relevance_mechanistic_r1b_prompt_comparison.csv`
+  - `notebooks/results/relevance_mechanistic_r1b_prompt_predictions.csv`
+- Updated `plans/automated_relevance_classification.md`, `docs/relevance_classification_comparison_draft.md`, and the headline relevance summary CSVs so they use the corrected `R1-B` numbers.
+
+**Results:**
+- Corrected dev-subset `R1-B` baseline (March 27 abstract prompt):
+  - macro F1 `0.317`
+  - binary relevant-class F1 `0.483`
+  - precision `1.000`
+  - recall `0.318`
+- `WU-R3` refresh on the March 31 improved abstract prompt:
+  - macro F1 `0.289`
+  - binary relevant-class F1 `0.483`
+  - precision `1.000`
+  - recall `0.318`
+- Only 4 of 30 record-level relevance predictions changed between March 27 and March 31:
+  - `11`: `M -> X`
+  - `30`: `X -> M`
+  - `39`: `L -> X`
+  - `253`: `X -> L`
+- Net interpretation:
+  - the March 31 prompt changes improved several extraction fields elsewhere in the prompt-engineering workflow
+  - but they did **not** improve downstream dev-subset mechanistic relevance classification for `R1-B`
+- This entry supersedes the earlier `R1-B = 0.125 / 0.000` notebook summary, which came from the scorer dropping predicted `data_type` before applying the relevance rules.
+
+**Key Issues Identified:**
+- Relevance scoring can look much worse than it really is if the prediction-side feature handoff is incomplete, especially for `data_type`.
+- Even with the corrected scorer, `R1-B` remains materially below both the GT-feature ceiling (`R1-A`) and the direct-LLM approach (`R2`).
+
+**Next Steps:**
+- Run `WU-R4` and `WU-R5` on the full annotated Fuster corpus.
+- Add `WU-R7` error attribution so each final relevance miss is tied back to `data_type`, temporal, spatial, or modulator extraction.
+
 ### 2026-04-01: Repeatability Test — gpt-5.4/medium (fresh run vs cached run)
 
 **Task:** Determine whether the poor gpt-5.4/medium results from the earlier 20260401 run are reproducible or a fluke. Same config, `skip_cache=True` to force fresh API calls.

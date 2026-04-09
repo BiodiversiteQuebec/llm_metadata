@@ -46,8 +46,15 @@
 > **Plan:** [`plans/automated_relevance_classification.md`](plans/automated_relevance_classification.md)
 
 - [x] WU-R1: `notebooks/relevance_mechanistic.ipynb` — rule-based scoring (Part A: GT features ceiling test; Part B: LLM features end-to-end)
+- [x] WU-R1C: `notebooks/relevance_mechanistic_pdf.ipynb` — rule-based scoring from PDF-native feature extraction using saved March 31 artifact
 - [x] WU-R2: `notebooks/relevance_llm_direct.ipynb` — direct LLM classification with extended schema
 - [x] Combined comparison table + lab log entry
+- [x] WU-R3: Refresh `R1-B` abstract/repository-description variant on 2026-03-31 improved abstract prompts and compare against March 27 baseline
+- [ ] WU-R4: Full-corpus `R1-A` ceiling audit against `MC_*` columns
+- [ ] WU-R5: Full-corpus `R1-B` abstract/repository-description evaluation against `MC_relevance_modifiers`
+- [ ] WU-R6: Fresh `R2` rerun with valid OpenAI credentials
+- [ ] WU-R7: Error attribution for `R1-B` and `R1-C` misses (`data_type` vs temporal vs spatial vs modulators)
+- [ ] WU-R8: Abstract vs sections vs PDF-native mechanistic relevance comparison
 
 ---
 
