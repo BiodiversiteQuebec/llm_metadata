@@ -1,16 +1,16 @@
 {
-  "name": "dev_subset_pdf_file",
-  "description": "Baseline prompt with improved species evaluation",
+  "name": "prompt_engineering_pdf_native",
+  "description": "Improved prompt for modulator fields and data_type and geospatial info dataset",
   "mode": "pdf_native",
   "manifest_path": "data/manifests/dev_subset_data_paper.csv",
   "prompt_module": "prompts.pdf_file",
-  "system_message": "You are EcodataGPT, a structured data extraction engine for ecological biodiversity research.\n\n## Task\n\nExtract biodiversity dataset features from the provided PDF document into the schema.\n\n## PDF Document Analysis\n\nThis PDF has been processed to provide both:\n1. **Extracted text** from each page for detailed content analysis\n2. **Visual rendering** of each page for tables, figures, and layout understanding\n\nUse BOTH the text and visual information to extract accurate metadata. Pay special attention to:\n- **Tables**: Often contain structured data about sampling sites, species lists, temporal coverage\n- **Figures/Maps**: May show study area extent, spatial distribution, geographic coordinates\n- **Supplementary materials**: Sometimes contain detailed methods or data descriptions\n\nScientific papers typically follow this structure — prioritize sections accordingly:\n\n| Section | Primary Information |\n|---------|-------------------|\n| Abstract | Overview summary (use for context, prefer details from body) |\n| Introduction | Study objectives, geographic scope |\n| Methods/Materials | **PRIMARY SOURCE**: Sampling protocols, study sites, dates, species |\n| Study Area | Geographic coordinates, spatial extent, region names |\n| Data/Data Availability | Dataset descriptions, data types, access information |\n| Results | Actual measurements, confirmed values |\n| Supplementary | Detailed species lists, coordinate tables, extended methods |\n\nWhen text and figures contradict, prefer quantitative data from tables/figures.\n\n## Extraction Philosophy\n\n- Only use information explicitly supported by the text. Do NOT guess or infer.\n- If a field is not clearly stated, set it to null (or an empty list) as allowed by the schema.\n- Prefer conservative outputs over over-extraction.\n- Output must conform exactly to the schema (types, enums, lists).\n\n## Dataset Scoping\n\nExtract features ONLY from the primary dataset(s) produced, collected, or curated by the authors of this study.\n\n- **Primary dataset**: data collected, generated, or curated by the study authors\n- **Referenced dataset**: previously published data used for context, calibration, or comparison\n\nDo NOT extract features from datasets that are merely cited or referenced. If a paper analyzes\npreviously published data, extract features of what was analyzed, not the original collection.\n\n## Controlled Vocabulary\n\n### data_type values\n- **abundance**: Count or density of individuals per area/time. Examples: \"population counts\", \"density estimates from transect surveys\". NOT: presence/absence records only.\n- **presence-only**: Records of species occurrence without abundance. Examples: \"occurrence records from citizen science\", \"species checklists from field surveys\".\n- **genetic_analysis**: Molecular or genomic data. Examples: \"microsatellite genotyping\", \"eDNA metabarcoding\", \"DNA sequences\".\n- **tracking**: Movement data from tagged individuals. Examples: \"GPS telemetry of caribou\", \"satellite tracking of whales\".\n- **remote_sensing**: Data derived from satellite or aerial imagery. Examples: \"NDVI from Landsat\", \"land cover from aerial photos\".\n- **acoustic**: Sound recordings or acoustic detections. Examples: \"bat acoustic surveys\", \"passive acoustic monitoring\".\n- **morphological**: Physical measurements of organisms. Examples: \"body mass, wing length measurements\".\n- **environmental**: Abiotic environmental measurements. Examples: \"temperature, precipitation, soil chemistry\".\n\n### geospatial_info values\n- **sample**: GPS coordinates of individual sample locations (point data).\n- **site**: Named or described study site locations (may have coordinates or not).\n- **range**: Species range or distribution maps.\n- **administrative_units**: Country, province, or other administrative region names only.\n- **maps**: Study area maps provided as figures (no coordinate data in dataset).\n\n## Modulator Boolean Fields\n\nSet each to true only when the text provides explicit evidence; otherwise set to null.\n\n- **time_series**: true if the dataset contains repeated measurements at the same locations/populations over time (e.g. \"annual surveys from 2005 to 2015\", \"monitored monthly\"). A single snapshot is NOT a time series.\n- **multispecies**: true if the dataset covers more than one species or taxonomic group.\n- **threatened_species**: true if any studied species are described as threatened, endangered, vulnerable, at-risk, or listed under IUCN/CITES/national red lists.\n- **new_species_science**: true if the study describes or names a species new to science (newly described taxon).\n- **new_species_region**: true if the study reports a species recorded in a region for the first time (range extension, first regional record).\n- **bias_north_south**: true if the text explicitly discusses geographic bias toward the Global North or underrepresentation of the Global South.\n\n## Output Format\n\nOutput must conform exactly to the schema (types, enums, lists). For missing information, use null or empty list as the schema allows.",
+  "system_message": "You are EcodataGPT, a structured data extraction engine for ecological biodiversity research.\n\n## Task\n\nExtract biodiversity dataset features from the provided PDF document into the schema.\n\n## PDF Document Analysis\n\nThis PDF has been processed to provide both:\n1. **Extracted text** from each page for detailed content analysis\n2. **Visual rendering** of each page for tables, figures, and layout understanding\n\nUse BOTH the text and visual information to extract accurate metadata. Pay special attention to:\n- **Tables**: Often contain structured data about sampling sites, species lists, temporal coverage\n- **Figures/Maps**: May show study area extent, spatial distribution, geographic coordinates\n- **Supplementary materials**: Sometimes contain detailed methods or data descriptions\n\nScientific papers typically follow this structure — prioritize sections accordingly:\n\n| Section | Primary Information |\n|---------|-------------------|\n| Abstract | Overview summary (use for context, prefer details from body) |\n| Introduction | Study objectives, geographic scope |\n| Methods/Materials | **PRIMARY SOURCE**: Sampling protocols, study sites, dates, species |\n| Study Area | Geographic coordinates, spatial extent, region names |\n| Data/Data Availability | Dataset descriptions, data types, access information |\n| Results | Actual measurements, confirmed values |\n| Supplementary | Detailed species lists, coordinate tables, extended methods |\n\nWhen text and figures contradict, prefer quantitative data from tables/figures.\n\n## PDF Mode — Field-Specific Rules\n\n**time_series**: Base the `time_series` judgment ONLY on the dataset description, sampling design section, or explicit data collection methodology. Repeated analyses, model runs, appendix tables, or supplementary data files do not constitute a time series.\n\n**new_species_science**: Full text provides the strongest signal for this rare field. Positive triggers: \"sp. nov.\", \"new species\", \"described here for the first time\", \"holotype\", \"taxonomic diagnosis\", \"new to science\", \"formally described\", formal species description language in taxonomy sections.\n\n**new_species_region**: True only for a first confirmed record in a defined region — require explicit language like \"first record for\", \"new to\", \"not previously recorded in\", \"first confirmed occurrence\". NOT: general range expansion discussion, recolonization, modeled range extension, or species known to occur in a nearby region.\n\n## Extraction Philosophy\n\n- Only use information explicitly supported by the text. Do NOT guess or infer.\n- If a field is not clearly stated, set it to null (or an empty list) as allowed by the schema.\n- Prefer conservative outputs over over-extraction.\n- Output must conform exactly to the schema (types, enums, lists).\n\n## Dataset Scoping\n\nExtract features ONLY from the primary dataset(s) produced, collected, or curated by the authors of this study.\n\n- **Primary dataset**: data collected, generated, or curated by the study authors\n- **Referenced dataset**: previously published data used for context, calibration, or comparison\n\nDo NOT extract features from datasets that are merely cited or referenced. If a paper analyzes\npreviously published data, extract features of what was analyzed, not the original collection.\n\n## Controlled Vocabulary\n\n### data_type values\n\nUse the exact enum value. Select the value that best describes the primary data *collected or stored* in the dataset — not derived analyses or modelling outputs.\n\n- **abundance**: Count or density of individuals per unit area or time. Examples: \"point count surveys\", \"quadrat-based density estimates\", \"transect population counts\". NOT: presence/absence records without counts.\n- **presence-absence**: Binary records of whether a species was detected or not at a location. Examples: \"occupancy surveys\", \"detection/non-detection at camera traps\", \"checklist with confirmed absences\". NOT: occurrence-only without explicit absence.\n- **presence-only**: Occurrence records without any attempt to record absence. Examples: \"opportunistic sightings\", \"citizen science occurrence records\", \"herbarium specimen locations\", \"species checklists from field visits\".\n  - Contrastive: **presence-only** vs **presence-absence** — presence-only has no confirmed absences; presence-absence explicitly records non-detections.\n- **density**: Continuous density estimates (individuals per area) derived from distance sampling or other formal density estimation methods. Examples: \"line transect density estimates\", \"mark-recapture population density\". NOT: simple counts without density conversion.\n  - Contrastive: **abundance** (raw counts) vs **density** (formal estimate per area unit).\n- **distribution**: Spatial distribution maps or modelled range outputs as the primary deliverable. Examples: \"species distribution models (SDMs)\", \"range maps derived from occurrence data\", \"predicted habitat suitability layers\". NOT: GPS coordinates of sampling points.\n  - Contrastive: **distribution** (modelled/mapped output) vs **presence-only** (raw occurrence records used as input).\n- **traits**: Morphological, physiological, or life-history measurements of individual organisms. Examples: \"body mass, wing length, bill depth measurements\", \"leaf area, specific leaf area\", \"metabolic rate measurements\". NOT: environmental variables.\n- **ecosystem_function**: Measurements of ecosystem processes and functional rates. Examples: \"primary productivity estimates (GPP/NPP)\", \"decomposition rates\", \"nutrient cycling flux measurements\", \"carbon stock measurements\". NOT: species community composition.\n- **ecosystem_structure**: Data describing the structural attributes of habitats or communities. Examples: \"forest canopy height and cover\", \"tree basal area\", \"benthic substrate composition\", \"habitat classification maps\". NOT: species occurrence or traits.\n- **genetic_analysis**: Molecular or genomic sequence data. Examples: \"microsatellite genotyping\", \"eDNA metabarcoding sequences\", \"whole genome sequences\", \"SNP datasets\", \"COI barcoding\".\n- **time_series** *(as data_type)*: A dataset explicitly organized as a temporal monitoring series, where the data format or structure itself is time-indexed. Examples: \"long-term monitoring database\", \"annual survey data from 1980–2020 at fixed plots\". Note: also set the `time_series` boolean field when this applies.\n- **species_richness**: Aggregated species diversity counts or diversity indices as the primary output. Examples: \"species richness per plot\", \"alpha diversity indices across sites\", \"rarefaction curves\". NOT: raw occurrence records from which richness could be calculated.\n- **other**: Data type is clearly described but does not fit any above category.\n- **unknown**: Data type cannot be determined from the available text.\n\n### geospatial_info_dataset values\n\nUse the exact enum value. Describes the spatial information *included in or describing* the dataset itself — not background geography of the study region.\n\n**Important negative rule:** Named places, study regions, or country names appearing in the background or introduction do NOT qualify as geospatial information for the dataset. Only spatial data that is part of the dataset record (coordinates, maps, identifiers) qualifies.\n\n- **sample**: GPS or georeferenced coordinates of individual sample or collection points (point-level data). Examples: \"GPS coordinates for each trap location\", \"georeferenced specimen records with lat/lon\".\n- **site**: Named or described study site locations. The dataset includes site names or descriptions, which may or may not have associated coordinates. Examples: \"five named forest plots\", \"site descriptions with local place names\".\n- **range**: Species geographic range or extent maps derived from the dataset. Examples: \"species range polygons\", \"area of occupancy estimates\".\n- **distribution**: Spatially explicit distribution outputs (grids, rasters, or polygon layers). Examples: \"50m resolution habitat suitability grid\", \"species distribution model output raster\", \"predicted occurrence maps\". NOT: raw occurrence point data.\n  - Contrastive: **distribution** (modelled spatial output) vs **sample** (raw point coordinates).\n- **geographic_features**: Explicit geographic or topographic features used to describe dataset extent. Examples: \"watershed boundaries\", \"elevation gradient\", \"coastline extent\", \"river basin delineation\".\n- **administrative_units**: Country, province, municipality, or other administrative region names as the primary spatial descriptor — no coordinates or maps provided. Examples: \"data collected across three Canadian provinces\", \"municipality-level records\".\n- **maps**: Study area or sampling design maps provided as supplementary figures (no coordinate dataset). Examples: \"map figure showing study area extent\", \"sampling grid illustrated in paper\".\n- **site_ids**: Numeric or coded site identifiers without geographic coordinates. Examples: \"sites coded 1–50\", \"grid cell IDs\", \"plot codes\". NOT: GPS coordinates.\n- **unknown**: Geospatial information cannot be determined from the available text.\n\n## Modulator Boolean Fields\n\nSet each to true only when the text provides explicit evidence; otherwise set to null.\n\n- **time_series**: true if the dataset contains repeated measurements at the SAME locations or populations across multiple time periods, with the explicit intent to track change over time (e.g., \"annual surveys 2005–2015 at 12 fixed plots\", \"monthly water quality monitoring\", \"long-term population census\"). NOT a time series: data collected across multiple years as independent snapshots, multi-year compilations from different sites, short study windows (\"sampled in 2006 and 2007\"), experimental treatment repeats, or data collected across multiple field seasons without stated revisit intent.\n- **multispecies**: true if the dataset covers more than one species or taxonomic group.\n- **threatened_species**: true if any studied species are described as threatened, endangered, vulnerable, at-risk, or conservation-listed. Explicit cues include: IUCN Red List categories (critically endangered, endangered, vulnerable, near threatened), CITES Appendix listings, Species at Risk Act (SARA) / COSEWIC designations, provincial red lists, \"species of conservation concern\", \"at-risk\", \"declining\", \"protected species\". If a well-known threatened taxon is named without explicit status language (e.g., polar bear, beluga whale, woodland caribou, monarch butterfly), use ecological knowledge to confirm status only when you are certain.\n- **new_species_science**: true if the study describes or names a species new to science (newly described taxon).\n- **new_species_region**: true if the study reports a species recorded in a region for the first time (range extension, first regional record).\n- **bias_north_south**: true under EITHER of two conditions:\n  (1) GEOGRAPHIC — the dataset is located in northern Quebec or northern Canada, defined as territory north of the 49th parallel, or north of the St. Lawrence River/Gulf. Trigger on named regions (Nunavik, James Bay, Hudson Bay, Ungava, Côte-Nord, northern Quebec), latitude references (above 49°N, above 55°N), ecosystem types in northern context (tundra, subarctic, Arctic), or explicit \"northern Quebec\" / \"north of the St. Lawrence\" framing. Note: \"boreal\" alone is not sufficient — require a geographic modifier or latitude context.\n  (2) EXPLICIT BIAS — the text explicitly discusses north-south sampling bias, underrepresentation of northern or tropical regions, data gaps in remote areas, or Global North/South disparities. Trigger on: \"undersampled\", \"data gap\", \"geographic bias\", \"north-south gradient\", \"underrepresented region\", \"Global North/South\", \"poorly documented northern territories\".\n\n## Output Format\n\nOutput must conform exactly to the schema (types, enums, lists). For missing information, use null or empty list as the schema allows.",
   "model": "gpt-5-mini",
   "reasoning": {
     "effort": "low"
   },
   "reasoning_effort": "low",
-  "created_at": "2026-03-27T21:26:56.190928+00:00",
+  "created_at": "2026-03-31T16:07:34.266429+00:00",
   "schema": {
     "$defs": {
       "EBVDataType": {
@@ -292,15 +292,15 @@
       "input_text": null,
       "extraction_method": "pdf_native",
       "usage_cost": {
-        "input_tokens": 23008,
-        "cached_tokens": 22272,
-        "reasoning_tokens": 1280,
-        "output_tokens": 1502,
-        "input_cost": 0.0002,
-        "cache_cost": 0.0006,
-        "reasoning_cost": 0.0026,
-        "output_cost": 0.003,
-        "total_cost": 0.0064
+        "input_tokens": 27881,
+        "cached_tokens": 0,
+        "reasoning_tokens": 1600,
+        "output_tokens": 1840,
+        "input_cost": 0.007,
+        "cache_cost": 0.0,
+        "reasoning_cost": 0.0032,
+        "output_cost": 0.0037,
+        "total_cost": 0.0139
       },
       "output": {
         "data_type": [
@@ -308,23 +308,24 @@
         ],
         "geospatial_info_dataset": [
           "site",
-          "sample",
-          "administrative_units"
+          "administrative_units",
+          "maps"
         ],
         "spatial_range_km2": null,
-        "temporal_range": "2006 to 2007",
+        "temporal_range": "from 2006 to 2007",
         "temp_range_i": 2006,
         "temp_range_f": 2007,
         "species": [
-          "Glyptemys insculpta (wood turtle)"
+          "Glyptemys insculpta",
+          "wood turtle"
         ],
-        "referred_dataset": "Microsatellites genotypes (http://dx.doi.org/10.5061/dryad.121sk)",
+        "referred_dataset": "Microsatellites genotypes (Dryad doi:10.5061/dryad.121sk)",
         "time_series": true,
         "multispecies": false,
         "threatened_species": true,
         "new_species_science": false,
         "new_species_region": false,
-        "bias_north_south": null,
+        "bias_north_south": false,
         "valid_yn": "yes",
         "reason_not_valid": null
       }
@@ -341,15 +342,15 @@
       "input_text": null,
       "extraction_method": "pdf_native",
       "usage_cost": {
-        "input_tokens": 35091,
-        "cached_tokens": 32256,
-        "reasoning_tokens": 832,
-        "output_tokens": 1133,
-        "input_cost": 0.0007,
-        "cache_cost": 0.0008,
-        "reasoning_cost": 0.0017,
-        "output_cost": 0.0023,
-        "total_cost": 0.0055
+        "input_tokens": 52019,
+        "cached_tokens": 2688,
+        "reasoning_tokens": 1152,
+        "output_tokens": 1406,
+        "input_cost": 0.0123,
+        "cache_cost": 0.0001,
+        "reasoning_cost": 0.0023,
+        "output_cost": 0.0028,
+        "total_cost": 0.0175
       },
       "output": {
         "data_type": [
@@ -366,16 +367,16 @@
         "temp_range_i": 2008,
         "temp_range_f": 2008,
         "species": [
-          "raccoon (Procyon lotor): 610 individuals captured",
-          "striped skunk (Mephitis mephitis): 121 individuals captured"
+          "raccoon (Procyon lotor)",
+          "striped skunk (Mephitis mephitis)"
         ],
         "referred_dataset": "Dryad: http://dx.doi.org/10.5061/dryad.1771t",
         "time_series": false,
         "multispecies": true,
-        "threatened_species": null,
-        "new_species_science": null,
-        "new_species_region": null,
-        "bias_north_south": null,
+        "threatened_species": false,
+        "new_species_science": false,
+        "new_species_region": false,
+        "bias_north_south": false,
         "valid_yn": "yes",
         "reason_not_valid": null
       }
@@ -392,45 +393,36 @@
       "input_text": null,
       "extraction_method": "pdf_native",
       "usage_cost": {
-        "input_tokens": 21588,
-        "cached_tokens": 20224,
-        "reasoning_tokens": 1280,
-        "output_tokens": 1587,
-        "input_cost": 0.0003,
-        "cache_cost": 0.0005,
-        "reasoning_cost": 0.0026,
-        "output_cost": 0.0032,
-        "total_cost": 0.0066
+        "input_tokens": 27433,
+        "cached_tokens": 0,
+        "reasoning_tokens": 1792,
+        "output_tokens": 2087,
+        "input_cost": 0.0069,
+        "cache_cost": 0.0,
+        "reasoning_cost": 0.0036,
+        "output_cost": 0.0042,
+        "total_cost": 0.0147
       },
       "output": {
         "data_type": [
           "time_series",
           "presence-only",
-          "distribution",
-          "other"
+          "ecosystem_structure"
         ],
         "geospatial_info_dataset": [
           "sample",
-          "site",
           "range",
-          "maps",
-          "administrative_units"
+          "site",
+          "maps"
         ],
         "spatial_range_km2": 7250.0,
-        "temporal_range": "1999–2011 (VHF 1999–2000; GPS 2004–2011; reproductive monitoring 2004–2007)",
+        "temporal_range": "1999–2000 and 2004–2011",
         "temp_range_i": 1999,
         "temp_range_f": 2011,
         "species": [
-          "Rangifer tarandus caribou",
-          "woodland caribou",
-          "Canis lupus",
-          "wolves",
-          "Ursus americanus",
-          "black bear",
-          "Alces alces",
-          "moose"
+          "Rangifer tarandus caribou (forest-dwelling woodland caribou)"
         ],
-        "referred_dataset": "Digital forest maps provided by the MRNF (Ministère des Ressources naturelles et de la Faune du Québec); Data deposited in Dryad Digital Repository (DOI:10.5061/dryad.1cc4v).",
+        "referred_dataset": "Digital forest maps provided by the Ministère des Ressources naturelles et de la Faune du Québec (MRNF); VHF telemetry data (1999–2000) from Courtois et al.",
         "time_series": true,
         "multispecies": false,
         "threatened_species": true,
@@ -453,44 +445,44 @@
       "input_text": null,
       "extraction_method": "pdf_native",
       "usage_cost": {
-        "input_tokens": 23804,
-        "cached_tokens": 1664,
-        "reasoning_tokens": 1152,
-        "output_tokens": 1449,
-        "input_cost": 0.0055,
+        "input_tokens": 28743,
+        "cached_tokens": 0,
+        "reasoning_tokens": 1984,
+        "output_tokens": 2306,
+        "input_cost": 0.0072,
         "cache_cost": 0.0,
-        "reasoning_cost": 0.0023,
-        "output_cost": 0.0029,
-        "total_cost": 0.0107
+        "reasoning_cost": 0.004,
+        "output_cost": 0.0046,
+        "total_cost": 0.0158
       },
       "output": {
         "data_type": [
-          "time_series",
-          "distribution"
+          "presence-only",
+          "time_series"
         ],
         "geospatial_info_dataset": [
           "sample",
           "site",
           "range",
+          "geographic_features",
           "maps",
           "site_ids"
         ],
         "spatial_range_km2": 7250.0,
-        "temporal_range": "April 2004 to March 2012",
+        "temporal_range": "2004–2011 (captures 2004–2008; monitored until 2012; analyses cover 2004–2011)",
         "temp_range_i": 2004,
-        "temp_range_f": 2012,
+        "temp_range_f": 2011,
         "species": [
-          "Rangifer tarandus caribou",
-          "woodland caribou"
+          "Rangifer tarandus caribou (woodland caribou)"
         ],
-        "referred_dataset": "Data used to perform repeatability analyses are available from the Dryad Digital Repository: https://doi.org/10.5061/dryad.24q6q70",
+        "referred_dataset": "Dryad Digital Repository: https://doi.org/10.5061/dryad.24q6q70; digital forest maps provided by the Québec provincial government (annual updates used for land cover, cutblocks, roads, disturbances)",
         "time_series": true,
         "multispecies": false,
         "threatened_species": true,
         "new_species_science": false,
         "new_species_region": false,
-        "bias_north_south": null,
-        "valid_yn": null,
+        "bias_north_south": false,
+        "valid_yn": "yes",
         "reason_not_valid": null
       }
     },
@@ -506,15 +498,15 @@
       "input_text": null,
       "extraction_method": "pdf_native",
       "usage_cost": {
-        "input_tokens": 18372,
-        "cached_tokens": 17024,
-        "reasoning_tokens": 1216,
-        "output_tokens": 1470,
-        "input_cost": 0.0003,
-        "cache_cost": 0.0004,
-        "reasoning_cost": 0.0024,
-        "output_cost": 0.0029,
-        "total_cost": 0.006
+        "input_tokens": 23298,
+        "cached_tokens": 2688,
+        "reasoning_tokens": 1600,
+        "output_tokens": 1832,
+        "input_cost": 0.0052,
+        "cache_cost": 0.0001,
+        "reasoning_cost": 0.0032,
+        "output_cost": 0.0037,
+        "total_cost": 0.0122
       },
       "output": {
         "data_type": [
@@ -524,19 +516,17 @@
         "geospatial_info_dataset": [
           "sample",
           "site",
-          "maps",
-          "administrative_units",
-          "site_ids"
+          "site_ids",
+          "maps"
         ],
         "spatial_range_km2": 2080.0,
         "temporal_range": "2011 to 2014",
         "temp_range_i": 2011,
         "temp_range_f": 2014,
         "species": [
-          "Ixodes scapularis",
-          "black-legged tick"
+          "Ixodes scapularis (black-legged tick)"
         ],
-        "referred_dataset": "Data deposited at Dryad: http://dx.doi.org/10.5061/dryad.2n5h6",
+        "referred_dataset": "Dryad: http://dx.doi.org/10.5061/dryad.2n5h6",
         "time_series": true,
         "multispecies": false,
         "threatened_species": false,
@@ -559,36 +549,34 @@
       "input_text": null,
       "extraction_method": "pdf_native",
       "usage_cost": {
-        "input_tokens": 28979,
-        "cached_tokens": 28288,
-        "reasoning_tokens": 1536,
-        "output_tokens": 1795,
-        "input_cost": 0.0002,
-        "cache_cost": 0.0007,
-        "reasoning_cost": 0.0031,
-        "output_cost": 0.0036,
-        "total_cost": 0.0076
+        "input_tokens": 33031,
+        "cached_tokens": 0,
+        "reasoning_tokens": 1792,
+        "output_tokens": 2073,
+        "input_cost": 0.0083,
+        "cache_cost": 0.0,
+        "reasoning_cost": 0.0036,
+        "output_cost": 0.0041,
+        "total_cost": 0.016
       },
       "output": {
         "data_type": [
-          "genetic_analysis",
-          "abundance",
-          "ecosystem_structure"
+          "genetic_analysis"
         ],
         "geospatial_info_dataset": [
           "site",
-          "maps",
           "site_ids",
-          "administrative_units"
+          "maps"
         ],
         "spatial_range_km2": null,
         "temporal_range": "2008–2009",
         "temp_range_i": 2008,
         "temp_range_f": 2009,
         "species": [
-          "Acer saccharum Marshall (sugar maple)"
+          "Acer saccharum Marshall",
+          "sugar maple"
         ],
-        "referred_dataset": "Microsatellite data in DRYAD (doi:10.5061/dryad.36634); MFFPQ ecoforestry maps and inventory databases (Québec)",
+        "referred_dataset": "Microsatellite genotype data in DRYAD (doi:10.5061/dryad.36634). GenBank access numbers for microsatellite markers listed in Table S1.",
         "time_series": false,
         "multispecies": false,
         "threatened_species": false,
@@ -611,20 +599,19 @@
       "input_text": null,
       "extraction_method": "pdf_native",
       "usage_cost": {
-        "input_tokens": 20346,
-        "cached_tokens": 1664,
-        "reasoning_tokens": 1408,
-        "output_tokens": 1746,
-        "input_cost": 0.0047,
-        "cache_cost": 0.0,
-        "reasoning_cost": 0.0028,
-        "output_cost": 0.0035,
-        "total_cost": 0.011
+        "input_tokens": 25282,
+        "cached_tokens": 2688,
+        "reasoning_tokens": 1600,
+        "output_tokens": 1962,
+        "input_cost": 0.0056,
+        "cache_cost": 0.0001,
+        "reasoning_cost": 0.0032,
+        "output_cost": 0.0039,
+        "total_cost": 0.0128
       },
       "output": {
         "data_type": [
-          "genetic_analysis",
-          "presence-only"
+          "genetic_analysis"
         ],
         "geospatial_info_dataset": [
           "sample",
@@ -639,16 +626,16 @@
         "species": [
           "Eastern Wolf (Canis lycaon)",
           "Eastern Coyote (Canis latrans)",
-          "Great Lakes-Boreal Wolf (Canis lupus × lycaon)",
-          "Domestic Dog (Canis familiaris)"
+          "Great Lakes-Boreal Wolf (C. lupus × lycaon)",
+          "Domestic dog (Canis familiaris)"
         ],
-        "referred_dataset": "Previously published genotype datasets combined with new data: Rutledge et al. 2010a (Algonquin Park genotypes; Dryad DOI:10.5061/dryad.q9d6s), Wheeldon et al. 2013 (Dryad DOI:10.5061/dryad.72s5k), Benson et al. 2012 datasets",
-        "time_series": true,
+        "referred_dataset": "Previously published datasets combined with new data: Rutledge et al. 2010a (Dryad: http://dx.doi.org/10.5061/dryad.q9d6s); Wheeldon et al. 2013 (Dryad: http://dx.doi.org/10.5061/dryad.72s5k); Benson et al. 2012 (Dryad: http://dx.doi.org/10.5061/dryad.568kn).",
+        "time_series": false,
         "multispecies": true,
         "threatened_species": true,
         "new_species_science": false,
         "new_species_region": true,
-        "bias_north_south": null,
+        "bias_north_south": false,
         "valid_yn": "yes",
         "reason_not_valid": null
       }
@@ -665,15 +652,15 @@
       "input_text": null,
       "extraction_method": "pdf_native",
       "usage_cost": {
-        "input_tokens": 30270,
-        "cached_tokens": 1664,
-        "reasoning_tokens": 1856,
-        "output_tokens": 2289,
-        "input_cost": 0.0072,
-        "cache_cost": 0.0,
-        "reasoning_cost": 0.0037,
-        "output_cost": 0.0046,
-        "total_cost": 0.0155
+        "input_tokens": 38460,
+        "cached_tokens": 2688,
+        "reasoning_tokens": 1088,
+        "output_tokens": 1450,
+        "input_cost": 0.0089,
+        "cache_cost": 0.0001,
+        "reasoning_cost": 0.0022,
+        "output_cost": 0.0029,
+        "total_cost": 0.0141
       },
       "output": {
         "data_type": [
@@ -683,13 +670,12 @@
         "geospatial_info_dataset": [
           "sample",
           "site",
-          "maps",
           "distribution",
-          "site_ids",
-          "administrative_units"
+          "maps",
+          "site_ids"
         ],
         "spatial_range_km2": 535355.0,
-        "temporal_range": "Ecological survey plots collected 1986–2000 (n = 15,339); forest maps (SIFORT) produced 1970–1990; climate normals 1961–1990; disturbance archives 1938–1998.",
+        "temporal_range": "1986 to 2000 (ecological survey plots); forest maps produced 1970–1990 (SIFORT); climate normals 1961–1990 used for climatic variables",
         "temp_range_i": 1986,
         "temp_range_f": 2000,
         "species": [
@@ -697,16 +683,15 @@
           "Kalmia angustifolia",
           "Chamaedaphne calyculata",
           "Vaccinium angustifolium",
-          "Vaccinium myrtilloides",
-          "Vaccinium spp"
+          "Vaccinium myrtilloides"
         ],
-        "referred_dataset": "Governmental ecological survey dataset (Saucier et al. 1994; ecological survey plots 1986–2000) and SIFORT forest map geospatial database (Pelletier et al. 2007; decennial maps 1970–1990); climate data from BioSIM (climate normals 1961–1990) and disturbance archives (1938–1998).",
+        "referred_dataset": "Governmental ecological survey dataset (15,339 plots; surveys 1986–2000) and Spatial Information on Forest composition based on Tesserae (SIFORT) forest maps (maps produced 1970–1990)",
         "time_series": false,
         "multispecies": true,
-        "threatened_species": null,
+        "threatened_species": false,
         "new_species_science": false,
         "new_species_region": false,
-        "bias_north_south": null,
+        "bias_north_south": true,
         "valid_yn": "yes",
         "reason_not_valid": null
       }
@@ -723,45 +708,40 @@
       "input_text": null,
       "extraction_method": "pdf_native",
       "usage_cost": {
-        "input_tokens": 23038,
-        "cached_tokens": 17024,
-        "reasoning_tokens": 1472,
-        "output_tokens": 1775,
-        "input_cost": 0.0015,
-        "cache_cost": 0.0004,
-        "reasoning_cost": 0.0029,
-        "output_cost": 0.0036,
-        "total_cost": 0.0084
+        "input_tokens": 34874,
+        "cached_tokens": 2688,
+        "reasoning_tokens": 1664,
+        "output_tokens": 1968,
+        "input_cost": 0.008,
+        "cache_cost": 0.0001,
+        "reasoning_cost": 0.0033,
+        "output_cost": 0.0039,
+        "total_cost": 0.0153
       },
       "output": {
         "data_type": [
-          "traits",
-          "time_series",
-          "distribution",
-          "other"
+          "time_series"
         ],
         "geospatial_info_dataset": [
           "sample",
           "site",
-          "range",
-          "maps"
+          "maps",
+          "geographic_features"
         ],
         "spatial_range_km2": 630000.0,
-        "temporal_range": "2007 to 2014",
+        "temporal_range": "GPS telemetry: 2007–2014; MODIS ice maps (processed): 2000–2014; historical Lake Nichicun data: 1947–1985",
         "temp_range_i": 2007,
         "temp_range_f": 2014,
         "species": [
-          "Rangifer tarandus (caribou)",
-          "Rivière-aux-Feuilles herd",
-          "96 caribou (80 F, 16 M); 181 individual-years"
+          "Rangifer tarandus caribou"
         ],
-        "referred_dataset": "Dryad Digital Repository (DOI:10.5061/dryad.4k275)",
+        "referred_dataset": "Dryad Digital Repository (DOI:10.5061/dryad.4k275); MODIS / NSIDC (MODIS Terra 8-day 500 m snow/ice product)",
         "time_series": true,
         "multispecies": false,
         "threatened_species": null,
         "new_species_science": null,
         "new_species_region": null,
-        "bias_north_south": null,
+        "bias_north_south": true,
         "valid_yn": "yes",
         "reason_not_valid": null
       }
@@ -778,42 +758,40 @@
       "input_text": null,
       "extraction_method": "pdf_native",
       "usage_cost": {
-        "input_tokens": 23468,
-        "cached_tokens": 23296,
-        "reasoning_tokens": 1088,
-        "output_tokens": 1352,
-        "input_cost": 0.0,
-        "cache_cost": 0.0006,
-        "reasoning_cost": 0.0022,
-        "output_cost": 0.0027,
-        "total_cost": 0.0055
+        "input_tokens": 25743,
+        "cached_tokens": 2688,
+        "reasoning_tokens": 1536,
+        "output_tokens": 1692,
+        "input_cost": 0.0058,
+        "cache_cost": 0.0001,
+        "reasoning_cost": 0.0031,
+        "output_cost": 0.0034,
+        "total_cost": 0.0124
       },
       "output": {
         "data_type": [
           "abundance",
           "genetic_analysis",
-          "time_series",
           "traits"
         ],
         "geospatial_info_dataset": [
-          "sample",
           "site",
-          "administrative_units"
+          "maps"
         ],
         "spatial_range_km2": null,
-        "temporal_range": "2002–2005 (adult returns sampled 2002–2004; fry sampled summers 2003–2005)",
+        "temporal_range": "2002 to 2005",
         "temp_range_i": 2002,
         "temp_range_f": 2005,
         "species": [
           "Atlantic salmon (Salmo salar)"
         ],
-        "referred_dataset": "Dryad doi:10.5061/dryad.4k739",
-        "time_series": true,
+        "referred_dataset": "Dryad: doi:10.5061/dryad.4k739",
+        "time_series": null,
         "multispecies": false,
         "threatened_species": null,
         "new_species_science": null,
         "new_species_region": null,
-        "bias_north_south": null,
+        "bias_north_south": false,
         "valid_yn": "yes",
         "reason_not_valid": null
       }
@@ -830,47 +808,53 @@
       "input_text": null,
       "extraction_method": "pdf_native",
       "usage_cost": {
-        "input_tokens": 33525,
-        "cached_tokens": 0,
-        "reasoning_tokens": 1856,
-        "output_tokens": 2134,
-        "input_cost": 0.0084,
-        "cache_cost": 0.0,
-        "reasoning_cost": 0.0037,
-        "output_cost": 0.0043,
-        "total_cost": 0.0164
+        "input_tokens": 38335,
+        "cached_tokens": 2688,
+        "reasoning_tokens": 2048,
+        "output_tokens": 2422,
+        "input_cost": 0.0089,
+        "cache_cost": 0.0001,
+        "reasoning_cost": 0.0041,
+        "output_cost": 0.0048,
+        "total_cost": 0.0179
       },
       "output": {
         "data_type": [
+          "abundance",
           "genetic_analysis",
           "traits",
-          "abundance",
-          "presence-absence",
-          "time_series",
           "ecosystem_structure"
         ],
         "geospatial_info_dataset": [
-          "site",
           "sample",
-          "administrative_units",
+          "site",
           "maps"
         ],
         "spatial_range_km2": 1.36,
-        "temporal_range": "2009 to 2011",
-        "temp_range_i": 2009,
+        "temporal_range": "2007 and 2009–2011",
+        "temp_range_i": 2007,
         "temp_range_f": 2011,
         "species": [
           "Populus balsamifera",
           "Populus deltoides",
-          "Populus deltoides × Populus balsamifera (native hybrids)"
+          "Populus (native hybrids, D × B)",
+          "Populus nigra",
+          "Populus maximowiczii",
+          "Populus laurifolia",
+          "Populus trichocarpa",
+          "Populus angustifolia",
+          "Populus fremontii",
+          "Melampsora larici-populina",
+          "Melampsora medusae f. sp. deltoidae",
+          "Melampsora occidentalis"
         ],
-        "referred_dataset": "Dryad data repository: doi:10.5061/dryad.63fr7",
-        "time_series": true,
+        "referred_dataset": "Dryad data repository (doi:10.5061/dryad.63fr7)",
+        "time_series": false,
         "multispecies": true,
-        "threatened_species": null,
-        "new_species_science": null,
-        "new_species_region": null,
-        "bias_north_south": null,
+        "threatened_species": false,
+        "new_species_science": false,
+        "new_species_region": false,
+        "bias_north_south": false,
         "valid_yn": "yes",
         "reason_not_valid": null
       }
@@ -887,50 +871,51 @@
       "input_text": null,
       "extraction_method": "pdf_native",
       "usage_cost": {
-        "input_tokens": 36034,
-        "cached_tokens": 0,
-        "reasoning_tokens": 1856,
-        "output_tokens": 2186,
-        "input_cost": 0.009,
-        "cache_cost": 0.0,
-        "reasoning_cost": 0.0037,
-        "output_cost": 0.0044,
-        "total_cost": 0.0171
+        "input_tokens": 53016,
+        "cached_tokens": 2688,
+        "reasoning_tokens": 2240,
+        "output_tokens": 2723,
+        "input_cost": 0.0126,
+        "cache_cost": 0.0001,
+        "reasoning_cost": 0.0045,
+        "output_cost": 0.0054,
+        "total_cost": 0.0226
       },
       "output": {
         "data_type": [
           "abundance",
-          "presence-absence",
-          "species_richness"
+          "presence-absence"
         ],
         "geospatial_info_dataset": [
           "site",
-          "site_ids",
           "maps",
-          "administrative_units"
+          "site_ids"
         ],
         "spatial_range_km2": null,
-        "temporal_range": "2007 to 2011 (small mammals sampled June–September 2007 and June–September 2011; beetles sampled 30 May–21 August 2011)",
+        "temporal_range": "Small mammal sampling: June–September 2007 and June–September 2011; Beetle sampling: 30 May–21 August 2011",
         "temp_range_i": 2007,
         "temp_range_f": 2011,
         "species": [
-          "Tamiasciurus hudsonicus",
-          "Tamias striatus",
-          "Sorex spp.",
-          "Peromiscus maniculatus",
-          "Myodes gapperi",
-          "Microtus chrotorrhinus",
-          "Synaptomys cooperi",
-          "ground-dwelling beetles (3894 individuals, 199 species collected; 58 species used in analyses)",
-          "flying beetles (2411 individuals, 240 species collected; 48 species used in analyses)"
+          "red-backed voles, Myodes gapperi",
+          "red squirrel (Tamiasciurus hudsonicus)",
+          "eastern chipmunk (Tamias striatus)",
+          "shrews (Sorex spp.)",
+          "deer mouse (Peromiscus maniculatus)",
+          "lemming and rock vole category: rock vole (Microtus chrotorrhinus) and southern bog lemming (Synaptomys cooperi)",
+          "ground-dwelling beetles (3894 individuals, 199 species or morphospecies; 58 species used in analyses)",
+          "flying beetles (2411 individuals, 240 species or morphospecies; 48 species used in analyses)",
+          "black spruce (Picea mariana)",
+          "balsam fir (Abies balsamea)",
+          "paper birch (Betula papyrifera)",
+          "trembling aspen (Populus tremuloides)"
         ],
-        "referred_dataset": "Dryad dataset DOI: 10.5061/dryad.679s1dt; forest inventory: Eco-forestry Information System, Ministère des Ressources naturelles et de la Faune du Québec; forestry company records (Resolute Forest Products and Arbec Forest Products Inc.)",
-        "time_series": null,
+        "referred_dataset": "Eco-forestry Information System, Ministère des Ressources naturelles et de la Faune du Québec; forest company records (Resolute Forest Products, Arbec Forest Products Inc.)",
+        "time_series": false,
         "multispecies": true,
         "threatened_species": null,
         "new_species_science": null,
         "new_species_region": null,
-        "bias_north_south": null,
+        "bias_north_south": true,
         "valid_yn": "yes",
         "reason_not_valid": null
       }
@@ -947,39 +932,38 @@
       "input_text": null,
       "extraction_method": "pdf_native",
       "usage_cost": {
-        "input_tokens": 25022,
-        "cached_tokens": 23296,
-        "reasoning_tokens": 1984,
-        "output_tokens": 2278,
-        "input_cost": 0.0004,
-        "cache_cost": 0.0006,
-        "reasoning_cost": 0.004,
+        "input_tokens": 34185,
+        "cached_tokens": 2688,
+        "reasoning_tokens": 2048,
+        "output_tokens": 2319,
+        "input_cost": 0.0079,
+        "cache_cost": 0.0001,
+        "reasoning_cost": 0.0041,
         "output_cost": 0.0046,
-        "total_cost": 0.0096
+        "total_cost": 0.0167
       },
       "output": {
         "data_type": [
+          "traits",
           "abundance",
           "presence-absence",
-          "traits",
           "time_series"
         ],
         "geospatial_info_dataset": [
-          "sample",
           "site",
-          "administrative_units",
-          "site_ids"
+          "site_ids",
+          "geographic_features"
         ],
         "spatial_range_km2": 10200.0,
-        "temporal_range": "2005 to 2011 (breeding seasons monitored April–August each year)",
+        "temporal_range": "2005 to 2011",
         "temp_range_i": 2005,
         "temp_range_f": 2011,
         "species": [
-          "tree swallow (Tachycineta bicolor)"
+          "Tachycineta bicolor (tree swallow)"
         ],
         "referred_dataset": "Dryad Digital Repository: doi:10.5061/dryad.67t23",
         "time_series": true,
-        "multispecies": null,
+        "multispecies": false,
         "threatened_species": null,
         "new_species_science": null,
         "new_species_region": null,
@@ -1000,44 +984,43 @@
       "input_text": null,
       "extraction_method": "pdf_native",
       "usage_cost": {
-        "input_tokens": 23568,
-        "cached_tokens": 1664,
-        "reasoning_tokens": 1472,
-        "output_tokens": 1755,
-        "input_cost": 0.0055,
-        "cache_cost": 0.0,
-        "reasoning_cost": 0.0029,
-        "output_cost": 0.0035,
-        "total_cost": 0.0119
+        "input_tokens": 28416,
+        "cached_tokens": 2688,
+        "reasoning_tokens": 1152,
+        "output_tokens": 1392,
+        "input_cost": 0.0064,
+        "cache_cost": 0.0001,
+        "reasoning_cost": 0.0023,
+        "output_cost": 0.0028,
+        "total_cost": 0.0116
       },
       "output": {
         "data_type": [
-          "traits",
-          "density",
-          "presence-absence",
           "time_series",
-          "abundance"
+          "abundance",
+          "presence-absence",
+          "traits"
         ],
         "geospatial_info_dataset": [
           "site",
           "sample",
           "maps",
-          "administrative_units"
+          "site_ids"
         ],
         "spatial_range_km2": 10200.0,
-        "temporal_range": "2004 to 2013",
+        "temporal_range": "from 2004 to 2013",
         "temp_range_i": 2004,
         "temp_range_f": 2013,
         "species": [
-          "tree swallow (Tachycineta bicolor)"
+          "Tachycineta bicolor (tree swallow)"
         ],
-        "referred_dataset": "Data available from the Dryad Digital Repository: http://dx.doi.org/10.5061/dryad.87jb3",
+        "referred_dataset": "Dryad Digital Repository: http://dx.doi.org/10.5061/dryad.87jb3",
         "time_series": true,
         "multispecies": false,
-        "threatened_species": null,
-        "new_species_science": null,
-        "new_species_region": null,
-        "bias_north_south": null,
+        "threatened_species": false,
+        "new_species_science": false,
+        "new_species_region": false,
+        "bias_north_south": false,
         "valid_yn": "yes",
         "reason_not_valid": null
       }
@@ -1049,52 +1032,56 @@
       "status": "success",
       "error_message": null,
       "title": "Data from: Threshold dynamics in plant succession after tree planting in agricultural riparian zones",
-      "abstract": "Data from: Threshold dynamics in plant succession after tree planting in agricultural riparian zones  Trajectories of plant communities can be described by different models of plant succession. While a Clementsian (gradual continuum model) or Gleasonian approach (relay floristics model) has traditionally been used to inform restoration outcomes, alternative succession models developed recently may better represent restoration trajectories. The threshold dynamics succession model, which predicts an abrupt species turnover after an environmental threshold is crossed, has never been used in a restoration context. This model might, however, better describe shifts in plant competitive ranking and facilitation interactions during species turnover._x000D_\nFifty-three riparian zones, planted with trees 3–17 years prior to sampling, and 14 natural riparian forests were studied in two agricultural watersheds of south-eastern Québec (Canada). The cover of vegetation strata was assessed at the site scale, and the cover of plant species was estimated in a total of 784 1-m2 plots. Canopy cover was measured stereoscopically for each plot._x000D_\nAs revealed by Principal Response Curves and broken stick models, herbaceous species composition was stable during the first 12–13 years after tree planting, but then abruptly shifted. This two-step pattern in species turnover followed the increase in canopy cover after tree planting. Once canopy cover passed a threshold of ca 40%, plant succession started and led to the re-establishment of forest communities 17 years after planting._x000D_\nFollowing herbaceous species turnover, the cover of ecological groups changed significantly towards covers of natural riparian forests: shade-tolerant species generally increased, while light-demanding and non-native species decreased. Vegetation structure was also significantly affected by tree planting: tree and shrub cover increased, while monocot cover decreased._x000D_\nSynthesis and applications. Tree planting efficiently restored herbaceous forest communities in riparian zones by inducing a species turnover mediated by light availability corresponding to the threshold dynamics model in plant succession. Fostering and monitoring canopy closure in tree-planted riparian zones should improve restoration success and the design of alternative strategies. The innovative statistical approach of this study aiming to identify succession patterns and their associated theoretical models can guide future restoration in any type of ecosystem around the world to bridge the gap between science and management. <div class=\"o-metadata__file-usage-entry\">Data_Bourgeois_et_al_2016_JApplEcol<div class=\"o-metadata__file-name\"></div></div> Succession models; Vegetation recovery; Herbaceous communities; Canopy cover; riparian zones; Agricultural landscapes",
+      "abstract": "Data from: Threshold dynamics in plant succession after tree planting in agricultural riparian zones  Trajectories of plant communities can be described by different models of plant succession. While a Clementsian (gradual continuum model) or Gleasonian approach (relay floristics model) has traditionally been used to inform restoration outcomes, alternative succession models developed recently may better represent restoration trajectories. The threshold dynamics succession model, which predicts an abrupt species turnover after an environmental threshold is crossed, has never been used in a restoration context. This model might, however, better describe shifts in plant competitive ranking and facilitation interactions during species turnover._x000D_\r\nFifty-three riparian zones, planted with trees 3–17 years prior to sampling, and 14 natural riparian forests were studied in two agricultural watersheds of south-eastern Québec (Canada). The cover of vegetation strata was assessed at the site scale, and the cover of plant species was estimated in a total of 784 1-m2 plots. Canopy cover was measured stereoscopically for each plot._x000D_\r\nAs revealed by Principal Response Curves and broken stick models, herbaceous species composition was stable during the first 12–13 years after tree planting, but then abruptly shifted. This two-step pattern in species turnover followed the increase in canopy cover after tree planting. Once canopy cover passed a threshold of ca 40%, plant succession started and led to the re-establishment of forest communities 17 years after planting._x000D_\r\nFollowing herbaceous species turnover, the cover of ecological groups changed significantly towards covers of natural riparian forests: shade-tolerant species generally increased, while light-demanding and non-native species decreased. Vegetation structure was also significantly affected by tree planting: tree and shrub cover increased, while monocot cover decreased._x000D_\r\nSynthesis and applications. Tree planting efficiently restored herbaceous forest communities in riparian zones by inducing a species turnover mediated by light availability corresponding to the threshold dynamics model in plant succession. Fostering and monitoring canopy closure in tree-planted riparian zones should improve restoration success and the design of alternative strategies. The innovative statistical approach of this study aiming to identify succession patterns and their associated theoretical models can guide future restoration in any type of ecosystem around the world to bridge the gap between science and management. <div class=\"o-metadata__file-usage-entry\">Data_Bourgeois_et_al_2016_JApplEcol<div class=\"o-metadata__file-name\"></div></div> Succession models; Vegetation recovery; Herbaceous communities; Canopy cover; riparian zones; Agricultural landscapes",
       "pdf_path": "data\\pdfs\\fuster\\10.1111_1365-2664.12675.pdf",
       "input_text": null,
       "extraction_method": "pdf_native",
       "usage_cost": {
-        "input_tokens": 20390,
-        "cached_tokens": 1664,
-        "reasoning_tokens": 1984,
-        "output_tokens": 2434,
-        "input_cost": 0.0047,
-        "cache_cost": 0.0,
-        "reasoning_cost": 0.004,
-        "output_cost": 0.0049,
-        "total_cost": 0.0136
+        "input_tokens": 26560,
+        "cached_tokens": 2688,
+        "reasoning_tokens": 2432,
+        "output_tokens": 2863,
+        "input_cost": 0.006,
+        "cache_cost": 0.0001,
+        "reasoning_cost": 0.0049,
+        "output_cost": 0.0057,
+        "total_cost": 0.0167
       },
       "output": {
         "data_type": [
           "abundance",
-          "ecosystem_structure",
-          "species_richness"
+          "ecosystem_structure"
         ],
         "geospatial_info_dataset": [
-          "sample",
           "site",
-          "administrative_units",
-          "site_ids"
+          "site_ids",
+          "maps"
         ],
         "spatial_range_km2": 259.0,
-        "temporal_range": "Sampling conducted summer 2012; chronosequence of sites planted 3–17 years prior (tree-planting projects conducted 1995–2009).",
+        "temporal_range": "Sampling in summer 2012; tree plantings occurred 1995–2009 producing a chronosequence of 3–17 years since planting",
         "temp_range_i": 1995,
-        "temp_range_f": 2009,
+        "temp_range_f": 2012,
         "species": [
-          "203 herbaceous species inventoried across 784 1-m2 plots (see Appendix S4)",
-          "Bromus inermis L.",
-          "Phalaris arundinacea L.",
-          "Equisetum arvense L.",
-          "Artemisia vulgaris L.",
-          "Solidago canadensis L.",
-          "Dryopteris carthusiana (Vill.) H.P. Fuchs",
-          "Athyrium filix-femina (L.) Roth",
-          "Trillium erectum L.",
-          "Rubus pubescens Raf.",
-          "Agrimonia striata Michx.",
-          "Fragaria virginiana Duchesne",
-          "Onoclea sensibilis L.",
-          "Solidago rugosa Mill."
+          "Fraxinus pennsylvanica",
+          "Acer saccharum",
+          "Picea glauca",
+          "Larix laricina",
+          "Quercus rubra",
+          "Quercus macrocarpa",
+          "Bromus inermis",
+          "Phalaris arundinacea",
+          "Equisetum arvense",
+          "Artemisia vulgaris",
+          "Solidago canadensis",
+          "Dryopteris carthusiana",
+          "Athyrium filix-femina",
+          "Trillium erectum",
+          "Rubus pubescens",
+          "Agrimonia striata",
+          "Fragaria virginiana",
+          "Onoclea sensibilis",
+          "Solidago rugosa",
+          "Thalictrum pubescens"
         ],
         "referred_dataset": "Dryad Digital Repository doi:10.5061/dryad.b46k4 (Bourgeois et al. 2016)",
         "time_series": false,
@@ -1102,7 +1089,7 @@
         "threatened_species": null,
         "new_species_science": null,
         "new_species_region": null,
-        "bias_north_south": null,
+        "bias_north_south": false,
         "valid_yn": "yes",
         "reason_not_valid": null
       }
@@ -1119,52 +1106,45 @@
       "input_text": null,
       "extraction_method": "pdf_native",
       "usage_cost": {
-        "input_tokens": 39063,
-        "cached_tokens": 32384,
-        "reasoning_tokens": 1536,
-        "output_tokens": 1859,
-        "input_cost": 0.0017,
-        "cache_cost": 0.0008,
-        "reasoning_cost": 0.0031,
-        "output_cost": 0.0037,
-        "total_cost": 0.0093
+        "input_tokens": 48785,
+        "cached_tokens": 2688,
+        "reasoning_tokens": 1152,
+        "output_tokens": 1473,
+        "input_cost": 0.0115,
+        "cache_cost": 0.0001,
+        "reasoning_cost": 0.0023,
+        "output_cost": 0.0029,
+        "total_cost": 0.0168
       },
       "output": {
         "data_type": [
           "time_series",
-          "presence-only",
-          "traits",
-          "distribution",
-          "presence-absence",
-          "traits",
-          "other",
-          "abundance",
-          "distribution"
+          "presence-only"
         ],
         "geospatial_info_dataset": [
           "sample",
           "site",
+          "site_ids",
           "maps",
-          "geographic_features",
-          "administrative_units",
-          "range"
+          "distribution",
+          "geographic_features"
         ],
         "spatial_range_km2": 33900.0,
-        "temporal_range": "March 2005 to March 2009 (caribou and wolves); March 2005 to March 2008 (moose). Analyses focused on winter (1 December to 31 March).",
+        "temporal_range": "March 2005 to March 2009 (winter seasons; moose data to March 2008)",
         "temp_range_i": 2005,
         "temp_range_f": 2009,
         "species": [
-          "Rangifer tarandus caribou",
-          "Alces alces",
-          "Canis lupus"
+          "Rangifer tarandus caribou (caribou)",
+          "Alces alces (moose)",
+          "Canis lupus (wolf)"
         ],
-        "referred_dataset": "Dryad data repository: http://dx.doi.org/10.5061/dryad.h65f4 (data associated with this paper). Also used Landsat TM image (year 2000) from Natural Resources Canada Canadian Forest Service and DEM and forest-company road/cut updates provided by MRNFQ/local companies (as described in paper).",
+        "referred_dataset": "Dryad repository DOI: 10.5061/dryad.h65f4",
         "time_series": true,
         "multispecies": true,
         "threatened_species": true,
-        "new_species_science": null,
-        "new_species_region": null,
-        "bias_north_south": null,
+        "new_species_science": false,
+        "new_species_region": false,
+        "bias_north_south": true,
         "valid_yn": "yes",
         "reason_not_valid": null
       }
@@ -1181,24 +1161,24 @@
       "input_text": null,
       "extraction_method": "pdf_native",
       "usage_cost": {
-        "input_tokens": 34615,
-        "cached_tokens": 1664,
-        "reasoning_tokens": 1408,
-        "output_tokens": 1716,
-        "input_cost": 0.0082,
-        "cache_cost": 0.0,
-        "reasoning_cost": 0.0028,
-        "output_cost": 0.0034,
-        "total_cost": 0.0144
+        "input_tokens": 39535,
+        "cached_tokens": 2688,
+        "reasoning_tokens": 1664,
+        "output_tokens": 1886,
+        "input_cost": 0.0092,
+        "cache_cost": 0.0001,
+        "reasoning_cost": 0.0033,
+        "output_cost": 0.0038,
+        "total_cost": 0.0164
       },
       "output": {
         "data_type": [
-          "genetic_analysis",
-          "time_series"
+          "genetic_analysis"
         ],
         "geospatial_info_dataset": [
           "site",
           "site_ids",
+          "administrative_units",
           "maps"
         ],
         "spatial_range_km2": null,
@@ -1206,17 +1186,16 @@
         "temp_range_i": 2009,
         "temp_range_f": 2011,
         "species": [
-          "Myotis lucifugus (little brown bat); tissue samples collected from 768 adults and 174 young-of-the-year (YOY)",
-          "mtDNA control region sequenced for 356 individuals",
-          "Microsatellite genotypes obtained for 735 adults and 168 YOY (successfully genotyped at ≥7 of 9 loci)"
+          "Myotis lucifugus",
+          "little brown bat"
         ],
-        "referred_dataset": "Dryad Digital Repository: http://doi.org/10.5061/dryad.hs37s",
-        "time_series": true,
+        "referred_dataset": null,
+        "time_series": null,
         "multispecies": false,
         "threatened_species": null,
-        "new_species_science": null,
-        "new_species_region": null,
-        "bias_north_south": null,
+        "new_species_science": false,
+        "new_species_region": false,
+        "bias_north_south": false,
         "valid_yn": "yes",
         "reason_not_valid": null
       }
@@ -1233,42 +1212,41 @@
       "input_text": null,
       "extraction_method": "pdf_native",
       "usage_cost": {
-        "input_tokens": 26703,
-        "cached_tokens": 25344,
-        "reasoning_tokens": 1344,
-        "output_tokens": 1680,
-        "input_cost": 0.0003,
-        "cache_cost": 0.0006,
-        "reasoning_cost": 0.0027,
-        "output_cost": 0.0034,
-        "total_cost": 0.007
+        "input_tokens": 35197,
+        "cached_tokens": 2688,
+        "reasoning_tokens": 1472,
+        "output_tokens": 1745,
+        "input_cost": 0.0081,
+        "cache_cost": 0.0001,
+        "reasoning_cost": 0.0029,
+        "output_cost": 0.0035,
+        "total_cost": 0.0146
       },
       "output": {
         "data_type": [
-          "traits",
-          "time_series",
-          "other"
+          "time_series"
         ],
         "geospatial_info_dataset": [
           "sample",
-          "site",
-          "administrative_units",
-          "maps"
+          "site_ids",
+          "maps",
+          "geographic_features"
         ],
         "spatial_range_km2": 31000.0,
-        "temporal_range": "2004–2010 (data collected between 2004 and 2010)",
+        "temporal_range": "2004 to 2010",
         "temp_range_i": 2004,
         "temp_range_f": 2010,
         "species": [
-          "49 female caribou (woodland caribou, Rangifer tarandus caribou)"
+          "Rangifer tarandus caribou",
+          "woodland caribou"
         ],
-        "referred_dataset": "Dryad Digital Repository: http://dx.doi.org/10.5061/dryad.n3c2f; Ecoforest maps from Ministe`re des Ressources naturelles et de la Faune (MRNF) used for habitat layers",
+        "referred_dataset": "Ecoforest maps provided by the Ministère des Ressources naturelles et de la Faune (MRNF) updated annually; primary dataset archived on Dryad (doi:10.5061/dryad.n3c2f)",
         "time_series": true,
         "multispecies": false,
         "threatened_species": true,
         "new_species_science": false,
         "new_species_region": false,
-        "bias_north_south": null,
+        "bias_north_south": true,
         "valid_yn": "yes",
         "reason_not_valid": null
       }
@@ -1285,43 +1263,41 @@
       "input_text": null,
       "extraction_method": "pdf_native",
       "usage_cost": {
-        "input_tokens": 18713,
-        "cached_tokens": 18048,
-        "reasoning_tokens": 1728,
-        "output_tokens": 2063,
-        "input_cost": 0.0002,
-        "cache_cost": 0.0005,
-        "reasoning_cost": 0.0035,
-        "output_cost": 0.0041,
-        "total_cost": 0.0083
+        "input_tokens": 23639,
+        "cached_tokens": 2688,
+        "reasoning_tokens": 2048,
+        "output_tokens": 2396,
+        "input_cost": 0.0052,
+        "cache_cost": 0.0001,
+        "reasoning_cost": 0.0041,
+        "output_cost": 0.0048,
+        "total_cost": 0.0142
       },
       "output": {
         "data_type": [
-          "distribution",
-          "density",
-          "time_series"
+          "distribution"
         ],
         "geospatial_info_dataset": [
           "maps",
-          "sample",
-          "site",
-          "range"
+          "distribution",
+          "range",
+          "geographic_features",
+          "site"
         ],
         "spatial_range_km2": 25000.0,
-        "temporal_range": "VHF telemetry 1998–2001; additional GPS telemetry (dates not specified); simulations are 4-year runs and scenarios represent conditions to 2080.",
+        "temporal_range": "Telemetry: 1998–2001 (VHF); scenario landscapes projected to 2080; simulations were 4-year runs (simulated data aggregated over last 3 years)",
         "temp_range_i": 1998,
         "temp_range_f": 2080,
         "species": [
-          "Rangifer tarandus caribou",
-          "Atlantic-Gaspésie caribou"
+          "Rangifer tarandus caribou (Atlantic-Gaspésie caribou)"
         ],
-        "referred_dataset": "Habitat quality raster layers for the 24 scenarios available at DRYAD (https://doi.org/10.5061/dryad.n726pq6). Model source code: SpaDES module (https://github.com/PredictiveEcology/SpaDES-modules/tree/master/modules/caribou2Movements). Ecoforestry maps and road database: Ministère des Forêts, de la Faune et des Parcs du Québec. Caribou telemetry data provided by Université du Québec à Rimouski.",
-        "time_series": true,
+        "referred_dataset": "Habitat quality raster layers for 24 scenarios (DRYAD: https://doi.org/10.5061/dryad.n726pq6); ecoforestry maps and road database from Ministère des Forêts, de la Faune et des Parcs du Québec (MFFP); caribou telemetry data provided by Université du Québec à Rimouski.",
+        "time_series": false,
         "multispecies": false,
         "threatened_species": true,
         "new_species_science": false,
         "new_species_region": false,
-        "bias_north_south": null,
+        "bias_north_south": false,
         "valid_yn": "yes",
         "reason_not_valid": null
       }
@@ -1338,44 +1314,44 @@
       "input_text": null,
       "extraction_method": "pdf_native",
       "usage_cost": {
-        "input_tokens": 24639,
-        "cached_tokens": 23168,
-        "reasoning_tokens": 1024,
-        "output_tokens": 1293,
-        "input_cost": 0.0004,
-        "cache_cost": 0.0006,
-        "reasoning_cost": 0.002,
-        "output_cost": 0.0026,
-        "total_cost": 0.0056
+        "input_tokens": 33802,
+        "cached_tokens": 2688,
+        "reasoning_tokens": 1600,
+        "output_tokens": 1799,
+        "input_cost": 0.0078,
+        "cache_cost": 0.0001,
+        "reasoning_cost": 0.0032,
+        "output_cost": 0.0036,
+        "total_cost": 0.0147
       },
       "output": {
         "data_type": [
           "genetic_analysis",
           "presence-only",
-          "time_series",
-          "distribution"
+          "distribution",
+          "time_series"
         ],
         "geospatial_info_dataset": [
           "sample",
           "site",
           "range",
-          "maps",
-          "administrative_units"
+          "maps"
         ],
         "spatial_range_km2": 1365000.0,
-        "temporal_range": null,
+        "temporal_range": "Daily models across the annual cycle (Julian days 1–365); habitat suitability maps produced per Julian day",
         "temp_range_i": null,
         "temp_range_f": null,
         "species": [
-          "Rangifer tarandus (caribou) — including migratory tundra, mountain and forest-dwelling (sedentary) ecotypes"
+          "Rangifer tarandus",
+          "caribou"
         ],
-        "referred_dataset": "Dryad repository DOI:10.5061/dryad.qn1cj",
+        "referred_dataset": "doi:10.5061/dryad.qn1cj",
         "time_series": true,
         "multispecies": false,
         "threatened_species": null,
         "new_species_science": null,
         "new_species_region": null,
-        "bias_north_south": null,
+        "bias_north_south": true,
         "valid_yn": "yes",
         "reason_not_valid": null
       }
@@ -1392,34 +1368,29 @@
       "input_text": null,
       "extraction_method": "pdf_native",
       "usage_cost": {
-        "input_tokens": 31375,
-        "cached_tokens": 29312,
-        "reasoning_tokens": 1920,
-        "output_tokens": 2271,
-        "input_cost": 0.0005,
-        "cache_cost": 0.0007,
-        "reasoning_cost": 0.0038,
-        "output_cost": 0.0045,
-        "total_cost": 0.0095
+        "input_tokens": 42419,
+        "cached_tokens": 0,
+        "reasoning_tokens": 1728,
+        "output_tokens": 2070,
+        "input_cost": 0.0106,
+        "cache_cost": 0.0,
+        "reasoning_cost": 0.0035,
+        "output_cost": 0.0041,
+        "total_cost": 0.0182
       },
       "output": {
         "data_type": [
-          "abundance",
-          "density",
-          "presence-absence",
-          "distribution",
-          "traits",
-          "ecosystem_structure"
+          "abundance"
         ],
         "geospatial_info_dataset": [
-          "sample",
           "site",
           "site_ids",
+          "geographic_features",
           "administrative_units"
         ],
         "spatial_range_km2": 35.0,
-        "temporal_range": "Sites harvested in 1992; field sampling / inventory conducted summer 1997 (50 plots of 4 m2 in each of 19 sites); growth measurements include 1996-1997; short-term projections made for 1997-2002.",
-        "temp_range_i": 1997,
+        "temporal_range": "Primary field sampling in 1997 (sites were harvested in 1992). Growth increment data refer to 1996–1997; short-term projections made to 2002.",
+        "temp_range_i": 1996,
         "temp_range_f": 1997,
         "species": [
           "Abies balsamea",
@@ -1437,11 +1408,11 @@
         "referred_dataset": null,
         "time_series": false,
         "multispecies": true,
-        "threatened_species": null,
-        "new_species_science": null,
-        "new_species_region": null,
-        "bias_north_south": null,
-        "valid_yn": null,
+        "threatened_species": false,
+        "new_species_science": false,
+        "new_species_region": false,
+        "bias_north_south": false,
+        "valid_yn": "yes",
         "reason_not_valid": null
       }
     },
@@ -1457,33 +1428,29 @@
       "input_text": null,
       "extraction_method": "pdf_native",
       "usage_cost": {
-        "input_tokens": 20267,
-        "cached_tokens": 19072,
-        "reasoning_tokens": 1472,
-        "output_tokens": 1857,
-        "input_cost": 0.0003,
-        "cache_cost": 0.0005,
-        "reasoning_cost": 0.0029,
-        "output_cost": 0.0037,
-        "total_cost": 0.0074
+        "input_tokens": 26457,
+        "cached_tokens": 2688,
+        "reasoning_tokens": 2048,
+        "output_tokens": 2388,
+        "input_cost": 0.0059,
+        "cache_cost": 0.0001,
+        "reasoning_cost": 0.0041,
+        "output_cost": 0.0048,
+        "total_cost": 0.0149
       },
       "output": {
         "data_type": [
-          "presence-absence",
           "abundance",
-          "traits",
-          "time_series",
-          "other"
+          "presence-absence",
+          "traits"
         ],
         "geospatial_info_dataset": [
           "site",
-          "sample",
           "site_ids",
-          "maps",
-          "administrative_units"
+          "maps"
         ],
         "spatial_range_km2": null,
-        "temporal_range": "2011–2012 (respirometry trials: May 30–June 13, 2011; swimming performance and blood physiology experiments: April 22–May 25, 2012; PIT-tag monitoring and passage data: May 14–July 10, 2012; tagging events: May 5–14 and May 24–25, 2012)",
+        "temporal_range": "Respirometry: May 30–June 13, 2011; Swimming and blood physiology experiments: April 22–May 25, 2012; Tagging: May 5–14 (silver & shorthead) and May 24–25 (river) 2012; Fishway monitoring: May 14–July 10, 2012.",
         "temp_range_i": 2011,
         "temp_range_f": 2012,
         "species": [
@@ -1491,12 +1458,12 @@
           "Moxostoma carinatum",
           "Moxostoma macrolepidotum"
         ],
-        "referred_dataset": "Quebec Ministère des Ressources Naturelles et de la Faune (unpublished data); 2010 passage data referenced from Thiem et al. (2013)",
-        "time_series": true,
+        "referred_dataset": null,
+        "time_series": null,
         "multispecies": true,
-        "threatened_species": false,
-        "new_species_science": false,
-        "new_species_region": false,
+        "threatened_species": null,
+        "new_species_science": null,
+        "new_species_region": null,
         "bias_north_south": null,
         "valid_yn": "yes",
         "reason_not_valid": null
@@ -1514,15 +1481,15 @@
       "input_text": null,
       "extraction_method": "pdf_native",
       "usage_cost": {
-        "input_tokens": 30600,
-        "cached_tokens": 29312,
-        "reasoning_tokens": 2048,
-        "output_tokens": 2566,
-        "input_cost": 0.0003,
-        "cache_cost": 0.0007,
-        "reasoning_cost": 0.0041,
-        "output_cost": 0.0051,
-        "total_cost": 0.0102
+        "input_tokens": 35526,
+        "cached_tokens": 2688,
+        "reasoning_tokens": 1536,
+        "output_tokens": 2008,
+        "input_cost": 0.0082,
+        "cache_cost": 0.0001,
+        "reasoning_cost": 0.0031,
+        "output_cost": 0.004,
+        "total_cost": 0.0154
       },
       "output": {
         "data_type": [
@@ -1530,23 +1497,19 @@
           "density",
           "traits",
           "ecosystem_structure",
-          "ecosystem_function",
           "species_richness"
         ],
         "geospatial_info_dataset": [
           "sample",
           "site",
-          "site_ids",
           "maps",
-          "administrative_units",
-          "geographic_features"
+          "site_ids"
         ],
         "spatial_range_km2": null,
-        "temporal_range": "Benthic sampling: July 2017; heavy metal concentration values interpolated from measurements in 2014 and 2016",
-        "temp_range_i": 2014,
+        "temporal_range": "July 2017 (benthic sampling); heavy metal concentrations interpolated from 2014 and 2016 data",
+        "temp_range_i": 2017,
         "temp_range_f": 2017,
         "species": [
-          "132 taxa (8 phyla)",
           "Micronephthys neotena",
           "Eudorellopsis integra",
           "Protomedeia grandimana",
@@ -1568,13 +1531,13 @@
           "Quasimelita formosa",
           "Quasimelita quadrispinosa"
         ],
-        "referred_dataset": "Heavy metal concentration values from Carrière (2018) Observatoire de la Baie de Sept Îles database; interpolated values (Inverse Distance Weighting). Data availability: Dataverse (CHONE2) https://dataverse.scholarsportal.info/dataverse/chone2 doi:10.5683/SP2/WDDDMI",
-        "time_series": null,
+        "referred_dataset": "Carrière (2018) Observatoire de la Baie de Sept Îles database (heavy metal concentrations from 2014 and 2016) used for interpolation",
+        "time_series": false,
         "multispecies": true,
         "threatened_species": null,
         "new_species_science": null,
         "new_species_region": null,
-        "bias_north_south": null,
+        "bias_north_south": true,
         "valid_yn": "yes",
         "reason_not_valid": null
       }
@@ -1591,53 +1554,49 @@
       "input_text": null,
       "extraction_method": "pdf_native",
       "usage_cost": {
-        "input_tokens": 21214,
-        "cached_tokens": 20224,
+        "input_tokens": 26154,
+        "cached_tokens": 2688,
         "reasoning_tokens": 1728,
-        "output_tokens": 2037,
-        "input_cost": 0.0002,
-        "cache_cost": 0.0005,
+        "output_tokens": 2097,
+        "input_cost": 0.0059,
+        "cache_cost": 0.0001,
         "reasoning_cost": 0.0035,
-        "output_cost": 0.0041,
-        "total_cost": 0.0083
+        "output_cost": 0.0042,
+        "total_cost": 0.0137
       },
       "output": {
         "data_type": [
           "abundance",
           "presence-absence",
           "ecosystem_function",
-          "ecosystem_structure",
-          "species_richness",
-          "traits"
+          "species_richness"
         ],
         "geospatial_info_dataset": [
           "site",
-          "sample",
-          "administrative_units"
+          "maps"
         ],
         "spatial_range_km2": null,
-        "temporal_range": "from May 14, 2011 to September 4, 2011",
+        "temporal_range": "May 14, 2011 to September 4, 2011",
         "temp_range_i": 2011,
         "temp_range_f": 2011,
         "species": [
           "Fucus distichus edentatus",
           "Fucus vesiculosus",
-          "Mytilus spp.",
-          "Mytilus edulis",
-          "Mytilus trossulus",
-          "Ralfsia clavata",
+          "Mytilus spp. (Mytilus edulis, M. trossulus, and hybrids)",
+          "Ralfsia clavata (encrusting alga)",
           "Gammarus spp.",
           "Lacuna vincta",
           "Margarites helicinus",
-          "Polychaeta"
+          "Polychaeta (various)",
+          "Additional 45 associated species reported (13 algae, 32 animals) as per Table S1"
         ],
-        "referred_dataset": "St. Lawrence Global Observatory (SLGO.ca)",
-        "time_series": null,
+        "referred_dataset": null,
+        "time_series": false,
         "multispecies": true,
         "threatened_species": false,
         "new_species_science": false,
         "new_species_region": false,
-        "bias_north_south": null,
+        "bias_north_south": false,
         "valid_yn": "yes",
         "reason_not_valid": null
       }
@@ -1654,15 +1613,15 @@
       "input_text": null,
       "extraction_method": "pdf_native",
       "usage_cost": {
-        "input_tokens": 39845,
-        "cached_tokens": 38656,
-        "reasoning_tokens": 1088,
-        "output_tokens": 1337,
-        "input_cost": 0.0003,
-        "cache_cost": 0.001,
-        "reasoning_cost": 0.0022,
-        "output_cost": 0.0027,
-        "total_cost": 0.0062
+        "input_tokens": 47537,
+        "cached_tokens": 0,
+        "reasoning_tokens": 1472,
+        "output_tokens": 1784,
+        "input_cost": 0.0119,
+        "cache_cost": 0.0,
+        "reasoning_cost": 0.0029,
+        "output_cost": 0.0036,
+        "total_cost": 0.0184
       },
       "output": {
         "data_type": [
@@ -1672,23 +1631,22 @@
           "sample",
           "site",
           "site_ids",
-          "maps",
-          "geographic_features"
+          "maps"
         ],
         "spatial_range_km2": null,
         "temporal_range": null,
         "temp_range_i": null,
         "temp_range_f": null,
         "species": [
-          "Arctic Char (Salvelinus alpinus)"
+          "Salvelinus alpinus (Arctic Char) — 650 individuals from 23 sampling locations; mitochondrial sequences for subset (n = 10–34 per site); 18,112 filtered SNPs (GBS)"
         ],
-        "referred_dataset": "NCBI SRA BioProject PRJNA655216 (raw sequence reads); Salvelinus reference genome ASM291031v2 (NCBI RefSeq GCF_002910315.2) used for alignment",
-        "time_series": null,
+        "referred_dataset": "NCBI SRA Bioproject PRJNA655216 (raw sequences); reference genome Salvelinus sp. ASM291031v2 (NCBI RefSeq GCF_002910315.2)",
+        "time_series": false,
         "multispecies": false,
-        "threatened_species": false,
-        "new_species_science": false,
-        "new_species_region": false,
-        "bias_north_south": null,
+        "threatened_species": null,
+        "new_species_science": null,
+        "new_species_region": null,
+        "bias_north_south": true,
         "valid_yn": "yes",
         "reason_not_valid": null
       }
@@ -1705,34 +1663,31 @@
       "input_text": null,
       "extraction_method": "pdf_native",
       "usage_cost": {
-        "input_tokens": 19484,
-        "cached_tokens": 14976,
-        "reasoning_tokens": 1472,
-        "output_tokens": 1939,
-        "input_cost": 0.0011,
-        "cache_cost": 0.0004,
-        "reasoning_cost": 0.0029,
-        "output_cost": 0.0039,
-        "total_cost": 0.0083
+        "input_tokens": 28054,
+        "cached_tokens": 2688,
+        "reasoning_tokens": 2496,
+        "output_tokens": 2927,
+        "input_cost": 0.0063,
+        "cache_cost": 0.0001,
+        "reasoning_cost": 0.005,
+        "output_cost": 0.0059,
+        "total_cost": 0.0173
       },
       "output": {
         "data_type": [
           "abundance",
           "presence-absence",
-          "species_richness",
           "genetic_analysis",
-          "time_series",
-          "distribution",
-          "traits",
-          "other"
+          "species_richness",
+          "traits"
         ],
         "geospatial_info_dataset": [
           "site",
-          "site_ids",
-          "maps"
+          "maps",
+          "site_ids"
         ],
         "spatial_range_km2": null,
-        "temporal_range": "Weekly sampling over eight weeks in June–July 2011",
+        "temporal_range": "June–July 2011 (weekly visits for 8 weeks)",
         "temp_range_i": 2011,
         "temp_range_f": 2011,
         "species": [
@@ -1751,13 +1706,14 @@
           "Ischnura posita",
           "Ischnura verticalis",
           "Nehalennia gracilis",
-          "Nehalennia irene"
+          "Nehalennia irene",
+          "Arrenurus (water mites) - 15 OTUs"
         ],
-        "referred_dataset": "Odonata Central (Abbott 2007) used for geographic range estimates; Barcode of Life Database (BOLD) / Canadian Centre for DNA Barcoding for COI barcoding; GenBank accessions KJ709142-KJ709343 included.",
+        "referred_dataset": "Odonata Central (Abbott 2007) used for host range estimates; COI sequences submitted to GenBank (KJ709142-KJ709343); barcoding performed via BOLD/CCDB",
         "time_series": true,
         "multispecies": true,
         "threatened_species": null,
-        "new_species_science": false,
+        "new_species_science": null,
         "new_species_region": null,
         "bias_north_south": null,
         "valid_yn": "yes",
@@ -1776,45 +1732,42 @@
       "input_text": null,
       "extraction_method": "pdf_native",
       "usage_cost": {
-        "input_tokens": 17577,
-        "cached_tokens": 1664,
-        "reasoning_tokens": 1920,
-        "output_tokens": 2362,
-        "input_cost": 0.004,
-        "cache_cost": 0.0,
-        "reasoning_cost": 0.0038,
-        "output_cost": 0.0047,
-        "total_cost": 0.0125
+        "input_tokens": 22037,
+        "cached_tokens": 2688,
+        "reasoning_tokens": 1792,
+        "output_tokens": 2169,
+        "input_cost": 0.0048,
+        "cache_cost": 0.0001,
+        "reasoning_cost": 0.0036,
+        "output_cost": 0.0043,
+        "total_cost": 0.0128
       },
       "output": {
         "data_type": [
           "abundance",
-          "presence-absence",
-          "species_richness",
           "time_series"
         ],
         "geospatial_info_dataset": [
-          "sample",
           "site",
           "administrative_units"
         ],
-        "spatial_range_km2": 0.35,
-        "temporal_range": "Weekly sampling from 28 June to 28 September 1999; 12 July to 13 September 2000 (survey years 1999–2000).",
+        "spatial_range_km2": null,
+        "temporal_range": "Weekly sampling from 28 June–28 September 1999 and 12 July–13 September 2000 (sampling years 1999–2000).",
         "temp_range_i": 1999,
         "temp_range_f": 2000,
         "species": [
-          "Amblyseius fallacis (Garman)",
-          "Typhlodromus caudiglans Schuster",
-          "Agistemus fleschneri Summers",
-          "Anystis baccarum (L.)",
+          "Amblyseius fallacis",
+          "Typhlodromus caudiglans",
+          "Agistemus fleschneri",
+          "Anystis baccarum",
           "Balaustium sp.",
-          "Typhlodromus conspicuus (Garman)",
-          "Typhlodromus herbertae Chant",
-          "Typhlodromus longipilis Nesbitt",
-          "Typhlodromus bakeri (Garman)",
-          "Typhlodromus pyri Scheuten",
-          "Amblyseius okanagensis (Chant)",
-          "Amblyseius finlandicus (Oudemans)",
+          "Typhlodromus conspicuus",
+          "Typhlodromus herbertae",
+          "Typhlodromus longipilis",
+          "Typhlodromus bakeri",
+          "Typhlodromus pyri",
+          "Amblyseius okanagensis",
+          "Amblyseius finlandicus",
           "Phytoseius sp."
         ],
         "referred_dataset": null,
@@ -1840,15 +1793,15 @@
       "input_text": null,
       "extraction_method": "pdf_native",
       "usage_cost": {
-        "input_tokens": 15365,
-        "cached_tokens": 1664,
-        "reasoning_tokens": 1856,
-        "output_tokens": 2447,
-        "input_cost": 0.0034,
-        "cache_cost": 0.0,
-        "reasoning_cost": 0.0037,
-        "output_cost": 0.0049,
-        "total_cost": 0.012
+        "input_tokens": 18899,
+        "cached_tokens": 2688,
+        "reasoning_tokens": 1664,
+        "output_tokens": 2086,
+        "input_cost": 0.0041,
+        "cache_cost": 0.0001,
+        "reasoning_cost": 0.0033,
+        "output_cost": 0.0042,
+        "total_cost": 0.0117
       },
       "output": {
         "data_type": [
@@ -1856,22 +1809,14 @@
           "species_richness"
         ],
         "geospatial_info_dataset": [
-          "site",
-          "administrative_units"
+          "sample",
+          "site"
         ],
         "spatial_range_km2": null,
-        "temporal_range": "Pitfall traps operated between 5 and 12 July 2006 at two St. Jacques-de-Leeds sites and between 6 and 13 July 2006 at the other sites.",
+        "temporal_range": "5–13 July 2006",
         "temp_range_i": 2006,
         "temp_range_f": 2006,
         "species": [
-          "Histeridae",
-          "Hydrophilidae",
-          "Leiodidae",
-          "Ptilidae",
-          "Scarabaeidae",
-          "Silphidae",
-          "Staphylinidae",
-          "Trogidae",
           "Hister furtivus LeConte",
           "Margarinotus egregius (Casey)",
           "Margarinotus faedatus (LeConte)",
@@ -1892,18 +1837,15 @@
           "Nicrophorus orbicollis Say",
           "Nicrophorus pustulatus Herschel",
           "Nicrophorus sayi Laporte",
-          "Nicrophorus tomentosus Weber",
-          "Aphodius leopardus Horn",
-          "Aphodius rufipes L.",
-          "Nicrophorus americanus"
+          "Nicrophorus tomentosus Weber"
         ],
         "referred_dataset": null,
         "time_series": false,
         "multispecies": true,
-        "threatened_species": false,
-        "new_species_science": false,
-        "new_species_region": false,
-        "bias_north_south": null,
+        "threatened_species": null,
+        "new_species_science": null,
+        "new_species_region": null,
+        "bias_north_south": false,
         "valid_yn": "yes",
         "reason_not_valid": null
       }
@@ -1920,15 +1862,15 @@
       "input_text": null,
       "extraction_method": "pdf_native",
       "usage_cost": {
-        "input_tokens": 22320,
-        "cached_tokens": 21248,
-        "reasoning_tokens": 2240,
-        "output_tokens": 3043,
-        "input_cost": 0.0003,
-        "cache_cost": 0.0005,
-        "reasoning_cost": 0.0045,
-        "output_cost": 0.0061,
-        "total_cost": 0.0114
+        "input_tokens": 31368,
+        "cached_tokens": 2688,
+        "reasoning_tokens": 2176,
+        "output_tokens": 2832,
+        "input_cost": 0.0072,
+        "cache_cost": 0.0001,
+        "reasoning_cost": 0.0044,
+        "output_cost": 0.0057,
+        "total_cost": 0.0174
       },
       "output": {
         "data_type": [
@@ -1942,58 +1884,58 @@
           "site",
           "maps",
           "distribution",
-          "administrative_units"
+          "site_ids"
         ],
         "spatial_range_km2": 1600000.0,
-        "temporal_range": "Observations (bird sightings) 1980–2013; present climate baseline 1950–2000; future projections for 2050 (2041–2060) and 2070 (2061–2080).",
+        "temporal_range": "Bird observations: 1980–2013 (used for current models); climate baseline: 1950–2000; future projection periods: 2041–2060 (2050) and 2061–2080 (2070).",
         "temp_range_i": 1980,
         "temp_range_f": 2013,
         "species": [
-          "Setophaga ruticilla American Redstard",
-          "Setophaga castanea Bay-breasted Warbler",
-          "Poecile atricapillus Black-capped Chickadee",
-          "Poecile hudsonicus Boreal Chickadee",
-          "Melanitta americana Black Scoter",
-          "Mniotilta varia Black-and-white Warbler",
-          "Corvus corax Common Raven",
-          "Acanthis flammea Common Redpoll",
-          "Junco hyemalis Dark-eyed Junco",
-          "Hesperiphona vespertina Evening Grosbeak",
-          "Passerella iliaca Fox Sparrow",
-          "Regulus satrapa Golden-crowned Kinglet",
-          "Perisoreus canadensis Gray Jay",
-          "Melospiza lincolnii Lincoln’s Sparrow",
-          "Lanius excubitor Northern Shrike",
-          "Contopus cooperi Olive-sided Flycatcher",
-          "Haemorhous purpureus Purple Finch",
-          "Pinicola enucleator Pine Grosbeak",
-          "Setophaga pinus Pine Warbler",
-          "Euphagus carolinus Rusty Blackbird",
-          "Sitta canadensis Red-breasted Nuthatch",
-          "Regulus calendula Ruby-crowned Kinglet",
-          "Loxia curvirostra Red Crossbill",
-          "Vireo olivaceus Red-eyed Vireo",
-          "Bonasa umbellus Ruffed Grouse",
-          "Falcipennis canadensis Spruce Grouse",
-          "Tringa solitaria Solitary Sandpiper",
-          "Actitis macularius Spotted Sandpiper",
-          "Melanitta perspicillata Surf Scoter",
-          "Melospiza georgiana Swamp Sparrow",
-          "Catharus ustulatus Swainson’s Thrush",
-          "Catharus fuscescens Veery",
-          "Zonotrichia leucophrys White-crowned Sparrow",
-          "Numenius phaeopus Whimbrel",
-          "Loxia leucoptera White-winged Crossbill",
-          "Melanitta deglandi White-winged Scoter",
-          "Empidonax flaviventris Yellow-bellied Flycatcher"
+          "Setophaga ruticilla",
+          "Setophaga castanea",
+          "Poecile atricapillus",
+          "Poecile hudsonicus",
+          "Melanitta americana",
+          "Mniotilta varia",
+          "Corvus corax",
+          "Acanthis flammea",
+          "Junco hyemalis",
+          "Hesperiphona vespertina",
+          "Passerella iliaca",
+          "Regulus satrapa",
+          "Perisoreus canadensis",
+          "Melospiza lincolnii",
+          "Lanius excubitor",
+          "Contopus cooperi",
+          "Haemorhous purpureus",
+          "Pinicola enucleator",
+          "Setophaga pinus",
+          "Euphagus carolinus",
+          "Sitta canadensis",
+          "Regulus calendula",
+          "Loxia curvirostra",
+          "Vireo olivaceus",
+          "Bonasa umbellus",
+          "Falcipennis canadensis",
+          "Tringa solitaria",
+          "Actitis macularius",
+          "Melanitta perspicillata",
+          "Melospiza georgiana",
+          "Catharus ustulatus",
+          "Catharus fuscescens",
+          "Zonotrichia leucophrys",
+          "Numenius phaeopus",
+          "Loxia leucoptera",
+          "Melanitta deglandi",
+          "Empidonax flaviventris"
         ],
-        "referred_dataset": "Primary species observations: eBird (bird distribution and abundance). Climate layers: WorldClim (BIO1–BIO19; present 1950–2000; future RCP scenarios). Elevation: Natural Resources Canada Canadian Digital Elevation Model. Anthropogenic disturbances: Global Forest Watch Canada. Forest/wet area: Canada’s Forest Inventory (CanFI) 2001 (Conservation Biology Institute).",
-        "time_series": null,
+        "referred_dataset": "eBird (bird observations); WorldClim (bioclimatic variables); Natural Resources Canada Canadian Digital Elevation Model; Global Forest Watch Canada (anthropogenic disturbances); Canadian Forest Inventory (2001) for percent forested/wet area.",
+        "time_series": false,
         "multispecies": true,
         "threatened_species": null,
         "new_species_science": null,
         "new_species_region": null,
-        "bias_north_south": null,
+        "bias_north_south": true,
         "valid_yn": "yes",
         "reason_not_valid": null
       }
@@ -2010,30 +1952,27 @@
       "input_text": null,
       "extraction_method": "pdf_native",
       "usage_cost": {
-        "input_tokens": 15654,
-        "cached_tokens": 14976,
-        "reasoning_tokens": 2432,
-        "output_tokens": 3351,
-        "input_cost": 0.0002,
-        "cache_cost": 0.0004,
-        "reasoning_cost": 0.0049,
-        "output_cost": 0.0067,
-        "total_cost": 0.0122
+        "input_tokens": 17920,
+        "cached_tokens": 2688,
+        "reasoning_tokens": 2240,
+        "output_tokens": 3121,
+        "input_cost": 0.0038,
+        "cache_cost": 0.0001,
+        "reasoning_cost": 0.0045,
+        "output_cost": 0.0062,
+        "total_cost": 0.0146
       },
       "output": {
         "data_type": [
           "abundance",
-          "presence-absence",
-          "species_richness",
-          "time_series"
+          "time_series",
+          "species_richness"
         ],
         "geospatial_info_dataset": [
-          "site",
-          "site_ids",
-          "administrative_units"
+          "site"
         ],
-        "spatial_range_km2": null,
-        "temporal_range": "Sampling in 1997–1999 (June–September 1997; May–September 1998 and 1999)",
+        "spatial_range_km2": 0.014,
+        "temporal_range": "June–September 1997; May–September 1998–1999",
         "temp_range_i": 1997,
         "temp_range_f": 1999,
         "species": [
@@ -2115,7 +2054,7 @@
         "time_series": true,
         "multispecies": true,
         "threatened_species": null,
-        "new_species_science": null,
+        "new_species_science": false,
         "new_species_region": true,
         "bias_north_south": null,
         "valid_yn": "yes",
@@ -2186,159 +2125,159 @@
     "field_metrics": {
       "bias_north_south": {
         "field": "bias_north_south",
-        "tp": 0,
+        "tp": 22,
         "fp": 1,
-        "fn": 30,
+        "fn": 8,
         "tn": 0,
         "n": 30,
-        "precision": 0.0,
-        "recall": 0.0,
-        "f1": null,
-        "accuracy": 0.0,
-        "exact_match_rate": 0.0
+        "precision": 0.9565217391304348,
+        "recall": 0.7333333333333333,
+        "f1": 0.8301886792452831,
+        "accuracy": 0.7333333333333333,
+        "exact_match_rate": 0.7333333333333333
       },
       "data_type": {
         "field": "data_type",
-        "tp": 24,
-        "fp": 87,
-        "fn": 12,
+        "tp": 20,
+        "fp": 52,
+        "fn": 16,
         "tn": 0,
         "n": 30,
-        "precision": 0.21621621621621623,
-        "recall": 0.6666666666666666,
-        "f1": 0.326530612244898,
-        "accuracy": 0.8,
-        "exact_match_rate": 0.06666666666666667
+        "precision": 0.2777777777777778,
+        "recall": 0.5555555555555556,
+        "f1": 0.3703703703703704,
+        "accuracy": 0.6666666666666666,
+        "exact_match_rate": 0.13333333333333333
       },
       "geospatial_info_dataset": {
         "field": "geospatial_info_dataset",
-        "tp": 13,
-        "fp": 111,
-        "fn": 1,
+        "tp": 14,
+        "fp": 94,
+        "fn": 0,
         "tn": 0,
         "n": 30,
-        "precision": 0.10483870967741936,
-        "recall": 0.9285714285714286,
-        "f1": 0.1884057971014493,
-        "accuracy": 0.43333333333333335,
+        "precision": 0.12962962962962962,
+        "recall": 1.0,
+        "f1": 0.22950819672131148,
+        "accuracy": 0.4666666666666667,
         "exact_match_rate": 0.0
       },
       "multispecies": {
         "field": "multispecies",
-        "tp": 22,
+        "tp": 23,
         "fp": 7,
-        "fn": 8,
+        "fn": 7,
         "tn": 0,
         "n": 30,
-        "precision": 0.7586206896551724,
-        "recall": 0.7333333333333333,
-        "f1": 0.7457627118644068,
-        "accuracy": 0.7333333333333333,
-        "exact_match_rate": 0.7333333333333333
+        "precision": 0.7666666666666667,
+        "recall": 0.7666666666666667,
+        "f1": 0.7666666666666667,
+        "accuracy": 0.7666666666666667,
+        "exact_match_rate": 0.7666666666666667
       },
       "new_species_region": {
         "field": "new_species_region",
-        "tp": 11,
-        "fp": 4,
-        "fn": 11,
-        "tn": 5,
+        "tp": 15,
+        "fp": 3,
+        "fn": 7,
+        "tn": 6,
         "n": 30,
-        "precision": 0.7333333333333333,
-        "recall": 0.5,
-        "f1": 0.5945945945945945,
-        "accuracy": 0.5333333333333333,
-        "exact_match_rate": 0.5333333333333333
+        "precision": 0.8333333333333334,
+        "recall": 0.6818181818181818,
+        "f1": 0.7499999999999999,
+        "accuracy": 0.7,
+        "exact_match_rate": 0.7
       },
       "new_species_science": {
         "field": "new_species_science",
-        "tp": 11,
-        "fp": 3,
-        "fn": 11,
-        "tn": 5,
+        "tp": 15,
+        "fp": 2,
+        "fn": 7,
+        "tn": 6,
         "n": 30,
-        "precision": 0.7857142857142857,
-        "recall": 0.5,
-        "f1": 0.6111111111111112,
-        "accuracy": 0.5333333333333333,
-        "exact_match_rate": 0.5333333333333333
+        "precision": 0.8823529411764706,
+        "recall": 0.6818181818181818,
+        "f1": 0.7692307692307693,
+        "accuracy": 0.7,
+        "exact_match_rate": 0.7
       },
       "spatial_range_km2": {
         "field": "spatial_range_km2",
         "tp": 13,
         "fp": 4,
         "fn": 7,
-        "tn": 7,
+        "tn": 8,
         "n": 30,
         "precision": 0.7647058823529411,
         "recall": 0.65,
         "f1": 0.7027027027027027,
-        "accuracy": 0.6666666666666666,
-        "exact_match_rate": 0.6666666666666666
+        "accuracy": 0.7,
+        "exact_match_rate": 0.7
       },
       "species": {
         "field": "species",
-        "tp": 28,
-        "fp": 255,
-        "fn": 24,
+        "tp": 31,
+        "fp": 248,
+        "fn": 21,
         "tn": 0,
         "n": 30,
-        "precision": 0.0989399293286219,
-        "recall": 0.5384615384615384,
-        "f1": 0.1671641791044776,
-        "accuracy": 0.9333333333333333,
-        "exact_match_rate": 0.36666666666666664
+        "precision": 0.1111111111111111,
+        "recall": 0.5961538461538461,
+        "f1": 0.18731117824773416,
+        "accuracy": 1.0333333333333334,
+        "exact_match_rate": 0.43333333333333335
       },
       "temp_range_f": {
         "field": "temp_range_f",
-        "tp": 15,
-        "fp": 13,
-        "fn": 6,
+        "tp": 17,
+        "fp": 11,
+        "fn": 4,
         "tn": 2,
         "n": 30,
-        "precision": 0.5357142857142857,
-        "recall": 0.7142857142857143,
-        "f1": 0.6122448979591837,
-        "accuracy": 0.5666666666666667,
-        "exact_match_rate": 0.5666666666666667
+        "precision": 0.6071428571428571,
+        "recall": 0.8095238095238095,
+        "f1": 0.6938775510204083,
+        "accuracy": 0.6333333333333333,
+        "exact_match_rate": 0.6333333333333333
       },
       "temp_range_i": {
         "field": "temp_range_i",
-        "tp": 18,
-        "fp": 10,
-        "fn": 3,
+        "tp": 17,
+        "fp": 11,
+        "fn": 4,
         "tn": 2,
         "n": 30,
-        "precision": 0.6428571428571429,
-        "recall": 0.8571428571428571,
-        "f1": 0.7346938775510204,
-        "accuracy": 0.6666666666666666,
-        "exact_match_rate": 0.6666666666666666
+        "precision": 0.6071428571428571,
+        "recall": 0.8095238095238095,
+        "f1": 0.6938775510204083,
+        "accuracy": 0.6333333333333333,
+        "exact_match_rate": 0.6333333333333333
       },
       "threatened_species": {
         "field": "threatened_species",
-        "tp": 11,
-        "fp": 2,
-        "fn": 10,
-        "tn": 7,
+        "tp": 14,
+        "fp": 1,
+        "fn": 7,
+        "tn": 8,
         "n": 30,
-        "precision": 0.8461538461538461,
-        "recall": 0.5238095238095238,
-        "f1": 0.6470588235294118,
-        "accuracy": 0.6,
-        "exact_match_rate": 0.6
+        "precision": 0.9333333333333333,
+        "recall": 0.6666666666666666,
+        "f1": 0.7777777777777778,
+        "accuracy": 0.7333333333333333,
+        "exact_match_rate": 0.7333333333333333
       },
       "time_series": {
         "field": "time_series",
-        "tp": 5,
-        "fp": 20,
-        "fn": 0,
-        "tn": 5,
+        "tp": 4,
+        "fp": 23,
+        "fn": 1,
+        "tn": 2,
         "n": 30,
-        "precision": 0.2,
-        "recall": 1.0,
-        "f1": 0.33333333333333337,
-        "accuracy": 0.3333333333333333,
-        "exact_match_rate": 0.3333333333333333
+        "precision": 0.14814814814814814,
+        "recall": 0.8,
+        "f1": 0.25,
+        "accuracy": 0.2,
+        "exact_match_rate": 0.2
       }
     },
     "field_results": [
@@ -2346,11 +2285,11 @@
         "record_id": "101",
         "field": "bias_north_south",
         "true_value": true,
-        "pred_value": null,
-        "match": false,
-        "tp": 0,
+        "pred_value": true,
+        "match": true,
+        "tp": 1,
         "fp": 0,
-        "fn": 1,
+        "fn": 0,
         "tn": 0
       },
       {
@@ -2360,14 +2299,12 @@
           "other"
         ],
         "pred_value": [
-          "traits",
-          "time_series",
-          "other"
+          "time_series"
         ],
         "match": false,
-        "tp": 1,
-        "fp": 2,
-        "fn": 0,
+        "tp": 0,
+        "fp": 1,
+        "fn": 1,
         "tn": 0
       },
       {
@@ -2376,9 +2313,9 @@
         "true_value": null,
         "pred_value": [
           "sample",
-          "site",
-          "administrative_units",
-          "maps"
+          "site_ids",
+          "maps",
+          "geographic_features"
         ],
         "match": false,
         "tp": 0,
@@ -2437,7 +2374,8 @@
           "caribou"
         ],
         "pred_value": [
-          "49 female caribou (woodland caribou, Rangifer tarandus caribou)"
+          "Rangifer tarandus caribou",
+          "woodland caribou"
         ],
         "match": true,
         "tp": 1,
@@ -2493,11 +2431,11 @@
         "record_id": "104",
         "field": "bias_north_south",
         "true_value": false,
-        "pred_value": null,
-        "match": false,
-        "tp": 0,
+        "pred_value": false,
+        "match": true,
+        "tp": 1,
         "fp": 0,
-        "fn": 1,
+        "fn": 0,
         "tn": 0
       },
       {
@@ -2507,13 +2445,11 @@
           "distribution"
         ],
         "pred_value": [
-          "distribution",
-          "density",
-          "time_series"
+          "distribution"
         ],
-        "match": false,
+        "match": true,
         "tp": 1,
-        "fp": 2,
+        "fp": 0,
         "fn": 0,
         "tn": 0
       },
@@ -2525,14 +2461,15 @@
         ],
         "pred_value": [
           "maps",
-          "sample",
-          "site",
-          "range"
+          "distribution",
+          "range",
+          "geographic_features",
+          "site"
         ],
         "match": false,
-        "tp": 0,
+        "tp": 1,
         "fp": 4,
-        "fn": 1,
+        "fn": 0,
         "tn": 0
       },
       {
@@ -2586,8 +2523,7 @@
           "caribou"
         ],
         "pred_value": [
-          "Rangifer tarandus caribou",
-          "Atlantic-Gaspésie caribou"
+          "Rangifer tarandus caribou (Atlantic-Gaspésie caribou)"
         ],
         "match": true,
         "tp": 1,
@@ -2632,7 +2568,7 @@
         "record_id": "104",
         "field": "time_series",
         "true_value": null,
-        "pred_value": true,
+        "pred_value": false,
         "match": false,
         "tp": 0,
         "fp": 1,
@@ -2659,12 +2595,11 @@
         "pred_value": [
           "time_series",
           "presence-only",
-          "distribution",
-          "other"
+          "ecosystem_structure"
         ],
         "match": false,
         "tp": 1,
-        "fp": 3,
+        "fp": 2,
         "fn": 0,
         "tn": 0
       },
@@ -2674,14 +2609,13 @@
         "true_value": null,
         "pred_value": [
           "sample",
-          "site",
           "range",
-          "maps",
-          "administrative_units"
+          "site",
+          "maps"
         ],
         "match": false,
         "tp": 0,
-        "fp": 5,
+        "fp": 4,
         "fn": 0,
         "tn": 0
       },
@@ -2736,18 +2670,11 @@
           "Rangifer tarandus caribou"
         ],
         "pred_value": [
-          "Rangifer tarandus caribou",
-          "woodland caribou",
-          "Canis lupus",
-          "wolves",
-          "Ursus americanus",
-          "black bear",
-          "Alces alces",
-          "moose"
+          "Rangifer tarandus caribou (forest-dwelling woodland caribou)"
         ],
-        "match": false,
+        "match": true,
         "tp": 1,
-        "fp": 7,
+        "fp": 0,
         "fn": 0,
         "tn": 0
       },
@@ -2799,11 +2726,11 @@
         "record_id": "12",
         "field": "bias_north_south",
         "true_value": false,
-        "pred_value": null,
-        "match": false,
-        "tp": 0,
+        "pred_value": false,
+        "match": true,
+        "tp": 1,
         "fp": 0,
-        "fn": 1,
+        "fn": 0,
         "tn": 0
       },
       {
@@ -2813,8 +2740,8 @@
           "other"
         ],
         "pred_value": [
-          "time_series",
-          "distribution"
+          "presence-only",
+          "time_series"
         ],
         "match": false,
         "tp": 0,
@@ -2830,12 +2757,13 @@
           "sample",
           "site",
           "range",
+          "geographic_features",
           "maps",
           "site_ids"
         ],
         "match": false,
         "tp": 0,
-        "fp": 5,
+        "fp": 6,
         "fn": 0,
         "tn": 0
       },
@@ -2890,12 +2818,11 @@
           "Rangifer tarandus caribou"
         ],
         "pred_value": [
-          "Rangifer tarandus caribou",
-          "woodland caribou"
+          "Rangifer tarandus caribou (woodland caribou)"
         ],
-        "match": false,
+        "match": true,
         "tp": 1,
-        "fp": 1,
+        "fp": 0,
         "fn": 0,
         "tn": 0
       },
@@ -2903,11 +2830,11 @@
         "record_id": "12",
         "field": "temp_range_f",
         "true_value": 2011,
-        "pred_value": 2012,
-        "match": false,
-        "tp": 0,
-        "fp": 1,
-        "fn": 1,
+        "pred_value": 2011,
+        "match": true,
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
         "tn": 0
       },
       {
@@ -2947,11 +2874,11 @@
         "record_id": "123",
         "field": "bias_north_south",
         "true_value": true,
-        "pred_value": null,
-        "match": false,
-        "tp": 0,
+        "pred_value": true,
+        "match": true,
+        "tp": 1,
         "fp": 0,
-        "fn": 1,
+        "fn": 0,
         "tn": 0
       },
       {
@@ -2964,8 +2891,8 @@
         "pred_value": [
           "genetic_analysis",
           "presence-only",
-          "time_series",
-          "distribution"
+          "distribution",
+          "time_series"
         ],
         "match": false,
         "tp": 2,
@@ -2983,12 +2910,11 @@
           "sample",
           "site",
           "range",
-          "maps",
-          "administrative_units"
+          "maps"
         ],
         "match": false,
         "tp": 1,
-        "fp": 4,
+        "fp": 3,
         "fn": 0,
         "tn": 0
       },
@@ -3043,11 +2969,12 @@
           "Caribou"
         ],
         "pred_value": [
-          "Rangifer tarandus (caribou) — including migratory tundra, mountain and forest-dwelling (sedentary) ecotypes"
+          "Rangifer tarandus",
+          "caribou"
         ],
-        "match": true,
+        "match": false,
         "tp": 1,
-        "fp": 0,
+        "fp": 1,
         "fn": 0,
         "tn": 0
       },
@@ -3099,11 +3026,11 @@
         "record_id": "175",
         "field": "bias_north_south",
         "true_value": false,
-        "pred_value": null,
-        "match": false,
-        "tp": 0,
+        "pred_value": false,
+        "match": true,
+        "tp": 1,
         "fp": 0,
-        "fn": 1,
+        "fn": 0,
         "tn": 0
       },
       {
@@ -3113,17 +3040,12 @@
           "density"
         ],
         "pred_value": [
-          "abundance",
-          "density",
-          "presence-absence",
-          "distribution",
-          "traits",
-          "ecosystem_structure"
+          "abundance"
         ],
         "match": false,
-        "tp": 1,
-        "fp": 5,
-        "fn": 0,
+        "tp": 0,
+        "fp": 1,
+        "fn": 1,
         "tn": 0
       },
       {
@@ -3131,9 +3053,9 @@
         "field": "geospatial_info_dataset",
         "true_value": null,
         "pred_value": [
-          "sample",
           "site",
           "site_ids",
+          "geographic_features",
           "administrative_units"
         ],
         "match": false,
@@ -3157,22 +3079,22 @@
         "record_id": "175",
         "field": "new_species_region",
         "true_value": false,
-        "pred_value": null,
-        "match": false,
-        "tp": 0,
+        "pred_value": false,
+        "match": true,
+        "tp": 1,
         "fp": 0,
-        "fn": 1,
+        "fn": 0,
         "tn": 0
       },
       {
         "record_id": "175",
         "field": "new_species_science",
         "true_value": false,
-        "pred_value": null,
-        "match": false,
-        "tp": 0,
+        "pred_value": false,
+        "match": true,
+        "tp": 1,
         "fp": 0,
-        "fn": 1,
+        "fn": 0,
         "tn": 0
       },
       {
@@ -3231,7 +3153,7 @@
         "record_id": "175",
         "field": "temp_range_i",
         "true_value": null,
-        "pred_value": 1997,
+        "pred_value": 1996,
         "match": false,
         "tp": 0,
         "fp": 1,
@@ -3242,11 +3164,11 @@
         "record_id": "175",
         "field": "threatened_species",
         "true_value": false,
-        "pred_value": null,
-        "match": false,
-        "tp": 0,
+        "pred_value": false,
+        "match": true,
+        "tp": 1,
         "fp": 0,
-        "fn": 1,
+        "fn": 0,
         "tn": 0
       },
       {
@@ -3297,13 +3219,12 @@
         "pred_value": [
           "sample",
           "site",
-          "maps",
-          "administrative_units",
-          "site_ids"
+          "site_ids",
+          "maps"
         ],
         "match": false,
         "tp": 1,
-        "fp": 4,
+        "fp": 3,
         "fn": 0,
         "tn": 0
       },
@@ -3358,12 +3279,11 @@
           "black-legged tick"
         ],
         "pred_value": [
-          "Ixodes scapularis",
-          "black-legged tick"
+          "Ixodes scapularis (black-legged tick)"
         ],
-        "match": false,
+        "match": true,
         "tp": 1,
-        "fp": 1,
+        "fp": 0,
         "fn": 0,
         "tn": 0
       },
@@ -3429,15 +3349,13 @@
           "presence-only"
         ],
         "pred_value": [
-          "presence-absence",
           "abundance",
-          "traits",
-          "time_series",
-          "other"
+          "presence-absence",
+          "traits"
         ],
         "match": false,
         "tp": 0,
-        "fp": 5,
+        "fp": 3,
         "fn": 1,
         "tn": 0
       },
@@ -3447,14 +3365,12 @@
         "true_value": null,
         "pred_value": [
           "site",
-          "sample",
           "site_ids",
-          "maps",
-          "administrative_units"
+          "maps"
         ],
         "match": false,
         "tp": 0,
-        "fp": 5,
+        "fp": 3,
         "fn": 0,
         "tn": 0
       },
@@ -3473,22 +3389,22 @@
         "record_id": "201",
         "field": "new_species_region",
         "true_value": false,
-        "pred_value": false,
-        "match": true,
-        "tp": 1,
+        "pred_value": null,
+        "match": false,
+        "tp": 0,
         "fp": 0,
-        "fn": 0,
+        "fn": 1,
         "tn": 0
       },
       {
         "record_id": "201",
         "field": "new_species_science",
         "true_value": false,
-        "pred_value": false,
-        "match": true,
-        "tp": 1,
+        "pred_value": null,
+        "match": false,
+        "tp": 0,
         "fp": 0,
-        "fn": 0,
+        "fn": 1,
         "tn": 0
       },
       {
@@ -3547,33 +3463,33 @@
         "record_id": "201",
         "field": "threatened_species",
         "true_value": false,
-        "pred_value": false,
-        "match": true,
-        "tp": 1,
+        "pred_value": null,
+        "match": false,
+        "tp": 0,
         "fp": 0,
-        "fn": 0,
+        "fn": 1,
         "tn": 0
       },
       {
         "record_id": "201",
         "field": "time_series",
         "true_value": null,
-        "pred_value": true,
-        "match": false,
+        "pred_value": null,
+        "match": true,
         "tp": 0,
-        "fp": 1,
+        "fp": 0,
         "fn": 0,
-        "tn": 0
+        "tn": 1
       },
       {
         "record_id": "208",
         "field": "bias_north_south",
         "true_value": true,
-        "pred_value": null,
-        "match": false,
-        "tp": 0,
+        "pred_value": true,
+        "match": true,
+        "tp": 1,
         "fp": 0,
-        "fn": 1,
+        "fn": 0,
         "tn": 0
       },
       {
@@ -3587,12 +3503,11 @@
           "density",
           "traits",
           "ecosystem_structure",
-          "ecosystem_function",
           "species_richness"
         ],
         "match": false,
         "tp": 1,
-        "fp": 5,
+        "fp": 4,
         "fn": 0,
         "tn": 0
       },
@@ -3605,14 +3520,12 @@
         "pred_value": [
           "sample",
           "site",
-          "site_ids",
           "maps",
-          "administrative_units",
-          "geographic_features"
+          "site_ids"
         ],
         "match": false,
         "tp": 1,
-        "fp": 5,
+        "fp": 3,
         "fn": 0,
         "tn": 0
       },
@@ -3667,7 +3580,6 @@
           "c.132 species of benthic community"
         ],
         "pred_value": [
-          "132 taxa (8 phyla)",
           "Micronephthys neotena",
           "Eudorellopsis integra",
           "Protomedeia grandimana",
@@ -3691,7 +3603,7 @@
         ],
         "match": false,
         "tp": 0,
-        "fp": 21,
+        "fp": 20,
         "fn": 1,
         "tn": 0
       },
@@ -3710,7 +3622,7 @@
         "record_id": "208",
         "field": "temp_range_i",
         "true_value": null,
-        "pred_value": 2014,
+        "pred_value": 2017,
         "match": false,
         "tp": 0,
         "fp": 1,
@@ -3732,22 +3644,22 @@
         "record_id": "208",
         "field": "time_series",
         "true_value": null,
-        "pred_value": null,
-        "match": true,
+        "pred_value": false,
+        "match": false,
         "tp": 0,
-        "fp": 0,
+        "fp": 1,
         "fn": 0,
-        "tn": 1
+        "tn": 0
       },
       {
         "record_id": "225",
         "field": "bias_north_south",
         "true_value": false,
-        "pred_value": null,
-        "match": false,
-        "tp": 0,
+        "pred_value": false,
+        "match": true,
+        "tp": 1,
         "fp": 0,
-        "fn": 1,
+        "fn": 0,
         "tn": 0
       },
       {
@@ -3760,13 +3672,11 @@
           "abundance",
           "presence-absence",
           "ecosystem_function",
-          "ecosystem_structure",
-          "species_richness",
-          "traits"
+          "species_richness"
         ],
         "match": false,
         "tp": 0,
-        "fp": 6,
+        "fp": 4,
         "fn": 1,
         "tn": 0
       },
@@ -3776,12 +3686,11 @@
         "true_value": null,
         "pred_value": [
           "site",
-          "sample",
-          "administrative_units"
+          "maps"
         ],
         "match": false,
         "tp": 0,
-        "fp": 3,
+        "fp": 2,
         "fn": 0,
         "tn": 0
       },
@@ -3841,18 +3750,17 @@
         "pred_value": [
           "Fucus distichus edentatus",
           "Fucus vesiculosus",
-          "Mytilus spp.",
-          "Mytilus edulis",
-          "Mytilus trossulus",
-          "Ralfsia clavata",
+          "Mytilus spp. (Mytilus edulis, M. trossulus, and hybrids)",
+          "Ralfsia clavata (encrusting alga)",
           "Gammarus spp.",
           "Lacuna vincta",
           "Margarites helicinus",
-          "Polychaeta"
+          "Polychaeta (various)",
+          "Additional 45 associated species reported (13 algae, 32 animals) as per Table S1"
         ],
         "match": false,
         "tp": 0,
-        "fp": 10,
+        "fp": 9,
         "fn": 4,
         "tn": 0
       },
@@ -3893,12 +3801,12 @@
         "record_id": "225",
         "field": "time_series",
         "true_value": null,
-        "pred_value": null,
-        "match": true,
+        "pred_value": false,
+        "match": false,
         "tp": 0,
-        "fp": 0,
+        "fp": 1,
         "fn": 0,
-        "tn": 1
+        "tn": 0
       },
       {
         "record_id": "24",
@@ -3918,13 +3826,11 @@
           "genetic_analysis"
         ],
         "pred_value": [
-          "genetic_analysis",
-          "abundance",
-          "ecosystem_structure"
+          "genetic_analysis"
         ],
-        "match": false,
+        "match": true,
         "tp": 1,
-        "fp": 2,
+        "fp": 0,
         "fn": 0,
         "tn": 0
       },
@@ -3936,13 +3842,12 @@
         ],
         "pred_value": [
           "site",
-          "maps",
           "site_ids",
-          "administrative_units"
+          "maps"
         ],
         "match": false,
         "tp": 1,
-        "fp": 3,
+        "fp": 2,
         "fn": 0,
         "tn": 0
       },
@@ -3997,11 +3902,12 @@
           "Acer saccharum"
         ],
         "pred_value": [
-          "Acer saccharum Marshall (sugar maple)"
+          "Acer saccharum Marshall",
+          "sugar maple"
         ],
-        "match": true,
+        "match": false,
         "tp": 1,
-        "fp": 0,
+        "fp": 1,
         "fn": 0,
         "tn": 0
       },
@@ -4053,11 +3959,11 @@
         "record_id": "253",
         "field": "bias_north_south",
         "true_value": true,
-        "pred_value": null,
-        "match": false,
-        "tp": 0,
+        "pred_value": true,
+        "match": true,
+        "tp": 1,
         "fp": 0,
-        "fn": 1,
+        "fn": 0,
         "tn": 0
       },
       {
@@ -4086,12 +3992,11 @@
           "sample",
           "site",
           "site_ids",
-          "maps",
-          "geographic_features"
+          "maps"
         ],
         "match": false,
         "tp": 1,
-        "fp": 4,
+        "fp": 3,
         "fn": 0,
         "tn": 0
       },
@@ -4110,22 +4015,22 @@
         "record_id": "253",
         "field": "new_species_region",
         "true_value": false,
-        "pred_value": false,
-        "match": true,
-        "tp": 1,
+        "pred_value": null,
+        "match": false,
+        "tp": 0,
         "fp": 0,
-        "fn": 0,
+        "fn": 1,
         "tn": 0
       },
       {
         "record_id": "253",
         "field": "new_species_science",
         "true_value": false,
-        "pred_value": false,
-        "match": true,
-        "tp": 1,
+        "pred_value": null,
+        "match": false,
+        "tp": 0,
         "fp": 0,
-        "fn": 0,
+        "fn": 1,
         "tn": 0
       },
       {
@@ -4146,7 +4051,7 @@
           "Salvelinus alpinus"
         ],
         "pred_value": [
-          "Arctic Char (Salvelinus alpinus)"
+          "Salvelinus alpinus (Arctic Char) — 650 individuals from 23 sampling locations; mitochondrial sequences for subset (n = 10–34 per site); 18,112 filtered SNPs (GBS)"
         ],
         "match": true,
         "tp": 1,
@@ -4180,23 +4085,23 @@
         "record_id": "253",
         "field": "threatened_species",
         "true_value": false,
-        "pred_value": false,
-        "match": true,
-        "tp": 1,
+        "pred_value": null,
+        "match": false,
+        "tp": 0,
         "fp": 0,
-        "fn": 0,
+        "fn": 1,
         "tn": 0
       },
       {
         "record_id": "253",
         "field": "time_series",
         "true_value": null,
-        "pred_value": null,
-        "match": true,
+        "pred_value": false,
+        "match": false,
         "tp": 0,
-        "fp": 0,
+        "fp": 1,
         "fn": 0,
-        "tn": 1
+        "tn": 0
       },
       {
         "record_id": "258",
@@ -4219,16 +4124,13 @@
         "pred_value": [
           "abundance",
           "presence-absence",
-          "species_richness",
           "genetic_analysis",
-          "time_series",
-          "distribution",
-          "traits",
-          "other"
+          "species_richness",
+          "traits"
         ],
         "match": false,
         "tp": 1,
-        "fp": 7,
+        "fp": 4,
         "fn": 1,
         "tn": 0
       },
@@ -4238,8 +4140,8 @@
         "true_value": null,
         "pred_value": [
           "site",
-          "site_ids",
-          "maps"
+          "maps",
+          "site_ids"
         ],
         "match": false,
         "tp": 0,
@@ -4273,12 +4175,12 @@
         "record_id": "258",
         "field": "new_species_science",
         "true_value": null,
-        "pred_value": false,
-        "match": false,
+        "pred_value": null,
+        "match": true,
         "tp": 0,
-        "fp": 1,
+        "fp": 0,
         "fn": 0,
-        "tn": 0
+        "tn": 1
       },
       {
         "record_id": "258",
@@ -4314,12 +4216,13 @@
           "Ischnura posita",
           "Ischnura verticalis",
           "Nehalennia gracilis",
-          "Nehalennia irene"
+          "Nehalennia irene",
+          "Arrenurus (water mites) - 15 OTUs"
         ],
         "match": false,
-        "tp": 0,
+        "tp": 1,
         "fp": 16,
-        "fn": 2,
+        "fn": 1,
         "tn": 0
       },
       {
@@ -4370,11 +4273,11 @@
         "record_id": "27",
         "field": "bias_north_south",
         "true_value": false,
-        "pred_value": null,
-        "match": false,
-        "tp": 0,
+        "pred_value": false,
+        "match": true,
+        "tp": 1,
         "fp": 0,
-        "fn": 1,
+        "fn": 0,
         "tn": 0
       },
       {
@@ -4385,13 +4288,12 @@
           "genetic_analysis"
         ],
         "pred_value": [
-          "genetic_analysis",
-          "presence-only"
+          "genetic_analysis"
         ],
-        "match": true,
-        "tp": 2,
+        "match": false,
+        "tp": 1,
         "fp": 0,
-        "fn": 0,
+        "fn": 1,
         "tn": 0
       },
       {
@@ -4466,8 +4368,8 @@
         "pred_value": [
           "Eastern Wolf (Canis lycaon)",
           "Eastern Coyote (Canis latrans)",
-          "Great Lakes-Boreal Wolf (Canis lupus × lycaon)",
-          "Domestic Dog (Canis familiaris)"
+          "Great Lakes-Boreal Wolf (C. lupus × lycaon)",
+          "Domestic dog (Canis familiaris)"
         ],
         "match": false,
         "tp": 2,
@@ -4512,7 +4414,7 @@
         "record_id": "27",
         "field": "time_series",
         "true_value": null,
-        "pred_value": true,
+        "pred_value": false,
         "match": false,
         "tp": 0,
         "fp": 1,
@@ -4539,13 +4441,11 @@
         ],
         "pred_value": [
           "abundance",
-          "presence-absence",
-          "species_richness",
           "time_series"
         ],
         "match": false,
         "tp": 1,
-        "fp": 3,
+        "fp": 1,
         "fn": 1,
         "tn": 0
       },
@@ -4556,13 +4456,12 @@
           "administrative_units"
         ],
         "pred_value": [
-          "sample",
           "site",
           "administrative_units"
         ],
         "match": false,
         "tp": 1,
-        "fp": 2,
+        "fp": 1,
         "fn": 0,
         "tn": 0
       },
@@ -4603,12 +4502,12 @@
         "record_id": "271",
         "field": "spatial_range_km2",
         "true_value": null,
-        "pred_value": 0.35,
-        "match": false,
+        "pred_value": null,
+        "match": true,
         "tp": 0,
-        "fp": 1,
+        "fp": 0,
         "fn": 0,
-        "tn": 0
+        "tn": 1
       },
       {
         "record_id": "271",
@@ -4617,18 +4516,18 @@
           "11 mite species"
         ],
         "pred_value": [
-          "Amblyseius fallacis (Garman)",
-          "Typhlodromus caudiglans Schuster",
-          "Agistemus fleschneri Summers",
-          "Anystis baccarum (L.)",
+          "Amblyseius fallacis",
+          "Typhlodromus caudiglans",
+          "Agistemus fleschneri",
+          "Anystis baccarum",
           "Balaustium sp.",
-          "Typhlodromus conspicuus (Garman)",
-          "Typhlodromus herbertae Chant",
-          "Typhlodromus longipilis Nesbitt",
-          "Typhlodromus bakeri (Garman)",
-          "Typhlodromus pyri Scheuten",
-          "Amblyseius okanagensis (Chant)",
-          "Amblyseius finlandicus (Oudemans)",
+          "Typhlodromus conspicuus",
+          "Typhlodromus herbertae",
+          "Typhlodromus longipilis",
+          "Typhlodromus bakeri",
+          "Typhlodromus pyri",
+          "Amblyseius okanagensis",
+          "Amblyseius finlandicus",
           "Phytoseius sp."
         ],
         "match": false,
@@ -4685,11 +4584,11 @@
         "record_id": "29",
         "field": "bias_north_south",
         "true_value": true,
-        "pred_value": null,
-        "match": false,
-        "tp": 0,
+        "pred_value": true,
+        "match": true,
+        "tp": 1,
         "fp": 0,
-        "fn": 1,
+        "fn": 0,
         "tn": 0
       },
       {
@@ -4715,14 +4614,13 @@
         "pred_value": [
           "sample",
           "site",
-          "maps",
           "distribution",
-          "site_ids",
-          "administrative_units"
+          "maps",
+          "site_ids"
         ],
         "match": false,
         "tp": 0,
-        "fp": 6,
+        "fp": 5,
         "fn": 0,
         "tn": 0
       },
@@ -4784,13 +4682,12 @@
           "Kalmia angustifolia",
           "Chamaedaphne calyculata",
           "Vaccinium angustifolium",
-          "Vaccinium myrtilloides",
-          "Vaccinium spp"
+          "Vaccinium myrtilloides"
         ],
         "match": false,
-        "tp": 4,
+        "tp": 3,
         "fp": 2,
-        "fn": 0,
+        "fn": 1,
         "tn": 0
       },
       {
@@ -4819,11 +4716,11 @@
         "record_id": "29",
         "field": "threatened_species",
         "true_value": false,
-        "pred_value": null,
-        "match": false,
-        "tp": 0,
+        "pred_value": false,
+        "match": true,
+        "tp": 1,
         "fp": 0,
-        "fn": 1,
+        "fn": 0,
         "tn": 0
       },
       {
@@ -4841,11 +4738,11 @@
         "record_id": "30",
         "field": "bias_north_south",
         "true_value": true,
-        "pred_value": null,
-        "match": false,
-        "tp": 0,
+        "pred_value": true,
+        "match": true,
+        "tp": 1,
         "fp": 0,
-        "fn": 1,
+        "fn": 0,
         "tn": 0
       },
       {
@@ -4855,14 +4752,11 @@
           "presence-only"
         ],
         "pred_value": [
-          "traits",
-          "time_series",
-          "distribution",
-          "other"
+          "time_series"
         ],
         "match": false,
         "tp": 0,
-        "fp": 4,
+        "fp": 1,
         "fn": 1,
         "tn": 0
       },
@@ -4875,8 +4769,8 @@
         "pred_value": [
           "sample",
           "site",
-          "range",
-          "maps"
+          "maps",
+          "geographic_features"
         ],
         "match": false,
         "tp": 1,
@@ -4935,13 +4829,11 @@
           "Rangifer tarandus"
         ],
         "pred_value": [
-          "Rangifer tarandus (caribou)",
-          "Rivière-aux-Feuilles herd",
-          "96 caribou (80 F, 16 M); 181 individual-years"
+          "Rangifer tarandus caribou"
         ],
-        "match": false,
+        "match": true,
         "tp": 1,
-        "fp": 2,
+        "fp": 0,
         "fn": 0,
         "tn": 0
       },
@@ -4993,11 +4885,11 @@
         "record_id": "31",
         "field": "bias_north_south",
         "true_value": false,
-        "pred_value": null,
-        "match": false,
-        "tp": 0,
+        "pred_value": false,
+        "match": true,
+        "tp": 1,
         "fp": 0,
-        "fn": 1,
+        "fn": 0,
         "tn": 0
       },
       {
@@ -5009,12 +4901,11 @@
         "pred_value": [
           "abundance",
           "genetic_analysis",
-          "time_series",
           "traits"
         ],
         "match": false,
         "tp": 1,
-        "fp": 3,
+        "fp": 2,
         "fn": 0,
         "tn": 0
       },
@@ -5023,13 +4914,12 @@
         "field": "geospatial_info_dataset",
         "true_value": null,
         "pred_value": [
-          "sample",
           "site",
-          "administrative_units"
+          "maps"
         ],
         "match": false,
         "tp": 0,
-        "fp": 3,
+        "fp": 2,
         "fn": 0,
         "tn": 0
       },
@@ -5129,22 +5019,22 @@
         "record_id": "31",
         "field": "time_series",
         "true_value": true,
-        "pred_value": true,
-        "match": true,
-        "tp": 1,
+        "pred_value": null,
+        "match": false,
+        "tp": 0,
         "fp": 0,
-        "fn": 0,
+        "fn": 1,
         "tn": 0
       },
       {
         "record_id": "315",
         "field": "bias_north_south",
         "true_value": false,
-        "pred_value": null,
-        "match": false,
-        "tp": 0,
+        "pred_value": false,
+        "match": true,
+        "tp": 1,
         "fp": 0,
-        "fn": 1,
+        "fn": 0,
         "tn": 0
       },
       {
@@ -5168,8 +5058,8 @@
         "field": "geospatial_info_dataset",
         "true_value": null,
         "pred_value": [
-          "site",
-          "administrative_units"
+          "sample",
+          "site"
         ],
         "match": false,
         "tp": 0,
@@ -5192,23 +5082,23 @@
         "record_id": "315",
         "field": "new_species_region",
         "true_value": null,
-        "pred_value": false,
-        "match": false,
+        "pred_value": null,
+        "match": true,
         "tp": 0,
-        "fp": 1,
+        "fp": 0,
         "fn": 0,
-        "tn": 0
+        "tn": 1
       },
       {
         "record_id": "315",
         "field": "new_species_science",
         "true_value": null,
-        "pred_value": false,
-        "match": false,
+        "pred_value": null,
+        "match": true,
         "tp": 0,
-        "fp": 1,
+        "fp": 0,
         "fn": 0,
-        "tn": 0
+        "tn": 1
       },
       {
         "record_id": "315",
@@ -5228,14 +5118,6 @@
           "c.30 beetle species"
         ],
         "pred_value": [
-          "Histeridae",
-          "Hydrophilidae",
-          "Leiodidae",
-          "Ptilidae",
-          "Scarabaeidae",
-          "Silphidae",
-          "Staphylinidae",
-          "Trogidae",
           "Hister furtivus LeConte",
           "Margarinotus egregius (Casey)",
           "Margarinotus faedatus (LeConte)",
@@ -5256,14 +5138,11 @@
           "Nicrophorus orbicollis Say",
           "Nicrophorus pustulatus Herschel",
           "Nicrophorus sayi Laporte",
-          "Nicrophorus tomentosus Weber",
-          "Aphodius leopardus Horn",
-          "Aphodius rufipes L.",
-          "Nicrophorus americanus"
+          "Nicrophorus tomentosus Weber"
         ],
         "match": false,
         "tp": 0,
-        "fp": 32,
+        "fp": 21,
         "fn": 1,
         "tn": 0
       },
@@ -5293,12 +5172,12 @@
         "record_id": "315",
         "field": "threatened_species",
         "true_value": null,
-        "pred_value": false,
-        "match": false,
+        "pred_value": null,
+        "match": true,
         "tp": 0,
-        "fp": 1,
+        "fp": 0,
         "fn": 0,
-        "tn": 0
+        "tn": 1
       },
       {
         "record_id": "315",
@@ -5315,11 +5194,11 @@
         "record_id": "343",
         "field": "bias_north_south",
         "true_value": true,
-        "pred_value": null,
-        "match": false,
-        "tp": 0,
+        "pred_value": true,
+        "match": true,
+        "tp": 1,
         "fp": 0,
-        "fn": 1,
+        "fn": 0,
         "tn": 0
       },
       {
@@ -5347,7 +5226,7 @@
           "site",
           "maps",
           "distribution",
-          "administrative_units"
+          "site_ids"
         ],
         "match": false,
         "tp": 0,
@@ -5406,43 +5285,43 @@
           "c.30 bird species"
         ],
         "pred_value": [
-          "Setophaga ruticilla American Redstard",
-          "Setophaga castanea Bay-breasted Warbler",
-          "Poecile atricapillus Black-capped Chickadee",
-          "Poecile hudsonicus Boreal Chickadee",
-          "Melanitta americana Black Scoter",
-          "Mniotilta varia Black-and-white Warbler",
-          "Corvus corax Common Raven",
-          "Acanthis flammea Common Redpoll",
-          "Junco hyemalis Dark-eyed Junco",
-          "Hesperiphona vespertina Evening Grosbeak",
-          "Passerella iliaca Fox Sparrow",
-          "Regulus satrapa Golden-crowned Kinglet",
-          "Perisoreus canadensis Gray Jay",
-          "Melospiza lincolnii Lincoln’s Sparrow",
-          "Lanius excubitor Northern Shrike",
-          "Contopus cooperi Olive-sided Flycatcher",
-          "Haemorhous purpureus Purple Finch",
-          "Pinicola enucleator Pine Grosbeak",
-          "Setophaga pinus Pine Warbler",
-          "Euphagus carolinus Rusty Blackbird",
-          "Sitta canadensis Red-breasted Nuthatch",
-          "Regulus calendula Ruby-crowned Kinglet",
-          "Loxia curvirostra Red Crossbill",
-          "Vireo olivaceus Red-eyed Vireo",
-          "Bonasa umbellus Ruffed Grouse",
-          "Falcipennis canadensis Spruce Grouse",
-          "Tringa solitaria Solitary Sandpiper",
-          "Actitis macularius Spotted Sandpiper",
-          "Melanitta perspicillata Surf Scoter",
-          "Melospiza georgiana Swamp Sparrow",
-          "Catharus ustulatus Swainson’s Thrush",
-          "Catharus fuscescens Veery",
-          "Zonotrichia leucophrys White-crowned Sparrow",
-          "Numenius phaeopus Whimbrel",
-          "Loxia leucoptera White-winged Crossbill",
-          "Melanitta deglandi White-winged Scoter",
-          "Empidonax flaviventris Yellow-bellied Flycatcher"
+          "Setophaga ruticilla",
+          "Setophaga castanea",
+          "Poecile atricapillus",
+          "Poecile hudsonicus",
+          "Melanitta americana",
+          "Mniotilta varia",
+          "Corvus corax",
+          "Acanthis flammea",
+          "Junco hyemalis",
+          "Hesperiphona vespertina",
+          "Passerella iliaca",
+          "Regulus satrapa",
+          "Perisoreus canadensis",
+          "Melospiza lincolnii",
+          "Lanius excubitor",
+          "Contopus cooperi",
+          "Haemorhous purpureus",
+          "Pinicola enucleator",
+          "Setophaga pinus",
+          "Euphagus carolinus",
+          "Sitta canadensis",
+          "Regulus calendula",
+          "Loxia curvirostra",
+          "Vireo olivaceus",
+          "Bonasa umbellus",
+          "Falcipennis canadensis",
+          "Tringa solitaria",
+          "Actitis macularius",
+          "Melanitta perspicillata",
+          "Melospiza georgiana",
+          "Catharus ustulatus",
+          "Catharus fuscescens",
+          "Zonotrichia leucophrys",
+          "Numenius phaeopus",
+          "Loxia leucoptera",
+          "Melanitta deglandi",
+          "Empidonax flaviventris"
         ],
         "match": false,
         "tp": 0,
@@ -5487,12 +5366,12 @@
         "record_id": "343",
         "field": "time_series",
         "true_value": null,
-        "pred_value": null,
-        "match": true,
+        "pred_value": false,
+        "match": false,
         "tp": 0,
-        "fp": 0,
+        "fp": 1,
         "fn": 0,
-        "tn": 1
+        "tn": 0
       },
       {
         "record_id": "351",
@@ -5513,13 +5392,12 @@
         ],
         "pred_value": [
           "abundance",
-          "presence-absence",
-          "species_richness",
-          "time_series"
+          "time_series",
+          "species_richness"
         ],
         "match": false,
         "tp": 1,
-        "fp": 3,
+        "fp": 2,
         "fn": 0,
         "tn": 0
       },
@@ -5528,13 +5406,11 @@
         "field": "geospatial_info_dataset",
         "true_value": null,
         "pred_value": [
-          "site",
-          "site_ids",
-          "administrative_units"
+          "site"
         ],
         "match": false,
         "tp": 0,
-        "fp": 3,
+        "fp": 1,
         "fn": 0,
         "tn": 0
       },
@@ -5564,21 +5440,21 @@
         "record_id": "351",
         "field": "new_species_science",
         "true_value": null,
-        "pred_value": null,
-        "match": true,
+        "pred_value": false,
+        "match": false,
         "tp": 0,
-        "fp": 0,
+        "fp": 1,
         "fn": 0,
-        "tn": 1
+        "tn": 0
       },
       {
         "record_id": "351",
         "field": "spatial_range_km2",
         "true_value": 0.5,
-        "pred_value": null,
+        "pred_value": 0.014,
         "match": false,
         "tp": 0,
-        "fp": 0,
+        "fp": 1,
         "fn": 1,
         "tn": 0
       },
@@ -5717,11 +5593,11 @@
         "record_id": "37",
         "field": "bias_north_south",
         "true_value": false,
-        "pred_value": null,
-        "match": false,
-        "tp": 0,
+        "pred_value": false,
+        "match": true,
+        "tp": 1,
         "fp": 0,
-        "fn": 1,
+        "fn": 0,
         "tn": 0
       },
       {
@@ -5732,16 +5608,14 @@
           "other"
         ],
         "pred_value": [
+          "abundance",
           "genetic_analysis",
           "traits",
-          "abundance",
-          "presence-absence",
-          "time_series",
           "ecosystem_structure"
         ],
         "match": false,
         "tp": 1,
-        "fp": 5,
+        "fp": 3,
         "fn": 1,
         "tn": 0
       },
@@ -5750,14 +5624,13 @@
         "field": "geospatial_info_dataset",
         "true_value": null,
         "pred_value": [
-          "site",
           "sample",
-          "administrative_units",
+          "site",
           "maps"
         ],
         "match": false,
         "tp": 0,
-        "fp": 4,
+        "fp": 3,
         "fn": 0,
         "tn": 0
       },
@@ -5776,22 +5649,22 @@
         "record_id": "37",
         "field": "new_species_region",
         "true_value": false,
-        "pred_value": null,
-        "match": false,
-        "tp": 0,
+        "pred_value": false,
+        "match": true,
+        "tp": 1,
         "fp": 0,
-        "fn": 1,
+        "fn": 0,
         "tn": 0
       },
       {
         "record_id": "37",
         "field": "new_species_science",
         "true_value": false,
-        "pred_value": null,
-        "match": false,
-        "tp": 0,
+        "pred_value": false,
+        "match": true,
+        "tp": 1,
         "fp": 0,
-        "fn": 1,
+        "fn": 0,
         "tn": 0
       },
       {
@@ -5816,12 +5689,21 @@
         "pred_value": [
           "Populus balsamifera",
           "Populus deltoides",
-          "Populus deltoides × Populus balsamifera (native hybrids)"
+          "Populus (native hybrids, D × B)",
+          "Populus nigra",
+          "Populus maximowiczii",
+          "Populus laurifolia",
+          "Populus trichocarpa",
+          "Populus angustifolia",
+          "Populus fremontii",
+          "Melampsora larici-populina",
+          "Melampsora medusae f. sp. deltoidae",
+          "Melampsora occidentalis"
         ],
         "match": false,
-        "tp": 2,
-        "fp": 0,
-        "fn": 1,
+        "tp": 3,
+        "fp": 8,
+        "fn": 0,
         "tn": 0
       },
       {
@@ -5839,7 +5721,18 @@
         "record_id": "37",
         "field": "temp_range_i",
         "true_value": 2009,
-        "pred_value": 2009,
+        "pred_value": 2007,
+        "match": false,
+        "tp": 0,
+        "fp": 1,
+        "fn": 1,
+        "tn": 0
+      },
+      {
+        "record_id": "37",
+        "field": "threatened_species",
+        "true_value": false,
+        "pred_value": false,
         "match": true,
         "tp": 1,
         "fp": 0,
@@ -5848,20 +5741,9 @@
       },
       {
         "record_id": "37",
-        "field": "threatened_species",
-        "true_value": false,
-        "pred_value": null,
-        "match": false,
-        "tp": 0,
-        "fp": 0,
-        "fn": 1,
-        "tn": 0
-      },
-      {
-        "record_id": "37",
         "field": "time_series",
         "true_value": null,
-        "pred_value": true,
+        "pred_value": false,
         "match": false,
         "tp": 0,
         "fp": 1,
@@ -5872,11 +5754,11 @@
         "record_id": "38",
         "field": "bias_north_south",
         "true_value": true,
-        "pred_value": null,
-        "match": false,
-        "tp": 0,
+        "pred_value": true,
+        "match": true,
+        "tp": 1,
         "fp": 0,
-        "fn": 1,
+        "fn": 0,
         "tn": 0
       },
       {
@@ -5887,12 +5769,11 @@
         ],
         "pred_value": [
           "abundance",
-          "presence-absence",
-          "species_richness"
+          "presence-absence"
         ],
         "match": false,
         "tp": 1,
-        "fp": 2,
+        "fp": 1,
         "fn": 0,
         "tn": 0
       },
@@ -5904,13 +5785,12 @@
         ],
         "pred_value": [
           "site",
-          "site_ids",
           "maps",
-          "administrative_units"
+          "site_ids"
         ],
         "match": false,
         "tp": 1,
-        "fp": 3,
+        "fp": 2,
         "fn": 0,
         "tn": 0
       },
@@ -5967,19 +5847,22 @@
           "240 flying-beetles species"
         ],
         "pred_value": [
-          "Tamiasciurus hudsonicus",
-          "Tamias striatus",
-          "Sorex spp.",
-          "Peromiscus maniculatus",
-          "Myodes gapperi",
-          "Microtus chrotorrhinus",
-          "Synaptomys cooperi",
-          "ground-dwelling beetles (3894 individuals, 199 species collected; 58 species used in analyses)",
-          "flying beetles (2411 individuals, 240 species collected; 48 species used in analyses)"
+          "red-backed voles, Myodes gapperi",
+          "red squirrel (Tamiasciurus hudsonicus)",
+          "eastern chipmunk (Tamias striatus)",
+          "shrews (Sorex spp.)",
+          "deer mouse (Peromiscus maniculatus)",
+          "lemming and rock vole category: rock vole (Microtus chrotorrhinus) and southern bog lemming (Synaptomys cooperi)",
+          "ground-dwelling beetles (3894 individuals, 199 species or morphospecies; 58 species used in analyses)",
+          "flying beetles (2411 individuals, 240 species or morphospecies; 48 species used in analyses)",
+          "black spruce (Picea mariana)",
+          "balsam fir (Abies balsamea)",
+          "paper birch (Betula papyrifera)",
+          "trembling aspen (Populus tremuloides)"
         ],
         "match": false,
         "tp": 0,
-        "fp": 9,
+        "fp": 12,
         "fn": 3,
         "tn": 0
       },
@@ -6020,12 +5903,12 @@
         "record_id": "38",
         "field": "time_series",
         "true_value": null,
-        "pred_value": null,
-        "match": true,
+        "pred_value": false,
+        "match": false,
         "tp": 0,
-        "fp": 0,
+        "fp": 1,
         "fn": 0,
-        "tn": 1
+        "tn": 0
       },
       {
         "record_id": "39",
@@ -6045,9 +5928,9 @@
           "genetic_analysis"
         ],
         "pred_value": [
+          "traits",
           "abundance",
           "presence-absence",
-          "traits",
           "time_series"
         ],
         "match": false,
@@ -6063,14 +5946,13 @@
           "site"
         ],
         "pred_value": [
-          "sample",
           "site",
-          "administrative_units",
-          "site_ids"
+          "site_ids",
+          "geographic_features"
         ],
         "match": false,
         "tp": 1,
-        "fp": 3,
+        "fp": 2,
         "fn": 0,
         "tn": 0
       },
@@ -6078,11 +5960,11 @@
         "record_id": "39",
         "field": "multispecies",
         "true_value": false,
-        "pred_value": null,
-        "match": false,
-        "tp": 0,
+        "pred_value": false,
+        "match": true,
+        "tp": 1,
         "fp": 0,
-        "fn": 1,
+        "fn": 0,
         "tn": 0
       },
       {
@@ -6125,7 +6007,7 @@
           "Tachycineta bicolor"
         ],
         "pred_value": [
-          "tree swallow (Tachycineta bicolor)"
+          "Tachycineta bicolor (tree swallow)"
         ],
         "match": true,
         "tp": 1,
@@ -6181,11 +6063,11 @@
         "record_id": "5",
         "field": "bias_north_south",
         "true_value": false,
-        "pred_value": null,
-        "match": false,
-        "tp": 0,
+        "pred_value": false,
+        "match": true,
+        "tp": 1,
         "fp": 0,
-        "fn": 1,
+        "fn": 0,
         "tn": 0
       },
       {
@@ -6209,8 +6091,8 @@
         "true_value": null,
         "pred_value": [
           "site",
-          "sample",
-          "administrative_units"
+          "administrative_units",
+          "maps"
         ],
         "match": false,
         "tp": 0,
@@ -6269,11 +6151,12 @@
           "Glyptemys insculpta"
         ],
         "pred_value": [
-          "Glyptemys insculpta (wood turtle)"
+          "Glyptemys insculpta",
+          "wood turtle"
         ],
-        "match": true,
+        "match": false,
         "tp": 1,
-        "fp": 0,
+        "fp": 1,
         "fn": 0,
         "tn": 0
       },
@@ -6325,11 +6208,11 @@
         "record_id": "56",
         "field": "bias_north_south",
         "true_value": false,
-        "pred_value": null,
-        "match": false,
-        "tp": 0,
+        "pred_value": false,
+        "match": true,
+        "tp": 1,
         "fp": 0,
-        "fn": 1,
+        "fn": 0,
         "tn": 0
       },
       {
@@ -6339,16 +6222,15 @@
           "density"
         ],
         "pred_value": [
-          "traits",
-          "density",
-          "presence-absence",
           "time_series",
-          "abundance"
+          "abundance",
+          "presence-absence",
+          "traits"
         ],
         "match": false,
-        "tp": 1,
+        "tp": 0,
         "fp": 4,
-        "fn": 0,
+        "fn": 1,
         "tn": 0
       },
       {
@@ -6361,7 +6243,7 @@
           "site",
           "sample",
           "maps",
-          "administrative_units"
+          "site_ids"
         ],
         "match": false,
         "tp": 1,
@@ -6384,22 +6266,22 @@
         "record_id": "56",
         "field": "new_species_region",
         "true_value": false,
-        "pred_value": null,
-        "match": false,
-        "tp": 0,
+        "pred_value": false,
+        "match": true,
+        "tp": 1,
         "fp": 0,
-        "fn": 1,
+        "fn": 0,
         "tn": 0
       },
       {
         "record_id": "56",
         "field": "new_species_science",
         "true_value": false,
-        "pred_value": null,
-        "match": false,
-        "tp": 0,
+        "pred_value": false,
+        "match": true,
+        "tp": 1,
         "fp": 0,
-        "fn": 1,
+        "fn": 0,
         "tn": 0
       },
       {
@@ -6420,7 +6302,7 @@
           "Tachycineta bicolor"
         ],
         "pred_value": [
-          "tree swallow (Tachycineta bicolor)"
+          "Tachycineta bicolor (tree swallow)"
         ],
         "match": true,
         "tp": 1,
@@ -6454,11 +6336,11 @@
         "record_id": "56",
         "field": "threatened_species",
         "true_value": false,
-        "pred_value": null,
-        "match": false,
-        "tp": 0,
+        "pred_value": false,
+        "match": true,
+        "tp": 1,
         "fp": 0,
-        "fn": 1,
+        "fn": 0,
         "tn": 0
       },
       {
@@ -6476,11 +6358,11 @@
         "record_id": "71",
         "field": "bias_north_south",
         "true_value": false,
-        "pred_value": null,
-        "match": false,
-        "tp": 0,
+        "pred_value": false,
+        "match": true,
+        "tp": 1,
         "fp": 0,
-        "fn": 1,
+        "fn": 0,
         "tn": 0
       },
       {
@@ -6491,12 +6373,11 @@
         ],
         "pred_value": [
           "abundance",
-          "ecosystem_structure",
-          "species_richness"
+          "ecosystem_structure"
         ],
         "match": false,
         "tp": 0,
-        "fp": 3,
+        "fp": 2,
         "fn": 1,
         "tn": 0
       },
@@ -6507,14 +6388,13 @@
           "site_ids"
         ],
         "pred_value": [
-          "sample",
           "site",
-          "administrative_units",
-          "site_ids"
+          "site_ids",
+          "maps"
         ],
         "match": false,
         "tp": 1,
-        "fp": 3,
+        "fp": 2,
         "fn": 0,
         "tn": 0
       },
@@ -6569,24 +6449,30 @@
           "c.150 plant species"
         ],
         "pred_value": [
-          "203 herbaceous species inventoried across 784 1-m2 plots (see Appendix S4)",
-          "Bromus inermis L.",
-          "Phalaris arundinacea L.",
-          "Equisetum arvense L.",
-          "Artemisia vulgaris L.",
-          "Solidago canadensis L.",
-          "Dryopteris carthusiana (Vill.) H.P. Fuchs",
-          "Athyrium filix-femina (L.) Roth",
-          "Trillium erectum L.",
-          "Rubus pubescens Raf.",
-          "Agrimonia striata Michx.",
-          "Fragaria virginiana Duchesne",
-          "Onoclea sensibilis L.",
-          "Solidago rugosa Mill."
+          "Fraxinus pennsylvanica",
+          "Acer saccharum",
+          "Picea glauca",
+          "Larix laricina",
+          "Quercus rubra",
+          "Quercus macrocarpa",
+          "Bromus inermis",
+          "Phalaris arundinacea",
+          "Equisetum arvense",
+          "Artemisia vulgaris",
+          "Solidago canadensis",
+          "Dryopteris carthusiana",
+          "Athyrium filix-femina",
+          "Trillium erectum",
+          "Rubus pubescens",
+          "Agrimonia striata",
+          "Fragaria virginiana",
+          "Onoclea sensibilis",
+          "Solidago rugosa",
+          "Thalictrum pubescens"
         ],
         "match": false,
         "tp": 0,
-        "fp": 14,
+        "fp": 20,
         "fn": 1,
         "tn": 0
       },
@@ -6594,11 +6480,11 @@
         "record_id": "71",
         "field": "temp_range_f",
         "true_value": 2012,
-        "pred_value": 2009,
-        "match": false,
-        "tp": 0,
-        "fp": 1,
-        "fn": 1,
+        "pred_value": 2012,
+        "match": true,
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
         "tn": 0
       },
       {
@@ -6638,11 +6524,11 @@
         "record_id": "89",
         "field": "bias_north_south",
         "true_value": true,
-        "pred_value": null,
-        "match": false,
-        "tp": 0,
+        "pred_value": true,
+        "match": true,
+        "tp": 1,
         "fp": 0,
-        "fn": 1,
+        "fn": 0,
         "tn": 0
       },
       {
@@ -6653,18 +6539,11 @@
         ],
         "pred_value": [
           "time_series",
-          "presence-only",
-          "traits",
-          "distribution",
-          "presence-absence",
-          "traits",
-          "other",
-          "abundance",
-          "distribution"
+          "presence-only"
         ],
         "match": false,
         "tp": 1,
-        "fp": 6,
+        "fp": 1,
         "fn": 0,
         "tn": 0
       },
@@ -6675,10 +6554,10 @@
         "pred_value": [
           "sample",
           "site",
+          "site_ids",
           "maps",
-          "geographic_features",
-          "administrative_units",
-          "range"
+          "distribution",
+          "geographic_features"
         ],
         "match": false,
         "tp": 0,
@@ -6701,22 +6580,22 @@
         "record_id": "89",
         "field": "new_species_region",
         "true_value": false,
-        "pred_value": null,
-        "match": false,
-        "tp": 0,
+        "pred_value": false,
+        "match": true,
+        "tp": 1,
         "fp": 0,
-        "fn": 1,
+        "fn": 0,
         "tn": 0
       },
       {
         "record_id": "89",
         "field": "new_species_science",
         "true_value": false,
-        "pred_value": null,
-        "match": false,
-        "tp": 0,
+        "pred_value": false,
+        "match": true,
+        "tp": 1,
         "fp": 0,
-        "fn": 1,
+        "fn": 0,
         "tn": 0
       },
       {
@@ -6739,9 +6618,9 @@
           "Canis lupus"
         ],
         "pred_value": [
-          "Rangifer tarandus caribou",
-          "Alces alces",
-          "Canis lupus"
+          "Rangifer tarandus caribou (caribou)",
+          "Alces alces (moose)",
+          "Canis lupus (wolf)"
         ],
         "match": true,
         "tp": 3,
@@ -6797,11 +6676,11 @@
         "record_id": "9",
         "field": "bias_north_south",
         "true_value": false,
-        "pred_value": null,
-        "match": false,
-        "tp": 0,
+        "pred_value": false,
+        "match": true,
+        "tp": 1,
         "fp": 0,
-        "fn": 1,
+        "fn": 0,
         "tn": 0
       },
       {
@@ -6852,22 +6731,22 @@
         "record_id": "9",
         "field": "new_species_region",
         "true_value": false,
-        "pred_value": null,
-        "match": false,
-        "tp": 0,
+        "pred_value": false,
+        "match": true,
+        "tp": 1,
         "fp": 0,
-        "fn": 1,
+        "fn": 0,
         "tn": 0
       },
       {
         "record_id": "9",
         "field": "new_species_science",
         "true_value": false,
-        "pred_value": null,
-        "match": false,
-        "tp": 0,
+        "pred_value": false,
+        "match": true,
+        "tp": 1,
         "fp": 0,
-        "fn": 1,
+        "fn": 0,
         "tn": 0
       },
       {
@@ -6889,13 +6768,13 @@
           "striped skunks"
         ],
         "pred_value": [
-          "raccoon (Procyon lotor): 610 individuals captured",
-          "striped skunk (Mephitis mephitis): 121 individuals captured"
+          "raccoon (Procyon lotor)",
+          "striped skunk (Mephitis mephitis)"
         ],
-        "match": false,
-        "tp": 0,
-        "fp": 2,
-        "fn": 2,
+        "match": true,
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
         "tn": 0
       },
       {
@@ -6924,11 +6803,11 @@
         "record_id": "9",
         "field": "threatened_species",
         "true_value": false,
-        "pred_value": null,
-        "match": false,
-        "tp": 0,
+        "pred_value": false,
+        "match": true,
+        "tp": 1,
         "fp": 0,
-        "fn": 1,
+        "fn": 0,
         "tn": 0
       },
       {
@@ -6946,11 +6825,11 @@
         "record_id": "91",
         "field": "bias_north_south",
         "true_value": false,
-        "pred_value": null,
-        "match": false,
-        "tp": 0,
+        "pred_value": false,
+        "match": true,
+        "tp": 1,
         "fp": 0,
-        "fn": 1,
+        "fn": 0,
         "tn": 0
       },
       {
@@ -6960,12 +6839,11 @@
           "genetic_analysis"
         ],
         "pred_value": [
-          "genetic_analysis",
-          "time_series"
+          "genetic_analysis"
         ],
-        "match": false,
+        "match": true,
         "tp": 1,
-        "fp": 1,
+        "fp": 0,
         "fn": 0,
         "tn": 0
       },
@@ -6976,11 +6854,12 @@
         "pred_value": [
           "site",
           "site_ids",
+          "administrative_units",
           "maps"
         ],
         "match": false,
         "tp": 0,
-        "fp": 3,
+        "fp": 4,
         "fn": 0,
         "tn": 0
       },
@@ -6999,22 +6878,22 @@
         "record_id": "91",
         "field": "new_species_region",
         "true_value": false,
-        "pred_value": null,
-        "match": false,
-        "tp": 0,
+        "pred_value": false,
+        "match": true,
+        "tp": 1,
         "fp": 0,
-        "fn": 1,
+        "fn": 0,
         "tn": 0
       },
       {
         "record_id": "91",
         "field": "new_species_science",
         "true_value": false,
-        "pred_value": null,
-        "match": false,
-        "tp": 0,
+        "pred_value": false,
+        "match": true,
+        "tp": 1,
         "fp": 0,
-        "fn": 1,
+        "fn": 0,
         "tn": 0
       },
       {
@@ -7035,13 +6914,12 @@
           "Myotis lucifugus"
         ],
         "pred_value": [
-          "Myotis lucifugus (little brown bat); tissue samples collected from 768 adults and 174 young-of-the-year (YOY)",
-          "mtDNA control region sequenced for 356 individuals",
-          "Microsatellite genotypes obtained for 735 adults and 168 YOY (successfully genotyped at ≥7 of 9 loci)"
+          "Myotis lucifugus",
+          "little brown bat"
         ],
         "match": false,
         "tp": 1,
-        "fp": 2,
+        "fp": 1,
         "fn": 0,
         "tn": 0
       },
@@ -7082,12 +6960,12 @@
         "record_id": "91",
         "field": "time_series",
         "true_value": null,
-        "pred_value": true,
-        "match": false,
+        "pred_value": null,
+        "match": true,
         "tp": 0,
-        "fp": 1,
+        "fp": 0,
         "fn": 0,
-        "tn": 0
+        "tn": 1
       }
     ]
   }

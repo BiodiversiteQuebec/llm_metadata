@@ -1,0 +1,239 @@
+Logging to: artifacts\runs\20260331_120734_prompt_engineering_pdf_native.log
+Recreate command: uv run python -m llm_metadata.prompt_eval --mode pdf_native --manifest data/manifests/dev_subset_data_paper.csv --parallelism 8 --model gpt-5-mini --gt data/dataset_092624_validated.xlsx --name prompt_engineering_pdf_native
+2026-03-31 12:07:34 | INFO     | __main__:run_eval:118 | Starting prompt_eval mode=pdf_native manifest_path=data/manifests/dev_subset_data_paper.csv parallelism=8 model=gpt-5-mini skip_cache=False
+2026-03-31 12:07:34 | INFO     | __main__:run_eval:127 | Loaded manifest records=30
+2026-03-31 12:07:34 | INFO     | llm_metadata.extraction:run_manifest_extraction:354 | Starting manifest extraction mode=pdf_native records=30 parallelism=8 model=gpt-5-mini prompt_module=prompts.pdf_file skip_cache=False
+2026-03-31 12:07:34 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [1/30] Queueing gt_record_id=5 record_id=10.1093/jhered/esx103 title=Data from: Paternity analysis of wood turtles (Glyptemys insculpta) reveals complex mating patterns
+2026-03-31 12:07:34 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [2/30] Queueing gt_record_id=9 record_id=10.1371/journal.pone.0128238 title=Data from: Resampling method for applying density-dependent habitat selection theory to wildlife surveys
+2026-03-31 12:07:34 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [3/30] Queueing gt_record_id=11 record_id=10.1371/journal.pone.0073695 title=Data from: Impacts of human disturbance on large prey species: do behavioral reactions translate to fitness consequences?
+2026-03-31 12:07:34 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [4/30] Queueing gt_record_id=12 record_id=10.1002/ece3.4685 title=Data from: Natal habitat preference induction in large mammals – Like mother, like child?
+2026-03-31 12:07:34 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [5/30] Queueing gt_record_id=19 record_id=10.1093/jhered/esw073 title=Data from: The genetic signature of range expansion in a disease vector - the black-legged tick
+2026-03-31 12:07:34 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [6/30] Queueing gt_record_id=24 record_id=10.1002/ece3.3906 title=Data from: Influence of northern limit range on genetic diversity and structure in a widespread North American tree, sugar maple (Acer saccharum Marshall)
+2026-03-31 12:07:34 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [7/30] Queueing gt_record_id=27 record_id=10.1111/ddi.12496 title=Data from: Patchy distribution and low effective population size raise concern for an at-risk top predator
+2026-03-31 12:07:34 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [8/30] Queueing gt_record_id=29 record_id=10.1002/ece3.1476 title=Data from: Ecological gradients driving the distribution of four Ericaceae in boreal Quebec, Canada
+2026-03-31 12:07:34 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [9/30] Queueing gt_record_id=30 record_id=10.1186/s40462-016-0079-4 title=Data from: Caribou, water, and ice – fine-scale movements of a migratory arctic ungulate in the context of climate change
+2026-03-31 12:07:34 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [10/30] Queueing gt_record_id=31 record_id=10.1111/eva.12028 title=Data from: Reduced fitness of Atlantic salmon released in the wild after one generation of captive-breeding
+2026-03-31 12:07:34 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [11/30] Queueing gt_record_id=37 record_id=10.1002/ece3.1029 title=Data from: Fitness dynamics within a poplar hybrid zone: I. Prezygotic and postzygotic barriers impacting a native poplar hybrid stand.
+2026-03-31 12:07:34 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [12/30] Queueing gt_record_id=38 record_id=10.1371/journal.pone.0204445 title=Data from: Temporal dynamics in animal community assembly during post-logging succession in boreal forest
+2026-03-31 12:07:34 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [13/30] Queueing gt_record_id=39 record_id=10.1098/rspb.2014.0649 title=Data from: Severe recent decrease of adult body mass in a declining insectivorous bird population
+2026-03-31 12:07:34 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [14/30] Queueing gt_record_id=56 record_id=10.1111/eva.12315 title=Data from: Multidimensional environmental influences on timing of breeding in a tree swallow population facing climate change
+2026-03-31 12:07:34 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [15/30] Queueing gt_record_id=71 record_id=10.1111/1365-2664.12675 title=Data from: Threshold dynamics in plant succession after tree planting in agricultural riparian zones
+2026-03-31 12:07:34 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [16/30] Queueing gt_record_id=89 record_id=10.1890/12-2118.1 title=Data from: Logging-induced changes in habitat network connectivity shape behavioral interactions in the wolf-caribou-moose system
+2026-03-31 12:07:34 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [17/30] Queueing gt_record_id=91 record_id=10.1002/ece3.1266 title=Data from: Genetic connectivity among swarming sites in the wide ranging and recently declining little brown bat (Myotis lucifugus)
+2026-03-31 12:07:34 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [18/30] Queueing gt_record_id=101 record_id=10.1371/journal.pone.0077514 title=Data from: Disentangling woodland caribou movements in response to clearcuts and roads across temporal scales
+2026-03-31 12:07:34 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [19/30] Queueing gt_record_id=104 record_id=10.1038/s41598-018-34822-9 title=Data from: Compensatory conservation measures for an endangered caribou population under climate change
+2026-03-31 12:07:34 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [20/30] Queueing gt_record_id=123 record_id=10.1098/rspb.2014.0502 title=Data from: Temporally dynamic habitat suitability predicts genetic relatedness among caribou
+2026-03-31 12:07:34 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [21/30] Queueing gt_record_id=175 record_id=10.5558/tfc76653-4 title=Ã‰valuation de la coupe avec protection de la rÃ©gÃ©nÃ©ration et des sols comme mÃ©thode de rÃ©gÃ©nÃ©ration de peuplements mÃ©langÃ©s du domaine bioclimatique de la sapiniÃ¨re Ã  bouleau jaune de l'est du QuÃ©bec, Canada
+2026-03-31 12:07:34 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [22/30] Queueing gt_record_id=201 record_id=10.1086/671900 title=Comparative Physiology and Relative Swimming Performance of Three Redhorse (Moxostoma spp.) Species: Associations with Fishway Passage Success*
+2026-03-31 12:07:34 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [23/30] Queueing gt_record_id=208 record_id=10.3389/fmars.2021.637546 title=Determining the Ecological Status of Benthic Coastal Communities: A Case in an Anthropized Sub-Arctic Area
+2026-03-31 12:07:34 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [24/30] Queueing gt_record_id=225 record_id=10.1371/journal.pone.0109261 title=Effects of Habitat-Forming Species Richness, Evenness, Identity, and Abundance on Benthic Intertidal Community Establishment and Productivity
+2026-03-31 12:07:34 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [25/30] Queueing gt_record_id=253 record_id=10.1111/eva.13248 title=Genomic data support management of anadromous Arctic Char fisheries in Nunavik by highlighting neutral and putatively adaptive genetic variation
+2026-03-31 12:07:34 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [26/30] Queueing gt_record_id=258 record_id=10.1111/ecog.00997 title=Host phenology, geographic range size and regional occurrence explain interspecific variation in damselflyâ€“water mite associations
+2026-03-31 12:07:34 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [27/30] Queueing gt_record_id=271 record_id=10.1603/0013-8746%282006%2999%5b536%3aiopmiq%5d2.0.co%3b2 title=Inventory of Predacious Mites in Quebec Commercial Apple Orchards Where Integrated Pest Management Programs Are Implemented
+2026-03-31 12:07:34 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [28/30] Queueing gt_record_id=315 record_id=10.1603/en10045 title=Selected Beetle Assemblages Captured in Pitfall Traps Baited with Deer Dung or Meat in Balsam Fir and Sugar Maple Forests of Central Quebec
+2026-03-31 12:07:34 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [29/30] Queueing gt_record_id=343 record_id=10.3390/ijgi7090335 title=Towards Modelling Future Trends of Quebec's Boreal Birds' Species Distribution under Climate Change
+2026-03-31 12:07:34 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [30/30] Queueing gt_record_id=351 record_id=10.1603/0013-8746%282005%29098%5b0565%3awccdaa%5d2.0.co%3b2 title=Weevil (Coleoptera: Curculionoidea) Diversity and Abundance in Two Quebec Vineyards
+2026-03-31 12:07:34 | INFO     | llm_metadata.gpt_extract:upload_pdf_to_openai:227 | Uploading PDF to OpenAI path=data\pdfs\fuster\10.1002_ece3.1476.pdf purpose=user_data
+2026-03-31 12:07:34 | INFO     | llm_metadata.gpt_extract:upload_pdf_to_openai:227 | Uploading PDF to OpenAI path=data\pdfs\fuster\10.1002_ece3.3906.pdf purpose=user_data
+2026-03-31 12:07:34 | INFO     | llm_metadata.gpt_extract:upload_pdf_to_openai:227 | Uploading PDF to OpenAI path=data\pdfs\fuster\10.1093_jhered_esw073.pdf purpose=user_data
+2026-03-31 12:07:34 | INFO     | llm_metadata.gpt_extract:upload_pdf_to_openai:227 | Uploading PDF to OpenAI path=data\pdfs\fuster\10.1002_ece3.4685.pdf purpose=user_data
+2026-03-31 12:07:34 | INFO     | llm_metadata.gpt_extract:upload_pdf_to_openai:227 | Uploading PDF to OpenAI path=data\pdfs\fuster\10.1111_ddi.12496.pdf purpose=user_data
+2026-03-31 12:07:34 | INFO     | llm_metadata.gpt_extract:upload_pdf_to_openai:227 | Uploading PDF to OpenAI path=data\pdfs\fuster\10.1371_journal.pone.0073695.pdf purpose=user_data
+2026-03-31 12:07:34 | INFO     | llm_metadata.gpt_extract:upload_pdf_to_openai:227 | Uploading PDF to OpenAI path=data\pdfs\fuster\10.1093_jhered_esx103.pdf purpose=user_data
+2026-03-31 12:07:34 | INFO     | llm_metadata.gpt_extract:upload_pdf_to_openai:227 | Uploading PDF to OpenAI path=data\pdfs\fuster\10.1371_journal.pone.0128238.pdf purpose=user_data
+2026-03-31 12:07:36 | DEBUG    | llm_metadata.gpt_extract:upload_pdf_to_openai:230 | Uploaded PDF to OpenAI file_id=file-EZeGSgAtF5MpDBV2E3wrFn
+2026-03-31 12:07:36 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:314 | Starting pdf_native extraction pdf_path=data\pdfs\fuster\10.1371_journal.pone.0073695.pdf file_id=file-EZeGSgAtF5MpDBV2E3wrFn model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss
+2026-03-31 12:07:36 | DEBUG    | llm_metadata.gpt_extract:_response_parse_pdf:286 | Calling OpenAI Responses API for native PDF extraction model=gpt-5-mini schema=DatasetFeaturesExtraction file_id=file-EZeGSgAtF5MpDBV2E3wrFn
+2026-03-31 12:07:36 | DEBUG    | llm_metadata.gpt_extract:upload_pdf_to_openai:230 | Uploaded PDF to OpenAI file_id=file-YB1ZfvLxz4yAbx1EubDzeK
+2026-03-31 12:07:36 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:314 | Starting pdf_native extraction pdf_path=data\pdfs\fuster\10.1002_ece3.4685.pdf file_id=file-YB1ZfvLxz4yAbx1EubDzeK model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss
+2026-03-31 12:07:36 | DEBUG    | llm_metadata.gpt_extract:_response_parse_pdf:286 | Calling OpenAI Responses API for native PDF extraction model=gpt-5-mini schema=DatasetFeaturesExtraction file_id=file-YB1ZfvLxz4yAbx1EubDzeK
+2026-03-31 12:07:36 | DEBUG    | llm_metadata.gpt_extract:upload_pdf_to_openai:230 | Uploaded PDF to OpenAI file_id=file-DcUD7RceyGwsRaMtgk4cLa
+2026-03-31 12:07:36 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:314 | Starting pdf_native extraction pdf_path=data\pdfs\fuster\10.1371_journal.pone.0128238.pdf file_id=file-DcUD7RceyGwsRaMtgk4cLa model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss
+2026-03-31 12:07:36 | DEBUG    | llm_metadata.gpt_extract:_response_parse_pdf:286 | Calling OpenAI Responses API for native PDF extraction model=gpt-5-mini schema=DatasetFeaturesExtraction file_id=file-DcUD7RceyGwsRaMtgk4cLa
+2026-03-31 12:07:36 | DEBUG    | llm_metadata.gpt_extract:upload_pdf_to_openai:230 | Uploaded PDF to OpenAI file_id=file-WucaRj443MPCGFwZLxgyjp
+2026-03-31 12:07:36 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:314 | Starting pdf_native extraction pdf_path=data\pdfs\fuster\10.1002_ece3.3906.pdf file_id=file-WucaRj443MPCGFwZLxgyjp model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss
+2026-03-31 12:07:36 | DEBUG    | llm_metadata.gpt_extract:_response_parse_pdf:286 | Calling OpenAI Responses API for native PDF extraction model=gpt-5-mini schema=DatasetFeaturesExtraction file_id=file-WucaRj443MPCGFwZLxgyjp
+2026-03-31 12:07:36 | DEBUG    | llm_metadata.gpt_extract:upload_pdf_to_openai:230 | Uploaded PDF to OpenAI file_id=file-ThYbAmwkHw33zkEbBgPjAG
+2026-03-31 12:07:36 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:314 | Starting pdf_native extraction pdf_path=data\pdfs\fuster\10.1093_jhered_esx103.pdf file_id=file-ThYbAmwkHw33zkEbBgPjAG model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss
+2026-03-31 12:07:36 | DEBUG    | llm_metadata.gpt_extract:_response_parse_pdf:286 | Calling OpenAI Responses API for native PDF extraction model=gpt-5-mini schema=DatasetFeaturesExtraction file_id=file-ThYbAmwkHw33zkEbBgPjAG
+2026-03-31 12:07:36 | DEBUG    | llm_metadata.gpt_extract:upload_pdf_to_openai:230 | Uploaded PDF to OpenAI file_id=file-F79HcjS187rYDTyiFHehaT
+2026-03-31 12:07:36 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:314 | Starting pdf_native extraction pdf_path=data\pdfs\fuster\10.1111_ddi.12496.pdf file_id=file-F79HcjS187rYDTyiFHehaT model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss
+2026-03-31 12:07:36 | DEBUG    | llm_metadata.gpt_extract:_response_parse_pdf:286 | Calling OpenAI Responses API for native PDF extraction model=gpt-5-mini schema=DatasetFeaturesExtraction file_id=file-F79HcjS187rYDTyiFHehaT
+2026-03-31 12:07:37 | DEBUG    | llm_metadata.gpt_extract:upload_pdf_to_openai:230 | Uploaded PDF to OpenAI file_id=file-PRxDvtx1RZVsGPkXWeQkyg
+2026-03-31 12:07:37 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:314 | Starting pdf_native extraction pdf_path=data\pdfs\fuster\10.1002_ece3.1476.pdf file_id=file-PRxDvtx1RZVsGPkXWeQkyg model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss
+2026-03-31 12:07:37 | DEBUG    | llm_metadata.gpt_extract:_response_parse_pdf:286 | Calling OpenAI Responses API for native PDF extraction model=gpt-5-mini schema=DatasetFeaturesExtraction file_id=file-PRxDvtx1RZVsGPkXWeQkyg
+2026-03-31 12:07:38 | DEBUG    | llm_metadata.gpt_extract:upload_pdf_to_openai:230 | Uploaded PDF to OpenAI file_id=file-KgRWRbpznQ1cWBWyv5apPK
+2026-03-31 12:07:38 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:314 | Starting pdf_native extraction pdf_path=data\pdfs\fuster\10.1093_jhered_esw073.pdf file_id=file-KgRWRbpznQ1cWBWyv5apPK model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss
+2026-03-31 12:07:38 | DEBUG    | llm_metadata.gpt_extract:_response_parse_pdf:286 | Calling OpenAI Responses API for native PDF extraction model=gpt-5-mini schema=DatasetFeaturesExtraction file_id=file-KgRWRbpznQ1cWBWyv5apPK
+2026-03-31 12:08:04 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:342 | Completed pdf_native extraction pdf_path=data\pdfs\fuster\10.1371_journal.pone.0128238.pdf file_id=file-DcUD7RceyGwsRaMtgk4cLa cache=miss cost=$0.0175
+2026-03-31 12:08:04 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [2/30] Finished gt_record_id=9 status=success method=pdf_native cost=$0.0175
+2026-03-31 12:08:04 | INFO     | llm_metadata.gpt_extract:upload_pdf_to_openai:227 | Uploading PDF to OpenAI path=data\pdfs\fuster\10.1186_s40462-016-0079-4.pdf purpose=user_data
+2026-03-31 12:08:06 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:342 | Completed pdf_native extraction pdf_path=data\pdfs\fuster\10.1111_ddi.12496.pdf file_id=file-F79HcjS187rYDTyiFHehaT cache=miss cost=$0.0128
+2026-03-31 12:08:06 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [7/30] Finished gt_record_id=27 status=success method=pdf_native cost=$0.0128
+2026-03-31 12:08:06 | INFO     | llm_metadata.gpt_extract:upload_pdf_to_openai:227 | Uploading PDF to OpenAI path=data\pdfs\fuster\10.1111_eva.12028.pdf purpose=user_data
+2026-03-31 12:08:06 | DEBUG    | llm_metadata.gpt_extract:upload_pdf_to_openai:230 | Uploaded PDF to OpenAI file_id=file-UkR23akc5suLkj6cf29dYP
+2026-03-31 12:08:06 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:314 | Starting pdf_native extraction pdf_path=data\pdfs\fuster\10.1186_s40462-016-0079-4.pdf file_id=file-UkR23akc5suLkj6cf29dYP model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss
+2026-03-31 12:08:06 | DEBUG    | llm_metadata.gpt_extract:_response_parse_pdf:286 | Calling OpenAI Responses API for native PDF extraction model=gpt-5-mini schema=DatasetFeaturesExtraction file_id=file-UkR23akc5suLkj6cf29dYP
+2026-03-31 12:08:07 | DEBUG    | llm_metadata.gpt_extract:upload_pdf_to_openai:230 | Uploaded PDF to OpenAI file_id=file-PckfaVYiLiDwLiuccTAuWz
+2026-03-31 12:08:07 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:314 | Starting pdf_native extraction pdf_path=data\pdfs\fuster\10.1111_eva.12028.pdf file_id=file-PckfaVYiLiDwLiuccTAuWz model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss
+2026-03-31 12:08:07 | DEBUG    | llm_metadata.gpt_extract:_response_parse_pdf:286 | Calling OpenAI Responses API for native PDF extraction model=gpt-5-mini schema=DatasetFeaturesExtraction file_id=file-PckfaVYiLiDwLiuccTAuWz
+2026-03-31 12:08:08 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:342 | Completed pdf_native extraction pdf_path=data\pdfs\fuster\10.1371_journal.pone.0073695.pdf file_id=file-EZeGSgAtF5MpDBV2E3wrFn cache=miss cost=$0.0147
+2026-03-31 12:08:08 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [3/30] Finished gt_record_id=11 status=success method=pdf_native cost=$0.0147
+2026-03-31 12:08:08 | INFO     | llm_metadata.gpt_extract:upload_pdf_to_openai:227 | Uploading PDF to OpenAI path=data\pdfs\fuster\10.1002_ece3.1029.pdf purpose=user_data
+2026-03-31 12:08:08 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:342 | Completed pdf_native extraction pdf_path=data\pdfs\fuster\10.1002_ece3.1476.pdf file_id=file-PRxDvtx1RZVsGPkXWeQkyg cache=miss cost=$0.0141
+2026-03-31 12:08:08 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [8/30] Finished gt_record_id=29 status=success method=pdf_native cost=$0.0141
+2026-03-31 12:08:08 | INFO     | llm_metadata.gpt_extract:upload_pdf_to_openai:227 | Uploading PDF to OpenAI path=data\pdfs\fuster\10.1371_journal.pone.0204445.pdf purpose=user_data
+2026-03-31 12:08:09 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:342 | Completed pdf_native extraction pdf_path=data\pdfs\fuster\10.1093_jhered_esx103.pdf file_id=file-ThYbAmwkHw33zkEbBgPjAG cache=miss cost=$0.0139
+2026-03-31 12:08:09 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [1/30] Finished gt_record_id=5 status=success method=pdf_native cost=$0.0139
+2026-03-31 12:08:09 | INFO     | llm_metadata.gpt_extract:upload_pdf_to_openai:227 | Uploading PDF to OpenAI path=data\pdfs\fuster\10.1098_rspb.2014.0649.pdf purpose=user_data
+2026-03-31 12:08:09 | DEBUG    | llm_metadata.gpt_extract:upload_pdf_to_openai:230 | Uploaded PDF to OpenAI file_id=file-2cjuuxnCEd236SZ6Xciy3z
+2026-03-31 12:08:09 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:314 | Starting pdf_native extraction pdf_path=data\pdfs\fuster\10.1002_ece3.1029.pdf file_id=file-2cjuuxnCEd236SZ6Xciy3z model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss
+2026-03-31 12:08:09 | DEBUG    | llm_metadata.gpt_extract:_response_parse_pdf:286 | Calling OpenAI Responses API for native PDF extraction model=gpt-5-mini schema=DatasetFeaturesExtraction file_id=file-2cjuuxnCEd236SZ6Xciy3z
+2026-03-31 12:08:09 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:342 | Completed pdf_native extraction pdf_path=data\pdfs\fuster\10.1093_jhered_esw073.pdf file_id=file-KgRWRbpznQ1cWBWyv5apPK cache=miss cost=$0.0122
+2026-03-31 12:08:09 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [5/30] Finished gt_record_id=19 status=success method=pdf_native cost=$0.0122
+2026-03-31 12:08:09 | INFO     | llm_metadata.gpt_extract:upload_pdf_to_openai:227 | Uploading PDF to OpenAI path=data\pdfs\fuster\10.1111_eva.12315.pdf purpose=user_data
+2026-03-31 12:08:10 | DEBUG    | llm_metadata.gpt_extract:upload_pdf_to_openai:230 | Uploaded PDF to OpenAI file_id=file-Rdk97KVcZVGUuDNKjzRhPi
+2026-03-31 12:08:10 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:314 | Starting pdf_native extraction pdf_path=data\pdfs\fuster\10.1098_rspb.2014.0649.pdf file_id=file-Rdk97KVcZVGUuDNKjzRhPi model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss
+2026-03-31 12:08:10 | DEBUG    | llm_metadata.gpt_extract:_response_parse_pdf:286 | Calling OpenAI Responses API for native PDF extraction model=gpt-5-mini schema=DatasetFeaturesExtraction file_id=file-Rdk97KVcZVGUuDNKjzRhPi
+2026-03-31 12:08:10 | DEBUG    | llm_metadata.gpt_extract:upload_pdf_to_openai:230 | Uploaded PDF to OpenAI file_id=file-4fQjVu4GK9PpBoZK4YL1NE
+2026-03-31 12:08:10 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:314 | Starting pdf_native extraction pdf_path=data\pdfs\fuster\10.1371_journal.pone.0204445.pdf file_id=file-4fQjVu4GK9PpBoZK4YL1NE model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss
+2026-03-31 12:08:10 | DEBUG    | llm_metadata.gpt_extract:_response_parse_pdf:286 | Calling OpenAI Responses API for native PDF extraction model=gpt-5-mini schema=DatasetFeaturesExtraction file_id=file-4fQjVu4GK9PpBoZK4YL1NE
+2026-03-31 12:08:10 | DEBUG    | llm_metadata.gpt_extract:upload_pdf_to_openai:230 | Uploaded PDF to OpenAI file_id=file-XQnXwJeb3uYyGZFsQt7gWm
+2026-03-31 12:08:11 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:314 | Starting pdf_native extraction pdf_path=data\pdfs\fuster\10.1111_eva.12315.pdf file_id=file-XQnXwJeb3uYyGZFsQt7gWm model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss
+2026-03-31 12:08:11 | DEBUG    | llm_metadata.gpt_extract:_response_parse_pdf:286 | Calling OpenAI Responses API for native PDF extraction model=gpt-5-mini schema=DatasetFeaturesExtraction file_id=file-XQnXwJeb3uYyGZFsQt7gWm
+2026-03-31 12:08:12 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:342 | Completed pdf_native extraction pdf_path=data\pdfs\fuster\10.1002_ece3.3906.pdf file_id=file-WucaRj443MPCGFwZLxgyjp cache=miss cost=$0.0160
+2026-03-31 12:08:12 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [6/30] Finished gt_record_id=24 status=success method=pdf_native cost=$0.0160
+2026-03-31 12:08:12 | INFO     | llm_metadata.gpt_extract:upload_pdf_to_openai:227 | Uploading PDF to OpenAI path=data\pdfs\fuster\10.1111_1365-2664.12675.pdf purpose=user_data
+2026-03-31 12:08:13 | DEBUG    | llm_metadata.gpt_extract:upload_pdf_to_openai:230 | Uploaded PDF to OpenAI file_id=file-L9zmbiMNQJt1j49rHkxYB7
+2026-03-31 12:08:13 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:314 | Starting pdf_native extraction pdf_path=data\pdfs\fuster\10.1111_1365-2664.12675.pdf file_id=file-L9zmbiMNQJt1j49rHkxYB7 model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss
+2026-03-31 12:08:13 | DEBUG    | llm_metadata.gpt_extract:_response_parse_pdf:286 | Calling OpenAI Responses API for native PDF extraction model=gpt-5-mini schema=DatasetFeaturesExtraction file_id=file-L9zmbiMNQJt1j49rHkxYB7
+2026-03-31 12:08:18 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:342 | Completed pdf_native extraction pdf_path=data\pdfs\fuster\10.1002_ece3.4685.pdf file_id=file-YB1ZfvLxz4yAbx1EubDzeK cache=miss cost=$0.0158
+2026-03-31 12:08:18 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [4/30] Finished gt_record_id=12 status=success method=pdf_native cost=$0.0158
+2026-03-31 12:08:18 | INFO     | llm_metadata.gpt_extract:upload_pdf_to_openai:227 | Uploading PDF to OpenAI path=data\pdfs\fuster\10.1890_12-2118.1.pdf purpose=user_data
+2026-03-31 12:08:19 | DEBUG    | llm_metadata.gpt_extract:upload_pdf_to_openai:230 | Uploaded PDF to OpenAI file_id=file-XGb6gDx32goe92zAWAtZcY
+2026-03-31 12:08:19 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:314 | Starting pdf_native extraction pdf_path=data\pdfs\fuster\10.1890_12-2118.1.pdf file_id=file-XGb6gDx32goe92zAWAtZcY model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss
+2026-03-31 12:08:19 | DEBUG    | llm_metadata.gpt_extract:_response_parse_pdf:286 | Calling OpenAI Responses API for native PDF extraction model=gpt-5-mini schema=DatasetFeaturesExtraction file_id=file-XGb6gDx32goe92zAWAtZcY
+2026-03-31 12:08:33 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:342 | Completed pdf_native extraction pdf_path=data\pdfs\fuster\10.1111_eva.12028.pdf file_id=file-PckfaVYiLiDwLiuccTAuWz cache=miss cost=$0.0124
+2026-03-31 12:08:33 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [10/30] Finished gt_record_id=31 status=success method=pdf_native cost=$0.0124
+2026-03-31 12:08:33 | INFO     | llm_metadata.gpt_extract:upload_pdf_to_openai:227 | Uploading PDF to OpenAI path=data\pdfs\fuster\10.1002_ece3.1266.pdf purpose=user_data
+2026-03-31 12:08:34 | DEBUG    | llm_metadata.gpt_extract:upload_pdf_to_openai:230 | Uploaded PDF to OpenAI file_id=file-NZxXDhWYp77sBAVCZqdYbR
+2026-03-31 12:08:34 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:314 | Starting pdf_native extraction pdf_path=data\pdfs\fuster\10.1002_ece3.1266.pdf file_id=file-NZxXDhWYp77sBAVCZqdYbR model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss
+2026-03-31 12:08:34 | DEBUG    | llm_metadata.gpt_extract:_response_parse_pdf:286 | Calling OpenAI Responses API for native PDF extraction model=gpt-5-mini schema=DatasetFeaturesExtraction file_id=file-NZxXDhWYp77sBAVCZqdYbR
+2026-03-31 12:08:36 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:342 | Completed pdf_native extraction pdf_path=data\pdfs\fuster\10.1111_eva.12315.pdf file_id=file-XQnXwJeb3uYyGZFsQt7gWm cache=miss cost=$0.0116
+2026-03-31 12:08:36 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [14/30] Finished gt_record_id=56 status=success method=pdf_native cost=$0.0116
+2026-03-31 12:08:36 | INFO     | llm_metadata.gpt_extract:upload_pdf_to_openai:227 | Uploading PDF to OpenAI path=data\pdfs\fuster\10.1371_journal.pone.0077514.pdf purpose=user_data
+2026-03-31 12:08:37 | DEBUG    | llm_metadata.gpt_extract:upload_pdf_to_openai:230 | Uploaded PDF to OpenAI file_id=file-Hd7peWBWhqid1Z4y5WgDXn
+2026-03-31 12:08:37 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:314 | Starting pdf_native extraction pdf_path=data\pdfs\fuster\10.1371_journal.pone.0077514.pdf file_id=file-Hd7peWBWhqid1Z4y5WgDXn model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss
+2026-03-31 12:08:37 | DEBUG    | llm_metadata.gpt_extract:_response_parse_pdf:286 | Calling OpenAI Responses API for native PDF extraction model=gpt-5-mini schema=DatasetFeaturesExtraction file_id=file-Hd7peWBWhqid1Z4y5WgDXn
+2026-03-31 12:08:43 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:342 | Completed pdf_native extraction pdf_path=data\pdfs\fuster\10.1186_s40462-016-0079-4.pdf file_id=file-UkR23akc5suLkj6cf29dYP cache=miss cost=$0.0153
+2026-03-31 12:08:43 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [9/30] Finished gt_record_id=30 status=success method=pdf_native cost=$0.0153
+2026-03-31 12:08:43 | INFO     | llm_metadata.gpt_extract:upload_pdf_to_openai:227 | Uploading PDF to OpenAI path=data\pdfs\fuster\10.1038_s41598-018-34822-9.pdf purpose=user_data
+2026-03-31 12:08:44 | DEBUG    | llm_metadata.gpt_extract:upload_pdf_to_openai:230 | Uploaded PDF to OpenAI file_id=file-RBVNWsizT8GApHa4CXFoxq
+2026-03-31 12:08:44 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:314 | Starting pdf_native extraction pdf_path=data\pdfs\fuster\10.1038_s41598-018-34822-9.pdf file_id=file-RBVNWsizT8GApHa4CXFoxq model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss
+2026-03-31 12:08:44 | DEBUG    | llm_metadata.gpt_extract:_response_parse_pdf:286 | Calling OpenAI Responses API for native PDF extraction model=gpt-5-mini schema=DatasetFeaturesExtraction file_id=file-RBVNWsizT8GApHa4CXFoxq
+2026-03-31 12:08:48 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:342 | Completed pdf_native extraction pdf_path=data\pdfs\fuster\10.1002_ece3.1029.pdf file_id=file-2cjuuxnCEd236SZ6Xciy3z cache=miss cost=$0.0179
+2026-03-31 12:08:48 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [11/30] Finished gt_record_id=37 status=success method=pdf_native cost=$0.0179
+2026-03-31 12:08:48 | INFO     | llm_metadata.gpt_extract:upload_pdf_to_openai:227 | Uploading PDF to OpenAI path=data\pdfs\fuster\10.1098_rspb.2014.0502.pdf purpose=user_data
+2026-03-31 12:08:49 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:342 | Completed pdf_native extraction pdf_path=data\pdfs\fuster\10.1890_12-2118.1.pdf file_id=file-XGb6gDx32goe92zAWAtZcY cache=miss cost=$0.0168
+2026-03-31 12:08:49 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [16/30] Finished gt_record_id=89 status=success method=pdf_native cost=$0.0168
+2026-03-31 12:08:49 | INFO     | llm_metadata.gpt_extract:upload_pdf_to_openai:227 | Uploading PDF to OpenAI path=data\pdfs\fuster\10.5558_TFC76653-4.pdf purpose=user_data
+2026-03-31 12:08:50 | DEBUG    | llm_metadata.gpt_extract:upload_pdf_to_openai:230 | Uploaded PDF to OpenAI file_id=file-XhhctVJgaVy9MVgw4VefWg
+2026-03-31 12:08:50 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:314 | Starting pdf_native extraction pdf_path=data\pdfs\fuster\10.1098_rspb.2014.0502.pdf file_id=file-XhhctVJgaVy9MVgw4VefWg model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss
+2026-03-31 12:08:50 | DEBUG    | llm_metadata.gpt_extract:_response_parse_pdf:286 | Calling OpenAI Responses API for native PDF extraction model=gpt-5-mini schema=DatasetFeaturesExtraction file_id=file-XhhctVJgaVy9MVgw4VefWg
+2026-03-31 12:08:51 | DEBUG    | llm_metadata.gpt_extract:upload_pdf_to_openai:230 | Uploaded PDF to OpenAI file_id=file-JnejLE55tf2qkxWk9NLGdm
+2026-03-31 12:08:51 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:314 | Starting pdf_native extraction pdf_path=data\pdfs\fuster\10.5558_TFC76653-4.pdf file_id=file-JnejLE55tf2qkxWk9NLGdm model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss
+2026-03-31 12:08:51 | DEBUG    | llm_metadata.gpt_extract:_response_parse_pdf:286 | Calling OpenAI Responses API for native PDF extraction model=gpt-5-mini schema=DatasetFeaturesExtraction file_id=file-JnejLE55tf2qkxWk9NLGdm
+2026-03-31 12:08:56 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:342 | Completed pdf_native extraction pdf_path=data\pdfs\fuster\10.1098_rspb.2014.0649.pdf file_id=file-Rdk97KVcZVGUuDNKjzRhPi cache=miss cost=$0.0167
+2026-03-31 12:08:56 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [13/30] Finished gt_record_id=39 status=success method=pdf_native cost=$0.0167
+2026-03-31 12:08:56 | INFO     | llm_metadata.gpt_extract:upload_pdf_to_openai:227 | Uploading PDF to OpenAI path=data\pdfs\fuster\10.1086_671900.pdf purpose=user_data
+2026-03-31 12:08:56 | DEBUG    | llm_metadata.gpt_extract:upload_pdf_to_openai:230 | Uploaded PDF to OpenAI file_id=file-VFWDBLhU8pNDszJVMHE1to
+2026-03-31 12:08:56 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:314 | Starting pdf_native extraction pdf_path=data\pdfs\fuster\10.1086_671900.pdf file_id=file-VFWDBLhU8pNDszJVMHE1to model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss
+2026-03-31 12:08:56 | DEBUG    | llm_metadata.gpt_extract:_response_parse_pdf:286 | Calling OpenAI Responses API for native PDF extraction model=gpt-5-mini schema=DatasetFeaturesExtraction file_id=file-VFWDBLhU8pNDszJVMHE1to
+2026-03-31 12:08:57 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:342 | Completed pdf_native extraction pdf_path=data\pdfs\fuster\10.1111_1365-2664.12675.pdf file_id=file-L9zmbiMNQJt1j49rHkxYB7 cache=miss cost=$0.0167
+2026-03-31 12:08:57 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [15/30] Finished gt_record_id=71 status=success method=pdf_native cost=$0.0167
+2026-03-31 12:08:57 | INFO     | llm_metadata.gpt_extract:upload_pdf_to_openai:227 | Uploading PDF to OpenAI path=data\pdfs\fuster\10.3389_fmars.2021.637546.pdf purpose=user_data
+2026-03-31 12:08:58 | DEBUG    | llm_metadata.gpt_extract:upload_pdf_to_openai:230 | Uploaded PDF to OpenAI file_id=file-5wDAReN994w2p7w4uAqdrG
+2026-03-31 12:08:58 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:314 | Starting pdf_native extraction pdf_path=data\pdfs\fuster\10.3389_fmars.2021.637546.pdf file_id=file-5wDAReN994w2p7w4uAqdrG model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss
+2026-03-31 12:08:58 | DEBUG    | llm_metadata.gpt_extract:_response_parse_pdf:286 | Calling OpenAI Responses API for native PDF extraction model=gpt-5-mini schema=DatasetFeaturesExtraction file_id=file-5wDAReN994w2p7w4uAqdrG
+2026-03-31 12:09:02 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:342 | Completed pdf_native extraction pdf_path=data\pdfs\fuster\10.1002_ece3.1266.pdf file_id=file-NZxXDhWYp77sBAVCZqdYbR cache=miss cost=$0.0164
+2026-03-31 12:09:02 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [17/30] Finished gt_record_id=91 status=success method=pdf_native cost=$0.0164
+2026-03-31 12:09:02 | INFO     | llm_metadata.gpt_extract:upload_pdf_to_openai:227 | Uploading PDF to OpenAI path=data\pdfs\fuster\10.1371_journal.pone.0109261.pdf purpose=user_data
+2026-03-31 12:09:02 | DEBUG    | llm_metadata.gpt_extract:upload_pdf_to_openai:230 | Uploaded PDF to OpenAI file_id=file-BRZKosppnuT7yZMbkt4gfi
+2026-03-31 12:09:02 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:314 | Starting pdf_native extraction pdf_path=data\pdfs\fuster\10.1371_journal.pone.0109261.pdf file_id=file-BRZKosppnuT7yZMbkt4gfi model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss
+2026-03-31 12:09:02 | DEBUG    | llm_metadata.gpt_extract:_response_parse_pdf:286 | Calling OpenAI Responses API for native PDF extraction model=gpt-5-mini schema=DatasetFeaturesExtraction file_id=file-BRZKosppnuT7yZMbkt4gfi
+2026-03-31 12:09:03 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:342 | Completed pdf_native extraction pdf_path=data\pdfs\fuster\10.1371_journal.pone.0077514.pdf file_id=file-Hd7peWBWhqid1Z4y5WgDXn cache=miss cost=$0.0146
+2026-03-31 12:09:03 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [18/30] Finished gt_record_id=101 status=success method=pdf_native cost=$0.0146
+2026-03-31 12:09:03 | INFO     | llm_metadata.gpt_extract:upload_pdf_to_openai:227 | Uploading PDF to OpenAI path=data\pdfs\fuster\10.1111_eva.13248.pdf purpose=user_data
+2026-03-31 12:09:03 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:342 | Completed pdf_native extraction pdf_path=data\pdfs\fuster\10.1371_journal.pone.0204445.pdf file_id=file-4fQjVu4GK9PpBoZK4YL1NE cache=miss cost=$0.0226
+2026-03-31 12:09:03 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [12/30] Finished gt_record_id=38 status=success method=pdf_native cost=$0.0226
+2026-03-31 12:09:03 | INFO     | llm_metadata.gpt_extract:upload_pdf_to_openai:227 | Uploading PDF to OpenAI path=data\pdfs\fuster\10.1111_ECOG.00997.pdf purpose=user_data
+2026-03-31 12:09:04 | DEBUG    | llm_metadata.gpt_extract:upload_pdf_to_openai:230 | Uploaded PDF to OpenAI file_id=file-8CifprzKETcjDBuRku9bis
+2026-03-31 12:09:04 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:314 | Starting pdf_native extraction pdf_path=data\pdfs\fuster\10.1111_ECOG.00997.pdf file_id=file-8CifprzKETcjDBuRku9bis model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss
+2026-03-31 12:09:05 | DEBUG    | llm_metadata.gpt_extract:_response_parse_pdf:286 | Calling OpenAI Responses API for native PDF extraction model=gpt-5-mini schema=DatasetFeaturesExtraction file_id=file-8CifprzKETcjDBuRku9bis
+2026-03-31 12:09:11 | DEBUG    | llm_metadata.gpt_extract:upload_pdf_to_openai:230 | Uploaded PDF to OpenAI file_id=file-MvPbu5kC2H6QX5KvWaweMr
+2026-03-31 12:09:11 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:314 | Starting pdf_native extraction pdf_path=data\pdfs\fuster\10.1111_eva.13248.pdf file_id=file-MvPbu5kC2H6QX5KvWaweMr model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss
+2026-03-31 12:09:11 | DEBUG    | llm_metadata.gpt_extract:_response_parse_pdf:286 | Calling OpenAI Responses API for native PDF extraction model=gpt-5-mini schema=DatasetFeaturesExtraction file_id=file-MvPbu5kC2H6QX5KvWaweMr
+2026-03-31 12:09:22 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:342 | Completed pdf_native extraction pdf_path=data\pdfs\fuster\10.1098_rspb.2014.0502.pdf file_id=file-XhhctVJgaVy9MVgw4VefWg cache=miss cost=$0.0147
+2026-03-31 12:09:22 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [20/30] Finished gt_record_id=123 status=success method=pdf_native cost=$0.0147
+2026-03-31 12:09:22 | INFO     | llm_metadata.gpt_extract:upload_pdf_to_openai:227 | Uploading PDF to OpenAI path=data\pdfs\fuster\10.1603_0013-8746%282006%2999%5B536%3AIOPMIQ%5D2.0.CO%3B2.pdf purpose=user_data
+2026-03-31 12:09:23 | DEBUG    | llm_metadata.gpt_extract:upload_pdf_to_openai:230 | Uploaded PDF to OpenAI file_id=file-A6myJDr7mQ3HS6ad2ojXCb
+2026-03-31 12:09:23 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:314 | Starting pdf_native extraction pdf_path=data\pdfs\fuster\10.1603_0013-8746%282006%2999%5B536%3AIOPMIQ%5D2.0.CO%3B2.pdf file_id=file-A6myJDr7mQ3HS6ad2ojXCb model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss
+2026-03-31 12:09:23 | DEBUG    | llm_metadata.gpt_extract:_response_parse_pdf:286 | Calling OpenAI Responses API for native PDF extraction model=gpt-5-mini schema=DatasetFeaturesExtraction file_id=file-A6myJDr7mQ3HS6ad2ojXCb
+2026-03-31 12:09:29 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:342 | Completed pdf_native extraction pdf_path=data\pdfs\fuster\10.3389_fmars.2021.637546.pdf file_id=file-5wDAReN994w2p7w4uAqdrG cache=miss cost=$0.0154
+2026-03-31 12:09:29 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [23/30] Finished gt_record_id=208 status=success method=pdf_native cost=$0.0154
+2026-03-31 12:09:29 | INFO     | llm_metadata.gpt_extract:upload_pdf_to_openai:227 | Uploading PDF to OpenAI path=data\pdfs\fuster\10.1603_EN10045.pdf purpose=user_data
+2026-03-31 12:09:29 | DEBUG    | llm_metadata.gpt_extract:upload_pdf_to_openai:230 | Uploaded PDF to OpenAI file_id=file-5eT7YnVACXc6VogoL7EpKm
+2026-03-31 12:09:29 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:314 | Starting pdf_native extraction pdf_path=data\pdfs\fuster\10.1603_EN10045.pdf file_id=file-5eT7YnVACXc6VogoL7EpKm model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss
+2026-03-31 12:09:29 | DEBUG    | llm_metadata.gpt_extract:_response_parse_pdf:286 | Calling OpenAI Responses API for native PDF extraction model=gpt-5-mini schema=DatasetFeaturesExtraction file_id=file-5eT7YnVACXc6VogoL7EpKm
+2026-03-31 12:09:32 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:342 | Completed pdf_native extraction pdf_path=data\pdfs\fuster\10.1086_671900.pdf file_id=file-VFWDBLhU8pNDszJVMHE1to cache=miss cost=$0.0149
+2026-03-31 12:09:32 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [22/30] Finished gt_record_id=201 status=success method=pdf_native cost=$0.0149
+2026-03-31 12:09:32 | INFO     | llm_metadata.gpt_extract:upload_pdf_to_openai:227 | Uploading PDF to OpenAI path=data\pdfs\fuster\10.3390_ijgi7090335.pdf purpose=user_data
+2026-03-31 12:09:34 | DEBUG    | llm_metadata.gpt_extract:upload_pdf_to_openai:230 | Uploaded PDF to OpenAI file_id=file-LDKi3sbeNgtRxSVuWqQHsD
+2026-03-31 12:09:34 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:314 | Starting pdf_native extraction pdf_path=data\pdfs\fuster\10.3390_ijgi7090335.pdf file_id=file-LDKi3sbeNgtRxSVuWqQHsD model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss
+2026-03-31 12:09:34 | DEBUG    | llm_metadata.gpt_extract:_response_parse_pdf:286 | Calling OpenAI Responses API for native PDF extraction model=gpt-5-mini schema=DatasetFeaturesExtraction file_id=file-LDKi3sbeNgtRxSVuWqQHsD
+2026-03-31 12:09:39 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:342 | Completed pdf_native extraction pdf_path=data\pdfs\fuster\10.1371_journal.pone.0109261.pdf file_id=file-BRZKosppnuT7yZMbkt4gfi cache=miss cost=$0.0137
+2026-03-31 12:09:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [24/30] Finished gt_record_id=225 status=success method=pdf_native cost=$0.0137
+2026-03-31 12:09:39 | INFO     | llm_metadata.gpt_extract:upload_pdf_to_openai:227 | Uploading PDF to OpenAI path=data\pdfs\fuster\10.1603_0013-8746%282005%29098%5B0565%3AWCCDAA%5D2.0.CO%3B2.pdf purpose=user_data
+2026-03-31 12:09:40 | DEBUG    | llm_metadata.gpt_extract:upload_pdf_to_openai:230 | Uploaded PDF to OpenAI file_id=file-88LTka1t7SPZCWK6kyw1mJ
+2026-03-31 12:09:40 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:314 | Starting pdf_native extraction pdf_path=data\pdfs\fuster\10.1603_0013-8746%282005%29098%5B0565%3AWCCDAA%5D2.0.CO%3B2.pdf file_id=file-88LTka1t7SPZCWK6kyw1mJ model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss
+2026-03-31 12:09:40 | DEBUG    | llm_metadata.gpt_extract:_response_parse_pdf:286 | Calling OpenAI Responses API for native PDF extraction model=gpt-5-mini schema=DatasetFeaturesExtraction file_id=file-88LTka1t7SPZCWK6kyw1mJ
+2026-03-31 12:09:40 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:342 | Completed pdf_native extraction pdf_path=data\pdfs\fuster\10.1038_s41598-018-34822-9.pdf file_id=file-RBVNWsizT8GApHa4CXFoxq cache=miss cost=$0.0142
+2026-03-31 12:09:40 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [19/30] Finished gt_record_id=104 status=success method=pdf_native cost=$0.0142
+2026-03-31 12:09:43 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:342 | Completed pdf_native extraction pdf_path=data\pdfs\fuster\10.5558_TFC76653-4.pdf file_id=file-JnejLE55tf2qkxWk9NLGdm cache=miss cost=$0.0182
+2026-03-31 12:09:43 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [21/30] Finished gt_record_id=175 status=success method=pdf_native cost=$0.0182
+2026-03-31 12:09:47 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:342 | Completed pdf_native extraction pdf_path=data\pdfs\fuster\10.1111_eva.13248.pdf file_id=file-MvPbu5kC2H6QX5KvWaweMr cache=miss cost=$0.0184
+2026-03-31 12:09:47 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [25/30] Finished gt_record_id=253 status=success method=pdf_native cost=$0.0184
+2026-03-31 12:09:55 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:342 | Completed pdf_native extraction pdf_path=data\pdfs\fuster\10.1111_ECOG.00997.pdf file_id=file-8CifprzKETcjDBuRku9bis cache=miss cost=$0.0173
+2026-03-31 12:09:55 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [26/30] Finished gt_record_id=258 status=success method=pdf_native cost=$0.0173
+2026-03-31 12:09:59 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:342 | Completed pdf_native extraction pdf_path=data\pdfs\fuster\10.1603_EN10045.pdf file_id=file-5eT7YnVACXc6VogoL7EpKm cache=miss cost=$0.0117
+2026-03-31 12:09:59 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [28/30] Finished gt_record_id=315 status=success method=pdf_native cost=$0.0117
+2026-03-31 12:10:00 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:342 | Completed pdf_native extraction pdf_path=data\pdfs\fuster\10.1603_0013-8746%282006%2999%5B536%3AIOPMIQ%5D2.0.CO%3B2.pdf file_id=file-A6myJDr7mQ3HS6ad2ojXCb cache=miss cost=$0.0128
+2026-03-31 12:10:00 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [27/30] Finished gt_record_id=271 status=success method=pdf_native cost=$0.0128
+2026-03-31 12:10:14 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:342 | Completed pdf_native extraction pdf_path=data\pdfs\fuster\10.3390_ijgi7090335.pdf file_id=file-LDKi3sbeNgtRxSVuWqQHsD cache=miss cost=$0.0174
+2026-03-31 12:10:14 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [29/30] Finished gt_record_id=343 status=success method=pdf_native cost=$0.0174
+2026-03-31 12:10:22 | INFO     | llm_metadata.gpt_extract:extract_from_pdf_file:342 | Completed pdf_native extraction pdf_path=data\pdfs\fuster\10.1603_0013-8746%282005%29098%5B0565%3AWCCDAA%5D2.0.CO%3B2.pdf file_id=file-88LTka1t7SPZCWK6kyw1mJ cache=miss cost=$0.0146
+2026-03-31 12:10:22 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [30/30] Finished gt_record_id=351 status=success method=pdf_native cost=$0.0146
+2026-03-31 12:10:22 | INFO     | llm_metadata.extraction:run_manifest_extraction:455 | Completed manifest extraction mode=pdf_native records=30 total_cost=$0.4613
+2026-03-31 12:10:22 | INFO     | __main__:run_eval:145 | Loading ground truth from data/dataset_092624_validated.xlsx
+2026-03-31 12:10:23 | INFO     | __main__:run_eval:151 | Evaluating predictions matched_records=30 fields=default
+2026-03-31 12:10:23 | INFO     | __main__:run_eval:170 | Saved prompt_eval artifact to artifacts\runs\20260331_120734_prompt_engineering_pdf_native.json
+2026-03-31 12:10:23 | INFO     | __main__:run_eval:171 | Saved extraction results CSV to artifacts\runs\20260331_120734_prompt_engineering_pdf_native.csv
+2026-03-31 12:10:23 | INFO     | __main__:run_eval:173 | Completed prompt_eval mode=pdf_native records=30 total_cost=$0.4613
+Field                         N       P       R      F1
+-------------------------------------------------------
+bias_north_south             30   0.957   0.733   0.830
+data_type                    30   0.278   0.556   0.370
+geospatial_info_dataset      30   0.130   1.000   0.230
+multispecies                 30   0.767   0.767   0.767
+new_species_region           30   0.833   0.682   0.750
+new_species_science          30   0.882   0.682   0.769
+spatial_range_km2            30   0.765   0.650   0.703
+species                      30   0.111   0.596   0.187
+temp_range_f                 30   0.607   0.810   0.694
+temp_range_i                 30   0.607   0.810   0.694
+threatened_species           30   0.933   0.667   0.778
+time_series                  30   0.148   0.800   0.250
+
+Total API cost: $0.4613
+
+Run artifact saved to: artifacts\runs\20260331_120734_prompt_engineering_pdf_native.json

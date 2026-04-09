@@ -363,15 +363,50 @@ class RunArtifact(BaseModel):
     model_config = {"populate_by_name": True}
 
     name: str
+    description: Optional[str] = None
     mode: ExtractionMode
     manifest_path: Optional[str] = None
     prompt_module: str
     system_message: str
     model: str
+    reasoning: Optional[dict[str, Any]] = None
+    reasoning_effort: Optional[str] = None
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     output_schema: Optional[dict[str, Any]] = Field(default=None, alias="schema")
     records: list[RunRecord] = Field(default_factory=list)
     evaluation: Optional[dict[str, Any]] = None
+
+    @model_validator(mode="before")
+    @classmethod
+    def _normalize_reasoning_fields(cls, data: Any) -> Any:
+        if not isinstance(data, dict):
+            return data
+
+        raw_reasoning = data.get("reasoning")
+        raw_effort = data.get("reasoning_effort")
+
+        effort: Optional[str] = None
+        if isinstance(raw_effort, str) and raw_effort.strip():
+            effort = raw_effort.strip()
+        elif raw_effort is not None:
+            effort = str(raw_effort).strip() or None
+
+        if isinstance(raw_reasoning, str):
+            normalized_effort = raw_reasoning.strip() or None
+            data["reasoning"] = {"effort": normalized_effort} if normalized_effort else None
+            effort = effort or normalized_effort
+        elif isinstance(raw_reasoning, dict):
+            raw_dict_effort = raw_reasoning.get("effort")
+            if raw_dict_effort is not None:
+                normalized_effort = str(raw_dict_effort).strip() or None
+                if normalized_effort is not None:
+                    data["reasoning"] = {**raw_reasoning, "effort": normalized_effort}
+                    effort = effort or normalized_effort
+        elif raw_reasoning is None and effort is not None:
+            data["reasoning"] = {"effort": effort}
+
+        data["reasoning_effort"] = effort
+        return data
 
     @property
     def total_cost_usd(self) -> float:

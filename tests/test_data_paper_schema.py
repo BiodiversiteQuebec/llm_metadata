@@ -79,10 +79,12 @@ class TestRunArtifact:
     def test_total_cost_usd(self, tmp_path):
         artifact = RunArtifact(
             name="demo",
+            description="Demo run",
             mode=ExtractionMode.ABSTRACT,
             prompt_module="prompts.abstract",
             system_message="system",
             model="gpt-5-mini",
+            reasoning={"effort": "medium"},
             records=[
                 RunRecord(
                     gt_record_id=1,
@@ -107,6 +109,30 @@ class TestRunArtifact:
         loaded = RunArtifact.load_json(output_path)
         assert loaded.name == "demo"
         assert loaded.mode == ExtractionMode.ABSTRACT
+        assert loaded.description == "Demo run"
+        assert loaded.reasoning_effort == "medium"
+        assert loaded.reasoning == {"effort": "medium"}
+
+    def test_load_json_backfills_reasoning_effort_from_legacy_string(self, tmp_path):
+        output_path = tmp_path / "artifact.json"
+        output_path.write_text(
+            """
+            {
+              "name": "demo",
+              "mode": "abstract",
+              "prompt_module": "prompts.abstract",
+              "system_message": "system",
+              "model": "gpt-5-mini",
+              "reasoning": "low",
+              "records": []
+            }
+            """.strip(),
+            encoding="utf-8",
+        )
+
+        loaded = RunArtifact.load_json(output_path)
+        assert loaded.reasoning_effort == "low"
+        assert loaded.reasoning == {"effort": "low"}
 
     def test_save_extraction_csv(self, tmp_path):
         artifact = RunArtifact(

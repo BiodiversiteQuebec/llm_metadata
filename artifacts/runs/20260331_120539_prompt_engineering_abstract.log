@@ -1,0 +1,176 @@
+Logging to: artifacts\runs\20260331_120539_prompt_engineering_abstract.log
+Recreate command: uv run python -m llm_metadata.prompt_eval --mode abstract --manifest data/manifests/dev_subset_data_paper.csv --parallelism 8 --model gpt-5-mini --gt data/dataset_092624_validated.xlsx --name prompt_engineering_abstract
+2026-03-31 12:05:39 | INFO     | __main__:run_eval:118 | Starting prompt_eval mode=abstract manifest_path=data/manifests/dev_subset_data_paper.csv parallelism=8 model=gpt-5-mini skip_cache=False
+2026-03-31 12:05:39 | INFO     | __main__:run_eval:127 | Loaded manifest records=30
+2026-03-31 12:05:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:354 | Starting manifest extraction mode=abstract records=30 parallelism=8 model=gpt-5-mini prompt_module=prompts.abstract skip_cache=False
+2026-03-31 12:05:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [1/30] Queueing gt_record_id=5 record_id=10.1093/jhered/esx103 title=Data from: Paternity analysis of wood turtles (Glyptemys insculpta) reveals complex mating patterns
+2026-03-31 12:05:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [2/30] Queueing gt_record_id=9 record_id=10.1371/journal.pone.0128238 title=Data from: Resampling method for applying density-dependent habitat selection theory to wildlife surveys
+2026-03-31 12:05:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [3/30] Queueing gt_record_id=11 record_id=10.1371/journal.pone.0073695 title=Data from: Impacts of human disturbance on large prey species: do behavioral reactions translate to fitness consequences?
+2026-03-31 12:05:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [4/30] Queueing gt_record_id=12 record_id=10.1002/ece3.4685 title=Data from: Natal habitat preference induction in large mammals – Like mother, like child?
+2026-03-31 12:05:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [5/30] Queueing gt_record_id=19 record_id=10.1093/jhered/esw073 title=Data from: The genetic signature of range expansion in a disease vector - the black-legged tick
+2026-03-31 12:05:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [6/30] Queueing gt_record_id=24 record_id=10.1002/ece3.3906 title=Data from: Influence of northern limit range on genetic diversity and structure in a widespread North American tree, sugar maple (Acer saccharum Marshall)
+2026-03-31 12:05:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [7/30] Queueing gt_record_id=27 record_id=10.1111/ddi.12496 title=Data from: Patchy distribution and low effective population size raise concern for an at-risk top predator
+2026-03-31 12:05:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [8/30] Queueing gt_record_id=29 record_id=10.1002/ece3.1476 title=Data from: Ecological gradients driving the distribution of four Ericaceae in boreal Quebec, Canada
+2026-03-31 12:05:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [9/30] Queueing gt_record_id=30 record_id=10.1186/s40462-016-0079-4 title=Data from: Caribou, water, and ice – fine-scale movements of a migratory arctic ungulate in the context of climate change
+2026-03-31 12:05:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [10/30] Queueing gt_record_id=31 record_id=10.1111/eva.12028 title=Data from: Reduced fitness of Atlantic salmon released in the wild after one generation of captive-breeding
+2026-03-31 12:05:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [11/30] Queueing gt_record_id=37 record_id=10.1002/ece3.1029 title=Data from: Fitness dynamics within a poplar hybrid zone: I. Prezygotic and postzygotic barriers impacting a native poplar hybrid stand.
+2026-03-31 12:05:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [12/30] Queueing gt_record_id=38 record_id=10.1371/journal.pone.0204445 title=Data from: Temporal dynamics in animal community assembly during post-logging succession in boreal forest
+2026-03-31 12:05:39 | INFO     | llm_metadata.gpt_extract:extract_from_text:139 | Starting text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction chars=2359 cache=miss
+2026-03-31 12:05:39 | INFO     | llm_metadata.gpt_extract:extract_from_text:139 | Starting text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction chars=2149 cache=miss
+2026-03-31 12:05:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [13/30] Queueing gt_record_id=39 record_id=10.1098/rspb.2014.0649 title=Data from: Severe recent decrease of adult body mass in a declining insectivorous bird population
+2026-03-31 12:05:39 | INFO     | llm_metadata.gpt_extract:extract_from_text:139 | Starting text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction chars=2379 cache=miss
+2026-03-31 12:05:39 | INFO     | llm_metadata.gpt_extract:extract_from_text:139 | Starting text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction chars=2568 cache=miss
+2026-03-31 12:05:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [14/30] Queueing gt_record_id=56 record_id=10.1111/eva.12315 title=Data from: Multidimensional environmental influences on timing of breeding in a tree swallow population facing climate change
+2026-03-31 12:05:39 | INFO     | llm_metadata.gpt_extract:extract_from_text:139 | Starting text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction chars=2647 cache=miss
+2026-03-31 12:05:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [15/30] Queueing gt_record_id=71 record_id=10.1111/1365-2664.12675 title=Data from: Threshold dynamics in plant succession after tree planting in agricultural riparian zones
+2026-03-31 12:05:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [16/30] Queueing gt_record_id=89 record_id=10.1890/12-2118.1 title=Data from: Logging-induced changes in habitat network connectivity shape behavioral interactions in the wolf-caribou-moose system
+2026-03-31 12:05:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [17/30] Queueing gt_record_id=91 record_id=10.1002/ece3.1266 title=Data from: Genetic connectivity among swarming sites in the wide ranging and recently declining little brown bat (Myotis lucifugus)
+2026-03-31 12:05:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [18/30] Queueing gt_record_id=101 record_id=10.1371/journal.pone.0077514 title=Data from: Disentangling woodland caribou movements in response to clearcuts and roads across temporal scales
+2026-03-31 12:05:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [19/30] Queueing gt_record_id=104 record_id=10.1038/s41598-018-34822-9 title=Data from: Compensatory conservation measures for an endangered caribou population under climate change
+2026-03-31 12:05:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [20/30] Queueing gt_record_id=123 record_id=10.1098/rspb.2014.0502 title=Data from: Temporally dynamic habitat suitability predicts genetic relatedness among caribou
+2026-03-31 12:05:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [21/30] Queueing gt_record_id=175 record_id=10.5558/tfc76653-4 title=Ã‰valuation de la coupe avec protection de la rÃ©gÃ©nÃ©ration et des sols comme mÃ©thode de rÃ©gÃ©nÃ©ration de peuplements mÃ©langÃ©s du domaine bioclimatique de la sapiniÃ¨re Ã  bouleau jaune de l'est du QuÃ©bec, Canada
+2026-03-31 12:05:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [22/30] Queueing gt_record_id=201 record_id=10.1086/671900 title=Comparative Physiology and Relative Swimming Performance of Three Redhorse (Moxostoma spp.) Species: Associations with Fishway Passage Success*
+2026-03-31 12:05:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [23/30] Queueing gt_record_id=208 record_id=10.3389/fmars.2021.637546 title=Determining the Ecological Status of Benthic Coastal Communities: A Case in an Anthropized Sub-Arctic Area
+2026-03-31 12:05:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [24/30] Queueing gt_record_id=225 record_id=10.1371/journal.pone.0109261 title=Effects of Habitat-Forming Species Richness, Evenness, Identity, and Abundance on Benthic Intertidal Community Establishment and Productivity
+2026-03-31 12:05:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [25/30] Queueing gt_record_id=253 record_id=10.1111/eva.13248 title=Genomic data support management of anadromous Arctic Char fisheries in Nunavik by highlighting neutral and putatively adaptive genetic variation
+2026-03-31 12:05:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [26/30] Queueing gt_record_id=258 record_id=10.1111/ecog.00997 title=Host phenology, geographic range size and regional occurrence explain interspecific variation in damselflyâ€“water mite associations
+2026-03-31 12:05:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [27/30] Queueing gt_record_id=271 record_id=10.1603/0013-8746%282006%2999%5b536%3aiopmiq%5d2.0.co%3b2 title=Inventory of Predacious Mites in Quebec Commercial Apple Orchards Where Integrated Pest Management Programs Are Implemented
+2026-03-31 12:05:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [28/30] Queueing gt_record_id=315 record_id=10.1603/en10045 title=Selected Beetle Assemblages Captured in Pitfall Traps Baited with Deer Dung or Meat in Balsam Fir and Sugar Maple Forests of Central Quebec
+2026-03-31 12:05:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [29/30] Queueing gt_record_id=343 record_id=10.3390/ijgi7090335 title=Towards Modelling Future Trends of Quebec's Boreal Birds' Species Distribution under Climate Change
+2026-03-31 12:05:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:417 | [30/30] Queueing gt_record_id=351 record_id=10.1603/0013-8746%282005%29098%5b0565%3awccdaa%5d2.0.co%3b2 title=Weevil (Coleoptera: Curculionoidea) Diversity and Abundance in Two Quebec Vineyards
+2026-03-31 12:05:39 | INFO     | llm_metadata.gpt_extract:extract_from_text:139 | Starting text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction chars=2862 cache=hit
+2026-03-31 12:05:39 | INFO     | llm_metadata.gpt_extract:extract_from_text:139 | Starting text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction chars=2194 cache=hit
+2026-03-31 12:05:39 | INFO     | llm_metadata.gpt_extract:extract_from_text:139 | Starting text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction chars=3368 cache=hit
+2026-03-31 12:05:39 | INFO     | llm_metadata.gpt_extract:extract_from_text:158 | Completed text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction cache=hit cost=$0.0047 output_tokens=1257
+2026-03-31 12:05:39 | INFO     | llm_metadata.gpt_extract:extract_from_text:158 | Completed text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction cache=hit cost=$0.0084 output_tokens=2119
+2026-03-31 12:05:39 | INFO     | llm_metadata.gpt_extract:extract_from_text:158 | Completed text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction cache=hit cost=$0.0048 output_tokens=1179
+2026-03-31 12:05:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [1/30] Finished gt_record_id=5 status=success method=abstract_text cost=$0.0047
+2026-03-31 12:05:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [3/30] Finished gt_record_id=11 status=success method=abstract_text cost=$0.0084
+2026-03-31 12:05:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [2/30] Finished gt_record_id=9 status=success method=abstract_text cost=$0.0048
+2026-03-31 12:05:39 | INFO     | llm_metadata.gpt_extract:extract_from_text:139 | Starting text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction chars=3702 cache=miss
+2026-03-31 12:05:39 | INFO     | llm_metadata.gpt_extract:extract_from_text:139 | Starting text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction chars=1885 cache=miss
+2026-03-31 12:05:39 | INFO     | llm_metadata.gpt_extract:extract_from_text:139 | Starting text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction chars=3870 cache=miss
+2026-03-31 12:05:39 | DEBUG    | llm_metadata.gpt_extract:_response_parse:121 | Calling OpenAI Responses API for text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction
+2026-03-31 12:05:39 | DEBUG    | llm_metadata.gpt_extract:_response_parse:121 | Calling OpenAI Responses API for text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction
+2026-03-31 12:05:39 | DEBUG    | llm_metadata.gpt_extract:_response_parse:121 | Calling OpenAI Responses API for text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction
+2026-03-31 12:05:39 | DEBUG    | llm_metadata.gpt_extract:_response_parse:121 | Calling OpenAI Responses API for text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction
+2026-03-31 12:05:39 | DEBUG    | llm_metadata.gpt_extract:_response_parse:121 | Calling OpenAI Responses API for text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction
+2026-03-31 12:05:39 | DEBUG    | llm_metadata.gpt_extract:_response_parse:121 | Calling OpenAI Responses API for text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction
+2026-03-31 12:05:39 | DEBUG    | llm_metadata.gpt_extract:_response_parse:121 | Calling OpenAI Responses API for text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction
+2026-03-31 12:05:39 | DEBUG    | llm_metadata.gpt_extract:_response_parse:121 | Calling OpenAI Responses API for text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction
+2026-03-31 12:05:54 | INFO     | llm_metadata.gpt_extract:extract_from_text:158 | Completed text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss cost=$0.0046 output_tokens=1223
+2026-03-31 12:05:54 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [10/30] Finished gt_record_id=31 status=success method=abstract_text cost=$0.0046
+2026-03-31 12:05:54 | INFO     | llm_metadata.gpt_extract:extract_from_text:139 | Starting text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction chars=6087 cache=miss
+2026-03-31 12:05:54 | DEBUG    | llm_metadata.gpt_extract:_response_parse:121 | Calling OpenAI Responses API for text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction
+2026-03-31 12:05:55 | INFO     | llm_metadata.gpt_extract:extract_from_text:158 | Completed text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss cost=$0.0053 output_tokens=1370
+2026-03-31 12:05:55 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [4/30] Finished gt_record_id=12 status=success method=abstract_text cost=$0.0053
+2026-03-31 12:05:55 | INFO     | llm_metadata.gpt_extract:extract_from_text:139 | Starting text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction chars=2699 cache=miss
+2026-03-31 12:05:55 | INFO     | llm_metadata.gpt_extract:extract_from_text:158 | Completed text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss cost=$0.0053 output_tokens=1382
+2026-03-31 12:05:55 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [5/30] Finished gt_record_id=19 status=success method=abstract_text cost=$0.0053
+2026-03-31 12:05:55 | INFO     | llm_metadata.gpt_extract:extract_from_text:139 | Starting text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction chars=4060 cache=miss
+2026-03-31 12:05:55 | DEBUG    | llm_metadata.gpt_extract:_response_parse:121 | Calling OpenAI Responses API for text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction
+2026-03-31 12:05:55 | DEBUG    | llm_metadata.gpt_extract:_response_parse:121 | Calling OpenAI Responses API for text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction
+2026-03-31 12:05:59 | INFO     | llm_metadata.gpt_extract:extract_from_text:158 | Completed text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss cost=$0.0062 output_tokens=1555
+2026-03-31 12:05:59 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [11/30] Finished gt_record_id=37 status=success method=abstract_text cost=$0.0062
+2026-03-31 12:05:59 | INFO     | llm_metadata.gpt_extract:extract_from_text:139 | Starting text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction chars=2855 cache=miss
+2026-03-31 12:05:59 | DEBUG    | llm_metadata.gpt_extract:_response_parse:121 | Calling OpenAI Responses API for text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction
+2026-03-31 12:06:00 | INFO     | llm_metadata.gpt_extract:extract_from_text:158 | Completed text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss cost=$0.0068 output_tokens=1730
+2026-03-31 12:06:00 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [6/30] Finished gt_record_id=24 status=success method=abstract_text cost=$0.0068
+2026-03-31 12:06:00 | INFO     | llm_metadata.gpt_extract:extract_from_text:139 | Starting text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction chars=7552 cache=miss
+2026-03-31 12:06:00 | DEBUG    | llm_metadata.gpt_extract:_response_parse:121 | Calling OpenAI Responses API for text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction
+2026-03-31 12:06:01 | INFO     | llm_metadata.gpt_extract:extract_from_text:158 | Completed text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss cost=$0.0071 output_tokens=1828
+2026-03-31 12:06:01 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [8/30] Finished gt_record_id=29 status=success method=abstract_text cost=$0.0071
+2026-03-31 12:06:01 | INFO     | llm_metadata.gpt_extract:extract_from_text:139 | Starting text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction chars=3420 cache=miss
+2026-03-31 12:06:01 | DEBUG    | llm_metadata.gpt_extract:_response_parse:121 | Calling OpenAI Responses API for text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction
+2026-03-31 12:06:08 | INFO     | llm_metadata.gpt_extract:extract_from_text:158 | Completed text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss cost=$0.0092 output_tokens=2306
+2026-03-31 12:06:08 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [9/30] Finished gt_record_id=30 status=success method=abstract_text cost=$0.0092
+2026-03-31 12:06:08 | INFO     | llm_metadata.gpt_extract:extract_from_text:139 | Starting text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction chars=2530 cache=miss
+2026-03-31 12:06:08 | DEBUG    | llm_metadata.gpt_extract:_response_parse:121 | Calling OpenAI Responses API for text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction
+2026-03-31 12:06:17 | INFO     | llm_metadata.gpt_extract:extract_from_text:158 | Completed text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss cost=$0.0100 output_tokens=2604
+2026-03-31 12:06:17 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [7/30] Finished gt_record_id=27 status=success method=abstract_text cost=$0.0100
+2026-03-31 12:06:17 | INFO     | llm_metadata.gpt_extract:extract_from_text:139 | Starting text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction chars=2011 cache=miss
+2026-03-31 12:06:17 | DEBUG    | llm_metadata.gpt_extract:_response_parse:121 | Calling OpenAI Responses API for text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction
+2026-03-31 12:06:21 | INFO     | llm_metadata.gpt_extract:extract_from_text:158 | Completed text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss cost=$0.0050 output_tokens=1167
+2026-03-31 12:06:21 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [18/30] Finished gt_record_id=101 status=success method=abstract_text cost=$0.0050
+2026-03-31 12:06:21 | INFO     | llm_metadata.gpt_extract:extract_from_text:139 | Starting text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction chars=2543 cache=miss
+2026-03-31 12:06:21 | DEBUG    | llm_metadata.gpt_extract:_response_parse:121 | Calling OpenAI Responses API for text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction
+2026-03-31 12:06:25 | INFO     | llm_metadata.gpt_extract:extract_from_text:158 | Completed text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss cost=$0.0078 output_tokens=1934
+2026-03-31 12:06:25 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [12/30] Finished gt_record_id=38 status=success method=abstract_text cost=$0.0078
+2026-03-31 12:06:25 | INFO     | llm_metadata.gpt_extract:extract_from_text:139 | Starting text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction chars=1047 cache=miss
+2026-03-31 12:06:25 | DEBUG    | llm_metadata.gpt_extract:_response_parse:121 | Calling OpenAI Responses API for text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction
+2026-03-31 12:06:26 | INFO     | llm_metadata.gpt_extract:extract_from_text:158 | Completed text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss cost=$0.0073 output_tokens=1797
+2026-03-31 12:06:26 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [14/30] Finished gt_record_id=56 status=success method=abstract_text cost=$0.0073
+2026-03-31 12:06:26 | INFO     | llm_metadata.gpt_extract:extract_from_text:139 | Starting text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction chars=2210 cache=miss
+2026-03-31 12:06:26 | DEBUG    | llm_metadata.gpt_extract:_response_parse:121 | Calling OpenAI Responses API for text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction
+2026-03-31 12:06:27 | INFO     | llm_metadata.gpt_extract:extract_from_text:158 | Completed text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss cost=$0.0058 output_tokens=1452
+2026-03-31 12:06:27 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [17/30] Finished gt_record_id=91 status=success method=abstract_text cost=$0.0058
+2026-03-31 12:06:27 | INFO     | llm_metadata.gpt_extract:extract_from_text:139 | Starting text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction chars=1427 cache=miss
+2026-03-31 12:06:27 | DEBUG    | llm_metadata.gpt_extract:_response_parse:121 | Calling OpenAI Responses API for text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction
+2026-03-31 12:06:29 | INFO     | llm_metadata.gpt_extract:extract_from_text:158 | Completed text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss cost=$0.0083 output_tokens=2079
+2026-03-31 12:06:29 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [13/30] Finished gt_record_id=39 status=success method=abstract_text cost=$0.0083
+2026-03-31 12:06:29 | INFO     | llm_metadata.gpt_extract:extract_from_text:139 | Starting text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction chars=1596 cache=miss
+2026-03-31 12:06:29 | DEBUG    | llm_metadata.gpt_extract:_response_parse:121 | Calling OpenAI Responses API for text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction
+2026-03-31 12:06:32 | INFO     | llm_metadata.gpt_extract:extract_from_text:158 | Completed text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss cost=$0.0080 output_tokens=2020
+2026-03-31 12:06:32 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [15/30] Finished gt_record_id=71 status=success method=abstract_text cost=$0.0080
+2026-03-31 12:06:32 | INFO     | llm_metadata.gpt_extract:extract_from_text:139 | Starting text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction chars=1835 cache=miss
+2026-03-31 12:06:32 | DEBUG    | llm_metadata.gpt_extract:_response_parse:121 | Calling OpenAI Responses API for text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction
+2026-03-31 12:06:34 | INFO     | llm_metadata.gpt_extract:extract_from_text:158 | Completed text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss cost=$0.0085 output_tokens=2064
+2026-03-31 12:06:34 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [16/30] Finished gt_record_id=89 status=success method=abstract_text cost=$0.0085
+2026-03-31 12:06:34 | INFO     | llm_metadata.gpt_extract:extract_from_text:139 | Starting text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction chars=1212 cache=miss
+2026-03-31 12:06:34 | DEBUG    | llm_metadata.gpt_extract:_response_parse:121 | Calling OpenAI Responses API for text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction
+2026-03-31 12:06:35 | INFO     | llm_metadata.gpt_extract:extract_from_text:158 | Completed text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss cost=$0.0062 output_tokens=1566
+2026-03-31 12:06:35 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [19/30] Finished gt_record_id=104 status=success method=abstract_text cost=$0.0062
+2026-03-31 12:06:35 | INFO     | llm_metadata.gpt_extract:extract_from_text:139 | Starting text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction chars=1302 cache=miss
+2026-03-31 12:06:35 | DEBUG    | llm_metadata.gpt_extract:_response_parse:121 | Calling OpenAI Responses API for text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction
+2026-03-31 12:06:42 | INFO     | llm_metadata.gpt_extract:extract_from_text:158 | Completed text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss cost=$0.0070 output_tokens=1759
+2026-03-31 12:06:42 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [20/30] Finished gt_record_id=123 status=success method=abstract_text cost=$0.0070
+2026-03-31 12:06:42 | INFO     | llm_metadata.gpt_extract:extract_from_text:139 | Starting text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction chars=1639 cache=miss
+2026-03-31 12:06:42 | DEBUG    | llm_metadata.gpt_extract:_response_parse:121 | Calling OpenAI Responses API for text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction
+2026-03-31 12:06:44 | INFO     | llm_metadata.gpt_extract:extract_from_text:158 | Completed text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss cost=$0.0060 output_tokens=1535
+2026-03-31 12:06:44 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [21/30] Finished gt_record_id=175 status=success method=abstract_text cost=$0.0060
+2026-03-31 12:06:44 | INFO     | llm_metadata.gpt_extract:extract_from_text:139 | Starting text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction chars=1299 cache=miss
+2026-03-31 12:06:44 | DEBUG    | llm_metadata.gpt_extract:_response_parse:121 | Calling OpenAI Responses API for text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction
+2026-03-31 12:06:46 | INFO     | llm_metadata.gpt_extract:extract_from_text:158 | Completed text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss cost=$0.0063 output_tokens=1591
+2026-03-31 12:06:46 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [22/30] Finished gt_record_id=201 status=success method=abstract_text cost=$0.0063
+2026-03-31 12:06:46 | INFO     | llm_metadata.gpt_extract:extract_from_text:139 | Starting text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction chars=1461 cache=miss
+2026-03-31 12:06:46 | DEBUG    | llm_metadata.gpt_extract:_response_parse:121 | Calling OpenAI Responses API for text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction
+2026-03-31 12:06:46 | INFO     | llm_metadata.gpt_extract:extract_from_text:158 | Completed text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss cost=$0.0060 output_tokens=1485
+2026-03-31 12:06:46 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [23/30] Finished gt_record_id=208 status=success method=abstract_text cost=$0.0060
+2026-03-31 12:06:49 | INFO     | llm_metadata.gpt_extract:extract_from_text:158 | Completed text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss cost=$0.0065 output_tokens=1678
+2026-03-31 12:06:49 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [24/30] Finished gt_record_id=225 status=success method=abstract_text cost=$0.0065
+2026-03-31 12:06:53 | INFO     | llm_metadata.gpt_extract:extract_from_text:158 | Completed text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss cost=$0.0056 output_tokens=1413
+2026-03-31 12:06:53 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [25/30] Finished gt_record_id=253 status=success method=abstract_text cost=$0.0056
+2026-03-31 12:06:55 | INFO     | llm_metadata.gpt_extract:extract_from_text:158 | Completed text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss cost=$0.0062 output_tokens=1612
+2026-03-31 12:06:55 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [26/30] Finished gt_record_id=258 status=success method=abstract_text cost=$0.0062
+2026-03-31 12:07:01 | INFO     | llm_metadata.gpt_extract:extract_from_text:158 | Completed text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss cost=$0.0056 output_tokens=1429
+2026-03-31 12:07:01 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [28/30] Finished gt_record_id=315 status=success method=abstract_text cost=$0.0056
+2026-03-31 12:07:23 | INFO     | llm_metadata.gpt_extract:extract_from_text:158 | Completed text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss cost=$0.0073 output_tokens=1872
+2026-03-31 12:07:23 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [29/30] Finished gt_record_id=343 status=success method=abstract_text cost=$0.0073
+2026-03-31 12:07:25 | INFO     | llm_metadata.gpt_extract:extract_from_text:158 | Completed text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss cost=$0.0102 output_tokens=2655
+2026-03-31 12:07:25 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [27/30] Finished gt_record_id=271 status=success method=abstract_text cost=$0.0102
+2026-03-31 12:07:30 | INFO     | llm_metadata.gpt_extract:extract_from_text:158 | Completed text extraction model=gpt-5-mini schema=DatasetFeaturesExtraction cache=miss cost=$0.0081 output_tokens=2077
+2026-03-31 12:07:30 | INFO     | llm_metadata.extraction:run_manifest_extraction:440 | [30/30] Finished gt_record_id=351 status=success method=abstract_text cost=$0.0081
+2026-03-31 12:07:30 | INFO     | llm_metadata.extraction:run_manifest_extraction:455 | Completed manifest extraction mode=abstract records=30 total_cost=$0.2041
+2026-03-31 12:07:30 | INFO     | __main__:run_eval:145 | Loading ground truth from data/dataset_092624_validated.xlsx
+2026-03-31 12:07:31 | INFO     | __main__:run_eval:151 | Evaluating predictions matched_records=30 fields=default
+2026-03-31 12:07:31 | INFO     | __main__:run_eval:170 | Saved prompt_eval artifact to artifacts\runs\20260331_120539_prompt_engineering_abstract.json
+2026-03-31 12:07:31 | INFO     | __main__:run_eval:171 | Saved extraction results CSV to artifacts\runs\20260331_120539_prompt_engineering_abstract.csv
+2026-03-31 12:07:31 | INFO     | __main__:run_eval:173 | Completed prompt_eval mode=abstract records=30 total_cost=$0.2041
+Field                         N       P       R      F1
+-------------------------------------------------------
+bias_north_south             30   1.000   0.167   0.286
+data_type                    30   0.367   0.500   0.424
+geospatial_info_dataset      30   0.171   0.500   0.255
+multispecies                 30   0.759   0.733   0.746
+new_species_region           30   0.600   0.136   0.222
+new_species_science          30   1.000   0.091   0.167
+spatial_range_km2            30   1.000   0.050   0.095
+species                      30   0.302   0.615   0.405
+temp_range_f                 30   0.786   0.524   0.629
+temp_range_i                 30   0.929   0.619   0.743
+threatened_species           30   1.000   0.238   0.385
+time_series                  30   0.333   0.800   0.471
+
+Total API cost: $0.2041
+
+Run artifact saved to: artifacts\runs\20260331_120539_prompt_engineering_abstract.json

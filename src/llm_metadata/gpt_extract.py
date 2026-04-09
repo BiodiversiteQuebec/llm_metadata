@@ -27,6 +27,9 @@ MODEL_COST_PER_1M_TOKENS = {
     "gpt-5": {"input": 1.25, "output": 10.00, "cache": 0.125},
     "gpt-5.1": {"input": 1.25, "output": 10.00, "cache": 0.125},
     "gpt-5.2": {"input": 1.75, "output": 14.00, "cache": 0.175},
+    "gpt-5.4": {"input": 2.50, "output": 15.00, "cache": 0.25},
+    "gpt-5.4-mini": {"input": 0.75, "output": 4.50, "cache": 0.075},
+    "gpt-5.4-nano": {"input": 0.20, "output": 1.25, "cache": 0.02},
     "gpt-4.1": {"input": 2.00, "output": 8.00, "cache": 0.50},
     "gpt-4o": {"input": 2.50, "output": 10.00, "cache": 1.25},
 }

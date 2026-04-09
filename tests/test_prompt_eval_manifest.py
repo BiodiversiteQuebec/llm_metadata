@@ -187,6 +187,8 @@ class TestPromptEvalModes:
                 mode="abstract",
                 manifest_path=str(tiny_manifest_csv),
                 gt_path=str(tiny_gt_xlsx),
+                reasoning_effort="medium",
+                description="Artifact persistence test",
                 output_path=output_path,
             )
 
@@ -194,6 +196,8 @@ class TestPromptEvalModes:
         assert output_path.with_suffix(".csv").exists()
         loaded = RunArtifact.load_json(output_path)
         assert loaded.mode.value == "abstract"
+        assert loaded.description == "Artifact persistence test"
+        assert loaded.reasoning_effort == "medium"
         assert loaded.evaluation is not None
         assert getattr(report, "saved_path") == str(output_path)
         assert getattr(report, "extraction_csv_path") == str(output_path.with_suffix(".csv"))
@@ -226,9 +230,13 @@ class TestPromptEvalModes:
                     manifest_path=str(tiny_manifest_csv),
                     gt_path=str(tiny_gt_xlsx),
                     parallelism=3,
+                    reasoning_effort="medium",
+                    description="Medium-effort run",
                 )
 
         assert captured["parallelism"] == 3
+        assert captured["description"] == "Medium-effort run"
+        assert captured["config"].reasoning == {"effort": "medium"}
 
 
 class TestBuildRecreateCommand:
@@ -245,12 +253,16 @@ class TestBuildRecreateCommand:
             output_path=None,
             name=None,
             model="gpt-5-mini",
+            reasoning_effort="medium",
             gt_path="data/dataset_092624_validated.xlsx",
+            description="Medium-effort rerun",
             skip_cache=False,
         )
         assert "--mode" in cmd
         assert "--manifest" in cmd
         assert "--parallelism 4" in cmd
+        assert "--reasoning-effort medium" in cmd
+        assert "--description 'Medium-effort rerun'" in cmd
 
 
 class TestCliSurface:
@@ -275,6 +287,10 @@ class TestCliSurface:
             str(tiny_manifest_csv),
             "--parallelism",
             "5",
+            "--reasoning-effort",
+            "medium",
+            "--description",
+            "Viewer smoke test",
             "--gt",
             str(tiny_gt_xlsx),
         ]
@@ -290,3 +306,5 @@ class TestCliSurface:
         assert called_kwargs["mode"] == "pdf_native"
         assert called_kwargs["manifest_path"] == str(tiny_manifest_csv)
         assert called_kwargs["parallelism"] == 5
+        assert called_kwargs["reasoning_effort"] == "medium"
+        assert called_kwargs["description"] == "Viewer smoke test"

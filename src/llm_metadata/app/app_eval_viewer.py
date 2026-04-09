@@ -99,26 +99,75 @@ def _log_path(run_path: Path) -> Path:
     return run_path.with_suffix(".log")
 
 
+def _timestamp_from_payload(artifact: Optional[RunArtifact], meta: dict) -> str:
+    created_at = getattr(artifact, "created_at", None) if artifact is not None else None
+    if isinstance(created_at, str) and created_at.strip():
+        return created_at
+    timestamp = meta.get("created_at") or meta.get("timestamp")
+    return str(timestamp) if timestamp is not None else "—"
+
+
+def _description_from_payload(artifact: Optional[RunArtifact], meta: dict) -> Optional[str]:
+    description = getattr(artifact, "description", None) if artifact is not None else None
+    if isinstance(description, str) and description.strip():
+        return description.strip()
+    description = meta.get("description")
+    return description.strip() if isinstance(description, str) and description.strip() else None
+
+
+def _reasoning_effort_from_payload(artifact: Optional[RunArtifact], meta: dict) -> Optional[str]:
+    artifact_reasoning_effort = getattr(artifact, "reasoning_effort", None) if artifact is not None else None
+    if isinstance(artifact_reasoning_effort, str) and artifact_reasoning_effort.strip():
+        return artifact_reasoning_effort.strip()
+
+    artifact_reasoning = getattr(artifact, "reasoning", None) if artifact is not None else None
+    if isinstance(artifact_reasoning, dict):
+        effort = artifact_reasoning.get("effort")
+        if effort is not None and str(effort).strip():
+            return str(effort).strip()
+
+    reasoning_effort = meta.get("reasoning_effort")
+    if isinstance(reasoning_effort, str) and reasoning_effort.strip():
+        return reasoning_effort.strip()
+
+    reasoning = meta.get("reasoning")
+    if isinstance(reasoning, dict):
+        effort = reasoning.get("effort")
+        if effort is not None and str(effort).strip():
+            return str(effort).strip()
+    if isinstance(reasoning, str) and reasoning.strip():
+        return reasoning.strip()
+    return None
+
+
 def _notes_header(run_path: Path, meta: dict) -> str:
     """Build a markdown header with run metadata for a new notes file."""
     run_name = run_path.name
     prompt = meta.get("prompt_module", "—")
     model = meta.get("model", "—")
+    reasoning_effort = _reasoning_effort_from_payload(None, meta) or "—"
+    description = _description_from_payload(None, meta)
     cost = meta.get("cost_usd")
     cost_str = f"${cost:.4f}" if cost is not None else "—"
-    ts = meta.get("timestamp", "—")
+    ts = _timestamp_from_payload(None, meta)
     try:
         run_ref = str(run_path.relative_to(Path.cwd()))
     except ValueError:
         run_ref = str(run_path)
-    return (
+    header = (
         f"# Notes — {run_name}\n\n"
         f"**Prompt:** `{prompt}` · "
         f"**Model:** {model} · "
+        f"**Reasoning:** {reasoning_effort} · "
         f"**Cost:** {cost_str} · "
         f"**Timestamp:** {ts} · "
-        f"**Run file:** `{run_ref}`\n\n"
-        f"---\n\n"
+        f"**Run file:** `{run_ref}`\n"
+    )
+    if description:
+        header += f"\n**Description:** {description}\n"
+    return (
+        header
+        + "\n---\n\n"
     )
 
 
@@ -665,17 +714,22 @@ def main() -> None:
     # TAB 1 — Overview
     # ════════════════════════════════════════════════════════════════════════
     with tab_overview:
-        timestamp = artifact_a.created_at if artifact_a is not None else meta_a.get("timestamp", "—")
+        timestamp = _timestamp_from_payload(artifact_a, meta_a)
+        description = _description_from_payload(artifact_a, meta_a)
+        reasoning_effort = _reasoning_effort_from_payload(artifact_a, meta_a)
         st.markdown(f"**Run:** `{run_a_name}`  |  **Timestamp:** `{timestamp}`")
         if artifact_a is not None and artifact_a.manifest_path:
             st.markdown(f"**Manifest:** `{artifact_a.manifest_path}`")
+        if description:
+            st.markdown(f"**Description:** {description}")
 
-        details_cols = st.columns(4)
+        details_cols = st.columns(5)
         details_cols[0].metric("Prompt", artifact_a.prompt_module if artifact_a is not None else meta_a.get("prompt_module", "—"))
         details_cols[1].metric("Model", artifact_a.model if artifact_a is not None else meta_a.get("model", "—"))
-        details_cols[2].metric("Mode", artifact_a.mode.value if artifact_a is not None else meta_a.get("mode", "—"))
+        details_cols[2].metric("Reasoning", reasoning_effort or "—")
+        details_cols[3].metric("Mode", artifact_a.mode.value if artifact_a is not None else meta_a.get("mode", "—"))
         cost_val = artifact_a.total_cost_usd if artifact_a is not None else meta_a.get("cost_usd")
-        details_cols[3].metric("Cost (USD)", f"${cost_val:.4f}" if isinstance(cost_val, (int, float)) else "—")
+        details_cols[4].metric("Cost (USD)", f"${cost_val:.4f}" if isinstance(cost_val, (int, float)) else "—")
 
         evaluated_record_ids = (
             {str(record.gt_record_id) for record in artifact_a.records}
@@ -715,7 +769,7 @@ def main() -> None:
         with st.expander("Run records", expanded=False):
             if gt_index is not None:
                 _gt_df = gt_index.reset_index()
-                st.dataframe(_gt_df, use_container_width=True, hide_index=True)
+                st.dataframe(_gt_df, width="stretch", hide_index=True)
                 _export_buttons(_gt_df, "gt_index", "Run records")
             else:
                 st.caption("No record metadata available for this run.")
@@ -847,7 +901,7 @@ def main() -> None:
             else:
                 coverage_event = st.dataframe(
                     coverage_df,
-                    use_container_width=True,
+                    width="stretch",
                     hide_index=True,
                     selection_mode="multi-row",
                     on_select="rerun",
@@ -872,7 +926,7 @@ def main() -> None:
             else:
                 extraction_event = st.dataframe(
                     filtered_extraction_df,
-                    use_container_width=True,
+                    width="stretch",
                     hide_index=True,
                     selection_mode="multi-row",
                     on_select="rerun",
@@ -933,7 +987,7 @@ def main() -> None:
             )
             metrics_event = st.dataframe(
                 styled_metrics,
-                use_container_width=True,
+                width="stretch",
                 selection_mode="multi-row",
                 on_select="rerun",
                 key="metrics_table",
@@ -1010,7 +1064,7 @@ def main() -> None:
 
                 mismatch_event = st.dataframe(
                     error_df,
-                    use_container_width=True,
+                    width="stretch",
                     selection_mode="multi-row",
                     on_select="rerun",
                     key=f"mismatch_table_{selected_field}",
@@ -1139,7 +1193,7 @@ def main() -> None:
                     output_df = pd.DataFrame(output_rows)
                     output_event = st.dataframe(
                         output_df,
-                        use_container_width=True,
+                        width="stretch",
                         hide_index=True,
                         selection_mode="multi-row",
                         on_select="rerun",
@@ -1169,7 +1223,7 @@ def main() -> None:
                     record_df = pd.DataFrame(rows)
                     record_event = st.dataframe(
                         record_df,
-                        use_container_width=True,
+                        width="stretch",
                         hide_index=True,
                         selection_mode="multi-row",
                         on_select="rerun",
@@ -1245,7 +1299,7 @@ def main() -> None:
                 st.subheader(f"Field comparison: {run_a_cmp} vs {run_b_cmp}")
                 st.caption("Sorted by Δ F1 ascending — regressions at top.")
                 compare_event = st.dataframe(
-                    compare_df, use_container_width=True, hide_index=True,
+                compare_df, width="stretch", hide_index=True,
                     selection_mode="multi-row", on_select="rerun",
                     key="compare_table",
                 )
@@ -1328,7 +1382,7 @@ def main() -> None:
                     st.markdown("**Overall metrics**")
                     st.line_chart(
                         overall_df.pivot(index="run", columns="field", values="f1"),
-                        use_container_width=True,
+                        width="stretch",
                         height=250,
                     )
 
@@ -1338,7 +1392,7 @@ def main() -> None:
                     st.markdown("**Per-field F1**")
                     st.line_chart(
                         per_field_df.pivot(index="run", columns="field", values="f1"),
-                        use_container_width=True,
+                        width="stretch",
                         height=400,
                     )
 
@@ -1348,14 +1402,14 @@ def main() -> None:
                         st.markdown("**Per-field Precision**")
                         st.line_chart(
                             per_field_df.pivot(index="run", columns="field", values="precision"),
-                            use_container_width=True,
+                            width="stretch",
                             height=300,
                         )
                     with pr_col_right:
                         st.markdown("**Per-field Recall**")
                         st.line_chart(
                             per_field_df.pivot(index="run", columns="field", values="recall"),
-                            use_container_width=True,
+                            width="stretch",
                             height=300,
                         )
 

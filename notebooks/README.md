@@ -378,15 +378,17 @@ The key design question: **should modulators apply unconditionally, or only when
 - For modulators: restrict upgrades to records where mc_relevance ≥ L (i.e., data type must not be X) — this may close most of the over-prediction gap.
 - For R2: prompt-tune the relevance block, especially the modulator threshold description; compare to R1-A ceiling.
 
-### 2026-03-31: WU-3.2 + WU-3.4 + WU-3.4b Prompt Iteration — All Modes
+### 2026-03-31: Improved Prompt for Modulator Fields, `data_type`, and `geospatial_info_dataset`
 
-**Task:** Implement Phase 3 rounds 2-3-4: expand VOCABULARY block (WU-3.2), boolean cue expansion (WU-3.4), and mode-specific rules (WU-3.4b); evaluate all three extraction modes on dev subset.
+**Task:** Improve the prompt for modulator fields, `data_type`, and `geospatial_info_dataset`, then evaluate all three extraction modes on the dev subset.
 
 **Work Performed:**
-- **WU-3.2** (`common.py` VOCABULARY): Replaced 8-entry partial vocabulary with full 13-value `data_type` enum (corrected 5 invalid values: `tracking`, `remote_sensing`, `acoustic`, `morphological`, `environmental`; added `presence-absence`, `density`, `distribution`, `traits`, `ecosystem_function`, `ecosystem_structure`, `species_richness`, `other`, `unknown`). Expanded `geospatial_info_dataset` from 5 to 9 values (`distribution`, `geographic_features`, `site_ids`, `unknown` added). Added contrastive examples and negative rule for place-name over-triggering.
-- **WU-3.4** (`common.py` MODULATOR_FIELDS): Expanded `time_series` with 4 negative anchors; expanded `threatened_species` with full IUCN/CITES/SARA/COSEWIC/provincial cue table; rewrote `bias_north_south` as dual-trigger (geographic: Nunavik/James Bay/above 49°N + explicit bias language).
-- **WU-3.4b** (`section.py`, `pdf_file.py`): Added sections-mode rules for `data_type` (primary collected data, not downstream analyses) and `time_series` (field seasons != time series); added PDF-mode rules for `time_series` (judge from sampling design only), `new_species_science` (sp. nov., holotype triggers), and `new_species_region` (first-record language contrastive).
-- **Runs:** Abstract-only first (`artifacts/runs/20260331_070721_wu32_34_abstract.json`), then all three modes (`artifacts/runs/20260331_12*`)
+- Expanded the `common.py` vocabulary block from a partial list to the full 13-value `data_type` enum (corrected 5 invalid values: `tracking`, `remote_sensing`, `acoustic`, `morphological`, `environmental`; added `presence-absence`, `density`, `distribution`, `traits`, `ecosystem_function`, `ecosystem_structure`, `species_richness`, `other`, `unknown`).
+- Expanded `geospatial_info_dataset` from 5 to 9 values (`distribution`, `geographic_features`, `site_ids`, `unknown` added), with contrastive examples and a negative rule for place-name over-triggering.
+- Expanded the modulator boolean guidance: `time_series` gained 4 negative anchors, `threatened_species` gained a broader IUCN/CITES/SARA/COSEWIC/provincial cue table, and `bias_north_south` was rewritten as a dual-trigger rule (northern geography + explicit bias language).
+- Added sections-mode rules for `data_type` (primary collected data, not downstream analyses) and `time_series` (field seasons do not imply a time series).
+- Added PDF-mode rules for `time_series` (judge from sampling design only), `new_species_science` (for example `sp. nov.` and holotype language), and `new_species_region` (explicit first-record wording).
+- **Runs:** Abstract-only smoke test first, then the three final mode runs in `artifacts/runs/20260331_12*`
 
 **Three-mode results (2026-03-31):**
 
@@ -408,27 +410,43 @@ The key design question: **should modulators apply unconditionally, or only when
 **Key findings:**
 - PDF native dominates for `threatened_species` (F1=0.78), `bias_north_south` (F1=0.83), `new_species_*` (F1=0.75/0.77), `spatial_range_km2` (F1=0.70)
 - Abstract best for `data_type`, `geospatial_info`, `species`, `temp_range_i`
-- Mode-specific rules in WU-3.4b appear effective: `new_species_science` PDF F1 0.61->0.77, `bias_north_south` PDF F1 was N/A->0.83
-- `threatened_species` recall unresponsive to cue expansion in abstract mode (R=0.24) but strong in PDF mode (R=0.67) - confirms conservation language appears in full text, not abstracts
-- Species precision still weak across all modes - WU-T1 (SPECIES_EXTRACTION block) is the next lever
+- The new mode-specific rules appear effective: `new_species_science` PDF F1 0.61->0.77, `bias_north_south` PDF F1 was N/A->0.83
+- `threatened_species` recall remained weak in abstract mode (R=0.24) but was strong in PDF mode (R=0.67), which suggests the conservation language often lives in full text rather than abstracts
+- Species precision is still weak across all modes, so the next prompt iteration should focus on a dedicated species-extraction block
+
+**PDF native vs sections — why the gap?**
+
+The two full-text modes differ fundamentally in what the LLM sees:
+- **Sections mode**: GROBID-parsed TEI -> filtered sections (Abstract + Methods + keyword-matched headings) -> concatenated markdown (~3-17k chars). A lossy subset of the paper.
+- **PDF native mode**: the actual PDF file via OpenAI File API - the LLM sees the entire document including figures, tables, captions, supplementary content, and layout.
+
+Three sources of information loss explain sections mode's underperformance:
+
+1. **Section filtering is aggressive** - only `ABSTRACT` + `METHODS` types + keyword-matched headings pass through (`SectionSelectionConfig`). Results, Discussion, Introduction, and Supplementary are mostly excluded. Fields like `threatened_species` (conservation language in Intro/Discussion), `new_species_*` (taxonomy sections), and `bias_north_south` (Discussion framing) lose their signal entirely.
+
+2. **GROBID parsing quality** - TEI extraction drops tables, figures, captions, and sometimes mislabels or truncates sections. Table headers for `spatial_range_km2`, figure maps for `geospatial_info`, and supplementary species lists are lost.
+
+3. **Structural context is destroyed** - PDF native preserves document layout, table formatting, figure captions, and section hierarchy. Sections mode collapses everything to flat markdown, removing cues the model uses for spatial/temporal/taxonomic extraction.
+
+The numbers confirm this pattern: PDF native wins on every field whose signal lives outside Abstract+Methods (`threatened_species` 0.78 vs 0.37, `new_species_science` 0.77 vs 0.24, `bias_north_south` 0.83 vs 0.38). Sections mode is competitive only where signal concentrates in Methods (`spatial_range_km2` 0.67 vs 0.70 - essentially tied). The remaining use case for sections mode is cost control at scale or targeted per-field section routing in a mode-fusion pipeline.
 
 **Next Steps:**
-- WU-T1: SPECIES_EXTRACTION block to address species precision
+- Add a dedicated `SPECIES_EXTRACTION` block to address species precision
 - Consider mode-fusion strategy: per-field best-mode selection for production pipeline
 - `data_type` F1 target (>=0.50) not yet met in any mode - may need further prompt refinement or GT audit
 
-### 2026-03-28: Dev-Subset Run Audit and Prompt Iteration Ladder
+### 2026-03-28: Baseline Prompt with Improved Species Evaluation — Dev-Subset Audit
 
-**Task:** Inspect the latest dev-subset run artifacts across abstract, section-based, and native-PDF modes, then turn the observed failure patterns into a practical prompt-engineering and eval-improvement roadmap ordered from easier to harder work.
+**Task:** Inspect the March 27 baseline run artifacts across abstract, section-based, and native-PDF modes, then turn the observed failure patterns into a practical prompt-engineering and evaluation roadmap.
 
 **Work Performed:**
 - **Artifacts reviewed:** `artifacts/runs/20260327_172654_dev_subset_abstract.json`, `artifacts/runs/20260327_172653_dev_subset_sections.json`, `artifacts/runs/20260327_172656_dev_subset_pdf_file.json`
 - Compared per-field metrics and mode tradeoffs, then inspected recurring false-positive / false-negative value patterns directly from `field_results`
 - Cross-checked the current prompt blocks in `src/llm_metadata/prompts/common.py` and found a major vocabulary mismatch: the prompt currently documents only a subset of the enum values actually accepted by `DatasetFeaturesExtraction`
-- Wrote mode-specific analyst notes for the three latest runs:
-  - `data/20260327_172654_dev_subset_abstract_notes.md`
-  - `data/20260327_172653_dev_subset_sections_notes.md`
-  - `data/20260327_172656_dev_subset_pdf_file_notes.md`
+- Wrote mode-specific analyst notes next to the three latest run artifacts:
+  - `artifacts/runs/20260327_172654_dev_subset_abstract_notes.md`
+  - `artifacts/runs/20260327_172653_dev_subset_sections_notes.md`
+  - `artifacts/runs/20260327_172656_dev_subset_pdf_file_notes.md`
 
 **Results:**
 - The March 27 run set is effectively a stable baseline; its metrics match the March 6 run set exactly, so no prompt improvement has landed yet

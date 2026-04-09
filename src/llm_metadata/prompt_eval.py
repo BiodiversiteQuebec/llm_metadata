@@ -31,6 +31,15 @@ from llm_metadata.schemas.fuster_features import (
 _LIST_COLS = ["data_type", "geospatial_info_dataset", "species"]
 _OUTPUT_DIR = Path(os.getenv("PROMPT_EVAL_OUTPUT_DIR", "artifacts/runs"))
 
+def _resolve_output_path(name: Optional[str], output: Optional[str]) -> Path:
+    _OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    if output:
+        path = Path(output)
+        return _OUTPUT_DIR / f"{timestamp}_{path.name}" if path.parent == Path(".") else path
+    if name:
+        return _OUTPUT_DIR / f"{timestamp}_{name}.json"
+    return _OUTPUT_DIR / f"{timestamp}_prompt_eval.json"
 
 def _parse_excel_val(val):
     if val is None:
@@ -107,76 +116,113 @@ def run_eval(
     config_path: Optional[str] = None,
     fields: Optional[list[str]] = None,
     model: str = "gpt-5-mini",
+    reasoning_effort: str = "low",
     gt_path: str = "data/dataset_092624_validated.xlsx",
     name: Optional[str] = None,
+    description: Optional[str] = None,
     output_path: Optional[str | Path] = None,
     skip_cache: bool = False,
 ) -> EvaluationReport:
     """Run extraction + evaluation for one explicit mode over one manifest."""
 
-    configure_extraction_logging()
-    logger.info(
-        "Starting prompt_eval mode={} manifest_path={} parallelism={} model={} skip_cache={}",
-        ExtractionMode(mode).value,
-        manifest_path,
-        parallelism,
-        model,
-        skip_cache,
+    requested_output_path = Path(output_path) if output_path is not None else None
+    resolved_output_path = _resolve_output_path(
+        name if requested_output_path is None else None,
+        str(requested_output_path) if requested_output_path is not None else None,
     )
-    manifest = DataPaperManifest.load_csv(manifest_path)
-    logger.info("Loaded manifest records={}", len(manifest.records))
-    eval_config = config or (
-        EvaluationConfig.from_json(config_path)
-        if config_path is not None
-        else EvaluationConfig(field_strategies=DEFAULT_FIELD_STRATEGIES)
-    )
-    run_config = ExtractionConfig(model=model, text_format=DatasetFeaturesExtraction)
-    run_artifact = run_manifest_extraction(
-        manifest,
+    log_path = resolved_output_path.with_suffix(".log")
+    recreate_cmd = _build_recreate_command(
         mode=mode,
+        manifest_path=manifest_path,
         parallelism=parallelism,
         prompt_module=prompt_module,
-        config=run_config,
-        manifest_path=manifest_path,
-        name=name,
+        config_path=config_path,
+        fields=fields,
+        output_path=requested_output_path,
+        name=name if requested_output_path is None else None,
+        model=model,
+        reasoning_effort=reasoning_effort,
+        gt_path=gt_path,
+        description=description,
         skip_cache=skip_cache,
     )
 
-    logger.info("Loading ground truth from {}", gt_path)
-    gt_df = _load_ground_truth(gt_path)
-    true_by_id = _build_true_by_id(gt_df, {record.gt_record_id for record in manifest.records})
-    if not true_by_id:
-        raise ValueError("No valid GT rows matched the manifest.")
+    try:
+        with _tee_console_to_log(log_path):
+            print(f"Recreate command: {recreate_cmd}")
+            configure_extraction_logging()
+            logger.info(
+                "Starting prompt_eval mode={} manifest_path={} parallelism={} model={} reasoning_effort={} description={} skip_cache={}",
+                ExtractionMode(mode).value,
+                manifest_path,
+                parallelism,
+                model,
+                reasoning_effort,
+                description or "",
+                skip_cache,
+            )
+            manifest = DataPaperManifest.load_csv(manifest_path)
+            logger.info("Loaded manifest records={}", len(manifest.records))
+            eval_config = config or (
+                EvaluationConfig.from_json(config_path)
+                if config_path is not None
+                else EvaluationConfig(field_strategies=DEFAULT_FIELD_STRATEGIES)
+            )
+            run_config = ExtractionConfig(
+                model=model,
+                reasoning={"effort": reasoning_effort},
+                text_format=DatasetFeaturesExtraction,
+            )
+            run_artifact = run_manifest_extraction(
+                manifest,
+                mode=mode,
+                parallelism=parallelism,
+                prompt_module=prompt_module,
+                config=run_config,
+                manifest_path=manifest_path,
+                name=name,
+                description=description,
+                skip_cache=skip_cache,
+            )
 
-    logger.info(
-        "Evaluating predictions matched_records={} fields={}",
-        len(true_by_id),
-        ",".join(fields) if fields else "default",
-    )
-    report = evaluate_indexed(
-        true_by_id=true_by_id,
-        pred_by_id=run_artifact.predictions_by_id(DatasetFeaturesExtraction),
-        fields=fields,
-        config=eval_config,
-    )
-    report.total_cost_usd = run_artifact.total_cost_usd  # type: ignore[attr-defined]
-    report.run_artifact = run_artifact  # type: ignore[attr-defined]
+            logger.info("Loading ground truth from {}", gt_path)
+            gt_df = _load_ground_truth(gt_path)
+            true_by_id = _build_true_by_id(gt_df, {record.gt_record_id for record in manifest.records})
+            if not true_by_id:
+                raise ValueError("No valid GT rows matched the manifest.")
 
-    run_artifact.evaluation = _evaluation_payload(report)
-    if output_path is not None:
-        saved_json_path, saved_csv_path = _save_run_outputs(run_artifact, output_path)
-        report.saved_path = str(saved_json_path)  # type: ignore[attr-defined]
-        report.extraction_csv_path = str(saved_csv_path)  # type: ignore[attr-defined]
-        logger.info("Saved prompt_eval artifact to {}", saved_json_path)
-        logger.info("Saved extraction results CSV to {}", saved_csv_path)
+            logger.info(
+                "Evaluating predictions matched_records={} fields={}",
+                len(true_by_id),
+                ",".join(fields) if fields else "default",
+            )
+            report = evaluate_indexed(
+                true_by_id=true_by_id,
+                pred_by_id=run_artifact.predictions_by_id(DatasetFeaturesExtraction),
+                fields=fields,
+                config=eval_config,
+            )
+            report.total_cost_usd = run_artifact.total_cost_usd  # type: ignore[attr-defined]
+            report.run_artifact = run_artifact  # type: ignore[attr-defined]
 
-    logger.info(
-        "Completed prompt_eval mode={} records={} total_cost=${:.4f}",
-        ExtractionMode(mode).value,
-        len(run_artifact.records),
-        run_artifact.total_cost_usd,
-    )
-    return report
+            run_artifact.evaluation = _evaluation_payload(report)
+            saved_json_path, saved_csv_path = _save_run_outputs(run_artifact, resolved_output_path)
+            report.saved_path = str(saved_json_path)  # type: ignore[attr-defined]
+            report.extraction_csv_path = str(saved_csv_path)  # type: ignore[attr-defined]
+            logger.info("Saved prompt_eval artifact to {}", saved_json_path)
+            logger.info("Saved extraction results CSV to {}", saved_csv_path)
+
+            logger.info(
+                "Completed prompt_eval mode={} records={} total_cost=${:.4f}",
+                ExtractionMode(mode).value,
+                len(run_artifact.records),
+                run_artifact.total_cost_usd,
+            )
+            _print_metrics_table(report)
+            print(f"\nRun artifact saved to: {saved_json_path}")
+            return report
+    finally:
+        configure_extraction_logging()
 
 
 def _print_metrics_table(report: EvaluationReport) -> None:
@@ -231,7 +277,9 @@ def _build_recreate_command(
     output_path: Optional[Path],
     name: Optional[str],
     model: str,
+    reasoning_effort: str,
     gt_path: str,
+    description: Optional[str],
     skip_cache: bool,
 ) -> str:
     command = [
@@ -248,6 +296,8 @@ def _build_recreate_command(
         str(parallelism),
         "--model",
         model,
+        "--reasoning-effort",
+        reasoning_effort,
         "--gt",
         gt_path,
     ]
@@ -261,20 +311,12 @@ def _build_recreate_command(
         command.extend(["--output", str(output_path)])
     elif name:
         command.extend(["--name", name])
+    if description:
+        command.extend(["--description", description])
     if skip_cache:
         command.append("--skip-cache")
     return " ".join(shlex.quote(part) for part in command)
 
-
-def _resolve_output_path(name: Optional[str], output: Optional[str]) -> Path:
-    _OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    if output:
-        path = Path(output)
-        return _OUTPUT_DIR / f"{timestamp}_{path.name}" if path.parent == Path(".") else path
-    if name:
-        return _OUTPUT_DIR / f"{timestamp}_{name}.json"
-    return _OUTPUT_DIR / f"{timestamp}_prompt_eval.json"
 
 
 def main() -> None:
@@ -290,45 +332,28 @@ def main() -> None:
     parser.add_argument("--output", default=None, help="Path to save the run artifact JSON.")
     parser.add_argument("--name", default=None, help="Run name stem for auto-generated output paths.")
     parser.add_argument("--model", default="gpt-5-mini", help="OpenAI model name.")
+    parser.add_argument("--reasoning-effort", default="low", help="GPT-5 reasoning effort.")
+    parser.add_argument("--description", default=None, help="Short description stored with the run artifact.")
     parser.add_argument("--gt", default="data/dataset_092624_validated.xlsx", help="Validated GT XLSX path.")
     parser.add_argument("--skip-cache", action="store_true", help="Bypass extraction cache.")
     args = parser.parse_args()
 
     fields = [field.strip() for field in args.fields.split(",")] if args.fields else None
-    output_path = _resolve_output_path(args.name, args.output)
-    log_path = output_path.with_suffix(".log")
-
-    with _tee_console_to_log(log_path):
-        recreate_cmd = _build_recreate_command(
-            mode=args.mode,
-            manifest_path=args.manifest,
-            parallelism=args.parallelism,
-            prompt_module=args.prompt,
-            config_path=args.config,
-            fields=fields,
-            output_path=Path(args.output) if args.output else None,
-            name=args.name if not args.output else None,
-            model=args.model,
-            gt_path=args.gt,
-            skip_cache=args.skip_cache,
-        )
-        print(f"Recreate command: {recreate_cmd}")
-
-        report = run_eval(
-            mode=args.mode,
-            manifest_path=args.manifest,
-            parallelism=args.parallelism,
-            prompt_module=args.prompt,
-            config_path=args.config,
-            fields=fields,
-            model=args.model,
-            gt_path=args.gt,
-            name=args.name,
-            output_path=output_path,
-            skip_cache=args.skip_cache,
-        )
-        _print_metrics_table(report)
-        print(f"\nRun artifact saved to: {output_path}")
+    run_eval(
+        mode=args.mode,
+        manifest_path=args.manifest,
+        parallelism=args.parallelism,
+        prompt_module=args.prompt,
+        config_path=args.config,
+        fields=fields,
+        model=args.model,
+        reasoning_effort=args.reasoning_effort,
+        gt_path=args.gt,
+        name=args.name,
+        description=args.description,
+        output_path=args.output,
+        skip_cache=args.skip_cache,
+    )
 
 
 if __name__ == "__main__":

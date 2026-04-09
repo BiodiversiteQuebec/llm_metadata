@@ -46,6 +46,13 @@ def _usage_cost_total(record: RunRecord) -> str:
     total_cost = record.usage_cost.get("total_cost")
     return "n/a" if total_cost is None else f"${total_cost:.4f}"
 
+
+def _reasoning_effort(reasoning: Optional[Dict[str, Any]]) -> Optional[str]:
+    if not reasoning:
+        return None
+    effort = reasoning.get("effort")
+    return str(effort).strip() if effort is not None and str(effort).strip() else None
+
 @dataclass
 class SectionSelectionConfig:
     section_types: list[SectionType] = field(
@@ -340,6 +347,7 @@ def run_manifest_extraction(
     output_path: Optional[str | Path] = None,
     manifest_path: Optional[str] = None,
     name: Optional[str] = None,
+    description: Optional[str] = None,
     skip_cache: bool = False,
 ) -> RunArtifact:
     """Run one explicit extraction mode across a manifest."""
@@ -352,21 +360,26 @@ def run_manifest_extraction(
     prompt_module = prompt_module or DEFAULT_PROMPT_MODULES[mode]
     system_message = _load_system_message(prompt_module) if prompt_module else _default_system_message(mode)
     logger.info(
-        "Starting manifest extraction mode={} records={} parallelism={} model={} prompt_module={} skip_cache={}",
+        "Starting manifest extraction mode={} records={} parallelism={} model={} reasoning_effort={} prompt_module={} description={} skip_cache={}",
         mode.value,
         len(manifest.records),
         parallelism,
         config.model,
+        _reasoning_effort(config.reasoning) or "default",
         prompt_module,
+        description or "",
         skip_cache,
     )
     artifact = RunArtifact(
         name=name or f"{mode.value}_run",
+        description=description,
         mode=mode,
         manifest_path=manifest_path,
         prompt_module=prompt_module,
         system_message=system_message,
         model=config.model,
+        reasoning=config.reasoning,
+        reasoning_effort=_reasoning_effort(config.reasoning),
         schema=config.text_format.model_json_schema(),
         records=[],
     )
