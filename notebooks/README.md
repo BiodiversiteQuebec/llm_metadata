@@ -4,6 +4,97 @@ This folder contains analysis and validation notebooks for ecological dataset ch
 
 ## Recent Activity
 
+### 2026-04-01: Automated Relevance Classification — Paper Comparison Synthesis
+
+**Task:** Expand the final synthesis so the automated relevance classification write-up explicitly compares our notebook methods to the original paper's automated classification methodology and reported results, with framing that is usable in manuscript drafting.
+
+**Work Performed:**
+- Re-read the relevant sections of `docs/fuster_et_al_2024/peerj-18853.pdf` covering:
+  - manual dataset relevance assignment
+  - automatic relevance classification methodology
+  - Table 3 results
+  - discussion paragraphs proposing direct feature extraction / LLM-like semantic approaches as a future direction
+- Added a new synthesis block to `plans/automated_relevance_classification.md` that now includes:
+  - side-by-side methodology comparison
+  - results comparison between the paper's supervised TF-IDF classifiers and our `R1-A`, `R1-B`, and `R2` notebook methods
+  - interpretation of what each method is actually testing
+  - explicit comparability limits
+  - paper-ready narrative guidance and discussion takeaways
+
+**Results:**
+- The final synthesis now distinguishes three methodological families clearly:
+  - the paper's binary supervised bag-of-words classifier
+  - our mechanistic LLM-features-plus-rules reconstruction
+  - our direct LLM semantic classification
+- The added comparison makes the main analytical point much clearer for writing:
+  - the Fuster rule framework itself is reproducible
+  - the main bottleneck is feature availability / extractability
+  - direct LLM inference partially compensates for weak intermediate feature extraction, but not for absent metadata
+- The synthesis now explicitly contextualizes the paper's best binary results from Table 3:
+  - Main Classifier only: relevant F1 `0.50`
+  - Main Classifier + Modulators: relevant F1 `0.67`
+- It also now places our current notebook numbers beside them with the correct caveat that the setups are not directly comparable because the corpus split, target definition, and evaluation protocol differ.
+
+**Key Issues Identified:**
+- The most important writing risk is over-claiming direct comparability with the paper's supervised baseline.
+- The cleanest manuscript framing is to treat this as a methodological comparison and proof-of-concept extension of the paper's own discussion, not as a strict benchmark replacement.
+
+**Next Steps:**
+- Reuse the new synthesis block from `plans/automated_relevance_classification.md` when drafting the discussion / methods-comparison subsection of the paper.
+- If you want a manuscript-ready paragraph next, the plan now contains enough structured material to condense into prose without having to re-derive the argument.
+
+### 2026-04-01: Automated Relevance Classification Completion
+
+**Task:** Finish `WU-R2`, refresh the cross-method comparison outputs so every headline row uses `MC_relevance_modifiers`, and close out the automated relevance classification plan.
+
+**Work Performed:**
+- Updated `notebooks/relevance_llm_direct.ipynb` so the primary target is now `MC_relevance_modifiers`, while `dataset_relevance` is preserved separately as `human_relevance` for diagnostics.
+- Tightened the direct-LLM notebook implementation:
+  - prompt block now mirrors the paper-faithful mechanistic framing more closely
+  - cache key now includes prompt hash as well as model/schema/text identity
+  - cache directory now lives inside the repository at `cache/relevance_llm_direct`
+- Added a credential-aware execution path:
+  - when `OPENAI_API_KEY` is present, the notebook can issue fresh direct-LLM calls
+  - when it is absent, the notebook falls back to `notebooks/results/relevance_llm_direct_predictions.csv` and still recomputes aligned metrics/artifacts
+- Executed `notebooks/relevance_llm_direct.ipynb` end-to-end in the current environment using the saved-predictions fallback.
+- Refreshed saved outputs:
+  - `notebooks/results/relevance_llm_direct_predictions.csv`
+  - `notebooks/results/relevance_llm_direct_summary.json`
+  - `notebooks/results/relevance_llm_direct_confusion.png`
+  - `notebooks/results/relevance_comparison_summary.csv`
+- Updated `plans/automated_relevance_classification.md` and `TODO.md` to mark the initiative complete.
+
+**Results:**
+- `R2` is now aligned to the same mechanistic target as `R1`.
+- Refreshed direct-LLM metrics vs `MC_relevance_modifiers` on the 30-record dev subset:
+  - headline macro F1 values follow the notebook convention of averaging over labels present in the target split; for `R2`, the stricter all-four-label macro is `0.374` and is saved in `relevance_llm_direct_summary.json`
+
+| Method | 4-class macro F1 | Binary F1 (relevant) | Binary P | Binary R |
+|---|---|---|---|---|
+| R1-A: Rules on GT features vs Fuster MC+Modulators | 1.000 | 1.000 | 1.000 | 1.000 |
+| R1-B: Rules on LLM features vs Fuster MC+Modulators | 0.125 | 0.000 | 0.000 | 0.000 |
+| R2: Direct LLM vs Fuster MC+Modulators | 0.498 | 0.773 | 0.773 | 0.773 |
+| Diagnostic: Fuster MC+Modulators vs human `dataset_relevance` | 0.491 | 0.850 | 0.773 | 0.944 |
+
+- `R2` is materially stronger than the mechanistic pipeline on LLM-extracted features (`0.498` vs `0.125` macro F1; `0.773` vs `0.000` binary F1), but still far below the GT-feature ceiling.
+- The same saved direct-LLM predictions remain weaker against `human_relevance` than against `MC_relevance_modifiers`:
+  - macro F1 `0.297`
+  - binary F1 `0.750`
+  - precision `0.682`
+  - recall `0.833`
+
+**Key Issues Identified:**
+- This environment does not currently expose `OPENAI_API_KEY`, so the notebook could not generate a truly fresh direct-LLM run here.
+- The refreshed `R2` metrics therefore reflect the existing saved direct-LLM predictions, re-evaluated against the corrected mechanistic target.
+- Even after target alignment, the dominant performance gap remains feature/evidence quality rather than post-hoc scoring:
+  - GT-feature rules are perfect on the dev subset
+  - rules on LLM-extracted features collapse badly
+  - direct LLM partially recovers that gap, but not enough to match the mechanistic ceiling
+
+**Next Steps:**
+- Re-run `notebooks/relevance_llm_direct.ipynb` with valid OpenAI credentials if we want to test whether the revised prompt block improves predictions rather than just the evaluation framing.
+- Use `notebooks/results/relevance_comparison_summary.csv` as the current headline table for any write-up or follow-on analysis.
+
 ### 2026-04-01: Automated Relevance Classification Plan Refresh
 
 **Task:** Reconcile `plans/automated_relevance_classification.md` with the notebook work already completed, and document what remains to implement.

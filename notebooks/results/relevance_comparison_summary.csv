@@ -1,0 +1,5 @@
+Method,4-class macro F1,Binary F1 (relevant),Binary P,Binary R
+R1-A: Rules on GT features vs Fuster MC+Modulators,1.0,1.0,1.0,1.0
+R1-B: Rules on LLM features vs Fuster MC+Modulators,0.125,0.0,0.0,0.0
+R2: Direct LLM vs Fuster MC+Modulators,0.498,0.773,0.773,0.773
+Diagnostic: Fuster MC+Modulators vs human dataset_relevance,0.491,0.85,0.773,0.944

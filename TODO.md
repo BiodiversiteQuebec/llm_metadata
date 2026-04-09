@@ -45,9 +45,9 @@
 
 > **Plan:** [`plans/automated_relevance_classification.md`](plans/automated_relevance_classification.md)
 
-- [ ] WU-R1: `notebooks/relevance_mechanistic.ipynb` — rule-based scoring (Part A: GT features ceiling test; Part B: LLM features end-to-end)
-- [ ] WU-R2: `notebooks/relevance_llm_direct.ipynb` — direct LLM classification with extended schema
-- [ ] Combined comparison table + lab log entry
+- [x] WU-R1: `notebooks/relevance_mechanistic.ipynb` — rule-based scoring (Part A: GT features ceiling test; Part B: LLM features end-to-end)
+- [x] WU-R2: `notebooks/relevance_llm_direct.ipynb` — direct LLM classification with extended schema
+- [x] Combined comparison table + lab log entry
 
 ---
 

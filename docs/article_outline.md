@@ -60,6 +60,7 @@ Goal :
 * Performance on relevancy classification
     * Segmantized by field (e.g., location, species, etc)
     * Overall performance metrics
+    * Manuscript-ready comparison draft: `docs/relevance_classification_comparison_draft.md`
 
 * Demo front-end showcasing extraction results and allowing user testing
 
@@ -68,6 +69,7 @@ Goal :
 * Field-base performance insights (e.g., location vs species extraction)
 * Trade-offs between abstract-only and full-text approaches (e.g., cost vs accuracy)
 * Performance comparison with NLP classification (Fuster & Valentin, 2024)
+    * Reuse manuscript-ready subsection draft from `docs/relevance_classification_comparison_draft.md`
 * Techniques to improve benchmark database and feature extraction performance
 * Benefits, limitations and perspectives/futures/dreams for LLM-based extraction for Biodiversité Québec
 

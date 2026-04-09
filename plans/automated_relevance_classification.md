@@ -19,8 +19,8 @@ Both are notebook-only. No modifications to `src/`.
 |---|---|---|
 | **WU-R1A** | Complete | `notebooks/relevance_mechanistic.ipynb` now reproduces the annotated Fuster mechanistic system exactly on the 30-record dev subset (`30/30` on all audited `MC_*` columns; macro F1 `1.00` vs `MC_relevance_modifiers`). |
 | **WU-R1B** | Complete | The same notebook evaluates rules on LLM-extracted features against `MC_relevance_modifiers`; current saved dev-subset result is macro F1 `0.125`. |
-| **WU-R2** | Partially complete | `notebooks/relevance_llm_direct.ipynb` exists and runs, but it still evaluates against `dataset_relevance` rather than the paper-faithful mechanistic target. |
-| **Final synthesis** | Remaining | The comparison framing and lab log need one final refresh so all headline rows use the same target definition. |
+| **WU-R2** | Complete | `notebooks/relevance_llm_direct.ipynb` now evaluates primarily against `MC_relevance_modifiers`, retains `dataset_relevance` as `human_relevance`, and writes refreshed `relevance_llm_direct_summary.json`, predictions, confusion figure, and `relevance_comparison_summary.csv`. In this environment the notebook executed via saved-predictions fallback because `OPENAI_API_KEY` was unavailable. |
+| **Final synthesis** | Complete | The cross-method comparison table and notebook lab log now use the same mechanistic target definition throughout. |
 
 ---
 
@@ -169,7 +169,7 @@ Implemented result:
 
 **deps:** none (independent notebook, but should now be aligned to the same target definition as WU-R1) | **files:** `notebooks/relevance_llm_direct.ipynb`
 
-**Status:** Partially implemented; remaining notebook work is here.
+**Status:** Implemented.
 
 **Schema (defined locally in notebook — no src changes)**
 
@@ -225,17 +225,23 @@ Use `get_openai_client()` from `openai_io.py` and call `client.responses.parse()
 Steps:
 - Build client from `openai_io.get_openai_client()`
 - Load dev subset manifest; join with raw xlsx for `full_text`
-- Loop over 30 records with joblib caching (cache key = record id + model + schema hash)
+- Loop over 30 records with joblib caching (cache key now includes record id + model + schema hash + prompt hash + text hash)
 - Parse responses into `DatasetFeaturesWithRelevance`
 - Carry both `gt_relevance = MC_relevance_modifiers` and `human_relevance = dataset_relevance`
 - Evaluate `relevance` primarily against `MC_relevance_modifiers` (same metrics as WU-R1)
 - Optionally keep a diagnostic comparison against `human_relevance`
 - Spot-check `relevance_reasoning` on mismatches
 
-Remaining tasks:
-- Update notebook framing so it explains the same target distinction already documented in `relevance_mechanistic.ipynb`
-- Replace the current `dataset_relevance`-based headline metrics and saved outputs with `MC_relevance_modifiers`-based ones
-- Re-run the notebook and refresh `relevance_llm_direct_summary.json`, predictions, and confusion figure
+Implemented result:
+- Primary target is now `MC_relevance_modifiers`; `dataset_relevance` is retained only as `human_relevance` for diagnostics.
+- Current saved dev-subset result vs `MC_relevance_modifiers`: macro F1 `0.498` over target-present labels (`0.374` over all four labels), binary F1 `0.773`, precision `0.773`, recall `0.773`.
+- Diagnostic comparison of the same predictions vs `human_relevance`: macro F1 `0.297`, binary F1 `0.750`.
+- The notebook now writes:
+  - `notebooks/results/relevance_llm_direct_predictions.csv`
+  - `notebooks/results/relevance_llm_direct_summary.json`
+  - `notebooks/results/relevance_llm_direct_confusion.png`
+  - `notebooks/results/relevance_comparison_summary.csv`
+- For reproducibility without credentials, the notebook falls back to the existing saved predictions file when `OPENAI_API_KEY` is absent, while still recomputing target-aligned metrics and artifacts.
 
 ---
 
@@ -255,28 +261,160 @@ eval_df = df[df["gt_relevance"].isin(["H", "M", "L", "X"])].copy()
 - 4-class: `sklearn.metrics.classification_report(labels=["H","M","L","X"])`
 - Binary: collapse H+M → "relevant", L+X → "not relevant"; compute P/R/F1
 - Confusion matrix heatmap
+- Headline notebook tables use macro F1 over labels present in the target split; on this dev subset `MC_relevance_modifiers` contains `H/M/L` only, so the stricter all-four-label macro for `R2` is `0.374` and is saved in `relevance_llm_direct_summary.json`.
 
 **Comparison table (final output):**
 
 | Method | 4-class macro F1 | Binary F1 (relevant) | Binary P | Binary R |
 |---|---|---|---|---|
-| R1-A: Rules on GT features | | | | |
-| R1-B: Rules on LLM features | | | | |
-| R2: Direct LLM | | | | |
-| Diagnostic: mechanistic target vs human `dataset_relevance` | | | | |
-
-Current known values:
-
-| Method | 4-class macro F1 | Binary F1 (relevant) | Binary P | Binary R |
-|---|---|---|---|---|
 | R1-A: Rules on GT features vs Fuster MC+Modulators | 1.000 | 1.000 | 1.000 | 1.000 |
 | R1-B: Rules on LLM features vs Fuster MC+Modulators | 0.125 | 0.000 | 0.000 | 0.000 |
-| Diagnostic: Fuster MC+Modulators vs human `dataset_relevance` | 0.491 | 0.850 | 0.773 | 0.944 |
-| R2: Direct LLM | pending refresh against `MC_relevance_modifiers` | pending | pending | pending |
+| R2: Direct LLM vs Fuster MC+Modulators | 0.498 | 0.773 | 0.773 | 0.773 |
+| Diagnostic: mechanistic target vs human `dataset_relevance` | 0.491 | 0.850 | 0.773 | 0.944 |
+
+---
+
+## Final Synthesis
+
+### Comparison to Fuster et al. automated classification
+
+The original paper's automated relevance classification is a **supervised binary text-classification pipeline**, whereas this notebook initiative evaluates two **LLM-centered alternatives** designed around the paper's own manual scoring logic.
+
+**Paper method (Fuster et al., PeerJ DOI `10.7717/peerj.18853`):**
+- Input text:
+  - Dryad / Zenodo: title + repository descriptive content
+  - Semantic Scholar: title + abstract
+- Text preprocessing:
+  - lowercase + special-character removal
+  - optional stop-word removal
+  - optional lemmatization
+  - unigrams alone or unigrams + bigrams
+  - TF-IDF representation with terms occurring in fewer than 3 documents removed
+- Classifiers compared:
+  - Logistic Regression
+  - Random Forest
+  - linear SVM
+- Class weighting: `balanced`
+- Target:
+  - binary only, because the paper collapsed `H/M -> relevant` and `L/X -> not relevant`
+- Evaluation:
+  - 5-fold cross-validation on the annotated corpus
+
+**Our methods:**
+- `R1-A`:
+  - no model; explicit reconstruction of the paper's mechanistic rules from GT features
+- `R1-B`:
+  - LLM feature extraction first, then deterministic rule scoring
+- `R2`:
+  - direct LLM structured prediction of both features and final relevance category, with reasoning
+- Target:
+  - primary target is the paper-faithful mechanistic label `MC_relevance_modifiers`
+  - evaluation remains 4-class first, then binary collapse as a secondary view
+- Evaluation:
+  - 30-record dev subset, not full-corpus cross-validation
+
+### Methodology contrast
+
+| Dimension | Fuster et al. automated classifier | `R1` mechanistic pipeline | `R2` direct LLM |
+|---|---|---|---|
+| Learning paradigm | Supervised ML on labeled corpus | No learned relevance model; deterministic rules over extracted features | Prompted LLM inference with structured output |
+| Input representation | TF-IDF bag-of-words over cleaned text | Semantic feature schema (`data_type`, temporal, spatial, modulators) | Same text, but end-to-end semantic reasoning in one call |
+| Output target | Binary relevant / not relevant | 4-class mechanistic relevance, then binary collapse if needed | 4-class relevance directly, plus feature fields and rationale |
+| Dependence on training set | High | Low for scorer, high for feature extraction quality | No task-specific training set required |
+| Interpretability | Medium; feature weights inspectable but indirect | High; every decision is traceable to explicit rules | Medium-high; reasoning is explicit, but still model-generated |
+| Failure mode highlighted by paper | lexical overfitting, sparse metadata | extracted-feature omissions propagate directly into rule failure | model may partially compensate for sparse cues, but remains limited by missing metadata |
+
+### Results comparison with the paper
+
+The paper reported the following best-performing supervised binary classifiers (Table 3):
+
+| System | Relevant Precision | Relevant Recall | Relevant F-score | Weighted F-score |
+|---|---|---|---|---|
+| Main Classifier only | 0.57 | 0.44 | 0.50 | 0.68 |
+| Main Classifier + Modulators | 0.62 | 0.71 | 0.67 | 0.61 |
+
+Our notebook results are not directly commensurable because they use a 30-record dev subset and a 4-class mechanistic target before binary collapse. Still, the binary collapse offers a useful orientation:
+
+| System | Relevant Precision | Relevant Recall | Relevant F1 | Notes |
+|---|---|---|---|---|
+| Fuster paper: supervised Main Classifier only | 0.57 | 0.44 | 0.50 | Full annotated corpus, 5-fold CV |
+| Fuster paper: supervised Main Classifier + Modulators | 0.62 | 0.71 | 0.67 | Full annotated corpus, 5-fold CV |
+| `R1-A`: rules on GT features | 1.00 | 1.00 | 1.00 | Ceiling test, dev subset |
+| `R1-B`: rules on LLM-extracted features | 0.00 | 0.00 | 0.00 | Dev subset, abstract-mode extracted features |
+| `R2`: direct LLM vs `MC_relevance_modifiers` | 0.773 | 0.773 | 0.773 | Dev subset, same saved predictions now scored on corrected target |
+
+### Interpretation for paper writing
+
+The important story is not simply that an LLM number is higher or lower than the paper's ML baseline. The more interesting finding is that the three approaches isolate **different bottlenecks**:
+
+1. **The Fuster rule system itself is not the main problem.**
+   `R1-A` shows that once the required features are available, the mechanistic framework is perfectly reproducible on the dev subset. This is strong evidence that the annotation framework is internally coherent enough to be operationalized.
+
+2. **Feature availability and feature extraction are the dominant bottleneck.**
+   The collapse from `R1-A` to `R1-B` shows that a deterministic post-processing layer cannot rescue missing or weakly extracted temporal, spatial, and data-type signals. This aligns closely with the paper's discussion that crucial metadata are often absent or sparsely expressed in repository text and abstracts.
+
+3. **Direct LLM prediction partially recovers information lost by the feature pipeline.**
+   `R2` substantially outperforms `R1-B`, suggesting that end-to-end semantic inference can use weak contextual cues that do not survive explicit feature extraction cleanly. In other words, the LLM seems better at latent relevance judgment than at emitting a fully faithful intermediate schema under current prompting.
+
+4. **The paper's own discussion anticipated this direction.**
+   In the discussion, Fuster et al. explicitly propose an alternative path: directly extracting key features such as data type and temporal extent from text, then combining them afterward in the same manual framework. `R1` is exactly that experiment. The paper also notes that LLM-style models may better capture semantics than bag-of-words approaches, though they would still be constrained by absent spatiotemporal metadata. Our results fit that expectation closely:
+   - direct semantic inference helps
+   - but absent metadata remain a hard ceiling
+
+5. **The target definition matters.**
+   One of the most important methodological clarifications from this initiative is that `MC_relevance_modifiers` and spreadsheet `dataset_relevance` should not be treated as interchangeable. For paper drafting, this is worth stating explicitly:
+   - `MC_relevance_modifiers` is the correct target when evaluating fidelity to the Fuster mechanistic system
+   - `dataset_relevance` is better treated as a neighboring human label, useful for diagnostics but not as the primary ceiling target for rule reconstruction
+
+### Suggested narrative for your paper
+
+If you want this section to read well in the manuscript, a strong structure would be:
+
+1. **Reconstruct the authors' logic first.**
+   Show that the mechanistic system can be reproduced exactly from GT features (`R1-A`). This establishes methodological fidelity and makes the rest of the comparison interpretable.
+
+2. **Separate rule validity from feature-extraction validity.**
+   Emphasize that `R1-B` fails not because the scoring logic is weak, but because the required evidence is incompletely recoverable from short repository descriptions and abstracts.
+
+3. **Position `R2` as a semantic shortcut rather than a black-box replacement.**
+   The direct LLM approach can be framed as bypassing the fragile intermediate extraction layer. It is not "better than the Fuster framework"; rather, it is a different way of approximating the same relevance construct when metadata are sparse.
+
+4. **Be explicit about comparability limits.**
+   The paper baseline used:
+   - full-corpus 5-fold CV
+   - binary relevance labels
+   - TF-IDF + classical classifiers
+
+   Our notebook comparison uses:
+   - a 30-record dev subset
+   - a 4-class mechanistic target with binary collapse as a derived view
+   - prompted LLM inference instead of supervised fitting
+
+   So the safest claim is not "LLMs outperform the original paper," but:
+   - the direct LLM approach is promising relative to the paper's feasibility baseline
+   - deterministic rule scoring remains attractive for interpretability
+   - the principal bottleneck is metadata presence and extractability, not merely classifier choice
+
+### Discussion-ready takeaways
+
+- The supervised TF-IDF baseline in the paper is best understood as a **document triage model** driven by lexical correlates of relevance.
+- `R1` tests a **feature-engineering interpretation** of the paper's own proposed future direction.
+- `R2` tests a **semantic inference interpretation** of that same direction.
+- Together, these results suggest that future work should probably not choose between "rules" and "LLMs" in isolation. A better next step is to improve the evidence layer:
+  - richer input text than repository descriptions alone
+  - section-aware or full-text retrieval
+  - stronger prompts for temporal/spatial grounding
+  - explicit evidence tracking for relevance decisions
+
+For manuscript phrasing, the central conclusion can be framed as:
+
+> The relevance framework itself is reproducible; the hard problem is recovering the underlying metadata reliably from short textual descriptions. Direct LLM classification appears more robust than a feature-extraction-plus-rules pipeline under sparse textual evidence, but both approaches remain bounded by metadata availability.
 
 ---
 
 ## Execution Order
+
+Completed:
 
 ```
 Round 1: Refresh WU-R2 target/framing/output files
@@ -291,6 +429,7 @@ Round 2: Update combined comparison table + lab log entry using consistent `MC_r
 |---|---|
 | `notebooks/relevance_mechanistic.ipynb` | WU-R1: rule-based approach |
 | `notebooks/relevance_llm_direct.ipynb` | WU-R2: direct LLM approach |
+| `notebooks/results/relevance_comparison_summary.csv` | Final cross-method comparison table |
 | `data/manifests/dev_subset_data_paper.csv` | 30-record dev subset manifest |
 | `data/dataset_092624.xlsx` | Raw GT (all 418 records) — joined for GT labels + MC columns |
 | `src/llm_metadata/schemas/fuster_features.py` | `DatasetFeaturesExtraction` base schema |
