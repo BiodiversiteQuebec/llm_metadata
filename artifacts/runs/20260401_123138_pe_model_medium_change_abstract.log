@@ -1,0 +1,179 @@
+Logging to: artifacts\runs\20260401_123138_pe_model_medium_change_abstract.log
+Recreate command: uv run python -m llm_metadata.prompt_eval --mode abstract --manifest data/manifests/dev_subset_data_paper.csv --parallelism 8 --model gpt-5.4 --reasoning-effort medium --gt data/dataset_092624_validated.xlsx --name pe_model_medium_change_abstract --description 'Run with better model/effort to see if it improves performance on modulator fields and [data_type, geospatial_info_dataset] compared to low thinking effort (20260131_run). Same than previous 20260401 run using gpt-5.4-medium to see if bad results are a repeatability issue or not. Is our prompt deterministic? Does it always fail on the same fields? Do we get the same results with the same model/effort?' --skip-cache
+2026-04-01 12:31:38 | INFO     | llm_metadata.prompt_eval:run_eval:154 | Starting prompt_eval mode=abstract manifest_path=data/manifests/dev_subset_data_paper.csv parallelism=8 model=gpt-5.4 reasoning_effort=medium description=Run with better model/effort to see if it improves performance on modulator fields and [data_type, geospatial_info_dataset] compared to low thinking effort (20260131_run). Same than previous 20260401 run using gpt-5.4-medium to see if bad results are a repeatability issue or not. Is our prompt deterministic? Does it always fail on the same fields? Do we get the same results with the same model/effort? skip_cache=True
+2026-04-01 12:31:38 | INFO     | llm_metadata.prompt_eval:run_eval:165 | Loaded manifest records=30
+2026-04-01 12:31:38 | INFO     | llm_metadata.extraction:run_manifest_extraction:362 | Starting manifest extraction mode=abstract records=30 parallelism=8 model=gpt-5.4 reasoning_effort=medium prompt_module=prompts.abstract description=Run with better model/effort to see if it improves performance on modulator fields and [data_type, geospatial_info_dataset] compared to low thinking effort (20260131_run). Same than previous 20260401 run using gpt-5.4-medium to see if bad results are a repeatability issue or not. Is our prompt deterministic? Does it always fail on the same fields? Do we get the same results with the same model/effort? skip_cache=True
+2026-04-01 12:31:38 | INFO     | llm_metadata.extraction:run_manifest_extraction:430 | [1/30] Queueing gt_record_id=5 record_id=10.1093/jhered/esx103 title=Data from: Paternity analysis of wood turtles (Glyptemys insculpta) reveals complex mating patterns
+2026-04-01 12:31:38 | INFO     | llm_metadata.extraction:run_manifest_extraction:430 | [2/30] Queueing gt_record_id=9 record_id=10.1371/journal.pone.0128238 title=Data from: Resampling method for applying density-dependent habitat selection theory to wildlife surveys
+2026-04-01 12:31:38 | INFO     | llm_metadata.gpt_extract:extract_from_text:142 | Starting text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction chars=2194 cache=bypass
+2026-04-01 12:31:38 | INFO     | llm_metadata.extraction:run_manifest_extraction:430 | [3/30] Queueing gt_record_id=11 record_id=10.1371/journal.pone.0073695 title=Data from: Impacts of human disturbance on large prey species: do behavioral reactions translate to fitness consequences?
+2026-04-01 12:31:38 | INFO     | llm_metadata.gpt_extract:extract_from_text:142 | Starting text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction chars=2862 cache=bypass
+2026-04-01 12:31:38 | INFO     | llm_metadata.extraction:run_manifest_extraction:430 | [4/30] Queueing gt_record_id=12 record_id=10.1002/ece3.4685 title=Data from: Natal habitat preference induction in large mammals – Like mother, like child?
+2026-04-01 12:31:38 | INFO     | llm_metadata.gpt_extract:extract_from_text:142 | Starting text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction chars=3368 cache=bypass
+2026-04-01 12:31:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:430 | [5/30] Queueing gt_record_id=19 record_id=10.1093/jhered/esw073 title=Data from: The genetic signature of range expansion in a disease vector - the black-legged tick
+2026-04-01 12:31:39 | INFO     | llm_metadata.gpt_extract:extract_from_text:142 | Starting text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction chars=2359 cache=bypass
+2026-04-01 12:31:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:430 | [6/30] Queueing gt_record_id=24 record_id=10.1002/ece3.3906 title=Data from: Influence of northern limit range on genetic diversity and structure in a widespread North American tree, sugar maple (Acer saccharum Marshall)
+2026-04-01 12:31:39 | INFO     | llm_metadata.gpt_extract:extract_from_text:142 | Starting text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction chars=2149 cache=bypass
+2026-04-01 12:31:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:430 | [7/30] Queueing gt_record_id=27 record_id=10.1111/ddi.12496 title=Data from: Patchy distribution and low effective population size raise concern for an at-risk top predator
+2026-04-01 12:31:39 | INFO     | llm_metadata.gpt_extract:extract_from_text:142 | Starting text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction chars=2379 cache=bypass
+2026-04-01 12:31:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:430 | [8/30] Queueing gt_record_id=29 record_id=10.1002/ece3.1476 title=Data from: Ecological gradients driving the distribution of four Ericaceae in boreal Quebec, Canada
+2026-04-01 12:31:39 | INFO     | llm_metadata.gpt_extract:extract_from_text:142 | Starting text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction chars=2647 cache=bypass
+2026-04-01 12:31:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:430 | [9/30] Queueing gt_record_id=30 record_id=10.1186/s40462-016-0079-4 title=Data from: Caribou, water, and ice – fine-scale movements of a migratory arctic ungulate in the context of climate change
+2026-04-01 12:31:39 | INFO     | llm_metadata.gpt_extract:extract_from_text:142 | Starting text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction chars=2568 cache=bypass
+2026-04-01 12:31:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:430 | [10/30] Queueing gt_record_id=31 record_id=10.1111/eva.12028 title=Data from: Reduced fitness of Atlantic salmon released in the wild after one generation of captive-breeding
+2026-04-01 12:31:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:430 | [11/30] Queueing gt_record_id=37 record_id=10.1002/ece3.1029 title=Data from: Fitness dynamics within a poplar hybrid zone: I. Prezygotic and postzygotic barriers impacting a native poplar hybrid stand.
+2026-04-01 12:31:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:430 | [12/30] Queueing gt_record_id=38 record_id=10.1371/journal.pone.0204445 title=Data from: Temporal dynamics in animal community assembly during post-logging succession in boreal forest
+2026-04-01 12:31:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:430 | [13/30] Queueing gt_record_id=39 record_id=10.1098/rspb.2014.0649 title=Data from: Severe recent decrease of adult body mass in a declining insectivorous bird population
+2026-04-01 12:31:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:430 | [14/30] Queueing gt_record_id=56 record_id=10.1111/eva.12315 title=Data from: Multidimensional environmental influences on timing of breeding in a tree swallow population facing climate change
+2026-04-01 12:31:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:430 | [15/30] Queueing gt_record_id=71 record_id=10.1111/1365-2664.12675 title=Data from: Threshold dynamics in plant succession after tree planting in agricultural riparian zones
+2026-04-01 12:31:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:430 | [16/30] Queueing gt_record_id=89 record_id=10.1890/12-2118.1 title=Data from: Logging-induced changes in habitat network connectivity shape behavioral interactions in the wolf-caribou-moose system
+2026-04-01 12:31:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:430 | [17/30] Queueing gt_record_id=91 record_id=10.1002/ece3.1266 title=Data from: Genetic connectivity among swarming sites in the wide ranging and recently declining little brown bat (Myotis lucifugus)
+2026-04-01 12:31:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:430 | [18/30] Queueing gt_record_id=101 record_id=10.1371/journal.pone.0077514 title=Data from: Disentangling woodland caribou movements in response to clearcuts and roads across temporal scales
+2026-04-01 12:31:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:430 | [19/30] Queueing gt_record_id=104 record_id=10.1038/s41598-018-34822-9 title=Data from: Compensatory conservation measures for an endangered caribou population under climate change
+2026-04-01 12:31:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:430 | [20/30] Queueing gt_record_id=123 record_id=10.1098/rspb.2014.0502 title=Data from: Temporally dynamic habitat suitability predicts genetic relatedness among caribou
+2026-04-01 12:31:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:430 | [21/30] Queueing gt_record_id=175 record_id=10.5558/tfc76653-4 title=Ã‰valuation de la coupe avec protection de la rÃ©gÃ©nÃ©ration et des sols comme mÃ©thode de rÃ©gÃ©nÃ©ration de peuplements mÃ©langÃ©s du domaine bioclimatique de la sapiniÃ¨re Ã  bouleau jaune de l'est du QuÃ©bec, Canada
+2026-04-01 12:31:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:430 | [22/30] Queueing gt_record_id=201 record_id=10.1086/671900 title=Comparative Physiology and Relative Swimming Performance of Three Redhorse (Moxostoma spp.) Species: Associations with Fishway Passage Success*
+2026-04-01 12:31:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:430 | [23/30] Queueing gt_record_id=208 record_id=10.3389/fmars.2021.637546 title=Determining the Ecological Status of Benthic Coastal Communities: A Case in an Anthropized Sub-Arctic Area
+2026-04-01 12:31:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:430 | [24/30] Queueing gt_record_id=225 record_id=10.1371/journal.pone.0109261 title=Effects of Habitat-Forming Species Richness, Evenness, Identity, and Abundance on Benthic Intertidal Community Establishment and Productivity
+2026-04-01 12:31:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:430 | [25/30] Queueing gt_record_id=253 record_id=10.1111/eva.13248 title=Genomic data support management of anadromous Arctic Char fisheries in Nunavik by highlighting neutral and putatively adaptive genetic variation
+2026-04-01 12:31:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:430 | [26/30] Queueing gt_record_id=258 record_id=10.1111/ecog.00997 title=Host phenology, geographic range size and regional occurrence explain interspecific variation in damselflyâ€“water mite associations
+2026-04-01 12:31:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:430 | [27/30] Queueing gt_record_id=271 record_id=10.1603/0013-8746%282006%2999%5b536%3aiopmiq%5d2.0.co%3b2 title=Inventory of Predacious Mites in Quebec Commercial Apple Orchards Where Integrated Pest Management Programs Are Implemented
+2026-04-01 12:31:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:430 | [28/30] Queueing gt_record_id=315 record_id=10.1603/en10045 title=Selected Beetle Assemblages Captured in Pitfall Traps Baited with Deer Dung or Meat in Balsam Fir and Sugar Maple Forests of Central Quebec
+2026-04-01 12:31:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:430 | [29/30] Queueing gt_record_id=343 record_id=10.3390/ijgi7090335 title=Towards Modelling Future Trends of Quebec's Boreal Birds' Species Distribution under Climate Change
+2026-04-01 12:31:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:430 | [30/30] Queueing gt_record_id=351 record_id=10.1603/0013-8746%282005%29098%5b0565%3awccdaa%5d2.0.co%3b2 title=Weevil (Coleoptera: Curculionoidea) Diversity and Abundance in Two Quebec Vineyards
+2026-04-01 12:31:39 | DEBUG    | llm_metadata.gpt_extract:_response_parse:124 | Calling OpenAI Responses API for text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction
+2026-04-01 12:31:39 | DEBUG    | llm_metadata.gpt_extract:_response_parse:124 | Calling OpenAI Responses API for text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction
+2026-04-01 12:31:39 | DEBUG    | llm_metadata.gpt_extract:_response_parse:124 | Calling OpenAI Responses API for text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction
+2026-04-01 12:31:39 | DEBUG    | llm_metadata.gpt_extract:_response_parse:124 | Calling OpenAI Responses API for text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction
+2026-04-01 12:31:39 | DEBUG    | llm_metadata.gpt_extract:_response_parse:124 | Calling OpenAI Responses API for text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction
+2026-04-01 12:31:39 | DEBUG    | llm_metadata.gpt_extract:_response_parse:124 | Calling OpenAI Responses API for text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction
+2026-04-01 12:31:39 | DEBUG    | llm_metadata.gpt_extract:_response_parse:124 | Calling OpenAI Responses API for text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction
+2026-04-01 12:31:39 | DEBUG    | llm_metadata.gpt_extract:_response_parse:124 | Calling OpenAI Responses API for text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction
+2026-04-01 12:31:42 | INFO     | llm_metadata.gpt_extract:extract_from_text:161 | Completed text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction cache=bypass cost=$0.0043 output_tokens=141
+2026-04-01 12:31:42 | INFO     | llm_metadata.gpt_extract:extract_from_text:161 | Completed text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction cache=bypass cost=$0.0102 output_tokens=133
+2026-04-01 12:31:42 | INFO     | llm_metadata.gpt_extract:extract_from_text:142 | Starting text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction chars=3702 cache=bypass
+2026-04-01 12:31:42 | INFO     | llm_metadata.extraction:run_manifest_extraction:453 | [4/30] Finished gt_record_id=12 status=success method=abstract_text cost=$0.0043
+2026-04-01 12:31:42 | INFO     | llm_metadata.extraction:run_manifest_extraction:453 | [1/30] Finished gt_record_id=5 status=success method=abstract_text cost=$0.0102
+2026-04-01 12:31:42 | INFO     | llm_metadata.gpt_extract:extract_from_text:142 | Starting text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction chars=1885 cache=bypass
+2026-04-01 12:31:42 | DEBUG    | llm_metadata.gpt_extract:_response_parse:124 | Calling OpenAI Responses API for text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction
+2026-04-01 12:31:42 | DEBUG    | llm_metadata.gpt_extract:_response_parse:124 | Calling OpenAI Responses API for text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction
+2026-04-01 12:31:42 | INFO     | llm_metadata.gpt_extract:extract_from_text:161 | Completed text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction cache=bypass cost=$0.0043 output_tokens=131
+2026-04-01 12:31:42 | INFO     | llm_metadata.extraction:run_manifest_extraction:453 | [6/30] Finished gt_record_id=24 status=success method=abstract_text cost=$0.0043
+2026-04-01 12:31:42 | INFO     | llm_metadata.gpt_extract:extract_from_text:142 | Starting text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction chars=3870 cache=bypass
+2026-04-01 12:31:42 | DEBUG    | llm_metadata.gpt_extract:_response_parse:124 | Calling OpenAI Responses API for text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction
+2026-04-01 12:31:42 | INFO     | llm_metadata.gpt_extract:extract_from_text:161 | Completed text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction cache=bypass cost=$0.0046 output_tokens=138
+2026-04-01 12:31:42 | INFO     | llm_metadata.extraction:run_manifest_extraction:453 | [2/30] Finished gt_record_id=9 status=success method=abstract_text cost=$0.0046
+2026-04-01 12:31:42 | INFO     | llm_metadata.gpt_extract:extract_from_text:142 | Starting text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction chars=6087 cache=bypass
+2026-04-01 12:31:42 | DEBUG    | llm_metadata.gpt_extract:_response_parse:124 | Calling OpenAI Responses API for text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction
+2026-04-01 12:31:42 | INFO     | llm_metadata.gpt_extract:extract_from_text:161 | Completed text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction cache=bypass cost=$0.0041 output_tokens=132
+2026-04-01 12:31:42 | INFO     | llm_metadata.extraction:run_manifest_extraction:453 | [5/30] Finished gt_record_id=19 status=success method=abstract_text cost=$0.0041
+2026-04-01 12:31:42 | INFO     | llm_metadata.gpt_extract:extract_from_text:142 | Starting text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction chars=2699 cache=bypass
+2026-04-01 12:31:42 | DEBUG    | llm_metadata.gpt_extract:_response_parse:124 | Calling OpenAI Responses API for text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction
+2026-04-01 12:31:42 | INFO     | llm_metadata.gpt_extract:extract_from_text:161 | Completed text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction cache=bypass cost=$0.0109 output_tokens=167
+2026-04-01 12:31:42 | INFO     | llm_metadata.extraction:run_manifest_extraction:453 | [8/30] Finished gt_record_id=29 status=success method=abstract_text cost=$0.0109
+2026-04-01 12:31:42 | INFO     | llm_metadata.gpt_extract:extract_from_text:142 | Starting text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction chars=4060 cache=bypass
+2026-04-01 12:31:43 | DEBUG    | llm_metadata.gpt_extract:_response_parse:124 | Calling OpenAI Responses API for text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction
+2026-04-01 12:31:43 | INFO     | llm_metadata.gpt_extract:extract_from_text:161 | Completed text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction cache=bypass cost=$0.0048 output_tokens=159
+2026-04-01 12:31:43 | INFO     | llm_metadata.extraction:run_manifest_extraction:453 | [7/30] Finished gt_record_id=27 status=success method=abstract_text cost=$0.0048
+2026-04-01 12:31:43 | INFO     | llm_metadata.gpt_extract:extract_from_text:142 | Starting text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction chars=2855 cache=bypass
+2026-04-01 12:31:43 | DEBUG    | llm_metadata.gpt_extract:_response_parse:124 | Calling OpenAI Responses API for text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction
+2026-04-01 12:31:43 | INFO     | llm_metadata.gpt_extract:extract_from_text:161 | Completed text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction cache=bypass cost=$0.0052 output_tokens=152
+2026-04-01 12:31:43 | INFO     | llm_metadata.gpt_extract:extract_from_text:142 | Starting text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction chars=7552 cache=bypass
+2026-04-01 12:31:43 | INFO     | llm_metadata.extraction:run_manifest_extraction:453 | [3/30] Finished gt_record_id=11 status=success method=abstract_text cost=$0.0052
+2026-04-01 12:31:43 | DEBUG    | llm_metadata.gpt_extract:_response_parse:124 | Calling OpenAI Responses API for text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction
+2026-04-01 12:31:45 | INFO     | llm_metadata.gpt_extract:extract_from_text:161 | Completed text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction cache=bypass cost=$0.0040 output_tokens=129
+2026-04-01 12:31:45 | INFO     | llm_metadata.extraction:run_manifest_extraction:453 | [10/30] Finished gt_record_id=31 status=success method=abstract_text cost=$0.0040
+2026-04-01 12:31:45 | INFO     | llm_metadata.gpt_extract:extract_from_text:142 | Starting text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction chars=3420 cache=bypass
+2026-04-01 12:31:45 | DEBUG    | llm_metadata.gpt_extract:_response_parse:124 | Calling OpenAI Responses API for text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction
+2026-04-01 12:31:45 | INFO     | llm_metadata.gpt_extract:extract_from_text:161 | Completed text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction cache=bypass cost=$0.0053 output_tokens=131
+2026-04-01 12:31:45 | INFO     | llm_metadata.extraction:run_manifest_extraction:453 | [14/30] Finished gt_record_id=56 status=success method=abstract_text cost=$0.0053
+2026-04-01 12:31:45 | INFO     | llm_metadata.gpt_extract:extract_from_text:142 | Starting text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction chars=2530 cache=bypass
+2026-04-01 12:31:45 | DEBUG    | llm_metadata.gpt_extract:_response_parse:124 | Calling OpenAI Responses API for text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction
+2026-04-01 12:31:45 | INFO     | llm_metadata.gpt_extract:extract_from_text:161 | Completed text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction cache=bypass cost=$0.0045 output_tokens=133
+2026-04-01 12:31:45 | INFO     | llm_metadata.extraction:run_manifest_extraction:453 | [13/30] Finished gt_record_id=39 status=success method=abstract_text cost=$0.0045
+2026-04-01 12:31:45 | INFO     | llm_metadata.gpt_extract:extract_from_text:142 | Starting text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction chars=2011 cache=bypass
+2026-04-01 12:31:45 | DEBUG    | llm_metadata.gpt_extract:_response_parse:124 | Calling OpenAI Responses API for text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction
+2026-04-01 12:31:45 | INFO     | llm_metadata.gpt_extract:extract_from_text:161 | Completed text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction cache=bypass cost=$0.0057 output_tokens=163
+2026-04-01 12:31:45 | INFO     | llm_metadata.extraction:run_manifest_extraction:453 | [11/30] Finished gt_record_id=37 status=success method=abstract_text cost=$0.0057
+2026-04-01 12:31:45 | INFO     | llm_metadata.gpt_extract:extract_from_text:142 | Starting text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction chars=2543 cache=bypass
+2026-04-01 12:31:45 | DEBUG    | llm_metadata.gpt_extract:_response_parse:124 | Calling OpenAI Responses API for text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction
+2026-04-01 12:31:45 | INFO     | llm_metadata.gpt_extract:extract_from_text:161 | Completed text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction cache=bypass cost=$0.0074 output_tokens=144
+2026-04-01 12:31:45 | INFO     | llm_metadata.extraction:run_manifest_extraction:453 | [16/30] Finished gt_record_id=89 status=success method=abstract_text cost=$0.0074
+2026-04-01 12:31:45 | INFO     | llm_metadata.gpt_extract:extract_from_text:142 | Starting text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction chars=1047 cache=bypass
+2026-04-01 12:31:45 | DEBUG    | llm_metadata.gpt_extract:_response_parse:124 | Calling OpenAI Responses API for text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction
+2026-04-01 12:31:45 | INFO     | llm_metadata.gpt_extract:extract_from_text:161 | Completed text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction cache=bypass cost=$0.0064 output_tokens=205
+2026-04-01 12:31:45 | INFO     | llm_metadata.extraction:run_manifest_extraction:453 | [9/30] Finished gt_record_id=30 status=success method=abstract_text cost=$0.0064
+2026-04-01 12:31:45 | INFO     | llm_metadata.gpt_extract:extract_from_text:142 | Starting text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction chars=2210 cache=bypass
+2026-04-01 12:31:45 | DEBUG    | llm_metadata.gpt_extract:_response_parse:124 | Calling OpenAI Responses API for text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction
+2026-04-01 12:31:45 | INFO     | llm_metadata.gpt_extract:extract_from_text:161 | Completed text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction cache=bypass cost=$0.0074 output_tokens=193
+2026-04-01 12:31:45 | INFO     | llm_metadata.gpt_extract:extract_from_text:142 | Starting text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction chars=1427 cache=bypass
+2026-04-01 12:31:45 | INFO     | llm_metadata.extraction:run_manifest_extraction:453 | [12/30] Finished gt_record_id=38 status=success method=abstract_text cost=$0.0074
+2026-04-01 12:31:45 | DEBUG    | llm_metadata.gpt_extract:_response_parse:124 | Calling OpenAI Responses API for text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction
+2026-04-01 12:31:45 | INFO     | llm_metadata.gpt_extract:extract_from_text:161 | Completed text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction cache=bypass cost=$0.0048 output_tokens=158
+2026-04-01 12:31:45 | INFO     | llm_metadata.extraction:run_manifest_extraction:453 | [15/30] Finished gt_record_id=71 status=success method=abstract_text cost=$0.0048
+2026-04-01 12:31:45 | INFO     | llm_metadata.gpt_extract:extract_from_text:142 | Starting text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction chars=1596 cache=bypass
+2026-04-01 12:31:45 | DEBUG    | llm_metadata.gpt_extract:_response_parse:124 | Calling OpenAI Responses API for text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction
+2026-04-01 12:31:47 | INFO     | llm_metadata.gpt_extract:extract_from_text:161 | Completed text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction cache=bypass cost=$0.0051 output_tokens=135
+2026-04-01 12:31:47 | INFO     | llm_metadata.extraction:run_manifest_extraction:453 | [17/30] Finished gt_record_id=91 status=success method=abstract_text cost=$0.0051
+2026-04-01 12:31:47 | INFO     | llm_metadata.gpt_extract:extract_from_text:142 | Starting text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction chars=1835 cache=bypass
+2026-04-01 12:31:47 | DEBUG    | llm_metadata.gpt_extract:_response_parse:124 | Calling OpenAI Responses API for text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction
+2026-04-01 12:31:47 | INFO     | llm_metadata.gpt_extract:extract_from_text:161 | Completed text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction cache=bypass cost=$0.0043 output_tokens=136
+2026-04-01 12:31:47 | INFO     | llm_metadata.extraction:run_manifest_extraction:453 | [18/30] Finished gt_record_id=101 status=success method=abstract_text cost=$0.0043
+2026-04-01 12:31:47 | INFO     | llm_metadata.gpt_extract:extract_from_text:142 | Starting text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction chars=1212 cache=bypass
+2026-04-01 12:31:47 | INFO     | llm_metadata.gpt_extract:extract_from_text:161 | Completed text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction cache=bypass cost=$0.0040 output_tokens=126
+2026-04-01 12:31:47 | INFO     | llm_metadata.extraction:run_manifest_extraction:453 | [19/30] Finished gt_record_id=104 status=success method=abstract_text cost=$0.0040
+2026-04-01 12:31:47 | INFO     | llm_metadata.gpt_extract:extract_from_text:142 | Starting text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction chars=1302 cache=bypass
+2026-04-01 12:31:47 | DEBUG    | llm_metadata.gpt_extract:_response_parse:124 | Calling OpenAI Responses API for text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction
+2026-04-01 12:31:47 | DEBUG    | llm_metadata.gpt_extract:_response_parse:124 | Calling OpenAI Responses API for text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction
+2026-04-01 12:31:47 | INFO     | llm_metadata.gpt_extract:extract_from_text:161 | Completed text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction cache=bypass cost=$0.0043 output_tokens=124
+2026-04-01 12:31:47 | INFO     | llm_metadata.extraction:run_manifest_extraction:453 | [20/30] Finished gt_record_id=123 status=success method=abstract_text cost=$0.0043
+2026-04-01 12:31:47 | INFO     | llm_metadata.gpt_extract:extract_from_text:142 | Starting text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction chars=1639 cache=bypass
+2026-04-01 12:31:47 | DEBUG    | llm_metadata.gpt_extract:_response_parse:124 | Calling OpenAI Responses API for text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction
+2026-04-01 12:31:48 | INFO     | llm_metadata.gpt_extract:extract_from_text:161 | Completed text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction cache=bypass cost=$0.0036 output_tokens=125
+2026-04-01 12:31:48 | INFO     | llm_metadata.extraction:run_manifest_extraction:453 | [23/30] Finished gt_record_id=208 status=success method=abstract_text cost=$0.0036
+2026-04-01 12:31:48 | INFO     | llm_metadata.gpt_extract:extract_from_text:142 | Starting text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction chars=1299 cache=bypass
+2026-04-01 12:31:48 | DEBUG    | llm_metadata.gpt_extract:_response_parse:124 | Calling OpenAI Responses API for text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction
+2026-04-01 12:31:48 | INFO     | llm_metadata.gpt_extract:extract_from_text:161 | Completed text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction cache=bypass cost=$0.0044 output_tokens=172
+2026-04-01 12:31:48 | INFO     | llm_metadata.extraction:run_manifest_extraction:453 | [21/30] Finished gt_record_id=175 status=success method=abstract_text cost=$0.0044
+2026-04-01 12:31:48 | INFO     | llm_metadata.gpt_extract:extract_from_text:142 | Starting text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction chars=1461 cache=bypass
+2026-04-01 12:31:48 | DEBUG    | llm_metadata.gpt_extract:_response_parse:124 | Calling OpenAI Responses API for text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction
+2026-04-01 12:31:48 | INFO     | llm_metadata.gpt_extract:extract_from_text:161 | Completed text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction cache=bypass cost=$0.0047 output_tokens=165
+2026-04-01 12:31:48 | INFO     | llm_metadata.extraction:run_manifest_extraction:453 | [22/30] Finished gt_record_id=201 status=success method=abstract_text cost=$0.0047
+2026-04-01 12:31:48 | INFO     | llm_metadata.gpt_extract:extract_from_text:161 | Completed text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction cache=bypass cost=$0.0041 output_tokens=150
+2026-04-01 12:31:48 | INFO     | llm_metadata.extraction:run_manifest_extraction:453 | [24/30] Finished gt_record_id=225 status=success method=abstract_text cost=$0.0041
+2026-04-01 12:31:49 | INFO     | llm_metadata.gpt_extract:extract_from_text:161 | Completed text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction cache=bypass cost=$0.0039 output_tokens=125
+2026-04-01 12:31:49 | INFO     | llm_metadata.extraction:run_manifest_extraction:453 | [25/30] Finished gt_record_id=253 status=success method=abstract_text cost=$0.0039
+2026-04-01 12:31:50 | INFO     | llm_metadata.gpt_extract:extract_from_text:161 | Completed text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction cache=bypass cost=$0.0043 output_tokens=151
+2026-04-01 12:31:50 | INFO     | llm_metadata.extraction:run_manifest_extraction:453 | [28/30] Finished gt_record_id=315 status=success method=abstract_text cost=$0.0043
+2026-04-01 12:31:50 | INFO     | llm_metadata.gpt_extract:extract_from_text:161 | Completed text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction cache=bypass cost=$0.0042 output_tokens=165
+2026-04-01 12:31:50 | INFO     | llm_metadata.extraction:run_manifest_extraction:453 | [26/30] Finished gt_record_id=258 status=success method=abstract_text cost=$0.0042
+2026-04-01 12:31:50 | INFO     | llm_metadata.gpt_extract:extract_from_text:161 | Completed text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction cache=bypass cost=$0.0036 output_tokens=129
+2026-04-01 12:31:50 | INFO     | llm_metadata.extraction:run_manifest_extraction:453 | [29/30] Finished gt_record_id=343 status=success method=abstract_text cost=$0.0036
+2026-04-01 12:31:51 | INFO     | llm_metadata.gpt_extract:extract_from_text:161 | Completed text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction cache=bypass cost=$0.0054 output_tokens=230
+2026-04-01 12:31:51 | INFO     | llm_metadata.extraction:run_manifest_extraction:453 | [27/30] Finished gt_record_id=271 status=success method=abstract_text cost=$0.0054
+2026-04-01 12:31:51 | INFO     | llm_metadata.gpt_extract:extract_from_text:161 | Completed text extraction model=gpt-5.4 schema=DatasetFeaturesExtraction cache=bypass cost=$0.0049 output_tokens=200
+2026-04-01 12:31:51 | INFO     | llm_metadata.extraction:run_manifest_extraction:453 | [30/30] Finished gt_record_id=351 status=success method=abstract_text cost=$0.0049
+2026-04-01 12:31:51 | INFO     | llm_metadata.extraction:run_manifest_extraction:468 | Completed manifest extraction mode=abstract records=30 total_cost=$0.1547
+2026-04-01 12:31:51 | INFO     | llm_metadata.prompt_eval:run_eval:188 | Loading ground truth from data/dataset_092624_validated.xlsx
+2026-04-01 12:31:52 | INFO     | llm_metadata.prompt_eval:run_eval:194 | Evaluating predictions matched_records=30 fields=default
+2026-04-01 12:31:52 | INFO     | llm_metadata.prompt_eval:run_eval:212 | Saved prompt_eval artifact to artifacts\runs\20260401_123138_pe_model_medium_change_abstract.json
+2026-04-01 12:31:52 | INFO     | llm_metadata.prompt_eval:run_eval:213 | Saved extraction results CSV to artifacts\runs\20260401_123138_pe_model_medium_change_abstract.csv
+2026-04-01 12:31:52 | INFO     | llm_metadata.prompt_eval:run_eval:215 | Completed prompt_eval mode=abstract records=30 total_cost=$0.1547
+Field                         N       P       R      F1
+-------------------------------------------------------
+bias_north_south             30   1.000   0.267   0.421
+data_type                    30   0.405   0.472   0.436
+geospatial_info_dataset      30   0.152   0.500   0.233
+multispecies                 30   0.562   0.300   0.391
+new_species_region           30   0.333   0.045   0.080
+new_species_science          30     N/A   0.000     N/A
+spatial_range_km2            30   1.000   0.050   0.095
+species                      30   0.296   0.654   0.407
+temp_range_f                 30   0.786   0.524   0.629
+temp_range_i                 30   0.929   0.619   0.743
+threatened_species           30   1.000   0.429   0.600
+time_series                  30   0.600   0.600   0.600
+
+Total API cost: $0.1547
+
+Run artifact saved to: artifacts\runs\20260401_123138_pe_model_medium_change_abstract.json

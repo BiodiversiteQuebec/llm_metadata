@@ -4,6 +4,37 @@ This folder contains analysis and validation notebooks for ecological dataset ch
 
 ## Recent Activity
 
+### 2026-04-01: Repeatability Test — gpt-5.4/medium (fresh run vs cached run)
+
+**Task:** Determine whether the poor gpt-5.4/medium results from the earlier 20260401 run are reproducible or a fluke. Same config, `skip_cache=True` to force fresh API calls.
+
+**Work Performed:**
+- Re-ran abstract and pdf_native modes with identical config to the earlier 20260401 runs, but with `skip_cache=True`
+- Launch script: `artifacts/runs/20260401_123138_pe_latest_model_repetition.py`
+- Runs: `artifacts/runs/20260401_123138_pe_model_medium_change_abstract.json`, `artifacts/runs/20260401_123152_pe_model_medium_pdf_native.json`
+- Compared Run1 (cached) vs Run2 (fresh) at the TP/FP/FN level per field
+
+**Results — Abstract mode repeatability (12 fields):**
+
+| Stability | Fields | Detail |
+|---|---|---|
+| Identical (7/12) | `bias_north_south`, `multispecies`, `new_species_region`, `new_species_science`, `spatial_range_km2`, `temp_range_f`, `temp_range_i` | Bit-identical TP/FP/FN |
+| Varies (5/12) | `data_type` (ΔF1=-0.03), `geospatial_info_dataset` (+0.04), `species` (+0.02), `threatened_species` (+0.10), `time_series` (+0.10) | Small variance, max ΔF1=0.10 |
+
+**Results — PDF native mode repeatability (12 fields):**
+
+| Stability | Fields | Detail |
+|---|---|---|
+| Identical (5/12) | `bias_north_south`, `spatial_range_km2`, `temp_range_f`, `temp_range_i`, `threatened_species` | Bit-identical TP/FP/FN |
+| Varies (7/12) | `data_type` (-0.03), `geospatial_info_dataset` (+0.04), `multispecies` (+0.04), `species` (+0.02), `new_species_region` (-0.07), `new_species_science` (-0.08), `time_series` (-0.09) | Max ΔF1=0.09 |
+
+**Key Findings:**
+- **The regressions are real, not stochastic.** Run-to-run variance is <=0.10 F1, while regressions vs gpt-5-mini baseline are 0.25-0.69 F1. Signal-to-noise is overwhelming.
+- **Abstract mode is highly deterministic** (7/12 identical). Boolean and numeric fields are perfectly stable.
+- **PDF native has more variance** (5/12 identical) - likely from non-deterministic visual/layout processing.
+- **List-output fields vary more** (`data_type`, `geospatial_info_dataset`, `species`). Boolean fields are the most stable across both modes.
+- **Conclusion confirmed:** gpt-5.4/medium is systematically more conservative than gpt-5-mini/low. The same records fail consistently. This is a model behavioral pattern, not noise.
+
 ### 2026-04-01: Model Upgrade Experiment — gpt-5-mini/low -> gpt-5.4/medium
 
 **Task:** Test whether upgrading from gpt-5-mini with low reasoning effort to gpt-5.4 with medium reasoning effort improves extraction performance on modulator fields and `data_type`/`geospatial_info_dataset`.
