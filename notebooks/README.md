@@ -20,22 +20,22 @@ This folder contains analysis and validation notebooks for ecological dataset ch
 - Updated the plan and manuscript draft so the PDF-derived mechanistic method appears in the reusable comparison tables.
 
 **Results:**
-- PDF-derived mechanistic relevance scoring vs `MC_relevance_modifiers` on the 30-record dev subset:
-  - macro F1 `0.389`
-  - binary relevant-class F1 `0.698`
-  - precision `0.714`
+- `R1-B` PDF-derived mechanistic relevance scoring vs `MC_relevance_modifiers` on the 30-record dev subset:
+  - macro F1 `0.486`
+  - binary relevant-class F1 `0.714`
+  - precision `0.750`
   - recall `0.682`
-- This is a substantial improvement over the abstract/repository-description mechanistic path:
-  - abstract-derived mechanistic: macro F1 `0.317`, binary F1 `0.533`
-  - PDF-derived mechanistic: macro F1 `0.389`, binary F1 `0.698`
-- The PDF-derived mechanistic pipeline now sits much closer to the paper's supervised bag-of-words baseline (`F1 0.67`) while still trailing the direct-LLM relevance classifier (`F1 0.773`).
+- This is a substantial improvement over `R1-A`:
+  - `R1-A` abstract/repository-description: macro F1 `0.317`, binary F1 `0.533`
+  - `R1-B` PDF-derived: macro F1 `0.486`, binary F1 `0.714`
+- The `R1-B` PDF-derived mechanistic pipeline now sits slightly above the paper's supervised bag-of-words baseline (`F1 0.67`) while still trailing the direct-LLM relevance classifier (`F1 0.773`).
 
 **Key Issues Identified:**
 - The main mechanistic limitation is not just the rule system itself; it is the evidence available to the feature extractor.
 - Reusing the March 31 PDF-native artifact keeps this notebook aligned with the prompt-engineering milestone and avoids unnecessary re-execution cost.
 
 **Next Steps:**
-- Use the PDF-derived mechanistic result as the current best mechanistic comparator in paper-facing tables.
+- Use `R1-B` as the current best mechanistic comparator in paper-facing tables.
 - Extend the same comparison to the full annotated corpus if we want a stronger manuscript result than the 30-record dev subset.
 
 ### 2026-04-09: Automated Relevance Classification — Live `uv` Rerun
@@ -52,12 +52,12 @@ This folder contains analysis and validation notebooks for ecological dataset ch
 
 **Results:**
 - The notebook executed successfully end to end under `uv`.
-- Current live `R1-B` result in `notebooks/results/relevance_mechanistic_summary.csv`:
+- Current live `R1-A` result in `notebooks/results/relevance_mechanistic_summary.csv`:
   - macro F1 `0.317`
   - binary F1 `0.533`
   - precision `1.000`
   - recall `0.364`
-- This is now the current repo source of truth for `R1-B`, superseding the earlier artifact-only `0.289 / 0.483` headline in places where the repo was still stale.
+- This is now the current repo source of truth for `R1-A`, superseding the earlier artifact-only `0.289 / 0.483` headline in places where the repo was still stale.
 
 **Key Issues Identified:**
 - `uv` was using the correct `.venv` already, but `.env` was not being loaded automatically because `UV_ENV_FILE` was unset in the shell.
@@ -69,10 +69,10 @@ This folder contains analysis and validation notebooks for ecological dataset ch
 
 ### 2026-04-09: Automated Relevance Classification — WU-R3 Prompt Refresh Check
 
-**Task:** Add the next relevance-classification work units to the plan, then refresh `R1-B` on the dev subset using the improved abstract prompt state from 2026-03-31.
+**Task:** Add the next relevance-classification work units to the plan, then refresh `R1-A` on the dev subset using the improved abstract prompt state from 2026-03-31.
 
 **Work Performed:**
-- Audited the current `R1-B` notebook path and found that the prediction-side scoring table was not carrying `data_type_primary` into the mechanistic relevance scorer, which understated the downstream result.
+- Audited the current `R1-A` notebook path and found that the prediction-side scoring table was not carrying `data_type_primary` into the mechanistic relevance scorer, which understated the downstream result.
 - Patched `notebooks/relevance_mechanistic.ipynb` so the prediction table preserves both the raw `data_type` list and `data_type_primary`.
 - Instead of depending on a fresh notebook extraction run, compared the saved abstract run artifacts directly:
   - baseline: `artifacts/runs/20260327_172654_dev_subset_abstract.json`
@@ -80,10 +80,10 @@ This folder contains analysis and validation notebooks for ecological dataset ch
 - Wrote refreshed comparison artifacts:
   - `notebooks/results/relevance_mechanistic_r1b_prompt_comparison.csv`
   - `notebooks/results/relevance_mechanistic_r1b_prompt_predictions.csv`
-- Updated `plans/automated_relevance_classification.md`, `docs/relevance_classification_comparison_draft.md`, and the headline relevance summary CSVs so they use the corrected `R1-B` numbers.
+- Updated `plans/automated_relevance_classification.md`, `docs/relevance_classification_comparison_draft.md`, and the headline relevance summary CSVs so they use the corrected `R1-A` numbers.
 
 **Results:**
-- Corrected dev-subset `R1-B` baseline (March 27 abstract prompt):
+- Corrected dev-subset `R1-A` baseline (March 27 abstract prompt):
   - macro F1 `0.317`
   - binary relevant-class F1 `0.483`
   - precision `1.000`
@@ -100,12 +100,12 @@ This folder contains analysis and validation notebooks for ecological dataset ch
   - `253`: `X -> L`
 - Net interpretation:
   - the March 31 prompt changes improved several extraction fields elsewhere in the prompt-engineering workflow
-  - but they did **not** improve downstream dev-subset mechanistic relevance classification for `R1-B`
-- This entry supersedes the earlier `R1-B = 0.125 / 0.000` notebook summary, which came from the scorer dropping predicted `data_type` before applying the relevance rules.
+  - but they did **not** improve downstream dev-subset mechanistic relevance classification for `R1-A`
+- This entry supersedes the earlier `R1-A = 0.125 / 0.000` notebook summary, which came from the scorer dropping predicted `data_type` before applying the relevance rules.
 
 **Key Issues Identified:**
 - Relevance scoring can look much worse than it really is if the prediction-side feature handoff is incomplete, especially for `data_type`.
-- Even with the corrected scorer, `R1-B` remains materially below both the GT-feature ceiling (`R1-A`) and the direct-LLM approach (`R2`).
+- Even with the corrected scorer, `R1-A` remains materially below both the GT-feature ceiling (`R0`) and the direct-LLM approach (`R2`).
 
 **Next Steps:**
 - Run `WU-R4` and `WU-R5` on the full annotated Fuster corpus.
@@ -209,7 +209,7 @@ This folder contains analysis and validation notebooks for ecological dataset ch
   - discussion paragraphs proposing direct feature extraction / LLM-like semantic approaches as a future direction
 - Added a new synthesis block to `plans/automated_relevance_classification.md` that now includes:
   - side-by-side methodology comparison
-  - results comparison between the paper's supervised TF-IDF classifiers and our `R1-A`, `R1-B`, and `R2` notebook methods
+  - results comparison between the paper's supervised TF-IDF classifiers and our `R0`, `R1-A`, `R1-B`, and `R2` notebook methods
   - interpretation of what each method is actually testing
   - explicit comparability limits
   - paper-ready narrative guidance and discussion takeaways
@@ -258,14 +258,14 @@ This folder contains analysis and validation notebooks for ecological dataset ch
 - Updated `plans/automated_relevance_classification.md` and `TODO.md` to mark the initiative complete.
 
 **Results:**
-- `R2` is now aligned to the same mechanistic target as `R1`.
+- `R2` is now aligned to the same mechanistic target as `R0`, `R1-A`, and `R1-B`.
 - Refreshed direct-LLM metrics vs `MC_relevance_modifiers` on the 30-record dev subset:
   - headline macro F1 values follow the notebook convention of averaging over labels present in the target split; for `R2`, the stricter all-four-label macro is `0.374` and is saved in `relevance_llm_direct_summary.json`
 
 | Method | 4-class macro F1 | Binary F1 (relevant) | Binary P | Binary R |
 |---|---|---|---|---|
-| R1-A: Rules on GT features vs Fuster MC+Modulators | 1.000 | 1.000 | 1.000 | 1.000 |
-| R1-B: Rules on LLM features vs Fuster MC+Modulators | 0.125 | 0.000 | 0.000 | 0.000 |
+| R0: Rules on GT features vs Fuster MC+Modulators | 1.000 | 1.000 | 1.000 | 1.000 |
+| R1-A: Rules on abstract/repository-description LLM features vs Fuster MC+Modulators | 0.125 | 0.000 | 0.000 | 0.000 |
 | R2: Direct LLM vs Fuster MC+Modulators | 0.498 | 0.773 | 0.773 | 0.773 |
 | Diagnostic: Fuster MC+Modulators vs human `dataset_relevance` | 0.491 | 0.850 | 0.773 | 0.944 |
 
@@ -299,12 +299,12 @@ This folder contains analysis and validation notebooks for ecological dataset ch
   - `notebooks/results/relevance_mechanistic_summary.csv`
   - `notebooks/results/relevance_llm_direct_summary.json`
 - Updated the plan so the primary target is now stated consistently as `MC_relevance_modifiers`, with `dataset_relevance` retained only as a diagnostic human label.
-- Marked `WU-R1A` and `WU-R1B` as implemented, and narrowed the remaining implementation work to `WU-R2` target alignment plus the final comparison/synthesis step.
+- Marked `R0` and `R1-A` as implemented, and narrowed the remaining implementation work to `WU-R2` target alignment plus the final comparison/synthesis step.
 
 **Results:**
 - `WU-R1` is no longer the open item in this initiative:
-  - `R1-A` exactly reconstructs the annotated mechanistic system on the dev subset (`30/30` on all audited `MC_*` columns; macro F1 `1.00`).
-  - `R1-B` is implemented and currently scores macro F1 `0.125` against `MC_relevance_modifiers`.
+  - `R0` exactly reconstructs the annotated mechanistic system on the dev subset (`30/30` on all audited `MC_*` columns; macro F1 `1.00`).
+  - `R1-A` is implemented and currently scores macro F1 `0.125` against `MC_relevance_modifiers`.
 - The remaining implementation work is now explicit:
   - `notebooks/relevance_llm_direct.ipynb` still evaluates against `dataset_relevance` and needs to be reframed to use `MC_relevance_modifiers` as `gt_relevance`.
   - After that rerun, the final comparison table and lab log should be refreshed so all headline rows use the same target definition.
@@ -321,7 +321,7 @@ This folder contains analysis and validation notebooks for ecological dataset ch
 
 ### 2026-04-01: Relevance Mechanistic Notebook — Fuster Rule Reconstruction Fix
 
-**Task:** Correct `notebooks/relevance_mechanistic.ipynb` so the mechanistic scoring logic reproduces the Fuster paper's annotated rule system, with `R1-A` evaluated against the authors' mechanistic reference rather than the separate `dataset_relevance` label.
+**Task:** Correct `notebooks/relevance_mechanistic.ipynb` so the mechanistic scoring logic reproduces the Fuster paper's annotated rule system, with `R0` evaluated against the authors' mechanistic reference rather than the separate `dataset_relevance` label.
 
 **Work Performed:**
 - Updated the notebook scoring functions to match the annotated Fuster rule implementation:
@@ -350,7 +350,7 @@ This folder contains analysis and validation notebooks for ecological dataset ch
   **Decision:** compute macro F1 over labels actually present in the comparison, and state that choice in the notebook so a perfect reconstruction is reported as `1.00`.
 
 **Results:**
-- Dev-subset verification for `R1-A` (rules on GT features vs `MC_relevance_modifiers`):
+- Dev-subset verification for `R0` (rules on GT features vs `MC_relevance_modifiers`):
   - Accuracy: **1.00**
   - Macro F1 over present labels (`H`, `M`, `L`): **1.00**
   - Mismatches: **0 / 30**
@@ -381,16 +381,16 @@ This folder contains analysis and validation notebooks for ecological dataset ch
 **Task:** Implement and evaluate two automated approaches to replicating Fuster et al.'s manual dataset relevance scoring (H/M/L/X) on the 30-record dev subset.
 
 **Work Performed:**
-- **WU-R1A** (`notebooks/relevance_mechanistic.ipynb` Part A): Applied Fuster scoring rules to GT (human-annotated) features — ceiling test. No LLM.
-- **WU-R1B** (`notebooks/relevance_mechanistic.ipynb` Part B): Applied same rules to LLM-extracted features (`DatasetFeaturesExtraction`, `gpt-5-mini`, cache hits from prior runs).
+- **R0** (`notebooks/relevance_mechanistic.ipynb` Part A): Applied Fuster scoring rules to GT (human-annotated) features — ceiling test. No LLM.
+- **R1-A** (`notebooks/relevance_mechanistic.ipynb` Part B): Applied same rules to LLM-extracted features (`DatasetFeaturesExtraction`, `gpt-5-mini`, cache hits from prior runs).
 - **WU-R2** (`notebooks/relevance_llm_direct.ipynb`): Direct LLM classification — single call that extracts features AND outputs a relevance verdict with reasoning.
 
 **Results (30-record dev subset):**
 
 | Method | 4-class macro F1 | Binary F1 (relevant) | Binary P | Binary R |
 |---|---|---|---|---|
-| R1-A: Rules on GT features | 0.394 | 0.773 | 0.654 | 0.944 |
-| R1-B: Rules on LLM features | 0.189 | 0.667 | 0.583 | 0.778 |
+| R0: Rules on GT features | 0.394 | 0.773 | 0.654 | 0.944 |
+| R1-A: Rules on abstract/repository-description LLM features | 0.189 | 0.667 | 0.583 | 0.778 |
 | R2: Direct LLM (gpt-5-mini) | 0.297 | 0.750 | 0.682 | 0.833 |
 | Authors' MC_relevance_modifiers (ref) | 0.491 | 0.850 | 0.773 | 0.944 |
 
@@ -419,15 +419,15 @@ The paper's automated relevance classification (Methods §"Automatic relevance c
 
 | Method | Relevant Precision | Relevant Recall | Relevant F1 |
 |---|---|---|---|
-| R1-A: Rules on GT features | 0.654 | 0.944 | 0.773 |
-| R1-B: Rules on LLM features | 0.583 | 0.778 | 0.667 |
+| R0: Rules on GT features | 0.654 | 0.944 | 0.773 |
+| R1-A: Rules on abstract/repository-description LLM features | 0.583 | 0.778 | 0.667 |
 | **R2: Direct LLM (gpt-5-mini)** | **0.682** | **0.833** | **0.750** |
 | Authors' MC_relevance_modifiers (reference) | 0.773 | 0.944 | 0.850 |
 
 **Comparison notes:**
-- R2 (Direct LLM) outperforms the paper's best ML classifier on all binary metrics (P: 0.682 vs 0.62, R: 0.833 vs 0.71, F1: 0.750 vs 0.67), on a 30-record subset. Results are not directly comparable (different corpus split, n=30 vs full dataset), but the direction is consistent with the paper's own suggestion in Discussion: *"an alternative approach would be to directly extract key features from the texts (e.g., data type, temporal extent, etc.) without relying on a supervised approach. These features may be combined a posteriori in the same framework as described for manual evaluation"* — which is exactly what R1 implements, and what R2 does end-to-end.
+- R2 (Direct LLM) outperforms the paper's best ML classifier on all binary metrics (P: 0.682 vs 0.62, R: 0.833 vs 0.71, F1: 0.750 vs 0.67), on a 30-record subset. Results are not directly comparable (different corpus split, n=30 vs full dataset), but the direction is consistent with the paper's own suggestion in Discussion: *"an alternative approach would be to directly extract key features from the texts (e.g., data type, temporal extent, etc.) without relying on a supervised approach. These features may be combined a posteriori in the same framework as described for manual evaluation"* — which is exactly what `R1-A` and `R1-B` implement, and what `R2` does end-to-end.
 - The paper's ML approach has notably low recall on relevant (0.44–0.71). The Discussion attributes this to: (1) spatio-temporal features often absent from abstracts/repository pages, (2) taxon/ecosystem overfitting in the training data, (3) small corpus size (418 records).
-- Our R1-B independently confirms issue (1): `spatial_range_km2` is mostly None from abstract text, making the spatial Main Classifier return X for ~25/30 records.
+- Our `R1-A` results independently confirm issue (1): `spatial_range_km2` is mostly None from abstract text, making the spatial Main Classifier return X for ~25/30 records.
 
 #### Rule Reconstruction Errors Found
 
@@ -468,7 +468,7 @@ Our implementation uses a simple majority vote with data_type as tiebreaker, whi
 
 ---
 
-#### R1-A Mismatch Analysis (rules on GT features, 18/30 wrong)
+#### R0 Mismatch Analysis (rules on GT features, 18/30 wrong)
 
 18 of 30 records are misclassified: **16 over-predictions, 2 under-predictions**. The rules have a strong upward bias. All row IDs below refer to the `id` column in `data/dataset_092624.xlsx`.
 
@@ -553,7 +553,7 @@ Note: this requires *both* Error 1 (data_type scoring) *and* Error 3 (tiebreaker
 
 ##### Expected impact of all three fixes combined
 
-The three errors interact. Fixing the tiebreaker alone (Error 3) resolves Pattern 2 entirely (4 records). Fixing multispecies modulator restriction (Error 2) resolves ~5 records in Pattern 1. Fixing data_type scoring (Error 1) combined with the tiebreaker resolves the worst under-prediction (id=38, Pattern 4). Conservative estimate: **10–12 of the 18 mismatches would be resolved**, bringing R1-A from 40% accuracy (12/30) to roughly 70–73% (22/30).
+The three errors interact. Fixing the tiebreaker alone (Error 3) resolves Pattern 2 entirely (4 records). Fixing multispecies modulator restriction (Error 2) resolves ~5 records in Pattern 1. Fixing data_type scoring (Error 1) combined with the tiebreaker resolves the worst under-prediction (id=38, Pattern 4). Conservative estimate: **10–12 of the 18 mismatches would be resolved**, bringing R0 from 40% accuracy (12/30) to roughly 70–73% (22/30).
 
 The remaining ~6 mismatches are likely irreducible with a rule-based approach — they stem from annotation subjectivity (where rules and authors both disagree with GT) or edge cases in modulator application that the paper doesn't fully specify.
 
@@ -561,15 +561,15 @@ The key design question: **should modulators apply unconditionally, or only when
 
 ---
 
-#### R1-B and R2 Summary
+#### R1-A and R2 Summary
 
-- **R1-B severe degradation (F1=0.189):** LLM extracts `spatial_range_km2` as None for most records (no explicit km² figure in the abstract text), so spatial classifier returns X for ~25 of 30 records. Combined with vocabulary mismatch on `data_type` ("genetic_analysis" vs "EBV genetic analysis"), the mechanistic scoring pipeline breaks down further.
-- **R2 outperforms R1-B** despite using the same LLM: end-to-end LLM reasoning tolerates imperfect intermediate representations better than rule application on imperfect features. Binary recall 0.833 is workable for screening.
+- **R1-A severe degradation (F1=0.189):** LLM extracts `spatial_range_km2` as None for most records (no explicit km² figure in the abstract text), so spatial classifier returns X for ~25 of 30 records. Combined with vocabulary mismatch on `data_type` ("genetic_analysis" vs "EBV genetic analysis"), the mechanistic scoring pipeline breaks down further.
+- **R2 outperforms R1-A** despite using the same LLM: end-to-end LLM reasoning tolerates imperfect intermediate representations better than rule application on imperfect features. Binary recall 0.833 is workable for screening.
 
 **Next Steps:**
-- For R1-A: test whether removing the X-penalty (or replacing it with a softer penalization) improves recall without tanking precision.
+- For R0: test whether removing the X-penalty (or replacing it with a softer penalization) improves recall without tanking precision.
 - For modulators: restrict upgrades to records where mc_relevance ≥ L (i.e., data type must not be X) — this may close most of the over-prediction gap.
-- For R2: prompt-tune the relevance block, especially the modulator threshold description; compare to R1-A ceiling.
+- For R2: prompt-tune the relevance block, especially the modulator threshold description; compare to the `R0` ceiling.
 
 ### 2026-03-31: Improved Prompt for Modulator Fields, `data_type`, and `geospatial_info_dataset`
 
