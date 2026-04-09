@@ -1,0 +1,27 @@
+{
+  "method": "R2-B: Direct LLM from PDF files vs Fuster MC+Modulators",
+  "model": "gpt-5-mini",
+  "target": "MC_relevance_modifiers",
+  "diagnostic_target": "dataset_relevance",
+  "prediction_source": "fresh_api_calls",
+  "n_records": 30,
+  "target_labels": [
+    "H",
+    "M",
+    "L"
+  ],
+  "macro_f1_present_labels": 0.501,
+  "macro_f1_all_labels": 0.375,
+  "binary_f1_relevant": 0.857,
+  "binary_precision": 0.778,
+  "binary_recall": 0.955,
+  "diagnostic_vs_human": {
+    "macro_f1_present_labels": 0.266,
+    "binary_f1_relevant": 0.756,
+    "binary_precision": 0.63,
+    "binary_recall": 0.944
+  },
+  "prompt_hash_current": "17e880ab",
+  "schema_hash": "152e9399",
+  "total_cost_usd": 0.4551
+}

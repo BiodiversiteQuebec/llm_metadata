@@ -4,6 +4,57 @@ This folder contains analysis and validation notebooks for ecological dataset ch
 
 ## Recent Activity
 
+### 2026-04-09: Automated Relevance Classification — Split Direct LLM Into `R2-A` and `R2-B`
+
+**Task:** Split the direct relevance-classification notebook into short-text and PDF-file variants, rerun both with live credentials, and refresh the shared comparison outputs and manuscript-facing nomenclature.
+
+**Work Performed:**
+- Kept `notebooks/relevance_llm_direct.ipynb` as the short-text direct notebook and relabeled it as `R2-A`.
+- Created `notebooks/relevance_llm_direct_pdf.ipynb` by reusing the `R2-A` notebook structure and swapping the evidence path to `pdf_local_path` plus the PDF-file prompt.
+- Reran both notebooks under `uv` with `UV_ENV_FILE=.env`, using live API calls rather than saved-predictions fallback.
+- Refreshed direct-LLM outputs:
+  - `notebooks/results/relevance_llm_direct_predictions.csv`
+  - `notebooks/results/relevance_llm_direct_summary.json`
+  - `notebooks/results/relevance_llm_direct_confusion.png`
+  - `notebooks/results/relevance_llm_direct_pdf_predictions.csv`
+  - `notebooks/results/relevance_llm_direct_pdf_summary.json`
+  - `notebooks/results/relevance_llm_direct_pdf_confusion.png`
+  - `notebooks/results/relevance_comparison_summary.csv`
+- Updated `TODO.md`, `plans/automated_relevance_classification.md`, and `docs/relevance_classification_comparison_draft.md` so the split `R2-A` / `R2-B` nomenclature is consistent in results tables and synthesis text.
+
+**Results:**
+- `R2-A` direct LLM from abstract / repository-description text vs `MC_relevance_modifiers`:
+  - macro F1 `0.381`
+  - binary relevant-class F1 `0.483`
+  - precision `1.000`
+  - recall `0.318`
+  - total cost `$0.0965`
+- `R2-B` direct LLM from PDF files vs `MC_relevance_modifiers`:
+  - macro F1 `0.501`
+  - binary relevant-class F1 `0.857`
+  - precision `0.778`
+  - recall `0.955`
+  - total cost `$0.4551`
+- Relative ordering on the dev subset is now:
+  - `R0`: macro F1 `1.000`, binary F1 `1.000`
+  - `R1-A`: macro F1 `0.317`, binary F1 `0.533`
+  - `R1-B`: macro F1 `0.486`, binary F1 `0.714`
+  - `R2-A`: macro F1 `0.381`, binary F1 `0.483`
+  - `R2-B`: macro F1 `0.501`, binary F1 `0.857`
+- Interpretation:
+  - short-text direct classification is still evidence-limited and over-predicts low relevance
+  - PDF-file direct classification is the strongest non-ceiling method currently in the repo
+
+**Key Issues Identified:**
+- The main story is now evidence sensitivity, not simply rule-based versus direct classification.
+- `R2-A` does not beat `R1-A` on binary screening, which means direct prompting alone does not fix sparse repository descriptions.
+- `R2-B` materially outperforms both `R1-B` and the paper's binary baseline, but it costs about 4.7x more than `R2-A`.
+
+**Next Steps:**
+- Use `R2-B` as the current best direct comparator in paper-facing tables.
+- Keep `R2-A` in the comparison because it isolates the effect of evidence source cleanly.
+- Follow with error attribution so `R1-A`, `R1-B`, `R2-A`, and `R2-B` misses can be tied back to data type, temporal, spatial, or modulator evidence gaps.
+
 ### 2026-04-09: Automated Relevance Classification — PDF-Derived Mechanistic Notebook
 
 **Task:** Create a PDF-native version of the mechanistic relevance-classification notebook so the same Fuster rule system can be evaluated on features extracted from full PDF files rather than abstract or repository-description text.

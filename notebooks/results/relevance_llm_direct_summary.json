@@ -1,27 +1,27 @@
 {
-  "method": "R2: Direct LLM vs Fuster MC+Modulators",
+  "method": "R2-A: Direct LLM from abstract/repository-description text vs Fuster MC+Modulators",
   "model": "gpt-5-mini",
   "target": "MC_relevance_modifiers",
   "diagnostic_target": "dataset_relevance",
-  "prediction_source": "saved_predictions_fallback",
+  "prediction_source": "fresh_api_calls",
   "n_records": 30,
   "target_labels": [
     "H",
     "M",
     "L"
   ],
-  "macro_f1_present_labels": 0.498,
-  "macro_f1_all_labels": 0.374,
-  "binary_f1_relevant": 0.773,
-  "binary_precision": 0.773,
-  "binary_recall": 0.773,
+  "macro_f1_present_labels": 0.381,
+  "macro_f1_all_labels": 0.286,
+  "binary_f1_relevant": 0.483,
+  "binary_precision": 1.0,
+  "binary_recall": 0.318,
   "diagnostic_vs_human": {
-    "macro_f1_present_labels": 0.297,
-    "binary_f1_relevant": 0.75,
-    "binary_precision": 0.682,
-    "binary_recall": 0.833
+    "macro_f1_present_labels": 0.258,
+    "binary_f1_relevant": 0.48,
+    "binary_precision": 0.857,
+    "binary_recall": 0.333
   },
-  "prompt_hash_current": "a86ef443",
+  "prompt_hash_current": "35c77322",
   "schema_hash": "152e9399",
-  "total_cost_usd": 0.0909
+  "total_cost_usd": 0.0965
 }
