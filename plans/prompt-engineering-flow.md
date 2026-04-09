@@ -388,7 +388,9 @@ Round 4: WU-2.6 || WU-2.7                   (deps: 2.2+2.3)
 
 ---
 
-## Phase 3: Per-Field Prompt Iteration ← **CURRENT PHASE**
+## Phase 3: Per-Field Prompt Iteration ✅ COMPLETE (common.py blocks)
+
+> Species prompt work (WU-T1/T1b) tracked separately in [`plans/taxonomic-relevance-refactor.md`](taxonomic-relevance-refactor.md).
 
 ### Goals
 
@@ -419,7 +421,7 @@ Mode comparison (from 2026-03-28 lab log): `abstract` best for `data_type`/`time
 
 ---
 
-### 3.2 `data_type` + `geospatial_info_dataset` vocabulary iteration `sonnet`
+### ~~3.2 `data_type` + `geospatial_info_dataset` vocabulary iteration~~ ✅
 
 **deps:** 3.1 (done) | **files:** `src/llm_metadata/prompts/common.py` (`VOCABULARY` block)
 
@@ -448,7 +450,7 @@ Mode comparison (from 2026-03-28 lab log): `abstract` best for `data_type`/`time
 
 ---
 
-### 3.4 Boolean field cue expansion `sonnet`
+### ~~3.4 Boolean field cue expansion~~ ✅
 
 **deps:** 3.1 (done), 3.2 | **files:** `src/llm_metadata/prompts/common.py` (`MODULATOR_FIELDS` block)
 
@@ -583,7 +585,7 @@ Also note: if a well-known threatened species is named (e.g., polar bear, beluga
 
 ---
 
-### 3.4b Mode-specific prompt tuning `sonnet`
+### ~~3.4b Mode-specific prompt tuning~~ ✅
 
 **deps:** 3.2, 3.4 | **files:** `src/llm_metadata/prompts/section.py`, `src/llm_metadata/prompts/pdf_file.py`
 
@@ -617,12 +619,36 @@ Sections and PDF mode prompts share the `common.py` blocks but need additional m
 ### Phase 3 Execution Rounds
 
 ```
-Round 1: ~~WU-3.1~~ ✅ done
-Round 2: WU-3.2                         (VOCABULARY block — data_type + geospatial_info_dataset)
-Round 3: WU-3.4                         (MODULATOR_FIELDS — after 3.2 to avoid interactions)
-Round 4: WU-3.4b                        (mode-specific section.py + pdf_file.py — after shared blocks stable)
-Round 5: WU-3.5                         (batch validation on full 418-record dataset)
+Round 1: ~~WU-3.1~~ ✅ done (2026-03-27)
+Round 2: ~~WU-3.2~~ ✅ done (2026-03-31) — VOCABULARY block expanded
+Round 3: ~~WU-3.4~~ ✅ done (2026-03-31) — MODULATOR_FIELDS cue expansion
+Round 4: ~~WU-3.4b~~ ✅ done (2026-03-31) — mode-specific section.py + pdf_file.py
 ```
+
+### Phase 3 Results Summary (2026-03-31)
+
+Three-mode eval after all prompt changes (`artifacts/runs/20260331_12*`):
+
+| Field | Abstract F1 | Sections F1 | PDF Native F1 | Best mode |
+|---|---|---|---|---|
+| `data_type` | **0.424** | 0.372 | 0.370 | abstract |
+| `geospatial_info_dataset` | **0.255** | 0.182 | 0.230 | abstract |
+| `species` | **0.405** | 0.380 | 0.187 | abstract |
+| `time_series` | 0.471 | **0.476** | 0.250 | sections |
+| `threatened_species` | 0.385 | 0.370 | **0.778** | pdf_native |
+| `bias_north_south` | 0.286 | 0.378 | **0.830** | pdf_native |
+| `multispecies` | **0.746** | 0.724 | 0.767 | pdf_native |
+| `temp_range_i` | **0.743** | 0.524 | 0.694 | abstract |
+| `temp_range_f` | **0.629** | 0.619 | 0.694 | pdf_native |
+| `spatial_range_km2` | 0.095 | **0.667** | 0.703 | pdf_native |
+| `new_species_region` | 0.222 | 0.286 | **0.750** | pdf_native |
+| `new_species_science` | 0.167 | 0.240 | **0.769** | pdf_native |
+
+**Key takeaways:**
+- PDF native dominates for `threatened_species`, `bias_north_south`, `new_species_*`, `spatial_range_km2`
+- Abstract best for `data_type`, `geospatial_info`, `species`, `temp_range_i`
+- Species precision still weak across all modes — WU-T1 (SPECIES_EXTRACTION block) is the next lever
+- `bias_north_south` dual-trigger working well in PDF mode (F1=0.83); abstract mode still limited (F1=0.29)
 
 > Species prompt work (previously WU-3.3) is now tracked separately in [`plans/taxonomic-relevance-refactor.md`](taxonomic-relevance-refactor.md) WU-T1/T1b and runs in parallel with this plan.
 

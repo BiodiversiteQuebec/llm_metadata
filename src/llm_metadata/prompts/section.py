@@ -18,7 +18,13 @@ Different sections contain different types of information:
 - **Study Area / Site Description**: Geographic coordinates, spatial range, administrative regions
 - **Results**: Actual values and measurements (may confirm temporal/spatial extent)
 
-When sections contradict, prefer Methods/Data sections over Abstract."""
+When sections contradict, prefer Methods/Data sections over Abstract.
+
+## Sections Mode — Field-Specific Rules
+
+**data_type**: Classify `data_type` for the primary data *collected or stored*, not downstream analyses or derived products. Methods sections often describe analytical workflows (e.g., modeling, ordination, diversity calculations) — ignore these when classifying data type. Focus on what kind of observations or measurements are physically in the dataset (occurrences, counts, sequences, traits, etc.).
+
+**time_series**: Experimental treatment periods, field seasons, or sampling rounds within a single study are NOT time series unless the study design explicitly states repeated observation of the same sites or populations over successive years. A methods section describing "three sampling campaigns" or "two field seasons" does not qualify unless same-site revisit is stated."""
 
 SYSTEM_MESSAGE: str = build_prompt(
     PERSONA, TASK_INSTRUCTIONS, PHILOSOPHY, SCOPING, VOCABULARY, MODULATOR_FIELDS, OUTPUT_FORMAT

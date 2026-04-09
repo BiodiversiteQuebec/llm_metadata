@@ -378,6 +378,45 @@ The key design question: **should modulators apply unconditionally, or only when
 - For modulators: restrict upgrades to records where mc_relevance ≥ L (i.e., data type must not be X) — this may close most of the over-prediction gap.
 - For R2: prompt-tune the relevance block, especially the modulator threshold description; compare to R1-A ceiling.
 
+### 2026-03-31: WU-3.2 + WU-3.4 + WU-3.4b Prompt Iteration — All Modes
+
+**Task:** Implement Phase 3 rounds 2-3-4: expand VOCABULARY block (WU-3.2), boolean cue expansion (WU-3.4), and mode-specific rules (WU-3.4b); evaluate all three extraction modes on dev subset.
+
+**Work Performed:**
+- **WU-3.2** (`common.py` VOCABULARY): Replaced 8-entry partial vocabulary with full 13-value `data_type` enum (corrected 5 invalid values: `tracking`, `remote_sensing`, `acoustic`, `morphological`, `environmental`; added `presence-absence`, `density`, `distribution`, `traits`, `ecosystem_function`, `ecosystem_structure`, `species_richness`, `other`, `unknown`). Expanded `geospatial_info_dataset` from 5 to 9 values (`distribution`, `geographic_features`, `site_ids`, `unknown` added). Added contrastive examples and negative rule for place-name over-triggering.
+- **WU-3.4** (`common.py` MODULATOR_FIELDS): Expanded `time_series` with 4 negative anchors; expanded `threatened_species` with full IUCN/CITES/SARA/COSEWIC/provincial cue table; rewrote `bias_north_south` as dual-trigger (geographic: Nunavik/James Bay/above 49°N + explicit bias language).
+- **WU-3.4b** (`section.py`, `pdf_file.py`): Added sections-mode rules for `data_type` (primary collected data, not downstream analyses) and `time_series` (field seasons != time series); added PDF-mode rules for `time_series` (judge from sampling design only), `new_species_science` (sp. nov., holotype triggers), and `new_species_region` (first-record language contrastive).
+- **Runs:** Abstract-only first (`artifacts/runs/20260331_070721_wu32_34_abstract.json`), then all three modes (`artifacts/runs/20260331_12*`)
+
+**Three-mode results (2026-03-31):**
+
+| Field | Abstract F1 | Sections F1 | PDF Native F1 | Best mode |
+|---|---|---|---|---|
+| `data_type` | **0.424** | 0.372 | 0.370 | abstract |
+| `geospatial_info_dataset` | **0.255** | 0.182 | 0.230 | abstract |
+| `species` | **0.405** | 0.380 | 0.187 | abstract |
+| `time_series` | 0.471 | **0.476** | 0.250 | sections |
+| `threatened_species` | 0.385 | 0.370 | **0.778** | pdf_native |
+| `bias_north_south` | 0.286 | 0.378 | **0.830** | pdf_native |
+| `multispecies` | 0.746 | 0.724 | **0.767** | pdf_native |
+| `temp_range_i` | **0.743** | 0.524 | 0.694 | abstract |
+| `temp_range_f` | **0.629** | 0.619 | 0.694 | pdf_native |
+| `spatial_range_km2` | 0.095 | 0.667 | **0.703** | pdf_native |
+| `new_species_region` | 0.222 | 0.286 | **0.750** | pdf_native |
+| `new_species_science` | 0.167 | 0.240 | **0.769** | pdf_native |
+
+**Key findings:**
+- PDF native dominates for `threatened_species` (F1=0.78), `bias_north_south` (F1=0.83), `new_species_*` (F1=0.75/0.77), `spatial_range_km2` (F1=0.70)
+- Abstract best for `data_type`, `geospatial_info`, `species`, `temp_range_i`
+- Mode-specific rules in WU-3.4b appear effective: `new_species_science` PDF F1 0.61->0.77, `bias_north_south` PDF F1 was N/A->0.83
+- `threatened_species` recall unresponsive to cue expansion in abstract mode (R=0.24) but strong in PDF mode (R=0.67) - confirms conservation language appears in full text, not abstracts
+- Species precision still weak across all modes - WU-T1 (SPECIES_EXTRACTION block) is the next lever
+
+**Next Steps:**
+- WU-T1: SPECIES_EXTRACTION block to address species precision
+- Consider mode-fusion strategy: per-field best-mode selection for production pipeline
+- `data_type` F1 target (>=0.50) not yet met in any mode - may need further prompt refinement or GT audit
+
 ### 2026-03-28: Dev-Subset Run Audit and Prompt Iteration Ladder
 
 **Task:** Inspect the latest dev-subset run artifacts across abstract, section-based, and native-PDF modes, then turn the observed failure patterns into a practical prompt-engineering and eval-improvement roadmap ordered from easier to harder work.
