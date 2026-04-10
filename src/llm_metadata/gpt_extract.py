@@ -57,12 +57,31 @@ def _cost_summary(usage_cost: Optional[dict[str, Any]]) -> str:
     return "n/a" if total_cost is None else f"${total_cost:.4f}"
 
 
-def _response_usage_cost(usage: dict[str, Any], model: str = MODEL) -> dict[str, Any]:
+def _response_usage_cost(
+    usage: dict[str, Any],
+    model: str = MODEL,
+    *,
+    joblib_cache_hit: bool = False,
+) -> dict[str, Any]:
     costs = MODEL_COST_PER_1M_TOKENS[model]
     input_tokens = usage.get("input_tokens", 0)
     cached_tokens = usage.get("input_tokens_details", {}).get("cached_tokens", 0)
     reasoning_tokens = usage.get("output_tokens_details", {}).get("reasoning_tokens", 0)
     output_tokens = usage.get("output_tokens", 0)
+
+    if joblib_cache_hit:
+        return {
+            "input_tokens": input_tokens,
+            "cached_tokens": cached_tokens,
+            "reasoning_tokens": reasoning_tokens,
+            "output_tokens": output_tokens,
+            "input_cost": 0.0,
+            "cache_cost": 0.0,
+            "reasoning_cost": 0.0,
+            "output_cost": 0.0,
+            "total_cost": 0.0,
+            "joblib_cache_hit": True,
+        }
 
     input_cost = round((input_tokens - cached_tokens) * costs["input"] / 1_000_000, 4)
     cache_cost = round(cached_tokens * costs["cache"] / 1_000_000, 4)
@@ -80,6 +99,7 @@ def _response_usage_cost(usage: dict[str, Any], model: str = MODEL) -> dict[str,
         "reasoning_cost": reasoning_cost,
         "output_cost": output_cost,
         "total_cost": total_cost,
+        "joblib_cache_hit": False,
     }
 
 
@@ -148,13 +168,14 @@ def extract_from_text(
     )
     response_dict = _response_parse.func(parameters) if skip_cache else _response_parse(parameters)  # type: ignore[attr-defined]
     response = _build_parse_response(response_dict=response_dict, text_format=text_format)
+    joblib_hit = cache_state == "hit"
     result = {
         "prompt": system_message,
         "text": text,
         "model": model,
         "response": response,
         "output": response.output_parsed,
-        "usage_cost": _response_usage_cost(response_dict["usage"], model=model) if response_dict.get("usage") else None,
+        "usage_cost": _response_usage_cost(response_dict["usage"], model=model, joblib_cache_hit=joblib_hit) if response_dict.get("usage") else None,
         "temperature": temperature,
         "reasoning": reasoning,
     }
@@ -328,6 +349,7 @@ def extract_from_pdf_file(
         else _response_parse_pdf(parameters, file_id)
     )
     response = _build_parse_response(response_dict=response_dict, text_format=text_format)
+    joblib_hit = cache_state == "hit"
     result = {
         "prompt": system_message,
         "pdf_path": str(pdf_path),
@@ -335,7 +357,7 @@ def extract_from_pdf_file(
         "model": model,
         "response": response,
         "output": response.output_parsed,
-        "usage_cost": _response_usage_cost(response_dict["usage"], model=model) if response_dict.get("usage") else None,
+        "usage_cost": _response_usage_cost(response_dict["usage"], model=model, joblib_cache_hit=joblib_hit) if response_dict.get("usage") else None,
         "extraction_method": "pdf_native",
         "temperature": temperature,
         "reasoning": reasoning,
@@ -417,13 +439,14 @@ def extract_from_pdf_url(
     )
     response_dict = _response_parse_pdf_url(parameters)
     response = _build_parse_response(response_dict=response_dict, text_format=text_format)
+    joblib_hit = cache_state == "hit"
     result = {
         "prompt": system_message,
         "pdf_url": pdf_url,
         "model": model,
         "response": response,
         "output": response.output_parsed,
-        "usage_cost": _response_usage_cost(response_dict["usage"], model=model) if response_dict.get("usage") else None,
+        "usage_cost": _response_usage_cost(response_dict["usage"], model=model, joblib_cache_hit=joblib_hit) if response_dict.get("usage") else None,
         "extraction_method": "pdf_url",
         "temperature": temperature,
         "reasoning": reasoning,

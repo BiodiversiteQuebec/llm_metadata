@@ -548,6 +548,8 @@ def _is_populated_value(value: object) -> bool:
 
 def _cache_status(record: RunRecord) -> str:
     usage_cost = record.usage_cost or {}
+    if usage_cost.get("joblib_cache_hit"):
+        return "joblib_hit"
     cached_tokens = usage_cost.get("cached_tokens")
     if cached_tokens is None:
         return "unknown"
@@ -568,14 +570,16 @@ def _input_tokens_value(record: RunRecord) -> Optional[int]:
 
 
 def _cost_value_usd(record: RunRecord, model: str) -> Optional[float]:
+    """Hypothetical full cost if neither joblib nor OpenAI prompt cache were used."""
     usage_cost = record.usage_cost or {}
-    total_cost = usage_cost.get("total_cost")
-    cached_tokens = usage_cost.get("cached_tokens")
     model_costs = MODEL_COST_PER_1M_TOKENS.get(model)
-    if total_cost is None or cached_tokens is None or model_costs is None:
+    input_tokens = usage_cost.get("input_tokens")
+    output_tokens = usage_cost.get("output_tokens")
+    if input_tokens is None or output_tokens is None or model_costs is None:
         return None
-    cache_delta = cached_tokens * (model_costs["input"] - model_costs["cache"]) / 1_000_000
-    return round(total_cost + cache_delta, 4)
+    input_cost = input_tokens * model_costs["input"] / 1_000_000
+    output_cost = output_tokens * model_costs["output"] / 1_000_000
+    return round(input_cost + output_cost, 4)
 
 
 def _cache_savings_usd(record: RunRecord, model: str) -> Optional[float]:
@@ -838,14 +842,14 @@ def main() -> None:
             error_count = sum(record.status == "error" for record in artifact_a.records)
             output_count = sum(record.output is not None for record in artifact_a.records)
             usage_records = [record for record in artifact_a.records if record.status == "success" and record.usage_cost]
-            cache_hit_count = sum(_cache_status(record) == "hit" for record in usage_records)
+            cache_hit_count = sum(_cache_status(record) in ("hit", "joblib_hit") for record in usage_records)
             cache_miss_count = sum(_cache_status(record) == "miss" for record in usage_records)
-            avg_cost = artifact_a.total_cost_usd / success_count if success_count else None
+            cost_value_rows = [cost for cost in (_cost_value_usd(record, artifact_a.model) for record in usage_records) if cost is not None]
+            avg_cost_value = sum(cost_value_rows) / len(cost_value_rows) if cost_value_rows else None
             total_input_tokens_used = sum(_input_tokens_used(record) or 0 for record in usage_records)
             total_input_tokens_value = sum(_input_tokens_value(record) or 0 for record in usage_records)
             total_cached_tokens = sum((record.usage_cost or {}).get("cached_tokens", 0) or 0 for record in usage_records)
             total_cost_used = round(sum((record.usage_cost or {}).get("total_cost", 0) or 0 for record in usage_records), 4)
-            cost_value_rows = [cost for cost in (_cost_value_usd(record, artifact_a.model) for record in usage_records) if cost is not None]
             total_cost_value = round(sum(cost_value_rows), 4) if cost_value_rows else None
             total_cache_savings = round(total_cost_value - total_cost_used, 4) if total_cost_value is not None else None
             populated_counts = [
@@ -888,7 +892,7 @@ def main() -> None:
             bottom_cols[3].metric("💵 Cost used", f"${total_cost_used:.4f}" if usage_records else "—")
             bottom_cols[4].metric("💵 Cost value", f"${total_cost_value:.4f}" if total_cost_value is not None else "—")
             bottom_cols[5].metric("💵 Saved", f"${total_cache_savings:.4f}" if total_cache_savings is not None else "—")
-            bottom_cols[6].metric("💵 Avg/run", f"${avg_cost:.4f}" if avg_cost is not None else "—")
+            bottom_cols[6].metric("💵 Avg/paper", f"${avg_cost_value:.4f}" if avg_cost_value is not None else "—")
             if usage_records:
                 st.caption(
                     "Token value / cost value are the no-cache baseline. "
