@@ -3,53 +3,24 @@
 from __future__ import annotations
 
 import csv
+import json
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
 
+from llm_metadata.schemas.data_paper import DataPaperManifest
+
 
 @pytest.fixture
-def tiny_gt_xlsx(tmp_path):
-    pytest.importorskip("pandas")
-    import pandas as pd
-
-    data = {
-        "id": [10, 20, 30],
-        "source": ["dryad", "dryad", "zenodo"],
-        "source_url": [
-            "https://doi.org/10.5061/dryad.aaa",
-            "https://doi.org/10.5061/dryad.bbb",
-            "https://doi.org/10.5281/zenodo.111",
-        ],
-        "cited_article_doi": [
-            "https://doi.org/10.1111/aaa.001",
-            "https://doi.org/10.1111/bbb.002",
-            "https://doi.org/10.1111/ccc.003",
-        ],
-        "is_oa": [1.0, 0.0, None],
-        "pdf_url": [None, None, None],
-        "journal_url": [None, None, None],
-        "title": ["Paper A", "Paper B", "Paper C"],
-        "data_type": [None, None, None],
-        "geospatial_info_dataset": [None, None, None],
-        "spatial_range_km2": [None, None, None],
-        "temporal_range": [None, None, None],
-        "temp_range_i": [None, None, None],
-        "temp_range_f": [None, None, None],
-        "species": [None, None, None],
-        "referred_dataset": [None, None, None],
-        "time_series": [None, None, None],
-        "multispecies": [None, None, None],
-        "threatened_species": [None, None, None],
-        "new_species_science": [None, None, None],
-        "new_species_region": [None, None, None],
-        "bias_north_south": [None, None, None],
-        "valid_yn": ["yes", "yes", "yes"],
-        "reason_not_valid": [None, None, None],
-    }
-    path = tmp_path / "gt_validated.xlsx"
-    pd.DataFrame(data).to_excel(str(path), index=False)
+def tiny_gt_json(tmp_path):
+    gt = [
+        {"gt_record_id": 10},
+        {"gt_record_id": 20},
+        {"gt_record_id": 30},
+    ]
+    path = tmp_path / "gt.json"
+    path.write_text(json.dumps(gt), encoding="utf-8")
     return path
 
 
@@ -139,7 +110,7 @@ def mock_text_result():
 
 
 class TestPromptEvalModes:
-    def test_pdf_native_uses_manifest_pdf_paths(self, tiny_gt_xlsx, tiny_manifest_csv, mock_pdf_result):
+    def test_pdf_native_uses_manifest_pdf_paths(self, tiny_gt_json, tiny_manifest_csv, mock_pdf_result):
         from llm_metadata.prompt_eval import run_eval
 
         calls: list[Path] = []
@@ -148,17 +119,20 @@ class TestPromptEvalModes:
             calls.append(Path(pdf_path))
             return mock_pdf_result
 
+        manifest_records = DataPaperManifest.load_csv(str(tiny_manifest_csv)).records
+        gt_data = json.loads(tiny_gt_json.read_text())
+
         with patch("llm_metadata.extraction.extract_from_pdf_file", side_effect=fake_extract):
             report = run_eval(
                 mode="pdf_native",
-                manifest_path=str(tiny_manifest_csv),
-                gt_path=str(tiny_gt_xlsx),
+                manifest=manifest_records,
+                gt=gt_data,
             )
 
         assert {path.name for path in calls} == {"paper_10.pdf", "paper_30.pdf"}
         assert getattr(report, "total_cost_usd") == 0.002
 
-    def test_abstract_mode_uses_manifest_abstracts(self, tiny_gt_xlsx, tiny_manifest_csv, mock_text_result):
+    def test_abstract_mode_uses_manifest_abstracts(self, tiny_gt_json, tiny_manifest_csv, mock_text_result):
         from llm_metadata.prompt_eval import run_eval
 
         seen_texts: list[str] = []
@@ -167,26 +141,32 @@ class TestPromptEvalModes:
             seen_texts.append(text)
             return mock_text_result
 
+        manifest_records = DataPaperManifest.load_csv(str(tiny_manifest_csv)).records
+        gt_data = json.loads(tiny_gt_json.read_text())
+
         with patch("llm_metadata.extraction.extract_from_text", side_effect=fake_extract):
             report = run_eval(
                 mode="abstract",
-                manifest_path=str(tiny_manifest_csv),
-                gt_path=str(tiny_gt_xlsx),
+                manifest=manifest_records,
+                gt=gt_data,
             )
 
         assert seen_texts == ["Abstract 10", "Abstract 20", "Abstract 30"]
         assert len(getattr(report, "run_artifact").records) == 3
 
-    def test_run_eval_saves_run_artifact(self, tiny_gt_xlsx, tiny_manifest_csv, mock_text_result, tmp_path):
+    def test_run_eval_saves_run_artifact(self, tiny_gt_json, tiny_manifest_csv, mock_text_result, tmp_path):
         from llm_metadata.prompt_eval import run_eval
         from llm_metadata.schemas.data_paper import RunArtifact
 
         output_path = tmp_path / "run.json"
+        manifest_records = DataPaperManifest.load_csv(str(tiny_manifest_csv)).records
+        gt_data = json.loads(tiny_gt_json.read_text())
+
         with patch("llm_metadata.extraction.extract_from_text", return_value=mock_text_result):
             report = run_eval(
                 mode="abstract",
-                manifest_path=str(tiny_manifest_csv),
-                gt_path=str(tiny_gt_xlsx),
+                manifest=manifest_records,
+                gt=gt_data,
                 reasoning_effort="medium",
                 description="Artifact persistence test",
                 output_path=output_path,
@@ -202,7 +182,7 @@ class TestPromptEvalModes:
         assert getattr(report, "saved_path") == str(output_path)
         assert getattr(report, "extraction_csv_path") == str(output_path.with_suffix(".csv"))
 
-    def test_run_eval_forwards_parallelism(self, tiny_gt_xlsx, tiny_manifest_csv):
+    def test_run_eval_forwards_parallelism(self, tiny_gt_json, tiny_manifest_csv):
         from llm_metadata.prompt_eval import run_eval
         from llm_metadata.schemas.data_paper import RunArtifact
 
@@ -213,12 +193,13 @@ class TestPromptEvalModes:
             return RunArtifact(
                 name="demo",
                 mode=kwargs["mode"],
-                manifest_path=kwargs.get("manifest_path"),
-                prompt_module="prompts.abstract",
                 system_message="system",
                 model="gpt-5-mini",
                 records=[],
             )
+
+        manifest_records = DataPaperManifest.load_csv(str(tiny_manifest_csv)).records
+        gt_data = json.loads(tiny_gt_json.read_text())
 
         with patch("llm_metadata.prompt_eval.run_manifest_extraction", side_effect=fake_run_manifest_extraction):
             with patch("llm_metadata.prompt_eval.evaluate_indexed") as evaluate_indexed:
@@ -227,8 +208,8 @@ class TestPromptEvalModes:
                 evaluate_indexed.return_value = report
                 run_eval(
                     mode="abstract",
-                    manifest_path=str(tiny_manifest_csv),
-                    gt_path=str(tiny_gt_xlsx),
+                    manifest=manifest_records,
+                    gt=gt_data,
                     parallelism=3,
                     reasoning_effort="medium",
                     description="Medium-effort run",
@@ -245,28 +226,24 @@ class TestBuildRecreateCommand:
 
         cmd = _build_recreate_command(
             mode="pdf_native",
-            manifest_path="data/manifests/dev_subset_data_paper.csv",
             parallelism=4,
-            prompt_module=None,
             config_path=None,
             fields=None,
             output_path=None,
             name=None,
             model="gpt-5-mini",
             reasoning_effort="medium",
-            gt_path="data/dataset_092624_validated.xlsx",
             description="Medium-effort rerun",
             skip_cache=False,
         )
         assert "--mode" in cmd
-        assert "--manifest" in cmd
         assert "--parallelism 4" in cmd
         assert "--reasoning-effort medium" in cmd
         assert "--description 'Medium-effort rerun'" in cmd
 
 
 class TestCliSurface:
-    def test_cli_passes_mode_and_manifest(self, tiny_gt_xlsx, tiny_manifest_csv):
+    def test_cli_passes_mode_and_manifest(self, tiny_gt_json, tiny_manifest_csv):
         from llm_metadata.prompt_eval import main
 
         called_kwargs: dict = {}
@@ -291,8 +268,8 @@ class TestCliSurface:
             "medium",
             "--description",
             "Viewer smoke test",
-            "--gt",
-            str(tiny_gt_xlsx),
+            "--gt-manifest",
+            str(tiny_gt_json),
         ]
 
         with patch("sys.argv", cli_args), patch("llm_metadata.prompt_eval.run_eval", side_effect=fake_run_eval), patch(
@@ -304,7 +281,8 @@ class TestCliSurface:
                 pass
 
         assert called_kwargs["mode"] == "pdf_native"
-        assert called_kwargs["manifest_path"] == str(tiny_manifest_csv)
+        assert called_kwargs["manifest"] is not None
+        assert called_kwargs["gt"] is not None
         assert called_kwargs["parallelism"] == 5
         assert called_kwargs["reasoning_effort"] == "medium"
         assert called_kwargs["description"] == "Viewer smoke test"

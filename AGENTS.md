@@ -37,7 +37,7 @@ uv run python -m pytest tests/test_evaluation.py::TestEvaluation::test_evaluate_
 python src/llm_metadata/gpt_extract.py
 
 # Run extraction + evaluation over a manifest with an explicit mode
-uv run python -m llm_metadata.prompt_eval --mode abstract --manifest data/manifests/dev_subset_data_paper.csv
+uv run python -m llm_metadata.prompt_eval --mode abstract --manifest data/manifests/dev_subset_data_paper.csv --gt-manifest data/gt/fuster_gt.json
 ```
 
 ### Environment Setup
@@ -363,6 +363,7 @@ The prompt engineering loop uses the infrastructure built in Phase 2 to iterate 
 uv run python -m llm_metadata.prompt_eval \
   --mode abstract \
   --manifest data/manifests/dev_subset_data_paper.csv \
+  --gt-manifest data/gt/fuster_gt.json \
   --config configs/eval_default.json \
   --fields species,data_type,time_series \
   --name abstract_20260219_01 \
@@ -373,10 +374,16 @@ Or from a notebook:
 
 ```python
 from llm_metadata.prompt_eval import run_eval
+from llm_metadata.schemas.data_paper import DataPaperManifest
+import json
+
+manifest = DataPaperManifest.load_csv("data/manifests/dev_subset_data_paper.csv").records
+gt = json.loads(open("data/gt/fuster_gt.json").read())
 
 report = run_eval(
     mode="abstract",
-    manifest_path="data/manifests/dev_subset_data_paper.csv",
+    manifest=manifest,
+    gt=gt,
     config_path="configs/eval_default.json",
     name="abstract_20260219_01",
 )
@@ -457,6 +464,7 @@ Also add a summary to `notebooks/README.md` under a dated session header per the
 | `configs/eval_fuzzy_species.json` | Fuzzy species matching variant |
 | `configs/eval_strict.json` | Exact-only matching baseline |
 | `data/dev_subset.csv` | 30-record curated evaluation subset (stable — don't change without bumping version) |
+| `data/gt/fuster_gt.json` | Pre-validated GT annotations as JSON array (from `export_gt_json()`) |
 | `artifacts/runs/*.json` | `prompt_eval` run artifacts (gitignored except baselines committed with `git add -f`) |
 
 ## Task Management & Session Coordination

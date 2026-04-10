@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import ast
 import csv
 import json
 import math
@@ -366,7 +367,7 @@ class RunArtifact(BaseModel):
     description: Optional[str] = None
     mode: ExtractionMode
     manifest_path: Optional[str] = None
-    prompt_module: str
+    prompt_module: Optional[str] = None
     system_message: str
     model: str
     reasoning: Optional[dict[str, Any]] = None
@@ -375,6 +376,14 @@ class RunArtifact(BaseModel):
     output_schema: Optional[dict[str, Any]] = Field(default=None, alias="schema")
     records: list[RunRecord] = Field(default_factory=list)
     evaluation: Optional[dict[str, Any]] = None
+    gt_digest: Optional[str] = None
+    manifest_digest: Optional[str] = None
+
+    @staticmethod
+    def compute_digest(data: str) -> str:
+        """Compute sha256 hex digest of a string."""
+        import hashlib
+        return hashlib.sha256(data.encode("utf-8")).hexdigest()
 
     @model_validator(mode="before")
     @classmethod
@@ -495,3 +504,80 @@ class RunArtifact(BaseModel):
                 continue
             predictions[str(record.gt_record_id)] = model_type.model_validate(record.output)
         return predictions
+
+
+_LIST_COLUMNS = {"data_type", "geospatial_info_dataset", "species"}
+
+
+def _parse_excel_val(key: str, value: Any) -> Any:
+    """Parse a raw Excel cell value, handling list-like strings for list columns."""
+    try:
+        import pandas as pd  # type: ignore
+        if pd.isna(value):
+            return None
+    except (TypeError, ValueError):
+        pass
+
+    if key in _LIST_COLUMNS and isinstance(value, str):
+        stripped = value.strip()
+        if stripped.startswith("["):
+            try:
+                parsed = ast.literal_eval(stripped)
+                if isinstance(parsed, list):
+                    return parsed
+            except (ValueError, SyntaxError):
+                pass
+        # Single non-list string — wrap in list for list columns
+        return [stripped] if stripped else None
+
+    return value
+
+
+def export_gt_json(
+    gt_path: str | Path = "data/dataset_092624_validated.xlsx",
+    output_path: str | Path = "data/gt/fuster_gt.json",
+    subset_ids: Optional[set[int]] = None,
+) -> Path:
+    """Export ground-truth annotations as a JSON array of normalized feature dicts.
+
+    Each entry contains ``gt_record_id`` plus all fields from
+    ``SEMANTIC_FEATURE_FIELD_NAMES`` validated through
+    ``DatasetFeaturesNormalized``.
+
+    Args:
+        gt_path: Path to the validated GT Excel workbook.
+        output_path: Destination JSON file path.
+        subset_ids: When provided, only export records whose ``id`` is in this set.
+
+    Returns:
+        The resolved output ``Path``.
+    """
+    from llm_metadata.schemas.fuster_features import (  # noqa: PLC0415
+        DatasetFeaturesNormalized,
+        SEMANTIC_FEATURE_FIELD_NAMES,
+    )
+
+    df = _load_gt_frame(gt_path)
+
+    if subset_ids is not None:
+        df = df[df["id"].isin(subset_ids)].copy()
+
+    records: list[dict[str, Any]] = []
+    for _, row in df.iterrows():
+        gt_record_id = int(row["id"])
+        raw: dict[str, Any] = {}
+        for field in SEMANTIC_FEATURE_FIELD_NAMES:
+            if field in row.index:
+                raw[field] = _parse_excel_val(field, row[field])
+
+        normalized = DatasetFeaturesNormalized.model_validate(raw)
+        entry: dict[str, Any] = {"gt_record_id": gt_record_id}
+        for field in SEMANTIC_FEATURE_FIELD_NAMES:
+            entry[field] = getattr(normalized, field)
+
+        records.append(entry)
+
+    out = Path(output_path)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps(records, indent=2, default=str), encoding="utf-8")
+    return out

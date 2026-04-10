@@ -143,7 +143,7 @@ def _reasoning_effort_from_payload(artifact: Optional[RunArtifact], meta: dict) 
 def _notes_header(run_path: Path, meta: dict) -> str:
     """Build a markdown header with run metadata for a new notes file."""
     run_name = run_path.name
-    prompt = meta.get("prompt_module", "—")
+    prompt = meta.get("prompt_module") or "custom"
     model = meta.get("model", "—")
     reasoning_effort = _reasoning_effort_from_payload(None, meta) or "—"
     description = _description_from_payload(None, meta)
@@ -724,7 +724,8 @@ def main() -> None:
             st.markdown(f"**Description:** {description}")
 
         details_cols = st.columns(5)
-        details_cols[0].metric("Prompt", artifact_a.prompt_module if artifact_a is not None else meta_a.get("prompt_module", "—"))
+        prompt_label = (artifact_a.prompt_module if artifact_a is not None else meta_a.get("prompt_module")) or "custom"
+        details_cols[0].metric("Prompt", prompt_label)
         details_cols[1].metric("Model", artifact_a.model if artifact_a is not None else meta_a.get("model", "—"))
         details_cols[2].metric("Reasoning", reasoning_effort or "—")
         details_cols[3].metric("Mode", artifact_a.mode.value if artifact_a is not None else meta_a.get("mode", "—"))
@@ -787,7 +788,7 @@ def main() -> None:
                 st.code(serialized_message, language=None)
             else:
                 prompt_module_path = artifact_a.prompt_module if artifact_a is not None else meta_a.get("prompt_module")
-                if prompt_module_path:
+                if prompt_module_path and prompt_module_path != "custom":
                     try:
                         mod = importlib.import_module(f"llm_metadata.{prompt_module_path}")
                         system_msg = getattr(mod, "SYSTEM_MESSAGE", None)

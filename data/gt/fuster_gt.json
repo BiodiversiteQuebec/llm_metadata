@@ -1,0 +1,6898 @@
+[
+  {
+    "gt_record_id": 3,
+    "data_type": [
+      "genetic_analysis"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "41 fish mock species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 4,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": [
+      "administrative_units"
+    ],
+    "spatial_range_km2": 0.2,
+    "temporal_range": "2012-2017",
+    "temp_range_i": 2012,
+    "temp_range_f": 2017,
+    "species": [
+      "Tamias striatus"
+    ],
+    "referred_dataset": null,
+    "time_series": true,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 5,
+    "data_type": [
+      "genetic_analysis"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": "2006-2007",
+    "temp_range_i": 2006,
+    "temp_range_f": 2007,
+    "species": [
+      "Glyptemys insculpta"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": true,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 7,
+    "data_type": [
+      "other"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "40 freshwater vertebrate and invertebrates"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 9,
+    "data_type": [
+      "density"
+    ],
+    "geospatial_info_dataset": [
+      "sample"
+    ],
+    "spatial_range_km2": null,
+    "temporal_range": "2008",
+    "temp_range_i": 2008,
+    "temp_range_f": 2008,
+    "species": [
+      "raccoons",
+      "striped skunks"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 10,
+    "data_type": [
+      "presence-absence"
+    ],
+    "geospatial_info_dataset": [
+      "site_ids"
+    ],
+    "spatial_range_km2": null,
+    "temporal_range": "2020",
+    "temp_range_i": 2020,
+    "temp_range_f": 2020,
+    "species": [
+      "white-tailed deer"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 11,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": 7250.0,
+    "temporal_range": "1999-2000, 2004-2011",
+    "temp_range_i": 1999,
+    "temp_range_f": 2011,
+    "species": [
+      "Rangifer tarandus caribou"
+    ],
+    "referred_dataset": null,
+    "time_series": true,
+    "multispecies": false,
+    "threatened_species": true,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 12,
+    "data_type": [
+      "other"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": 7250.0,
+    "temporal_range": "2004-2011",
+    "temp_range_i": 2004,
+    "temp_range_f": 2011,
+    "species": [
+      "Rangifer tarandus caribou"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": true,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 13,
+    "data_type": [
+      "genetic_analysis"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Aspicilia bicensis"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": true,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 16,
+    "data_type": [
+      "genetic_analysis"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": 500000.0,
+    "temporal_range": "2003-2013",
+    "temp_range_i": 2003,
+    "temp_range_f": 2013,
+    "species": [
+      "Salvelinus namaycush"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": true,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 17,
+    "data_type": [
+      "abundance",
+      "presence-absence",
+      "density"
+    ],
+    "geospatial_info_dataset": [
+      "sample"
+    ],
+    "spatial_range_km2": 10200.0,
+    "temporal_range": "2009-2018",
+    "temp_range_i": 2009,
+    "temp_range_f": 2018,
+    "species": [
+      "Tachycineta bicolor",
+      "Passer domesticus"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 19,
+    "data_type": [
+      "presence-only",
+      "genetic_analysis"
+    ],
+    "geospatial_info_dataset": [
+      "sample"
+    ],
+    "spatial_range_km2": 2080.0,
+    "temporal_range": "2011-2014",
+    "temp_range_i": 2011,
+    "temp_range_f": 2014,
+    "species": [
+      "black-legged tick"
+    ],
+    "referred_dataset": null,
+    "time_series": true,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 20,
+    "data_type": [
+      "density"
+    ],
+    "geospatial_info_dataset": [
+      "sample"
+    ],
+    "spatial_range_km2": 243000.0,
+    "temporal_range": "1973-2016",
+    "temp_range_i": 1973,
+    "temp_range_f": 2016,
+    "species": [
+      "black spruce: Picea mariana",
+      "jack pine: Pinus banksiana",
+      "Balsam fir: Abies balsamea",
+      "broadleaved: Betula papyrifera and Populus tremuloides"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": true,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 24,
+    "data_type": [
+      "genetic_analysis"
+    ],
+    "geospatial_info_dataset": [
+      "site_ids"
+    ],
+    "spatial_range_km2": 500000.0,
+    "temporal_range": "2008-2009",
+    "temp_range_i": 2008,
+    "temp_range_f": 2008,
+    "species": [
+      "Acer saccharum"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": true,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 25,
+    "data_type": [
+      "genetic_analysis"
+    ],
+    "geospatial_info_dataset": [
+      "sample"
+    ],
+    "spatial_range_km2": 0.5,
+    "temporal_range": "1999-2006",
+    "temp_range_i": 1999,
+    "temp_range_f": 2006,
+    "species": [
+      "Anguilla rostrata"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": true,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 27,
+    "data_type": [
+      "presence-only",
+      "genetic_analysis"
+    ],
+    "geospatial_info_dataset": [
+      "sample"
+    ],
+    "spatial_range_km2": null,
+    "temporal_range": "2010-2014",
+    "temp_range_i": 2010,
+    "temp_range_f": 2014,
+    "species": [
+      "Eastern coyote",
+      "eastern wolf"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": true,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 28,
+    "data_type": [
+      "density"
+    ],
+    "geospatial_info_dataset": [
+      "sample"
+    ],
+    "spatial_range_km2": 0.5,
+    "temporal_range": "2010-2016",
+    "temp_range_i": 2010,
+    "temp_range_f": 2016,
+    "species": [
+      "64 plant species"
+    ],
+    "referred_dataset": null,
+    "time_series": true,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 29,
+    "data_type": [
+      "abundance"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": 535355.0,
+    "temporal_range": "1986-2000",
+    "temp_range_i": 1986,
+    "temp_range_f": 2000,
+    "species": [
+      "Rhododendron groenlandicum",
+      "Kalmia angustifolia",
+      "Chamaedaphne calyculata",
+      "Vaccinium spp"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": true,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 30,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": [
+      "sample"
+    ],
+    "spatial_range_km2": 630000.0,
+    "temporal_range": "1947-1985, 2007-2014",
+    "temp_range_i": 1947,
+    "temp_range_f": 1985,
+    "species": [
+      "Rangifer tarandus"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": true,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": true,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 31,
+    "data_type": [
+      "genetic_analysis"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": "2002-2004",
+    "temp_range_i": 2002,
+    "temp_range_f": 2004,
+    "species": [
+      "Atlantic salmon"
+    ],
+    "referred_dataset": null,
+    "time_series": true,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 35,
+    "data_type": [
+      "distribution"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": 25000.0,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Rangifer tarandus"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 36,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": [
+      "site_ids"
+    ],
+    "spatial_range_km2": 20.0,
+    "temporal_range": "2012",
+    "temp_range_i": 2012,
+    "temp_range_f": 2012,
+    "species": [
+      "Oxalis montana"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 37,
+    "data_type": [
+      "genetic_analysis",
+      "other"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": 1.36,
+    "temporal_range": "2009-2011",
+    "temp_range_i": 2009,
+    "temp_range_f": 2011,
+    "species": [
+      "Populus balsamifera",
+      "Populus deltoides",
+      "hybrids"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 38,
+    "data_type": [
+      "presence-absence"
+    ],
+    "geospatial_info_dataset": [
+      "site_ids"
+    ],
+    "spatial_range_km2": null,
+    "temporal_range": "2007-2011",
+    "temp_range_i": 2007,
+    "temp_range_f": 2011,
+    "species": [
+      "12 mammal",
+      "199 ground-dwelling beetles",
+      "240 flying-beetles species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": true,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 39,
+    "data_type": [
+      "genetic_analysis"
+    ],
+    "geospatial_info_dataset": [
+      "site"
+    ],
+    "spatial_range_km2": 10200.0,
+    "temporal_range": "2005-2011",
+    "temp_range_i": 2005,
+    "temp_range_f": 2011,
+    "species": [
+      "Tachycineta bicolor"
+    ],
+    "referred_dataset": null,
+    "time_series": true,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 40,
+    "data_type": [
+      "presence-only",
+      "other"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": "2013",
+    "temp_range_i": 2013,
+    "temp_range_f": 2013,
+    "species": [
+      "Coregonus clupeaformis"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 43,
+    "data_type": [
+      "genetic_analysis"
+    ],
+    "geospatial_info_dataset": [
+      "sample"
+    ],
+    "spatial_range_km2": 64000.0,
+    "temporal_range": "2007-2013",
+    "temp_range_i": 2007,
+    "temp_range_f": 2013,
+    "species": [
+      "Salvelinus namaycush"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 46,
+    "data_type": [
+      "genetic_analysis"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": 10000.0,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Atlantic salmon"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 47,
+    "data_type": [
+      "presence-absence"
+    ],
+    "geospatial_info_dataset": [
+      "administrative_units"
+    ],
+    "spatial_range_km2": 357644.0,
+    "temporal_range": "2004-2013",
+    "temp_range_i": 2004,
+    "temp_range_f": 2013,
+    "species": [
+      "Rangifer tarandus caribou"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": true,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": true,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 48,
+    "data_type": [
+      "density"
+    ],
+    "geospatial_info_dataset": [
+      "sample"
+    ],
+    "spatial_range_km2": 65.0,
+    "temporal_range": "2010-2015",
+    "temp_range_i": 2010,
+    "temp_range_f": 2015,
+    "species": [
+      "40 species (mostly birds and few mammals)"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": true,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 51,
+    "data_type": [
+      "presence-only",
+      "genetic_analysis"
+    ],
+    "geospatial_info_dataset": [
+      "site"
+    ],
+    "spatial_range_km2": null,
+    "temporal_range": "2002-2008",
+    "temp_range_i": 2002,
+    "temp_range_f": 2008,
+    "species": [
+      "Protomognathus americanus",
+      "Temnothorax longispinosus",
+      "Temnothorax curvispinosus"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 52,
+    "data_type": [
+      "other"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": "1997",
+    "temp_range_i": 1997,
+    "temp_range_f": 1997,
+    "species": [
+      "Onnia tomentosa"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 53,
+    "data_type": [
+      "presence-only",
+      "genetic_analysis"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": 24706834.0,
+    "temporal_range": "2007-2010",
+    "temp_range_i": 2007,
+    "temp_range_f": 2010,
+    "species": [
+      "Poecile hudsonicus"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": true,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 54,
+    "data_type": [
+      "abundance",
+      "other"
+    ],
+    "geospatial_info_dataset": [
+      "site"
+    ],
+    "spatial_range_km2": 3000.0,
+    "temporal_range": "2012",
+    "temp_range_i": 2012,
+    "temp_range_f": 2012,
+    "species": [
+      "74 bee species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 56,
+    "data_type": [
+      "density"
+    ],
+    "geospatial_info_dataset": [
+      "sample"
+    ],
+    "spatial_range_km2": 10200.0,
+    "temporal_range": "2004-2013",
+    "temp_range_i": 2004,
+    "temp_range_f": 2013,
+    "species": [
+      "Tachycineta bicolor"
+    ],
+    "referred_dataset": null,
+    "time_series": true,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 58,
+    "data_type": [
+      "abundance"
+    ],
+    "geospatial_info_dataset": [
+      "site_ids"
+    ],
+    "spatial_range_km2": null,
+    "temporal_range": "1996-2017",
+    "temp_range_i": 1996,
+    "temp_range_f": 2017,
+    "species": [
+      "21 bird species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 60,
+    "data_type": [
+      "presence-absence"
+    ],
+    "geospatial_info_dataset": [
+      "site_ids"
+    ],
+    "spatial_range_km2": 2250.0,
+    "temporal_range": "2017-2018",
+    "temp_range_i": 2017,
+    "temp_range_f": 2018,
+    "species": [
+      "Pseudacris maculata"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": true,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 61,
+    "data_type": [
+      "abundance"
+    ],
+    "geospatial_info_dataset": [
+      "site"
+    ],
+    "spatial_range_km2": 50000.0,
+    "temporal_range": "2019",
+    "temp_range_i": 2019,
+    "temp_range_f": 2019,
+    "species": [
+      "10 tree species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 62,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Globodera rostochiensis"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 63,
+    "data_type": [
+      "density"
+    ],
+    "geospatial_info_dataset": [
+      "administrative_units"
+    ],
+    "spatial_range_km2": null,
+    "temporal_range": "2005-2019",
+    "temp_range_i": 2005,
+    "temp_range_f": 2019,
+    "species": [
+      "arctic fox",
+      "lemming",
+      "Sandpiper",
+      "Passerine"
+    ],
+    "referred_dataset": null,
+    "time_series": true,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": true,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 65,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": [
+      "site_ids"
+    ],
+    "spatial_range_km2": 36.0,
+    "temporal_range": "2015-2016",
+    "temp_range_i": 2015,
+    "temp_range_f": 2016,
+    "species": [
+      "black spruce"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 68,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": [
+      "site_ids"
+    ],
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Salvelinus fontinalis"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 69,
+    "data_type": [
+      "abundance"
+    ],
+    "geospatial_info_dataset": [
+      "site",
+      "geographic_features"
+    ],
+    "spatial_range_km2": 60000.0,
+    "temporal_range": "2018-2019",
+    "temp_range_i": 2018,
+    "temp_range_f": 2019,
+    "species": [
+      "100 lichen species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": true,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 71,
+    "data_type": [
+      "density"
+    ],
+    "geospatial_info_dataset": [
+      "site_ids"
+    ],
+    "spatial_range_km2": 200.0,
+    "temporal_range": "2012",
+    "temp_range_i": 2012,
+    "temp_range_f": 2012,
+    "species": [
+      "c.150 plant species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 74,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": 378181.0,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "wolf",
+      "moose"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 75,
+    "data_type": [
+      "other"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Centaurea diffusa"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 78,
+    "data_type": [
+      "density"
+    ],
+    "geospatial_info_dataset": [
+      "site_ids"
+    ],
+    "spatial_range_km2": 20.0,
+    "temporal_range": "2011-2013",
+    "temp_range_i": 2011,
+    "temp_range_f": 2013,
+    "species": [
+      "Sugar maple"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 80,
+    "data_type": [
+      "presence-absence"
+    ],
+    "geospatial_info_dataset": [
+      "site",
+      "site_ids"
+    ],
+    "spatial_range_km2": 140000.0,
+    "temporal_range": "2017",
+    "temp_range_i": 2017,
+    "temp_range_f": 2017,
+    "species": [
+      "37 ant species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": true,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 81,
+    "data_type": [
+      "presence-absence",
+      "genetic_analysis"
+    ],
+    "geospatial_info_dataset": [
+      "sample"
+    ],
+    "spatial_range_km2": 1600000.0,
+    "temporal_range": "20.000 YA - present",
+    "temp_range_i": -20000,
+    "temp_range_f": 2022,
+    "species": [
+      "Juglans cinerea"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": true,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 83,
+    "data_type": [
+      "density",
+      "presence-absence"
+    ],
+    "geospatial_info_dataset": [
+      "site_ids"
+    ],
+    "spatial_range_km2": 80.0,
+    "temporal_range": "1995-2011",
+    "temp_range_i": 1995,
+    "temp_range_f": 2011,
+    "species": [
+      "97 plant species"
+    ],
+    "referred_dataset": null,
+    "time_series": true,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 84,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": [
+      "site_ids"
+    ],
+    "spatial_range_km2": 250000.0,
+    "temporal_range": "1968-1998",
+    "temp_range_i": 1968,
+    "temp_range_f": 1998,
+    "species": [
+      "black spruce",
+      "balsam fir",
+      "jack pine",
+      "white spruce",
+      "white birch"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 85,
+    "data_type": [
+      "genetic_analysis",
+      "other"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": "2010",
+    "temp_range_i": 2010,
+    "temp_range_f": 2010,
+    "species": [
+      "Coregonus clupeaformis"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 86,
+    "data_type": [
+      "presence-absence"
+    ],
+    "geospatial_info_dataset": [
+      "sample"
+    ],
+    "spatial_range_km2": 200.0,
+    "temporal_range": "2015",
+    "temp_range_i": 2015,
+    "temp_range_f": 2015,
+    "species": [
+      "Ursus americanus"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 89,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": 33900.0,
+    "temporal_range": "2005-2009",
+    "temp_range_i": 2005,
+    "temp_range_f": 2009,
+    "species": [
+      "Rangifer tarandus",
+      "Alces alces",
+      "Canis lupus"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": true,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": true,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 91,
+    "data_type": [
+      "genetic_analysis"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": "2009-2011",
+    "temp_range_i": 2009,
+    "temp_range_f": 2011,
+    "species": [
+      "Myotis lucifugus"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": true,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 92,
+    "data_type": [
+      "other"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": 187000.0,
+    "temporal_range": "2013",
+    "temp_range_i": 2013,
+    "temp_range_f": 2013,
+    "species": [
+      "Acer saccharum"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 94,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": "1990-2019",
+    "temp_range_i": 1990,
+    "temp_range_f": 2019,
+    "species": [
+      "Anser caerulescens atlantica"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": true,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 95,
+    "data_type": [
+      "genetic_analysis"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": "2007-2013",
+    "temp_range_i": 2007,
+    "temp_range_f": 2013,
+    "species": [
+      "Salvelinus namaycush"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 98,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": 55.0,
+    "temporal_range": "2015-2016",
+    "temp_range_i": 2015,
+    "temp_range_f": 2016,
+    "species": [
+      "Trillium erectum",
+      "Erythronium americanum"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 100,
+    "data_type": [
+      "density"
+    ],
+    "geospatial_info_dataset": [
+      "site_ids"
+    ],
+    "spatial_range_km2": 10200.0,
+    "temporal_range": "2004-2020",
+    "temp_range_i": 2004,
+    "temp_range_f": 2020,
+    "species": [
+      "Tachycineta bicolor"
+    ],
+    "referred_dataset": null,
+    "time_series": true,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 101,
+    "data_type": [
+      "other"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": 31000.0,
+    "temporal_range": "2004-2010",
+    "temp_range_i": 2004,
+    "temp_range_f": 2010,
+    "species": [
+      "caribou"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": true,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": true,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 103,
+    "data_type": [
+      "genetic_analysis"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": 10200.0,
+    "temporal_range": "2013-2014",
+    "temp_range_i": 2013,
+    "temp_range_f": 2014,
+    "species": [
+      "Tachycineta bicolor"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 104,
+    "data_type": [
+      "distribution"
+    ],
+    "geospatial_info_dataset": [
+      "distribution"
+    ],
+    "spatial_range_km2": 25000.0,
+    "temporal_range": "1998-2014",
+    "temp_range_i": 1998,
+    "temp_range_f": 2014,
+    "species": [
+      "caribou"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": true,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 105,
+    "data_type": [
+      "genetic_analysis",
+      "other"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": 10200.0,
+    "temporal_range": "2004-2016",
+    "temp_range_i": 2004,
+    "temp_range_f": 2016,
+    "species": [
+      "Tachycineta bicolor"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 107,
+    "data_type": [
+      "distribution"
+    ],
+    "geospatial_info_dataset": [
+      "site_ids",
+      "sample"
+    ],
+    "spatial_range_km2": 24706834.0,
+    "temporal_range": "1995-2015",
+    "temp_range_i": 1995,
+    "temp_range_f": 2015,
+    "species": [
+      "Porzana carolina",
+      "Rallus limicola",
+      "Coturnicops noveboracensis"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 109,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": [
+      "geographic_features"
+    ],
+    "spatial_range_km2": 2000.0,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Salvelinus namaycush"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 110,
+    "data_type": [
+      "other"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "5 seaduck species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 111,
+    "data_type": [
+      "abundance",
+      "presence-only"
+    ],
+    "geospatial_info_dataset": [
+      "site_ids"
+    ],
+    "spatial_range_km2": 100.0,
+    "temporal_range": "2008-2012",
+    "temp_range_i": 2008,
+    "temp_range_f": 2012,
+    "species": [
+      "northern flying squirrel"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 112,
+    "data_type": [
+      "density",
+      "presence-absence"
+    ],
+    "geospatial_info_dataset": [
+      "site_ids"
+    ],
+    "spatial_range_km2": 160.0,
+    "temporal_range": "2010-2019",
+    "temp_range_i": 2010,
+    "temp_range_f": 2019,
+    "species": [
+      "8 bird species",
+      "lemmings"
+    ],
+    "referred_dataset": null,
+    "time_series": true,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": true,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 115,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": 1000000.0,
+    "temporal_range": "1991-2012",
+    "temp_range_i": 1991,
+    "temp_range_f": 2012,
+    "species": [
+      "caribou"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": true,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": true,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 116,
+    "data_type": [
+      "abundance"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": "1991",
+    "temp_range_i": 1991,
+    "temp_range_f": 1991,
+    "species": [
+      "39 bird species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 117,
+    "data_type": [
+      "genetic_analysis"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": "2003-2014",
+    "temp_range_i": 2003,
+    "temp_range_f": 2014,
+    "species": [
+      "Odocoileus virginianus"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 119,
+    "data_type": [
+      "density"
+    ],
+    "geospatial_info_dataset": [
+      "sample"
+    ],
+    "spatial_range_km2": null,
+    "temporal_range": "2015-2016",
+    "temp_range_i": 2015,
+    "temp_range_f": 2016,
+    "species": [
+      "Abies balsamea",
+      "Acer rubrum",
+      "Acer saccharum",
+      "Betula papyrifera",
+      "Betula alleghaniensis",
+      "Populus tremuloides",
+      "Fagus grandifolia",
+      "and other data for 40 species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 120,
+    "data_type": [
+      "other"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Agrilus planipennis"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 121,
+    "data_type": [
+      "presence-absence"
+    ],
+    "geospatial_info_dataset": [
+      "site_ids"
+    ],
+    "spatial_range_km2": 700.0,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Carex (42)",
+      "Eriophorum (6)",
+      "and Trichophorum (2) species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": true,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 122,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": [
+      "site_ids"
+    ],
+    "spatial_range_km2": 28.0,
+    "temporal_range": "2019",
+    "temp_range_i": 2019,
+    "temp_range_f": 2019,
+    "species": [
+      "Castor canadensis",
+      "Agrilus planipennis",
+      "c.30 plant species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 123,
+    "data_type": [
+      "presence-only",
+      "genetic_analysis"
+    ],
+    "geospatial_info_dataset": [
+      "sample"
+    ],
+    "spatial_range_km2": 1365000.0,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Caribou"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": true,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": true,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 124,
+    "data_type": [
+      "genetic_analysis"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": 300.0,
+    "temporal_range": "2013",
+    "temp_range_i": 2013,
+    "temp_range_f": 2013,
+    "species": [
+      "Salvelinus namaycush"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": true,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 125,
+    "data_type": [
+      "abundance"
+    ],
+    "geospatial_info_dataset": [
+      "administrative_units"
+    ],
+    "spatial_range_km2": 0.5,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "42 plant species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": true,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 127,
+    "data_type": [
+      "distribution"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": 24706834.0,
+    "temporal_range": "1950-2000",
+    "temp_range_i": 1950,
+    "temp_range_f": 2000,
+    "species": [
+      "Dendragapus canadensis",
+      "Poecile hudsonicus",
+      "Alces americanus",
+      "Rangifer tarandus",
+      "other 8 mammals",
+      "4 tree species",
+      "3 bird species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": true,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 129,
+    "data_type": [
+      "presence-only",
+      "genetic_analysis"
+    ],
+    "geospatial_info_dataset": [
+      "sample"
+    ],
+    "spatial_range_km2": 350000.0,
+    "temporal_range": "2014",
+    "temp_range_i": 2014,
+    "temp_range_f": 2014,
+    "species": [
+      "Apanteles fumiferanae",
+      "Glypta fumiferanae"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": true,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 130,
+    "data_type": [
+      "genetic_analysis"
+    ],
+    "geospatial_info_dataset": [
+      "site_ids"
+    ],
+    "spatial_range_km2": 416.0,
+    "temporal_range": "2009",
+    "temp_range_i": 2009,
+    "temp_range_f": 2009,
+    "species": [
+      "Phragmites australis"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 131,
+    "data_type": [
+      "density",
+      "species_richness"
+    ],
+    "geospatial_info_dataset": [
+      "site"
+    ],
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "180 plant species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": true,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 132,
+    "data_type": [
+      "presence-only",
+      "genetic_analysis"
+    ],
+    "geospatial_info_dataset": [
+      "sample"
+    ],
+    "spatial_range_km2": null,
+    "temporal_range": "2018-2019",
+    "temp_range_i": 2018,
+    "temp_range_f": 2019,
+    "species": [
+      "Enallagma hageni",
+      "Enallagma ebrium"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 135,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": [
+      "sample"
+    ],
+    "spatial_range_km2": 240000.0,
+    "temporal_range": "1986-2000",
+    "temp_range_i": 1986,
+    "temp_range_f": 2000,
+    "species": [
+      "Thuja occidentalis"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": true,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 136,
+    "data_type": [
+      "presence-absence",
+      "density"
+    ],
+    "geospatial_info_dataset": [
+      "site",
+      "site_ids"
+    ],
+    "spatial_range_km2": 63.0,
+    "temporal_range": "1960-2000",
+    "temp_range_i": 1960,
+    "temp_range_f": 2000,
+    "species": [
+      "Black spruce",
+      "other 16 plants"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": true,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 137,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": 4.0,
+    "temporal_range": "2013-2018",
+    "temp_range_i": 2013,
+    "temp_range_f": 2018,
+    "species": [
+      "Trillium erectum",
+      "Erythronium americanum"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 139,
+    "data_type": [
+      "presence-only",
+      "other"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": "2007",
+    "temp_range_i": 2007,
+    "temp_range_f": 2007,
+    "species": [
+      "10 fish species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 140,
+    "data_type": [
+      "presence-only",
+      "genetic_analysis"
+    ],
+    "geospatial_info_dataset": [
+      "site_ids",
+      "administrative_units"
+    ],
+    "spatial_range_km2": 156000.0,
+    "temporal_range": "1952-1964, 2009-2016",
+    "temp_range_i": 1952,
+    "temp_range_f": 1964,
+    "species": [
+      "Lynx rufus"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 141,
+    "data_type": [
+      "other"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": 27500.0,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Seiurus aurocapilla"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 143,
+    "data_type": [
+      "abundance"
+    ],
+    "geospatial_info_dataset": [
+      "sample",
+      "site"
+    ],
+    "spatial_range_km2": 80.0,
+    "temporal_range": "1991-2009",
+    "temp_range_i": 1991,
+    "temp_range_f": 2009,
+    "species": [
+      "28 plant species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 145,
+    "data_type": [
+      "presence-only",
+      "abundance"
+    ],
+    "geospatial_info_dataset": [
+      "site_ids",
+      "site"
+    ],
+    "spatial_range_km2": null,
+    "temporal_range": "1982",
+    "temp_range_i": 1982,
+    "temp_range_f": 1982,
+    "species": [
+      "88 phytoplankton species",
+      "34 zooplankton species",
+      "18 fish species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": true,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 147,
+    "data_type": [
+      "genetic_analysis"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": "2016",
+    "temp_range_i": 2016,
+    "temp_range_f": 2016,
+    "species": [
+      "Homarus americanus"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 148,
+    "data_type": [
+      "density"
+    ],
+    "geospatial_info_dataset": [
+      "site_ids"
+    ],
+    "spatial_range_km2": null,
+    "temporal_range": "2006-2016",
+    "temp_range_i": 2006,
+    "temp_range_f": 2016,
+    "species": [
+      "diptera (in general. No species)"
+    ],
+    "referred_dataset": null,
+    "time_series": true,
+    "multispecies": false,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 149,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": [
+      "geographic_features"
+    ],
+    "spatial_range_km2": null,
+    "temporal_range": "2012-2013",
+    "temp_range_i": 2012,
+    "temp_range_f": 2013,
+    "species": [
+      "Salvelinus namaycush"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 150,
+    "data_type": [
+      "abundance"
+    ],
+    "geospatial_info_dataset": [
+      "site_ids",
+      "site"
+    ],
+    "spatial_range_km2": null,
+    "temporal_range": "2016",
+    "temp_range_i": 2016,
+    "temp_range_f": 2016,
+    "species": [
+      "parasites (460 OTUS)"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": true,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 151,
+    "data_type": [
+      "other"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "white spruce"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 152,
+    "data_type": [
+      "other"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "white spurce"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 153,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": [
+      "site_ids"
+    ],
+    "spatial_range_km2": null,
+    "temporal_range": "2016",
+    "temp_range_i": 2016,
+    "temp_range_f": 2016,
+    "species": [
+      "9 plant",
+      "68 insect species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 155,
+    "data_type": [
+      "other"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Tree communities (70 to 100 spp)"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 158,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": [
+      "sample"
+    ],
+    "spatial_range_km2": 750000.0,
+    "temporal_range": "1875-2015",
+    "temp_range_i": 1875,
+    "temp_range_f": 2015,
+    "species": [
+      "150 insect species (Odonata)"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": true,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 159,
+    "data_type": [
+      "other"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 160,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": 560000.0,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Rangifer tarandus caribou"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 162,
+    "data_type": [
+      "presence-only",
+      "genetic_analysis"
+    ],
+    "geospatial_info_dataset": [
+      "sample"
+    ],
+    "spatial_range_km2": 21000.0,
+    "temporal_range": "2008-2009",
+    "temp_range_i": 2008,
+    "temp_range_f": 2009,
+    "species": [
+      "Procyon lotor"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 175,
+    "data_type": [
+      "density"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": 35.0,
+    "temporal_range": "1997",
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "sapin baumier",
+      "epinette blanche",
+      "bouleau jaune",
+      "bouleau a papier",
+      "Crable a epis",
+      "cerisier de Pennsylvanie"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 176,
+    "data_type": [
+      "density"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": 0.5,
+    "temporal_range": "1983",
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Tagetes erecta",
+      "Glomus constrictum",
+      "Glomus mosseae",
+      "Sclerocystis rubiformis",
+      "Gigaspora calospora",
+      "Glomus aggregatum"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": null,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 177,
+    "data_type": [
+      "density"
+    ],
+    "geospatial_info_dataset": [
+      "site_ids",
+      "site"
+    ],
+    "spatial_range_km2": 25000.0,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "16 tree species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 179,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "sugar maple",
+      "red maple"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 181,
+    "data_type": [
+      "other"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": 1500000.0,
+    "temporal_range": "1974-1999",
+    "temp_range_i": 1974,
+    "temp_range_f": 1999,
+    "species": [
+      "743 species (flora and fauna)"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 194,
+    "data_type": [
+      "density"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": "2020",
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "c.30 lichen species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 200,
+    "data_type": [
+      "abundance"
+    ],
+    "geospatial_info_dataset": [
+      "site",
+      "administrative_units"
+    ],
+    "spatial_range_km2": null,
+    "temporal_range": "1995-1996",
+    "temp_range_i": 1995,
+    "temp_range_f": 1996,
+    "species": [
+      "c. 90 collembola species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 201,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": 0.5,
+    "temporal_range": "2012",
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Moxostoma anisurum",
+      "Moxostoma carinatum",
+      "Moxostoma macrolepidotum"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 202,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": 480.0,
+    "temporal_range": "2010 - 2012",
+    "temp_range_i": 2010,
+    "temp_range_f": 2012,
+    "species": [
+      "16 fish species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 208,
+    "data_type": [
+      "density"
+    ],
+    "geospatial_info_dataset": [
+      "site_ids"
+    ],
+    "spatial_range_km2": 370000.0,
+    "temporal_range": "2017",
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "c.132 species of benthic community"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": true,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 214,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": "2013-2013",
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "c. 150 plant species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 216,
+    "data_type": [
+      "abundance"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": 80.0,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Zooplankton families (c.15) and genera (c.15)"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 225,
+    "data_type": [
+      "density"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": "2011",
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Benthic intertidal community (c.20 algae",
+      "c.15 molluscs",
+      "c.15 annelid species",
+      "and others)"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 228,
+    "data_type": [
+      "presence-absence"
+    ],
+    "geospatial_info_dataset": [
+      "site"
+    ],
+    "spatial_range_km2": null,
+    "temporal_range": "2002",
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Tipula paludosa"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": true,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 234,
+    "data_type": [
+      "abundance"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Lichens and bryophytes communities (c.40 mosses species",
+      "7 liverworts species",
+      "c.30 lichen species)",
+      "and Populus tremuloides"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 237,
+    "data_type": [
+      "abundance"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": 1542056.0,
+    "temporal_range": "2007-2015",
+    "temp_range_i": 2007,
+    "temp_range_f": 2015,
+    "species": [
+      "12 tick species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 240,
+    "data_type": [
+      "abundance"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": 200000.0,
+    "temporal_range": "1994-2008",
+    "temp_range_i": 1994,
+    "temp_range_f": 2008,
+    "species": [
+      "marine mammals (c.22 species)"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 247,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": [
+      "site_ids"
+    ],
+    "spatial_range_km2": 60.0,
+    "temporal_range": "1997-1998",
+    "temp_range_i": 1997,
+    "temp_range_f": 1998,
+    "species": [
+      "yellow perch"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 248,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": [
+      "administrative_units"
+    ],
+    "spatial_range_km2": 190000.0,
+    "temporal_range": "1994-1996",
+    "temp_range_i": 1994,
+    "temp_range_f": 1996,
+    "species": [
+      "Phalacrocorax auritus"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 249,
+    "data_type": [
+      "abundance"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": "2014",
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "31 plant species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 250,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": 100.0,
+    "temporal_range": "1997-1998",
+    "temp_range_i": 1997,
+    "temp_range_f": 1998,
+    "species": [
+      "Picoides tridactylus",
+      "and 4 tree species (Black spruce",
+      "Jack pine",
+      "Basam fir",
+      "White birch)"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 253,
+    "data_type": [
+      "genetic_analysis",
+      "presence-only"
+    ],
+    "geospatial_info_dataset": [
+      "site"
+    ],
+    "spatial_range_km2": 140000.0,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Salvelinus alpinus"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": true,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 254,
+    "data_type": [
+      "abundance"
+    ],
+    "geospatial_info_dataset": [
+      "site_ids"
+    ],
+    "spatial_range_km2": 8.0,
+    "temporal_range": "1998-1999",
+    "temp_range_i": 1998,
+    "temp_range_f": 1999,
+    "species": [
+      "97 spider species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 258,
+    "data_type": [
+      "abundance",
+      "presence-only"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": 40.0,
+    "temporal_range": "2011",
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "16 damselfly species",
+      "water mite"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 261,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": 20000.0,
+    "temporal_range": "1979-1980",
+    "temp_range_i": 1979,
+    "temp_range_f": 1980,
+    "species": [
+      "c. 27 honeysuckle_x000D_\nspecies",
+      "Hyadaphis tataricae"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 262,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": [
+      "administrative_units"
+    ],
+    "spatial_range_km2": 500000.0,
+    "temporal_range": "1988-2003",
+    "temp_range_i": 1988,
+    "temp_range_f": 2003,
+    "species": [
+      "Rangifer_x000D_\ntarandus"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": true,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": true,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 263,
+    "data_type": [
+      "presence-only",
+      "density"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": 700.0,
+    "temporal_range": "1799-2003",
+    "temp_range_i": 1799,
+    "temp_range_f": 2003,
+    "species": [
+      "sugar maple",
+      "yellow birch",
+      "American beech (historical data",
+      "presence only)",
+      "c.30 tree species (present",
+      "density)"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 267,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "c 50 insect species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 271,
+    "data_type": [
+      "abundance",
+      "presence-only"
+    ],
+    "geospatial_info_dataset": [
+      "administrative_units"
+    ],
+    "spatial_range_km2": null,
+    "temporal_range": "1999-2000",
+    "temp_range_i": 1999,
+    "temp_range_f": 2000,
+    "species": [
+      "11 mite species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": false,
+    "new_species_region": true,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 272,
+    "data_type": [
+      "other"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Epinette noire",
+      "Sapin beaumier",
+      "Pine qris"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 276,
+    "data_type": [
+      "abundance"
+    ],
+    "geospatial_info_dataset": [
+      "administrative_units",
+      "geographic_features"
+    ],
+    "spatial_range_km2": null,
+    "temporal_range": "1995-2008",
+    "temp_range_i": 1995,
+    "temp_range_f": 2008,
+    "species": [
+      "Acipenser fulvescens"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": true,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 280,
+    "data_type": [
+      "presence-only",
+      "abundance"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": "1991-2009",
+    "temp_range_i": 1991,
+    "temp_range_f": 2009,
+    "species": [
+      "balsam fir",
+      "white birch",
+      "white spruce",
+      "trembling aspen",
+      "eastern white cedar"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 281,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": [
+      "sample",
+      "administrative_units"
+    ],
+    "spatial_range_km2": 36000.0,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Rosa blanda",
+      "Rosa palustris",
+      "Rosa johannensis",
+      "Rosa rousseauiorum",
+      "Rosa subblanda",
+      "Rosa williamsii"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 283,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": [
+      "sample"
+    ],
+    "spatial_range_km2": 120000.0,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "black spruce. red spruce"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 284,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": [
+      "site_ids"
+    ],
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "c. 20 bird species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 288,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": 0.5,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "15 tree species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 297,
+    "data_type": [
+      "presence-absence"
+    ],
+    "geospatial_info_dataset": [
+      "site"
+    ],
+    "spatial_range_km2": 40000.0,
+    "temporal_range": "2011",
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Peromyscus leucopus",
+      "Peromyscus maniculatus"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 298,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": "1986-1987",
+    "temp_range_i": 1986,
+    "temp_range_f": 1987,
+    "species": [
+      "c. 14 plant species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 300,
+    "data_type": [
+      "abundance"
+    ],
+    "geospatial_info_dataset": [
+      "site",
+      "geographic_features",
+      "administrative_units"
+    ],
+    "spatial_range_km2": 250000.0,
+    "temporal_range": "1940-1979",
+    "temp_range_i": 1940,
+    "temp_range_f": 1979,
+    "species": [
+      "Alca torda"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": true,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 301,
+    "data_type": [
+      "other"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Pinus banksiana"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 302,
+    "data_type": [
+      "abundance"
+    ],
+    "geospatial_info_dataset": [
+      "administrative_units",
+      "geographic_features"
+    ],
+    "spatial_range_km2": 4500.0,
+    "temporal_range": "1997-1998",
+    "temp_range_i": 1997,
+    "temp_range_f": 1998,
+    "species": [
+      "Notropis hudsonius",
+      "Larus delawarensis",
+      "Diplostomum spp",
+      "Notemigonus crysoleucas",
+      "Perca flavescens",
+      "Tylodelphys scheuringi",
+      "Neascus spp"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 303,
+    "data_type": [
+      "abundance"
+    ],
+    "geospatial_info_dataset": [
+      "site",
+      "site_ids",
+      "administrative_units"
+    ],
+    "spatial_range_km2": 17000.0,
+    "temporal_range": "1959-2011",
+    "temp_range_i": 1959,
+    "temp_range_f": 2011,
+    "species": [
+      "Peromyscus maniculatus",
+      "Peromyscus leucopus"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 306,
+    "data_type": [
+      "other"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "8 tree species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 307,
+    "data_type": [
+      "abundance"
+    ],
+    "geospatial_info_dataset": [
+      "site_ids"
+    ],
+    "spatial_range_km2": 0.5,
+    "temporal_range": "2002-2003",
+    "temp_range_i": 2002,
+    "temp_range_f": 2003,
+    "species": [
+      "c 36 Carabid species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 308,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": [
+      "site",
+      "geographic_features"
+    ],
+    "spatial_range_km2": 6400.0,
+    "temporal_range": "1994-1997, 2000-2001",
+    "temp_range_i": 1994,
+    "temp_range_f": 2001,
+    "species": [
+      "Hexagenia limbata",
+      "Pyganodon grandis"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 311,
+    "data_type": [
+      "abundance"
+    ],
+    "geospatial_info_dataset": [
+      "site_ids"
+    ],
+    "spatial_range_km2": null,
+    "temporal_range": "1999-2000",
+    "temp_range_i": 1999,
+    "temp_range_f": 2000,
+    "species": [
+      "116 beetle species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 314,
+    "data_type": [
+      "abundance"
+    ],
+    "geospatial_info_dataset": [
+      "geographic_features"
+    ],
+    "spatial_range_km2": 0.5,
+    "temporal_range": "2002-2005",
+    "temp_range_i": 2002,
+    "temp_range_f": 2005,
+    "species": [
+      "Telenomus spp",
+      "Hemlock Looper"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 315,
+    "data_type": [
+      "abundance"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": "2006",
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "c.30 beetle species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 320,
+    "data_type": [
+      "abundance"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": 10000.0,
+    "temporal_range": "1994-1997",
+    "temp_range_i": 1994,
+    "temp_range_f": 1997,
+    "species": [
+      "c. 15 mosses",
+      "c.20 lichens",
+      "c.70 other plant species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 324,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": [
+      "site_ids"
+    ],
+    "spatial_range_km2": 3000.0,
+    "temporal_range": "1992",
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Populus balsamifera",
+      "salix planifolia"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 325,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": "1984",
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "c. 15 macrophyte species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 331,
+    "data_type": [
+      "abundance"
+    ],
+    "geospatial_info_dataset": [
+      "site"
+    ],
+    "spatial_range_km2": 25000.0,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Chrosomus eos"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 334,
+    "data_type": [
+      "abundance",
+      "presence-only"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": 0.5,
+    "temporal_range": "2003",
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "c.30 ant species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 336,
+    "data_type": [
+      "other"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "5 tree spcies"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 339,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": "1992",
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "c.20 plant species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": true,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 343,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "c.30 bird species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": true,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 344,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": [
+      "site"
+    ],
+    "spatial_range_km2": null,
+    "temporal_range": "1690-2004",
+    "temp_range_i": 1690,
+    "temp_range_f": 2004,
+    "species": [
+      "c. 10 tree species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": true,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 348,
+    "data_type": [
+      "other"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Helianthus divaricatus",
+      "Rhus aromatica"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 351,
+    "data_type": [
+      "abundance"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": 0.5,
+    "temporal_range": "1997-1999",
+    "temp_range_i": 1997,
+    "temp_range_f": 1999,
+    "species": [
+      "73 weevil species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 356,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": "2009",
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Quedius criddlei",
+      "Bisnius quediinu"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": true,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 357,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Gyrophaena wisconsinica",
+      "Gyrophaena wisconsinica",
+      "Atheta pseudomodesta",
+      "Philhygra luridipennis"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": true,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 363,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": 5.0,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Parametriocnemus eoclivus",
+      "Parametriocnemus hamatus",
+      "Parametriocnemus lundbeckii"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": true,
+    "new_species_region": true,
+    "bias_north_south": true,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 364,
+    "data_type": [
+      "abundance"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": 0.2,
+    "temporal_range": "2008",
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "74 spider species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 365,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": 1542056.0,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "890 plant species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": true,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 371,
+    "data_type": [
+      "abundance"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": "1996-2001",
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Glyptemys insculpta"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": true,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 377,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": "2012",
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "72 tree species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 380,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": [
+      "sample"
+    ],
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Poa annua"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 382,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Centroptilum convexum",
+      "Centroptilum minor"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": true,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 392,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "vulpes lagopus",
+      "vulpes vulpes"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": true,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 393,
+    "data_type": [
+      "abundance"
+    ],
+    "geospatial_info_dataset": [
+      "administrative_units"
+    ],
+    "spatial_range_km2": null,
+    "temporal_range": "2001-2007",
+    "temp_range_i": 2001,
+    "temp_range_f": 2007,
+    "species": [
+      "Catharus bicknelli",
+      "Catharus ustulatus"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": true,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 396,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": [
+      "geographic_features"
+    ],
+    "spatial_range_km2": null,
+    "temporal_range": "1978-1981",
+    "temp_range_i": 1978,
+    "temp_range_f": 1981,
+    "species": [
+      "Diaptomus minutus",
+      "Diaptomus oregonensis",
+      "Epischura lacustris"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 399,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": [
+      "site_ids"
+    ],
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Populus spp",
+      "Picea spp",
+      "Salix spp"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 401,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": [
+      "administrative_units"
+    ],
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Picea glauca"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 413,
+    "data_type": [
+      "presence-absence"
+    ],
+    "geospatial_info_dataset": [
+      "site_ids"
+    ],
+    "spatial_range_km2": null,
+    "temporal_range": "2012-2013",
+    "temp_range_i": 2012,
+    "temp_range_f": 2013,
+    "species": [
+      "24 zooplankton species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": true,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": true,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 418,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": "2006",
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Rhabdias ranae",
+      "Oswaldocruzia",
+      "Strongyloides"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 424,
+    "data_type": [
+      "abundance"
+    ],
+    "geospatial_info_dataset": [
+      "site_ids"
+    ],
+    "spatial_range_km2": null,
+    "temporal_range": "2011-2012",
+    "temp_range_i": 2011,
+    "temp_range_f": 2012,
+    "species": [
+      "5 Bryozoan species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": false,
+    "threatened_species": false,
+    "new_species_science": false,
+    "new_species_region": false,
+    "bias_north_south": false,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 163,
+    "data_type": [
+      "density"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": 3200.0,
+    "temporal_range": "2015",
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Frangula alnus"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 171,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Salvelinus fontinalis",
+      "Salvelinus alpinus"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 172,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 173,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 182,
+    "data_type": [
+      "presence-absence",
+      "presence-only"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": 1542056.0,
+    "temporal_range": "1974-1999",
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "744 species (flora and fauna)"
+    ],
+    "referred_dataset": "yes",
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 183,
+    "data_type": [
+      "presence-absence",
+      "presence-only"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": 1542056.0,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "346 plant species",
+      "48 animal species"
+    ],
+    "referred_dataset": "yes",
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 184,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": "1984-1994",
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "breeding birds"
+    ],
+    "referred_dataset": "yes",
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 185,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Arrenodes minutus"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 187,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 188,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": 800000.0,
+    "temporal_range": "2015-2018",
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "black spruce"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 189,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "balsam fir"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 190,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": "km",
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      ">1"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 191,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 192,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "c.40 bird species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 193,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "c. 10 tree species",
+      "c. 30 herbaceus species",
+      "c.20 lichens and mosses"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 195,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "11 tree species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 196,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Carex \u00d7cayouettei hybrid"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 198,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Fraxinus americana"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 203,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "cyanobacterias"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 205,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 207,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Nosema apis",
+      "Nosema ceranae"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 209,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Thuja occidentalis"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 210,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Cyanobacteria"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 211,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "White spruce",
+      "black spruce",
+      "Eastern larch",
+      "Jack pine",
+      "Trembling aspen"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 213,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 215,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 218,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Lesser Yellowlegs"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 219,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Balsam fir",
+      "Black spruce"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 221,
+    "data_type": [
+      "presence-only"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "166 species of insects of order Brachycera (Dyptera)"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 222,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 224,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 226,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 227,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Echinochloa crus-galli"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 231,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Cyanobacterias"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 233,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Honckenya pepbides",
+      "Elymus mollis"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 235,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": "1994-2007",
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Abies balsamea",
+      "Picea glauca"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 236,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Plasmopara viticola"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 239,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "milliped"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 243,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 244,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 246,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Neocrepidodera ferruginea"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 251,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 252,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 256,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Tyto alba"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 265,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 266,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Zooplankton"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 268,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Tennessee",
+      "Cape May",
+      "bay-breasted warbler"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 269,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 270,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "plant communities"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 275,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "white-tailed deer",
+      "plant communities"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 277,
+    "data_type": [
+      "abundance"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": "1920-2008",
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Acipenser fulvescens"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 278,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 279,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 282,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 285,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "c. 10 insect species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 287,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Plectrophenax nivalis"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 289,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "c. 16 spp insect (genera Pityophthorus)"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 290,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 291,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Trypoxylon politurn",
+      "c.70 spider species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 295,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Frangula alnus"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 296,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 299,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 304,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Ophiognomonia clavigignenti-juglandacearum"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 305,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 306,
+    "data_type": [
+      "distribution"
+    ],
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": 700000.0,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "8 tree species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 309,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Betula glandulosa",
+      "Salix planifolia"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 310,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Notophthalmus viridescens"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 312,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 313,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Didymosphenia geminate"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 316,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "12 tree species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 317,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Aphis glycines"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 318,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Impatiens pallida",
+      "Impatiens capensis"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 322,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Esox lucius",
+      "Perca flavescens"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 323,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "c.8 tree species"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 326,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Setaria glauca",
+      "Setaria verticillata"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 329,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 330,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 335,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 345,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 346,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 349,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "vegetation community"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 350,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "Pinus strobus"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 352,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 353,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "8 plant species (genus Latuca)"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 354,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": [
+      "zooplankton community"
+    ],
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 355,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 358,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 359,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 361,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 362,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 366,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 368,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 369,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 373,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 376,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 381,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 383,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 389,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 394,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 395,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 397,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 398,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 400,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 404,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 405,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 406,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 407,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 408,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 409,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 410,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 411,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 412,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 415,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 416,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 417,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 419,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 420,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 421,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  },
+  {
+    "gt_record_id": 423,
+    "data_type": null,
+    "geospatial_info_dataset": null,
+    "spatial_range_km2": null,
+    "temporal_range": null,
+    "temp_range_i": null,
+    "temp_range_f": null,
+    "species": null,
+    "referred_dataset": null,
+    "time_series": null,
+    "multispecies": null,
+    "threatened_species": null,
+    "new_species_science": null,
+    "new_species_region": null,
+    "bias_north_south": null,
+    "valid_yn": "yes",
+    "reason_not_valid": null
+  }
+]

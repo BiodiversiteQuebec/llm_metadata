@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import ast
 import contextlib
 import json
 import os
@@ -20,15 +19,13 @@ from llm_metadata.groundtruth_eval import (
 )
 from llm_metadata.extraction import ExtractionConfig, ExtractionMode, run_manifest_extraction
 from llm_metadata.logging_utils import configure_extraction_logging, logger
-from llm_metadata.schemas.data_paper import DataPaperManifest, RunArtifact
+from llm_metadata.schemas.data_paper import DataPaperManifest, DataPaperRecord, RunArtifact
 from llm_metadata.schemas.fuster_features import (
     DatasetFeaturesExtraction,
     DatasetFeaturesNormalized,
-    SEMANTIC_FEATURE_FIELD_NAMES,
 )
 
 
-_LIST_COLS = ["data_type", "geospatial_info_dataset", "species"]
 _OUTPUT_DIR = Path(os.getenv("PROMPT_EVAL_OUTPUT_DIR", "artifacts/runs"))
 
 def _resolve_output_path(name: Optional[str], output: Optional[str]) -> Path:
@@ -41,54 +38,17 @@ def _resolve_output_path(name: Optional[str], output: Optional[str]) -> Path:
         return _OUTPUT_DIR / f"{timestamp}_{name}.json"
     return _OUTPUT_DIR / f"{timestamp}_prompt_eval.json"
 
-def _parse_excel_val(val):
-    if val is None:
-        return None
-    try:
-        import pandas as pd  # type: ignore
-
-        if isinstance(val, float) and pd.isna(val):
-            return None
-    except ImportError:
-        pass
-    if isinstance(val, list):
-        return val
-    if isinstance(val, str):
-        stripped = val.strip()
-        if stripped.startswith("["):
-            try:
-                return ast.literal_eval(stripped)
-            except Exception:
-                return val
-    return val
-
-
-def _load_ground_truth(gt_path: str) -> "pd.DataFrame":  # type: ignore[name-defined]
-    try:
-        import pandas as pd  # type: ignore
-    except ImportError as exc:
-        raise ImportError("pandas is required for prompt_eval; install with `pip install pandas openpyxl`.") from exc
-
-    df = pd.read_excel(gt_path)
-    for col in _LIST_COLS:
-        if col in df.columns:
-            df[col] = df[col].map(_parse_excel_val)
-    return df
-
-
-def _build_true_by_id(
-    df: "pd.DataFrame",  # type: ignore[name-defined]
+def _build_true_by_id_from_gt(
+    gt: list[dict],
     allowed_ids: set[int],
 ) -> dict[str, DatasetFeaturesNormalized]:
-    annotation_cols = list(SEMANTIC_FEATURE_FIELD_NAMES)
-    available_cols = [col for col in annotation_cols if col in df.columns]
     true_by_id: dict[str, DatasetFeaturesNormalized] = {}
-    for _, row in df.iterrows():
-        record_id = int(row["id"])
-        if record_id not in allowed_ids:
+    for entry in gt:
+        entry = dict(entry)  # shallow copy to avoid mutating caller's data
+        gt_record_id = int(entry.pop("gt_record_id"))
+        if gt_record_id not in allowed_ids:
             continue
-        row_dict = {col: row[col] for col in available_cols if col in row.index}
-        true_by_id[str(record_id)] = DatasetFeaturesNormalized.model_validate(row_dict)
+        true_by_id[str(gt_record_id)] = DatasetFeaturesNormalized.model_validate(entry)
     return true_by_id
 
 
@@ -109,15 +69,15 @@ def _save_run_outputs(run_artifact: RunArtifact, output_path: str | Path) -> tup
 def run_eval(
     *,
     mode: ExtractionMode | str,
-    manifest_path: str,
+    manifest: list[DataPaperRecord],
+    gt: list[dict],
+    prompt: Optional[str] = None,
     parallelism: int = 1,
-    prompt_module: Optional[str] = None,
     config: Optional[EvaluationConfig] = None,
     config_path: Optional[str] = None,
     fields: Optional[list[str]] = None,
     model: str = "gpt-5-mini",
     reasoning_effort: str = "low",
-    gt_path: str = "data/dataset_092624_validated.xlsx",
     name: Optional[str] = None,
     description: Optional[str] = None,
     output_path: Optional[str | Path] = None,
@@ -133,16 +93,13 @@ def run_eval(
     log_path = resolved_output_path.with_suffix(".log")
     recreate_cmd = _build_recreate_command(
         mode=mode,
-        manifest_path=manifest_path,
         parallelism=parallelism,
-        prompt_module=prompt_module,
         config_path=config_path,
         fields=fields,
         output_path=requested_output_path,
         name=name if requested_output_path is None else None,
         model=model,
         reasoning_effort=reasoning_effort,
-        gt_path=gt_path,
         description=description,
         skip_cache=skip_cache,
     )
@@ -151,18 +108,18 @@ def run_eval(
         with _tee_console_to_log(log_path):
             print(f"Recreate command: {recreate_cmd}")
             configure_extraction_logging()
+            manifest_obj = DataPaperManifest(records=manifest)
             logger.info(
-                "Starting prompt_eval mode={} manifest_path={} parallelism={} model={} reasoning_effort={} description={} skip_cache={}",
+                "Starting prompt_eval mode={} records={} parallelism={} model={} reasoning_effort={} description={} skip_cache={}",
                 ExtractionMode(mode).value,
-                manifest_path,
+                len(manifest_obj.records),
                 parallelism,
                 model,
                 reasoning_effort,
                 description or "",
                 skip_cache,
             )
-            manifest = DataPaperManifest.load_csv(manifest_path)
-            logger.info("Loaded manifest records={}", len(manifest.records))
+            logger.info("Loaded manifest records={}", len(manifest_obj.records))
             eval_config = config or (
                 EvaluationConfig.from_json(config_path)
                 if config_path is not None
@@ -174,20 +131,27 @@ def run_eval(
                 text_format=DatasetFeaturesExtraction,
             )
             run_artifact = run_manifest_extraction(
-                manifest,
+                manifest_obj,
                 mode=mode,
                 parallelism=parallelism,
-                prompt_module=prompt_module,
+                prompt=prompt,
                 config=run_config,
-                manifest_path=manifest_path,
                 name=name,
                 description=description,
                 skip_cache=skip_cache,
             )
 
-            logger.info("Loading ground truth from {}", gt_path)
-            gt_df = _load_ground_truth(gt_path)
-            true_by_id = _build_true_by_id(gt_df, {record.gt_record_id for record in manifest.records})
+            # Compute provenance digests
+            run_artifact.gt_digest = RunArtifact.compute_digest(
+                json.dumps(gt, sort_keys=True, default=str)
+            )
+            run_artifact.manifest_digest = RunArtifact.compute_digest(
+                json.dumps([r.model_dump() for r in manifest], sort_keys=True, default=str)
+            )
+
+            logger.info("Building ground truth from {} GT records", len(gt))
+            allowed_ids = {record.gt_record_id for record in manifest_obj.records}
+            true_by_id = _build_true_by_id_from_gt(gt, allowed_ids)
             if not true_by_id:
                 raise ValueError("No valid GT rows matched the manifest.")
 
@@ -269,16 +233,13 @@ def _tee_console_to_log(log_path: Path):
 def _build_recreate_command(
     *,
     mode: ExtractionMode | str,
-    manifest_path: str,
     parallelism: int,
-    prompt_module: Optional[str],
     config_path: Optional[str],
     fields: Optional[list[str]],
     output_path: Optional[Path],
     name: Optional[str],
     model: str,
     reasoning_effort: str,
-    gt_path: str,
     description: Optional[str],
     skip_cache: bool,
 ) -> str:
@@ -290,19 +251,13 @@ def _build_recreate_command(
         "llm_metadata.prompt_eval",
         "--mode",
         str(ExtractionMode(mode).value),
-        "--manifest",
-        manifest_path,
         "--parallelism",
         str(parallelism),
         "--model",
         model,
         "--reasoning-effort",
         reasoning_effort,
-        "--gt",
-        gt_path,
     ]
-    if prompt_module:
-        command.extend(["--prompt", prompt_module])
     if config_path:
         command.extend(["--config", config_path])
     if fields:
@@ -324,9 +279,11 @@ def main() -> None:
 
     parser = argparse.ArgumentParser(description="Run extraction + evaluation over a manifest.")
     parser.add_argument("--mode", required=True, choices=[mode.value for mode in ExtractionMode])
-    parser.add_argument("--manifest", required=True, help="Path to the canonical DataPaperManifest CSV.")
+    parser.add_argument("--manifest", required=True, help="Path to DataPaperManifest CSV.")
+    parser.add_argument("--gt-manifest", default="data/gt/fuster_gt.json", help="Path to GT JSON array file.")
+    parser.add_argument("--gt", default=None, help="[DEPRECATED] Validated GT XLSX path. Use --gt-manifest instead.")
+    parser.add_argument("--prompt", default=None, help="Path to a text file containing the system prompt, or omit for mode default.")
     parser.add_argument("--parallelism", type=int, default=1, help="Number of records to extract concurrently.")
-    parser.add_argument("--prompt", default=None, help="Prompt module path relative to llm_metadata.")
     parser.add_argument("--config", default=None, help="Path to an EvaluationConfig JSON file.")
     parser.add_argument("--fields", default=None, help="Comma-separated field names to evaluate.")
     parser.add_argument("--output", default=None, help="Path to save the run artifact JSON.")
@@ -334,21 +291,47 @@ def main() -> None:
     parser.add_argument("--model", default="gpt-5-mini", help="OpenAI model name.")
     parser.add_argument("--reasoning-effort", default="low", help="GPT-5 reasoning effort.")
     parser.add_argument("--description", default=None, help="Short description stored with the run artifact.")
-    parser.add_argument("--gt", default="data/dataset_092624_validated.xlsx", help="Validated GT XLSX path.")
     parser.add_argument("--skip-cache", action="store_true", help="Bypass extraction cache.")
     args = parser.parse_args()
 
-    fields = [field.strip() for field in args.fields.split(",")] if args.fields else None
+    # Load manifest CSV → list[DataPaperRecord]
+    manifest_records = DataPaperManifest.load_csv(args.manifest).records
+
+    # Load GT
+    if args.gt is not None:
+        import warnings
+        warnings.warn(
+            "--gt is deprecated. Use --gt-manifest with a JSON file instead. "
+            "See `export_gt_json()` in llm_metadata.schemas.data_paper.",
+            DeprecationWarning,
+            stacklevel=1,
+        )
+        from llm_metadata.schemas.data_paper import export_gt_json
+        import tempfile
+        tmp = tempfile.NamedTemporaryFile(suffix=".json", delete=False)
+        export_gt_json(gt_path=args.gt, output_path=tmp.name)
+        gt_data = json.loads(Path(tmp.name).read_text(encoding="utf-8"))
+    else:
+        gt_path = Path(args.gt_manifest)
+        gt_data = json.loads(gt_path.read_text(encoding="utf-8"))
+
+    # Load prompt text from file if provided
+    prompt_text = None
+    if args.prompt:
+        prompt_text = Path(args.prompt).read_text(encoding="utf-8")
+
+    fields = [f.strip() for f in args.fields.split(",")] if args.fields else None
+
     run_eval(
         mode=args.mode,
-        manifest_path=args.manifest,
+        manifest=manifest_records,
+        gt=gt_data,
+        prompt=prompt_text,
         parallelism=args.parallelism,
-        prompt_module=args.prompt,
         config_path=args.config,
         fields=fields,
         model=args.model,
         reasoning_effort=args.reasoning_effort,
-        gt_path=args.gt,
         name=args.name,
         description=args.description,
         output_path=args.output,

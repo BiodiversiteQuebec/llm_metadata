@@ -342,7 +342,7 @@ def run_manifest_extraction(
     *,
     mode: ExtractionMode | str,
     parallelism: int = 1,
-    prompt_module: Optional[str] = None,
+    prompt: Optional[str] = None,
     config: Optional[ExtractionConfig] = None,
     output_path: Optional[str | Path] = None,
     manifest_path: Optional[str] = None,
@@ -357,8 +357,12 @@ def run_manifest_extraction(
     mode = ExtractionMode(mode)
     if parallelism < 1:
         raise ValueError("parallelism must be at least 1.")
-    prompt_module = prompt_module or DEFAULT_PROMPT_MODULES[mode]
-    system_message = _load_system_message(prompt_module) if prompt_module else _default_system_message(mode)
+    if prompt:
+        system_message = prompt
+        prompt_module_label = "custom"
+    else:
+        prompt_module_label = DEFAULT_PROMPT_MODULES[mode]
+        system_message = _load_system_message(prompt_module_label)
     logger.info(
         "Starting manifest extraction mode={} records={} parallelism={} model={} reasoning_effort={} prompt_module={} description={} skip_cache={}",
         mode.value,
@@ -366,7 +370,7 @@ def run_manifest_extraction(
         parallelism,
         config.model,
         _reasoning_effort(config.reasoning) or "default",
-        prompt_module,
+        prompt_module_label,
         description or "",
         skip_cache,
     )
@@ -375,7 +379,7 @@ def run_manifest_extraction(
         description=description,
         mode=mode,
         manifest_path=manifest_path,
-        prompt_module=prompt_module,
+        prompt_module=prompt_module_label,
         system_message=system_message,
         model=config.model,
         reasoning=config.reasoning,

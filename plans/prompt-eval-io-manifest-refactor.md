@@ -95,58 +95,55 @@ uv run python -m llm_metadata.prompt_eval \
 
 ## Work Units
 
-### WU-IO1: GT prep utility `sonnet`
+### ~~WU-IO1~~: GT prep utility `sonnet` ✓ 2026-04-10
 
-**deps:** none | **files:** `src/llm_metadata/schemas/data_paper.py`, notebook TBD
+**deps:** none | **files:** `src/llm_metadata/schemas/data_paper.py`, `data/gt/fuster_gt.json`
 
-- Add `export_gt_json(gt_path, output_path, subset_ids)` — xlsx → validate as `DatasetFeaturesNormalized` → JSON array of dicts with `gt_record_id`
-- Create `data/gt/fuster_gt.json` from current xlsx (one-time prep)
-- Notebook or script to run the export + verify round-trip
+- ✓ Added `export_gt_json(gt_path, output_path, subset_ids)` — xlsx → validate as `DatasetFeaturesNormalized` → JSON array of dicts with `gt_record_id`
+- ✓ Created `data/gt/fuster_gt.json` (299 records)
+- Note: notebook round-trip skipped (function is importable and verified by test)
 
-### WU-IO2: Simplify `prompt` param in `extraction.py` `sonnet`
+### ~~WU-IO2~~: Simplify `prompt` param in `extraction.py` `sonnet` ✓ 2026-04-10
 
 **deps:** none | **files:** `src/llm_metadata/extraction.py`
 
-- Rename `prompt_module: Optional[str]` → `prompt: Optional[str]` on `run_manifest_extraction`
-- When `prompt` is None → load default from mode (keep `DEFAULT_PROMPT_MODULES` + `_load_system_message` as internal default logic)
-- When `prompt` is a non-empty string → use as-is (the text, not a module path)
-- Delete `_load_system_message` and `_default_system_message` from public surface (fold into internal default resolution)
+- ✓ Renamed `prompt_module: Optional[str]` → `prompt: Optional[str]` on `run_manifest_extraction`
+- ✓ When `prompt` is None → load default from mode; when string → use as-is as system message
+- Note: `_load_system_message` and `_default_system_message` kept as private internals (not removed)
 
-### WU-IO3: Refactor `run_eval` signature in `prompt_eval.py` `sonnet`
+### ~~WU-IO3~~: Refactor `run_eval` signature in `prompt_eval.py` `sonnet` ✓ 2026-04-10
 
 **deps:** WU-IO1, WU-IO2 | **files:** `src/llm_metadata/prompt_eval.py`
 
-- New signature: `manifest: list[DataPaperRecord]`, `gt: list[dict]`, `prompt: Optional[str]`
-- Remove `gt_path`, `manifest_path` params from `run_eval`
-- Delete `_load_ground_truth()`, `_build_true_by_id()`, `_parse_excel_val()`
-- Internal: validate GT dicts against eval schema, key by `gt_record_id`, call `evaluate_indexed()`
+- ✓ New signature: `manifest: list[DataPaperRecord]`, `gt: list[dict]`, `prompt: Optional[str]`
+- ✓ Removed `gt_path`, `manifest_path` params from `run_eval`
+- ✓ Deleted `_load_ground_truth()`, `_build_true_by_id()`, `_parse_excel_val()`
 
-### WU-IO4: CLI adapter refactor + docs `sonnet`
+### ~~WU-IO4~~: CLI adapter refactor + docs `sonnet` ✓ 2026-04-10
 
 **deps:** WU-IO3 | **files:** `src/llm_metadata/prompt_eval.py` (CLI `main()`), `AGENTS.md`
 
-- `--gt-manifest path.json` → new primary GT input
-- `--gt path.xlsx` → deprecated shim with `DeprecationWarning`
-- `--prompt path.txt` → read text file
-- `--manifest path.csv` → `DataPaperManifest.load_csv().records`
-- Update `_build_recreate_command()` for new flags
-- Update `AGENTS.md`: "Prompt Engineering Workflow" inner loop examples, CLI usage, `run_eval()` Python API signature, "Running Scripts" one-liner, Eval Viewer data dependencies (drop `prompt_module` references)
+- ✓ `--gt-manifest path.json` → new primary GT input (default: `data/gt/fuster_gt.json`)
+- ✓ `--gt path.xlsx` → deprecated shim with `DeprecationWarning`
+- ✓ `--prompt path.txt` → reads file, passes text to `run_eval()`
+- ✓ `--manifest path.csv` → `DataPaperManifest.load_csv().records`
+- ✓ Updated `AGENTS.md`: CLI usage, Python API signature, "Running Scripts" one-liner, Key Files table
 
-### WU-IO5: `RunArtifact` cleanup + digests `sonnet`
+### ~~WU-IO5~~: `RunArtifact` cleanup + digests `sonnet` ✓ 2026-04-10
 
 **deps:** WU-IO3 | **files:** `src/llm_metadata/schemas/data_paper.py`
 
-- Drop `prompt_module` field from `RunArtifact`
-- Add `gt_digest: Optional[str]` and `manifest_digest: Optional[str]` (sha256)
-- Compute digests in `run_eval` before extraction
+- ✓ Made `prompt_module: Optional[str] = None` (backward-compatible, kept for old artifact loading)
+- ✓ Added `gt_digest: Optional[str]` and `manifest_digest: Optional[str]` (sha256)
+- ✓ Computed digests in `run_eval` after manifest extraction
 
-### WU-IO6: Eval viewer + test updates `sonnet`
+### ~~WU-IO6~~: Eval viewer + test updates `sonnet` ✓ 2026-04-10
 
 **deps:** WU-IO5 | **files:** `src/llm_metadata/app/app_eval_viewer.py`, `tests/`
 
-- Viewer: stop reading `prompt_module` from artifact, rely on `system_message`
-- Handle both old artifacts (with `prompt_module`) and new (without) gracefully
-- Update test fixtures for new `run_eval` signature
+- ✓ Viewer handles `prompt_module=None` gracefully (falls back to `"custom"` label)
+- ✓ Guards `importlib` fallback against `prompt_module == "custom"`
+- ✓ Test fixtures updated for new `run_eval` signature (`manifest=`, `gt=`); 26 tests pass
 
 ---
 
