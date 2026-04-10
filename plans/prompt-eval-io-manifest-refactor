@@ -1,0 +1,11 @@
+Let's refactor the way we handle input and output manifests. 
+
+My goal is to make prompt eval completely disconnected from the extracted and ground truth schema. Right now, both the prompt and the extracted schema are selected through the mode. So basically, right now I want to have distinct information for extracted schema and ground truth manifests. This would allow me more flexibility Reusing the PromptEvolve flow for different models. Care also if the prompt was just a simple string or a text file or whatever, when they run in command line, maybe that would make it more flexible, as I would say. 
+
+Right now, the ground truth is loaded to the Excel file dataset, or from an Excel file. I don't want that anymore. Preliminary step should have a ground truth file prepared into a pydantic model and to be validated in such a way. And for the ground truth to be loaded by the prompt eval run function from a manifest that is in pydantic model export. So the manifest ground truth manifest should be either a variable containing validated data through the pydantic model or a file with validated data.
+
+One concern I have is if the run is launched to a command line or from a Python environment through the Python module, like a notebook environment. If it's launched from a command line, I'd prefer the manifests and prompts to be saved as some text file, JSONs or whatever. Though I think I'd rather have JSONs and text files only for prompts and JSONs for pydantic manifests dated data. I like this idea of notebook execution, using not files but only Python data structures such as lists a validated model, or just text for the prompt.
+
+Make some recommendations about how to handle existing inputs and how we should deprecate them. I think we should keep the `mode` input and just stdout out a warning, and for the xls file, we should mark it deprecated but send only a warning also. 
+
+Let's discuss it ! Feel free to challenge me or push back ! Be mindful of the larger workflow.
