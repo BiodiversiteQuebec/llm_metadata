@@ -1,27 +1,21 @@
 {
   "method": "R2-A: Direct LLM from abstract/repository-description text vs Fuster MC+Modulators",
-  "model": "gpt-5-mini",
   "target": "MC_relevance_modifiers",
   "diagnostic_target": "dataset_relevance",
-  "prediction_source": "fresh_api_calls",
-  "n_records": 30,
-  "target_labels": [
-    "H",
-    "M",
-    "L"
-  ],
-  "macro_f1_present_labels": 0.381,
-  "macro_f1_all_labels": 0.286,
-  "binary_f1_relevant": 0.483,
-  "binary_precision": 1.0,
-  "binary_recall": 0.318,
-  "diagnostic_vs_human": {
-    "macro_f1_present_labels": 0.258,
-    "binary_f1_relevant": 0.48,
-    "binary_precision": 0.857,
-    "binary_recall": 0.333
-  },
-  "prompt_hash_current": "35c77322",
-  "schema_hash": "152e9399",
-  "total_cost_usd": 0.0965
+  "run_artifact": "C:\\Users\\beav3503\\dev\\llm_metadata\\artifacts\\runs\\relevance_llm_direct.json",
+  "gt_manifest": "C:\\Users\\beav3503\\dev\\llm_metadata\\data\\gt\\relevance_llm_direct_dev_subset_gt.json",
+  "model": "gpt-5-mini",
+  "reasoning_effort": "low",
+  "records_total": 30,
+  "records_with_predictions": 30,
+  "total_cost_usd": 0.0788,
+  "macro_f1_present_labels": 0.293,
+  "macro_f1_all_labels": 0.22,
+  "binary_precision": 0.769,
+  "binary_recall": 0.455,
+  "binary_f1": 0.571,
+  "human_macro_f1_present_labels": 0.265,
+  "human_binary_precision": 0.615,
+  "human_binary_recall": 0.444,
+  "human_binary_f1": 0.516
 }

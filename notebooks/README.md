@@ -2325,3 +2325,72 @@ Goal : Manual deep dive into the Fuster dataset to understand the data and its s
 - Audit the `taxon_broad_group_labels` false positives to decide whether the GBIF-to-group mapping is too permissive
 - Decide whether broad-group matching should stay notebook-only or graduate into a standard evaluation view
 - If the notebook shows clear value, fold the new taxonomic fields into a reusable prompt-eval comparison flow
+
+---
+
+### 2026-04-10: Direct Relevance Notebook Refactor Onto `prompt_eval`
+
+**Task:** Refactor `notebooks/relevance_llm_direct.ipynb` so it uses the current `prompt_eval` API, keeps the relevance schema and prompt local to the notebook, removes notebook-managed caching, and writes a GT manifest compatible with the notebook-local GT model.
+
+**Work Performed:**
+- Refactored `src/llm_metadata/prompt_eval.py` so `run_eval(...)` can accept notebook-defined `text_format` and GT `BaseModel` classes instead of being hard-wired to the Fuster feature pair.
+- Added targeted coverage in `tests/test_prompt_eval_manifest.py` for the custom-model path.
+- Rewrote `notebooks/relevance_llm_direct.ipynb` as a self-contained workflow:
+  - local `DatasetFeaturesWithRelevance` prediction model
+  - local `DatasetFeaturesWithRelevanceGT` GT model
+  - local assembled prompt including the relevance scoring block
+  - GT export cell writing `data/gt/relevance_llm_direct_dev_subset_gt.json`
+  - `prompt_eval.run_eval(...)` call with no notebook-level cache layer and no notebook `skip_cache` usage
+- Preserved the notebook outputs for predictions CSV, summary JSON, confusion plot, and comparison CSV refresh.
+
+**Results:**
+- `notebooks/relevance_llm_direct.ipynb` now runs through the shared extraction/evaluation stack instead of calling `responses.parse()` directly.
+- The new GT manifest at `data/gt/relevance_llm_direct_dev_subset_gt.json` contains the dev-subset mechanistic target (`relevance`) plus the diagnostic human label (`human_relevance`) keyed by `gt_record_id`.
+- Verification:
+  - `uv run python -m pytest tests/test_prompt_eval_manifest.py -q`
+  - notebook JSON reload check via `nbformat`
+
+**Key Issues Identified:**
+- The notebook only has explicit GT for relevance, not for the generated `has_dataset` or `relevance_reasoning` fields, so the prompt-eval report is intentionally scoped to `relevance` exact-match evaluation.
+- Keeping the prompt self-contained means the notebook now owns a copy of the abstract prompt blocks; if the shared abstract prompt changes later, this notebook will not inherit those edits automatically.
+
+**Next Steps:**
+- Mirror the same self-contained `prompt_eval` pattern into `notebooks/relevance_llm_direct_pdf.ipynb` if we want the two direct-LLM relevance notebooks to stay structurally aligned.
+
+---
+
+### 2026-04-10: PDF Direct Relevance Notebook Refactor Onto `prompt_eval`
+
+**Task:** Refactor `notebooks/relevance_llm_direct_pdf.ipynb` onto the same self-contained `prompt_eval` workflow as the abstract notebook, keep the notebook-local relevance schema and prompt block, preserve the user's `parallelism=10` change, and execute the notebook end to end.
+
+**Work Performed:**
+- Reworked `notebooks/relevance_llm_direct_pdf.ipynb` to mirror the abstract direct-relevance notebook structure while keeping the PDF-specific task instructions from `llm_metadata.prompts.pdf_file`.
+- Kept the notebook self-contained for experiment logic:
+  - local `DatasetFeaturesWithRelevance` prediction model
+  - local `DatasetFeaturesWithRelevanceGT` GT model
+  - local `RELEVANCE_BLOCK`
+  - GT export to `data/gt/relevance_llm_direct_pdf_dev_subset_gt.json`
+- Routed execution through `prompt_eval.run_eval(...)` in `pdf_native` mode with `parallelism=10`, without notebook-managed caching and without notebook `skip_cache`.
+- Fixed a post-run notebook bug where merging manifest metadata introduced a duplicate `title` column and broke the prediction-table cell.
+
+**Results:**
+- Executed `notebooks/relevance_llm_direct_pdf.ipynb` successfully with no notebook error outputs.
+- Refreshed outputs:
+  - `artifacts/runs/relevance_llm_direct_pdf.json`
+  - `artifacts/runs/relevance_llm_direct_pdf.csv`
+  - `notebooks/results/relevance_llm_direct_pdf_predictions.csv`
+  - `notebooks/results/relevance_llm_direct_pdf_summary.json`
+  - `notebooks/results/relevance_comparison_summary.csv`
+- Summary metrics from the rerun:
+  - macro F1 present labels: `0.553`
+  - binary precision: `0.800`
+  - binary recall: `0.909`
+  - binary F1: `0.851`
+  - total cost: `$0.4466`
+
+**Key Issues Identified:**
+- The first execution surfaced a brittle notebook assumption around a plain `title` column after DataFrame merges; the notebook now avoids the duplicate-column path.
+- The local execution environment did not expose `OPENAI_API_KEY` to the rerun command, so this pass relied on the existing `prompt_eval` cache surface rather than forcing fresh API calls, which is consistent with the notebook's no-`skip-cache` requirement.
+
+**Next Steps:**
+- If we want a guaranteed fresh API rerun later, execute the same notebook command in a shell where `uv run` loads `.env` or where `OPENAI_API_KEY` is exported before launch.

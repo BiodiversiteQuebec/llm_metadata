@@ -11,10 +11,13 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
+from pydantic import BaseModel
+
 from llm_metadata.groundtruth_eval import (
     DEFAULT_FIELD_STRATEGIES,
     EvaluationConfig,
     EvaluationReport,
+    FieldEvalStrategy,
     evaluate_indexed,
 )
 from llm_metadata.extraction import ExtractionConfig, ExtractionMode, run_manifest_extraction
@@ -41,15 +44,35 @@ def _resolve_output_path(name: Optional[str], output: Optional[str]) -> Path:
 def _build_true_by_id_from_gt(
     gt: list[dict],
     allowed_ids: set[int],
-) -> dict[str, DatasetFeaturesNormalized]:
-    true_by_id: dict[str, DatasetFeaturesNormalized] = {}
+    *,
+    model_type: type[BaseModel],
+) -> dict[str, BaseModel]:
+    true_by_id: dict[str, BaseModel] = {}
     for entry in gt:
         entry = dict(entry)  # shallow copy to avoid mutating caller's data
         gt_record_id = int(entry.pop("gt_record_id"))
         if gt_record_id not in allowed_ids:
             continue
-        true_by_id[str(gt_record_id)] = DatasetFeaturesNormalized.model_validate(entry)
+        true_by_id[str(gt_record_id)] = model_type.model_validate(entry)
     return true_by_id
+
+
+def _default_eval_config_for_models(
+    *,
+    text_format: type[BaseModel],
+    gt_model: type[BaseModel],
+) -> EvaluationConfig:
+    if text_format is DatasetFeaturesExtraction and gt_model is DatasetFeaturesNormalized:
+        return EvaluationConfig(field_strategies=DEFAULT_FIELD_STRATEGIES)
+
+    shared_fields = sorted(
+        set(text_format.model_fields.keys()) & set(gt_model.model_fields.keys())
+    )
+    return EvaluationConfig(
+        field_strategies={
+            field_name: FieldEvalStrategy(match="exact") for field_name in shared_fields
+        }
+    )
 
 
 def _evaluation_payload(report: EvaluationReport) -> dict:
@@ -82,6 +105,8 @@ def run_eval(
     description: Optional[str] = None,
     output_path: Optional[str | Path] = None,
     skip_cache: bool = False,
+    text_format: type[BaseModel] = DatasetFeaturesExtraction,
+    gt_model: type[BaseModel] = DatasetFeaturesNormalized,
 ) -> EvaluationReport:
     """Run extraction + evaluation for one explicit mode over one manifest."""
 
@@ -91,17 +116,21 @@ def run_eval(
         str(requested_output_path) if requested_output_path is not None else None,
     )
     log_path = resolved_output_path.with_suffix(".log")
-    recreate_cmd = _build_recreate_command(
-        mode=mode,
-        parallelism=parallelism,
-        config_path=config_path,
-        fields=fields,
-        output_path=requested_output_path,
-        name=name if requested_output_path is None else None,
-        model=model,
-        reasoning_effort=reasoning_effort,
-        description=description,
-        skip_cache=skip_cache,
+    recreate_cmd = (
+        "Python API run with custom notebook-defined schema; CLI recreation unavailable."
+        if text_format is not DatasetFeaturesExtraction or gt_model is not DatasetFeaturesNormalized
+        else _build_recreate_command(
+            mode=mode,
+            parallelism=parallelism,
+            config_path=config_path,
+            fields=fields,
+            output_path=requested_output_path,
+            name=name if requested_output_path is None else None,
+            model=model,
+            reasoning_effort=reasoning_effort,
+            description=description,
+            skip_cache=skip_cache,
+        )
     )
 
     try:
@@ -123,12 +152,15 @@ def run_eval(
             eval_config = config or (
                 EvaluationConfig.from_json(config_path)
                 if config_path is not None
-                else EvaluationConfig(field_strategies=DEFAULT_FIELD_STRATEGIES)
+                else _default_eval_config_for_models(
+                    text_format=text_format,
+                    gt_model=gt_model,
+                )
             )
             run_config = ExtractionConfig(
                 model=model,
                 reasoning={"effort": reasoning_effort},
-                text_format=DatasetFeaturesExtraction,
+                text_format=text_format,
             )
             run_artifact = run_manifest_extraction(
                 manifest_obj,
@@ -151,7 +183,11 @@ def run_eval(
 
             logger.info("Building ground truth from {} GT records", len(gt))
             allowed_ids = {record.gt_record_id for record in manifest_obj.records}
-            true_by_id = _build_true_by_id_from_gt(gt, allowed_ids)
+            true_by_id = _build_true_by_id_from_gt(
+                gt,
+                allowed_ids,
+                model_type=gt_model,
+            )
             if not true_by_id:
                 raise ValueError("No valid GT rows matched the manifest.")
 
@@ -162,7 +198,7 @@ def run_eval(
             )
             report = evaluate_indexed(
                 true_by_id=true_by_id,
-                pred_by_id=run_artifact.predictions_by_id(DatasetFeaturesExtraction),
+                pred_by_id=run_artifact.predictions_by_id(text_format),
                 fields=fields,
                 config=eval_config,
             )

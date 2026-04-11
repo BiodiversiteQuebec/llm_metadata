@@ -1,0 +1,152 @@
+[
+  {
+    "gt_record_id": 5,
+    "relevance": "M",
+    "human_relevance": "M"
+  },
+  {
+    "gt_record_id": 9,
+    "relevance": "L",
+    "human_relevance": "L"
+  },
+  {
+    "gt_record_id": 11,
+    "relevance": "M",
+    "human_relevance": "M"
+  },
+  {
+    "gt_record_id": 12,
+    "relevance": "H",
+    "human_relevance": "M"
+  },
+  {
+    "gt_record_id": 19,
+    "relevance": "M",
+    "human_relevance": "M"
+  },
+  {
+    "gt_record_id": 24,
+    "relevance": "H",
+    "human_relevance": "H"
+  },
+  {
+    "gt_record_id": 27,
+    "relevance": "M",
+    "human_relevance": "M"
+  },
+  {
+    "gt_record_id": 29,
+    "relevance": "H",
+    "human_relevance": "H"
+  },
+  {
+    "gt_record_id": 30,
+    "relevance": "H",
+    "human_relevance": "H"
+  },
+  {
+    "gt_record_id": 31,
+    "relevance": "L",
+    "human_relevance": "L"
+  },
+  {
+    "gt_record_id": 37,
+    "relevance": "M",
+    "human_relevance": "L"
+  },
+  {
+    "gt_record_id": 38,
+    "relevance": "H",
+    "human_relevance": "H"
+  },
+  {
+    "gt_record_id": 39,
+    "relevance": "M",
+    "human_relevance": "M"
+  },
+  {
+    "gt_record_id": 56,
+    "relevance": "M",
+    "human_relevance": "M"
+  },
+  {
+    "gt_record_id": 71,
+    "relevance": "M",
+    "human_relevance": "L"
+  },
+  {
+    "gt_record_id": 89,
+    "relevance": "M",
+    "human_relevance": "M"
+  },
+  {
+    "gt_record_id": 91,
+    "relevance": "M",
+    "human_relevance": "L"
+  },
+  {
+    "gt_record_id": 101,
+    "relevance": "L",
+    "human_relevance": "L"
+  },
+  {
+    "gt_record_id": 104,
+    "relevance": "H",
+    "human_relevance": "M"
+  },
+  {
+    "gt_record_id": 123,
+    "relevance": "H",
+    "human_relevance": "H"
+  },
+  {
+    "gt_record_id": 175,
+    "relevance": "L",
+    "human_relevance": "L"
+  },
+  {
+    "gt_record_id": 201,
+    "relevance": "L",
+    "human_relevance": "L"
+  },
+  {
+    "gt_record_id": 208,
+    "relevance": "H",
+    "human_relevance": "H"
+  },
+  {
+    "gt_record_id": 225,
+    "relevance": "L",
+    "human_relevance": "M"
+  },
+  {
+    "gt_record_id": 253,
+    "relevance": "H",
+    "human_relevance": "M"
+  },
+  {
+    "gt_record_id": 258,
+    "relevance": "M",
+    "human_relevance": "L"
+  },
+  {
+    "gt_record_id": 271,
+    "relevance": "M",
+    "human_relevance": "L"
+  },
+  {
+    "gt_record_id": 315,
+    "relevance": "L",
+    "human_relevance": "L"
+  },
+  {
+    "gt_record_id": 343,
+    "relevance": "L",
+    "human_relevance": "X"
+  },
+  {
+    "gt_record_id": 351,
+    "relevance": "H",
+    "human_relevance": "M"
+  }
+]

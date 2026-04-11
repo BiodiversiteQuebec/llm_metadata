@@ -8,8 +8,19 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
+from pydantic import BaseModel
 
 from llm_metadata.schemas.data_paper import DataPaperManifest
+
+
+class TinyEvalExtraction(BaseModel):
+    relevance: str
+    notes: str | None = None
+
+
+class TinyEvalGT(BaseModel):
+    relevance: str
+    human_relevance: str | None = None
 
 
 @pytest.fixture
@@ -218,6 +229,39 @@ class TestPromptEvalModes:
         assert captured["parallelism"] == 3
         assert captured["description"] == "Medium-effort run"
         assert captured["config"].reasoning == {"effort": "medium"}
+
+    def test_run_eval_accepts_custom_models(self, tiny_manifest_csv):
+        from llm_metadata.prompt_eval import run_eval
+
+        manifest_records = DataPaperManifest.load_csv(str(tiny_manifest_csv)).records
+        gt_data = [
+            {"gt_record_id": 10, "relevance": "H", "human_relevance": "M"},
+            {"gt_record_id": 20, "relevance": "L", "human_relevance": "L"},
+            {"gt_record_id": 30, "relevance": "M", "human_relevance": "M"},
+        ]
+
+        def fake_extract(text, **kwargs):
+            mapping = {
+                "Abstract 10": TinyEvalExtraction(relevance="H", notes="first"),
+                "Abstract 20": TinyEvalExtraction(relevance="L", notes="second"),
+                "Abstract 30": TinyEvalExtraction(relevance="M", notes="third"),
+            }
+            return {
+                "output": mapping[text],
+                "usage_cost": {"input_tokens": 10, "output_tokens": 5, "total_cost": 0.001},
+            }
+
+        with patch("llm_metadata.extraction.extract_from_text", side_effect=fake_extract):
+            report = run_eval(
+                mode="abstract",
+                manifest=manifest_records,
+                gt=gt_data,
+                text_format=TinyEvalExtraction,
+                gt_model=TinyEvalGT,
+            )
+
+        assert set(report.field_metrics.keys()) == {"relevance"}
+        assert report.field_metrics["relevance"].f1 == pytest.approx(1.0)
 
 
 class TestBuildRecreateCommand:
