@@ -33,6 +33,20 @@ Either answer is a result:
   - extract ecological metadata from scientific documents with LLMs, comparing short and long text, against manual annotations (precision, recall, F1);
   - compare relevance classification with the manual and automated results of Fuster-Calvo et al.
 
+### Framing (to be discussed)
+
+- **Motivation:** help identify, from extracted features, which datasets can feed the indicators and analyses of Biodiversité Québec. This is stated as motivation and outlook, not as a goal the article tests.
+- **End-to-end flow:** the introduction sketches the full flow the work fits into:
+  - datasets and papers harvested from Dryad, Zenodo and Semantic Scholar;
+  - features extracted from them;
+  - features matched against the data need of an indicator;
+  - candidate datasets that support a decision.
+
+  Only the extraction and relevance scoring steps are evaluated. The case study, if kept, illustrates one pass through the full flow.
+- **Points to settle:**
+  - how much of the flow to show (one or two sentences, or an outer band on Figure 1);
+  - how an indicator's data need is written as explicit criteria (taxa, region, period, data type), which then act as the rule set for rule-based scoring.
+
 ---
 
 ## 3. Methods
