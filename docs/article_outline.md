@@ -86,6 +86,28 @@ Either answer is a result:
 ### Figure 1: conceptual workflow
 Inputs (article PDF, abstract or data paper description) → LLM with instructions and model choice → one of the three tasks → structured output → evaluation against the normalized ground truth → outcomes (confusion matrix, precision, recall, F1).
 
+```
+                        Instructions (prompt engineering) ◄──────┐
+                                     │                           │ iterate
+                                     ▼                           │
+ ┌──────────────────┐       ┌─────────────────────────┐          │
+ │ Article PDF      │──┐    │ LLM  (model choice)     │          │
+ │  (long text)     │  │    │                         │    ┌─────┴──────────────┐
+ ├──────────────────┤  │    │ 1. Feature extraction   │    │ Structured output  │
+ │ Abstract         │──┼OR─▶│ 2. Extraction + scoring │───▶│ { features }  or   │
+ ├──────────────────┤  │    │ 3. Scoring only         │    │ relevance category │
+ │ Data paper       │──┘    └─────────────────────────┘    └─────────┬──────────┘
+ │  description     │                                                │
+ │  (short text)    │                                      same data model
+ └──────────────────┘                                                │
+                                                                     ▼
+ ┌──────────────────┐       ┌─────────────────┐            ┌──────────────────┐     ┌──────────────────┐
+ │ Ground truth     │──────▶│ Normalization   │───────────▶│    Evaluation    │────▶│ Confusion matrix │
+ │ (manual          │       │ (same data      │            │                  │     │ Precision        │
+ │  annotations)    │       │  model)         │            │                  │     │ Recall, F1       │
+ └──────────────────┘       └─────────────────┘            └──────────────────┘     └──────────────────┘
+```
+
 **Interpretation:** the reader's map of the study. It shows that both approaches share the inputs, the data model and the evaluation, and differ only in what the LLM is asked to return.
 
 ### Figure 2: method clarification
@@ -97,9 +119,40 @@ The anatomy of one LLM call:
 
 It shows how these differ between feature extraction and direct scoring.
 
+```
+   Approach 1: rules on extracted features        Approach 2: direct scoring
+
+ ┌─────────────────────────────────────┐        ┌─────────────────────────────────────┐
+ │ Model + parameters                  │        │ Model + parameters                  │
+ │ (reasoning effort)                  │        │ (reasoning effort)                  │
+ ├─────────────────────────────────────┤        ├─────────────────────────────────────┤
+ │ Instructions (system prompt)        │        │ Instructions (system prompt)        │
+ │ persona, vocabularies, extraction   │        │ relevance rules + Biodiversité      │
+ │ rules per field                     │        │ Québec priorities                   │
+ ├─────────────────────────────────────┤        ├─────────────────────────────────────┤
+ │ User input: document text           │        │ User input: document text           │
+ └──────────────────┬──────────────────┘        └──────────────────┬──────────────────┘
+                    ▼                                              ▼
+              { features }                                 relevance category
+                    │                                      (high / moderate /
+                    ▼                                       low / not relevant)
+        relevance rules applied in code
+                    │
+                    ▼
+            relevance category
+```
+
 **Interpretation:** an explainer for an ecology audience. It defines the terms used in Methods ("prompt", "instructions", "reasoning effort") and makes clear where the relevance rules live: in code for approach 1, in the instructions for approach 2.
 
 A small inset can contrast the two routes. Rule-based scoring must go through extracted taxa, its weakest feature; direct scoring bypasses that step.
+
+```
+ Rule-based scoring:  text ──▶ features ──▶ taxa ──▶ rules ──▶ category
+                                             ▲
+                                       weakest step
+
+ Direct scoring:      text ──────────────────────────────────▶ category
+```
 
 ---
 
@@ -127,15 +180,44 @@ Reference row: the supervised bag-of-words classifier of Fuster-Calvo et al. (F1
 
 Split by input (abstract, sections, PDF).
 
+| Abstract / data paper description | Article PDF |
+|---|---|
+| ![Per-field metrics, abstract input](img/article_outline/table2_metrics_abstract.png) | ![Per-field metrics, PDF input](img/article_outline/table2_metrics_pdf.png) |
+
+*Per-field precision, recall and F1 from the results app: improved prompt, gpt-5-mini at low reasoning effort. The app table shows 10 of the 12 fields.*
+
+*⚠️ Only 30 records (the evaluation subset: 10 Dryad, 10 Zenodo, 10 Semantic Scholar, all open access). Indicative, not final results.*
+
 **Interpretation:** only approach 1 has features to evaluate. The table shows where extraction fails, which explains the gap between short and long text in Table 1. Under sparse metadata, extraction rather than rule design is the main failure point.
 
 ### Table 3: confusion matrices (optional)
 Predicted vs true relevance category, per approach and input.
 
+| | Short text | Article PDF |
+|---|---|---|
+| Rules on extracted features | ![Rule-based scoring, short text](../notebooks/results/relevance_mechanistic_comparison.png) | ![Rule-based scoring, PDF](../notebooks/results/relevance_mechanistic_pdf_comparison.png) |
+| Direct LLM scoring | ![Direct scoring, short text](../notebooks/results/relevance_llm_direct_confusion.png) | ![Direct scoring, PDF](../notebooks/results/relevance_llm_direct_pdf_confusion.png) |
+
+*True vs predicted relevance category (H = high, M = moderate, L = low, X = not relevant), from the relevance notebooks; the results app has no relevance view. In the rule-based images, the left panel applies the rules to the human-annotated features (the ceiling check) and the right panel applies them to extracted features.*
+
+*⚠️ Only 30 records (the evaluation subset). Indicative, not final results.*
+
 **Interpretation:** shows whether each method overrates or underrates relevance. Together with Table 2, it shows which criteria (species, data type, spatial, temporal) the LLM describes well or poorly, and what bias that brings to prioritization.
 
 ### Table 4: model quality (optional)
 Relevance scoring performance across models and reasoning effort, with a repeatability check (a fresh run vs a cached run).
+
+![Compare runs: gpt-5-mini vs gpt-5.4, abstract input](img/article_outline/table4_compare_models_abstract.png)
+
+*Feature extraction from abstracts, gpt-5-mini at low reasoning effort (run A) vs gpt-5.4 at medium effort (run B), from the results app. Fields are sorted by the change in F1, regressions first.*
+
+*⚠️ Only 30 records (the evaluation subset). Indicative, not final results. Model effect on relevance scoring itself is not measured yet.*
+
+![Trends across runs](img/article_outline/table4_trends.png)
+
+*Per-field F1, precision and recall across all runs in chronological order, all input modes mixed, from the results app.*
+
+*⚠️ Only 30 records per run (the evaluation subset). Indicative, not final results.*
 
 **Interpretation:** tests whether the conclusions hold across models, and how much a stronger model narrows the gap between approaches.
 
@@ -146,10 +228,24 @@ Relevance scoring performance across models and reasoning effort, with a repeata
 ### S1: taxa extraction
 Species extraction is the weakest feature. The supplement documents the failure modes: decorated strings, counts, broad groups, vernacular vs scientific names, and focal vs incidental taxa. It also covers the name-aware matching used to evaluate them.
 
+![Species mismatches, PDF input](img/article_outline/s1_species_mismatches_pdf.png)
+
+*Species mismatches from PDF input, with their likely cause (vocabulary gap, over-extraction, mixed), from the results app: improved prompt, gpt-5-mini at low reasoning effort.*
+
+*⚠️ Only 30 records (the evaluation subset), 17 of which have a species mismatch. Indicative, not final results.*
+
 **Interpretation:** this keeps a technical weakness out of the main text while explaining why rule-based scoring suffers where taxa matter, and why direct scoring can do better there.
 
 ### S2: cost per approach
 Tokens and cost in US dollars per record, for each approach and input (short text, PDF), and the cost of scaling to a full repository harvest.
+
+| Abstract / data paper description | Article PDF |
+|---|---|
+| ![Run cost, abstract input](img/article_outline/s2_cost_abstract.png) | ![Run cost, PDF input](img/article_outline/s2_cost_pdf.png) |
+
+*Total cost of one feature extraction run (Cost tile, US dollars), from the results app: improved prompt, gpt-5-mini at low reasoning effort.*
+
+*⚠️ Only 30 records (the evaluation subset). Divide by 30 for the cost per record; it does not cover relevance scoring calls.*
 
 **Interpretation:** long text and stronger models cost more. This supplement lets a reader weigh the performance gains in Table 1 against the cost of running each approach at Biodiversité Québec's scale.
 
