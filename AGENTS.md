@@ -101,7 +101,7 @@ Data Ingestion → Schema & Prompt Engineering → LLM Inference → Evaluation 
   3. EZproxy (institutional access via `ezproxy.py`)
   4. Sci-Hub (last resort via `scihub.py`)
 - **[Stage 1]** `pdf_parsing.py` — GROBID-based full-text extraction, TEI XML parsing, hierarchical section structure
-- **[Stage 1]** `article_retrieval.py` — DOI matching between data papers (Dryad) and scientific articles (for ground truth preparation)
+- **[Stage 1]** `doi_utils.py` — DOI cleaning and matching (the former `article_retrieval.py` was retired; article links now live on `DataPaperRecord`)
 - **[Stage 1]** `unpaywall.py` — Open access PDF discovery API
 - **[Stage 1]** `semantic_scholar.py` — Semantic Scholar Graph API client for paper search, citations, and references
 
@@ -313,19 +313,22 @@ uv run app
 | Tab | Purpose |
 |-----|---------|
 | Overview | Run metadata + run counts, foldable GT dataset table, foldable rendered system prompt, foldable run logs |
-| Detailed Metrics | Per-field F1/P/R table (multi-row select); mismatch table (multi-row select) |
+| Extraction Output | Raw extracted features per record |
+| Detailed Metrics | Per-field F1/P/R table (multi-row select); mismatch table with root-cause categories (multi-row select) |
 | Dataset Results | Paper selector → metadata + abstract + field results (multi-row select) |
 | Compare Runs | Delta table for two runs, sorted by Δ F1 ascending (multi-row select) |
-| Notes | Rich text editor for per-run analyst notes, save to disk, open in VS Code |
+| Trends | Per-field F1/P/R sparklines across runs |
 
-All dataframes in tabs 2–4 support multi-row selection. The CSV/Markdown export buttons export only selected rows when a selection exists, otherwise the full table. Each export shows a caption with the source table name and row count.
+The former Notes tab is disabled (commented out in `app_eval_viewer.py`). Notes files are still read and written next to each run (see below).
+
+All dataframes in the metrics, dataset and compare tabs support multi-row selection. The CSV/Markdown export buttons export only selected rows when a selection exists, otherwise the full table. Each export shows a caption with the source table name and row count.
 
 ### Data dependencies
 
 | File | Required | Purpose |
 |------|----------|---------|
-| `data/*.json` | **Yes** — app stops if none | `EvaluationReport` results from `prompt_eval` (preferred source for records + prompt text) |
-| `data/*.log` | Optional | Run logs shown in Overview → Logs |
+| `artifacts/runs/*.json` (or `EVAL_VIEWER_RESULTS_DIR`) | **Yes** — app stops if none | Run artifacts from `prompt_eval` (preferred source for records + prompt text) |
+| `artifacts/runs/*.log` | Optional | Run logs shown in Overview → Logs |
 | `data/dataset_092624_validated.xlsx` | Optional (fallback only) | Paper title, DOI, links, validity metadata for older JSON files |
 | `data/dataset_092624.xlsx` | Optional (fallback only) | Abstract text (`full_text` column) for older JSON files |
 | `{run_dir}/{run_stem}_notes.md` | Optional (created on first save/open) | Per-run analyst notes stored next to the run artifact |
@@ -342,7 +345,7 @@ Notes are stored as `{run_dir}/{run_stem}_notes.md`, in the same directory as th
 ---
 ```
 
-The Notes tab uses `streamlit_lexical` for rich text editing. The "Open in Windows" button uses `os.startfile()` on Windows (default `.md` handler) or `code` CLI on other platforms.
+When the Notes tab was enabled, it used `streamlit_lexical` for rich text editing, and its "Open in Windows" button used `os.startfile()` on Windows (default `.md` handler) or the `code` CLI on other platforms. Until it is re-enabled, create and edit notes files directly.
 
 ## Prompt Engineering Workflow
 
@@ -407,7 +410,7 @@ Cache behavior:
 | Ground truth | `data/dataset_092624_validated.xlsx` | Original human annotations, annotator's intent |
 | Raw abstract | Extracted from xlsx `abstract` column | What text the LLM saw |
 | Parsed PDF | `artifacts/tei/{doi}.md` or GROBID output | Full-text context — was information available? |
-| Extraction output | `data/{run}.json` → `field_results` | What the LLM produced |
+| Extraction output | `artifacts/runs/{run}.json` → `field_results` | What the LLM produced |
 | Analyst notes | `{run_dir}/{run_stem}_notes.md` | Prior observations, field-level analysis stored next to the run artifact |
 
 **Analyst guidelines:**
@@ -422,7 +425,7 @@ Cache behavior:
 When an agent (Analyst role) analyzes prompt eval results, it **must** write observations to the run's notes file:
 
 1. **Check for existing notes** — read `{run_dir}/{run_stem}_notes.md` if it exists
-2. **Create if missing** — use the Eval Viewer app's Notes tab (which seeds the metadata header), or create manually with the header format documented in the Eval Viewer section above
+2. **Create if missing** — create it manually with the header format documented in the Eval Viewer section above (the app's Notes tab, which seeded the header, is currently disabled)
 3. **Write per-field observations** using the format below, appending under the `---` separator
 4. **Save** — either via the Eval Viewer's Save button or by writing the file directly
 
@@ -443,7 +446,7 @@ Also add a summary to `notebooks/README.md` under a dated session header per the
 
 ### Prompt Iteration Protocol
 
-1. **Baseline first** — never modify prompts before establishing a baseline run on `dev_subset.csv`
+1. **Baseline first** — never modify prompts before establishing a baseline run on the dev subset (`data/manifests/dev_subset_data_paper.csv`)
 2. **One change at a time** — isolate prompt changes to a single block (VOCABULARY, SCOPING, etc.)
 3. **Field scope** — state upfront which fields the change is expected to affect
 4. **Compare to baseline** — use `EvaluationReport.load()` + side-by-side comparison; never judge by feel
@@ -463,7 +466,7 @@ Also add a summary to `notebooks/README.md` under a dated session header per the
 | `configs/eval_default.json` | DEFAULT_FIELD_STRATEGIES + standard normalization |
 | `configs/eval_fuzzy_species.json` | Fuzzy species matching variant |
 | `configs/eval_strict.json` | Exact-only matching baseline |
-| `data/dev_subset.csv` | 30-record curated evaluation subset (stable — don't change without bumping version) |
+| `data/manifests/dev_subset_data_paper.csv` | 30-record curated evaluation subset (stable — don't change without bumping version) |
 | `data/gt/fuster_gt.json` | Pre-validated GT annotations as JSON array (from `export_gt_json()`) |
 | `artifacts/runs/*.json` | `prompt_eval` run artifacts (gitignored except baselines committed with `git add -f`) |
 

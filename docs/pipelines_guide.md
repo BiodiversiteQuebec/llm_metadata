@@ -1,437 +1,202 @@
-# Classification extraction Guide
+# Module guide
 
-## Overview
+Code examples for each stage of the pipeline. The [README](../README.md) covers the main path: a `prompt_eval` run on a manifest, then the results app. This guide is for when you want to call the modules yourself, in a notebook or a script.
 
-The LLM Metadata package provides three specialized classification extraction for extracting structured metadata from scientific documents:
-
-1. **Text Pipeline** - Direct text classification
-2. **PDF Pipeline** - Raw PDF extraction and classification  
-3. **Section Pipeline** - GROBID-based section extraction and classification
-
-## Quick Start
-
-### Unified Interface
-
-The simplest way to use any pipeline is through the unified `extract()` function:
-
-```python
-from llm_metadata.extraction import extract
-
-# Auto-detect and extract
-results = extract("path/to/paper.pdf")
-
-# Or specify pipeline explicitly
-results = extract("path/to/paper.pdf", pipeline="pdf")
-```
-
-### Pipeline Selection
-
-Use this decision tree to choose the right pipeline:
-
-```
-Do you already have extracted text?
-├─ YES → Use text_pipeline
-└─ NO → Do you have PDF files?
-    └─ YES → Do you need section-level granularity?
-        ├─ YES → Use section_pipeline (GROBID)
-        └─ NO → Use pdf_pipeline (raw extraction)
-```
-
-## Pipeline Details
-
-### 1. Text Pipeline
-
-**Module**: `text_pipeline.py`  
-**Input**: Raw text strings (abstracts, pre-extracted content, etc.)  
-**Processing**: Text → GPT Classification  
-
-**Use Cases:**
-- Classifying abstracts from a database
-- Processing pre-extracted text
-- Testing prompts without PDF processing
-- Batch processing text from APIs
-
-**Example:**
-
-```python
-from llm_metadata.text_pipeline import (
-    text_classification_flow,
-    TextClassificationConfig,
-    TextInputRecord
-)
-
-# Configure
-config = TextClassificationConfig(
-    model="gpt-5-mini",
-    reasoning={"effort": "low"}
-)
-
-# Prepare input
-records = [
-    TextInputRecord(
-        id="paper_1",
-        text="We collected genetic samples from 150 individuals...",
-        metadata={"source": "openalex", "year": 2024}
-    )
-]
-
-# Run
-results = text_classification_flow(records, config)
-```
-
-**Performance**: Fastest (~1-2s per record, GPT only)
+Run everything through `uv run` so the project environment and `.env` are used.
 
 ---
 
-### 2. PDF Pipeline
+## Stage 1: data ingestion
 
-**Module**: `pdf_pipeline.py`  
-**Input**: PDF files  
-**Processing**: PDF → Text Extraction (pypdf) → GPT Classification  
-
-**Use Cases:**
-- Quick batch processing of PDFs
-- When document structure is not important
-- No GROBID server available
-- Processing papers where all content matters
-
-**Example:**
+### Datasets and papers from the repositories
 
 ```python
-from llm_metadata.pdf_pipeline import (
-    pdf_classification_flow,
-    PDFClassificationConfig,
-    PDFInputRecord
-)
+from llm_metadata.dryad import search_datasets, get_dataset
+from llm_metadata.zenodo import get_record_by_doi, get_record_by_doi_list
+from llm_metadata.semantic_scholar import get_paper_by_doi, get_open_access_pdf_url
 
-# Configure
-config = PDFClassificationConfig(
-    model="gpt-5-mini",
-    reasoning={"effort": "low"},
-    max_pdf_pages=10  # Optional: limit to first 10 pages
-)
+# Dryad: keyword search, or one dataset by DOI
+results = search_datasets("biodiversity Quebec Canada", per_page=10)
+dataset = get_dataset("doi:10.5061/dryad.n726pq6")
 
-# Prepare input
-records = [
-    PDFInputRecord(
-        id="10.1234/example",
-        pdf_path="data/pdfs/paper.pdf",
-        metadata={"doi": "10.1234/example"}
-    )
-]
+# Zenodo (needs ZENODO_ACCESS_TOKEN): one record or a batch
+record = get_record_by_doi("10.5061/dryad.2n5h6")
+records = get_record_by_doi_list(["10.5061/dryad.2n5h6", "10.5061/dryad.3nh72"])
 
-# Run
-results = pdf_classification_flow(records, config)
-
-# Or process entire directory
-from llm_metadata.pdf_pipeline import pdf_classification_from_directory
-results = pdf_classification_from_directory(
-    pdf_dir=Path("data/pdfs"),
-    config=config
-)
+# Semantic Scholar: paper metadata and open-access PDF link
+paper = get_paper_by_doi("10.1371/journal.pone.0128238")
+pdf_url = get_open_access_pdf_url("10.1371/journal.pone.0128238")
 ```
 
-**Performance**: Fast (~3-5s per record, pypdf + GPT)
-
----
-
-### 3. Section Pipeline
-
-**Module**: `section_pipeline.py`  
-**Input**: PDF files  
-**Processing**: PDF → GROBID Parsing → Section Selection → GPT Classification  
-
-**Use Cases:**
-- Need structured section extraction
-- Want to focus on specific sections (Methods, Data, etc.)
-- High-quality scientific papers
-- When section context improves extraction
-
-**Example:**
+### Article metadata from OpenAlex
 
 ```python
-from llm_metadata.section_pipeline import (
-    section_classification_flow,
-    SectionClassificationConfig,
-    SectionSelectionConfig,
-    SectionInputRecord
-)
-from llm_metadata.schemas.chunk_metadata import SectionType
+from llm_metadata.openalex import get_work_by_doi, extract_abstract, extract_pdf_url
 
-# Configure section selection
-section_config = SectionSelectionConfig(
-    section_types=[SectionType.ABSTRACT, SectionType.METHODS],
-    keywords=["data", "dataset", "sample"],
-    include_abstract=True,
-    include_all=False  # Only selected sections
-)
-
-# Configure pipeline
-config = SectionClassificationConfig(
-    model="gpt-5-mini",
-    reasoning={"effort": "low"},
-    section_config=section_config,
-    grobid_url="http://localhost:8070"
-)
-
-# Prepare input
-records = [
-    SectionInputRecord(
-        id="10.1234/example",
-        pdf_path="data/pdfs/paper.pdf"
-    )
-]
-
-# Run
-results = section_classification_flow(records, config)
+work = get_work_by_doi("10.1371/journal.pone.0128238")
+abstract = extract_abstract(work)   # OpenAlex stores abstracts as an inverted index
+pdf_url = extract_pdf_url(work)
 ```
 
-**Performance**: Slower (~10-15s per record, GROBID + GPT)  
-**Requires**: GROBID server running
+### PDF download
 
----
-
-## Configuration Comparison
-
-| Feature | Text Pipeline | PDF Pipeline | Section Pipeline |
-|---------|--------------|--------------|------------------|
-| **Model** | ✓ | ✓ | ✓ |
-| **Reasoning** | ✓ | ✓ | ✓ |
-| **Temperature** | ✓ | ✓ | ✓ |
-| **Text Format** | ✓ | ✓ | ✓ |
-| **Max PDF Pages** | ✗ | ✓ | ✗ |
-| **Section Selection** | ✗ | ✗ | ✓ |
-| **GROBID URL** | ✗ | ✗ | ✓ |
-
-## Unified Interface Examples
-
-### Auto-Detection
+`download_pdf_with_fallback` tries the open-access sources first (OpenAlex, then Unpaywall), then institutional access. For the article, only open-access PDFs are used.
 
 ```python
-from llm_metadata.extraction import extract
+from llm_metadata.pdf_download import download_pdf_with_fallback
 
-# Automatically detects pipeline based on input type
-results = extract("Direct text to extract")  # → text_pipeline
-results = extract(Path("paper.pdf"))  # → pdf_pipeline (default for PDFs)
-results = extract([Path("p1.pdf"), Path("p2.pdf")])  # → pdf_pipeline
+pdf_path = download_pdf_with_fallback(doi="10.1371/journal.pone.0128238")
 ```
 
-### Explicit Pipeline Selection
+Institutional access needs browser cookies. See [`ezproxy_guide.md`](ezproxy_guide.md).
+
+### Full-text parsing with GROBID
+
+Start GROBID first: `docker compose up -d grobid`.
 
 ```python
-from llm_metadata.extraction import extract, TextClassificationConfig
-
-# Force specific pipeline
-config = TextClassificationConfig(model="gpt-5-mini")
-results = extract(
-    source="Some text to extract",
-    pipeline="text",
-    config=config,
-    output_manifest=Path("results.csv")
-)
-```
-
-### Batch Processing
-
-```python
-from llm_metadata.extraction import extract
 from pathlib import Path
+from llm_metadata.pdf_parsing import process_pdf
 
-# Process directory of PDFs
-pdf_files = list(Path("data/pdfs").glob("*.pdf"))
-results = extract(
-    source=pdf_files,
-    pipeline="pdf",
-    output_manifest=Path("artifacts/results.csv")
+tei_path, doc = process_pdf(
+    pdf_path=Path("data/pdfs/article.pdf"),   # where downloads are stored
+    work_id="W123",                       # OpenAlex work ID
+    grobid_url="http://localhost:8070",   # default: from env or localhost
 )
-
-print(f"Processed {len(results)} PDFs")
-print(f"Success: {sum(r.status == 'success' for r in results)}")
+print(doc.title, len(doc.sections))
 ```
 
-## Input/Output Formats
+The TEI XML and the parsed document JSON are saved under `artifacts/`.
 
-### Input Records
+---
 
-All extraction use structured input records:
+## Stage 2: schemas and full-text search
+
+### Feature schemas
 
 ```python
-# Text Pipeline
-TextInputRecord(id="...", text="...", metadata={...})
-
-# PDF Pipeline
-PDFInputRecord(id="...", pdf_path="...", metadata={...})
-
-# Section Pipeline
-SectionInputRecord(id="...", pdf_path="...", metadata={...})
+from llm_metadata.schemas.fuster_features import (
+    DatasetFeaturesExtraction,   # what the LLM must return
+    DatasetFeaturesNormalized,   # cleans manual annotations
+    DatasetFeaturesEvaluation,   # adds derived fields (GBIF keys)
+    EBVDataType,
+)
 ```
 
-### Output Records
+### Chunks, embeddings and vector search
 
-All extraction return structured output records:
+Start Qdrant first: `docker compose up -d qdrant`.
 
 ```python
-OutputRecord(
-    id="...",
-    status="success",  # or "error"
-    error_message=None,
-    input_tokens=1234,
-    output_tokens=567,
-    cost_usd=0.0123,
-    extraction={...},  # Structured metadata
-    metadata={...},  # Original metadata
-    processed_at=datetime.utcnow()
-)
+from llm_metadata.chunking import chunk_document, ChunkingConfig
+from llm_metadata.embedding import embed_chunks
+from llm_metadata.vector_store import init_collection, upsert_chunks, search_chunks
+
+# Split a parsed document into section-aware chunks
+config = ChunkingConfig(target_tokens=450, max_tokens=650, overlap_tokens=80)
+chunks = chunk_document(doc, config=config)
+
+# Embed (cached locally) and store
+embeddings, _records = embed_chunks(chunks)
+init_collection()
+upsert_chunks(chunks, embeddings)
+
+# Search with a query vector, filtered on section type
+hits = search_chunks(query_vector=embeddings[0], limit=5, section_types=["METHODS"])
 ```
 
-### Manifest Files
+This full-text search path was explored but is not used in the current evaluations.
 
-Save/load results as CSV:
+---
+
+## Stage 3: LLM inference
+
+### One text
 
 ```python
-# Save results
-results = text_classification_flow(
-    records,
-    config,
-    output_manifest=Path("results.csv")
+from llm_metadata.gpt_extract import extract_from_text
+from llm_metadata.schemas.fuster_features import DatasetFeaturesExtraction
+
+result = extract_from_text(
+    "We monitored caribou in northern Quebec from 1999 to 2015 using GPS telemetry.",
+    text_format=DatasetFeaturesExtraction,
 )
-
-# Load existing manifest
-from llm_metadata.text_pipeline import load_text_manifest
-records = load_text_manifest(Path("input.csv"))
+features = result["output"]                       # a DatasetFeaturesExtraction
+print(result["usage_cost"]["total_cost"])         # cost in USD
 ```
 
-Expected CSV format:
+Calls are cached with joblib. Pass `skip_cache=True` to force a fresh call.
 
-**Input CSV** (text_pipeline):
-```csv
-id,text,source,year
-paper_1,"We collected samples...",openalex,2024
-paper_2,"Field surveys were...",crossref,2023
-```
-
-**Output CSV** (all extraction):
-```csv
-id,status,input_tokens,output_tokens,cost_usd,extraction_field1,extraction_field2,...
-paper_1,success,1234,567,0.0123,value1,value2,...
-```
-
-## Advanced Configuration
-
-### Custom Schema
+### A whole manifest
 
 ```python
-from pydantic import BaseModel, Field
+from llm_metadata.extraction import run_manifest_extraction
+from llm_metadata.schemas.data_paper import DataPaperManifest
 
-class CustomMetadata(BaseModel):
-    species: str = Field(None, description="Species name")
-    location: str = Field(None, description="Study location")
-    sample_size: int = Field(None, description="Number of samples")
-
-config = TextClassificationConfig(
-    text_format=CustomMetadata
+manifest = DataPaperManifest.load_csv("data/manifests/dev_subset_data_paper.csv")
+artifact = run_manifest_extraction(
+    manifest,
+    mode="sections",       # abstract | pdf_text | pdf_native | sections
+    name="dev_subset_sections",
 )
+print(artifact.total_cost_usd)
 ```
 
-### Section Selection Strategies
+---
+
+## Stage 4: evaluation
+
+### Validate the manual annotations
 
 ```python
-from llm_metadata.section_pipeline import SectionSelectionConfig
-from llm_metadata.schemas.chunk_metadata import SectionType
+import pandas as pd
+from llm_metadata.schemas.validation import DataFrameValidator
+from llm_metadata.schemas.fuster_features import DatasetFeaturesNormalized
 
-# Strategy 1: Specific section types
-config = SectionSelectionConfig(
-    section_types=[SectionType.METHODS, SectionType.RESULTS],
-    include_abstract=True
-)
-
-# Strategy 2: Keyword matching
-config = SectionSelectionConfig(
-    keywords=["data", "dataset", "sampling", "survey"],
-    include_all=False
-)
-
-# Strategy 3: Everything
-config = SectionSelectionConfig(
-    include_all=True
-)
+df = pd.read_excel("data/dataset_092624.xlsx")
+report = DataFrameValidator(DatasetFeaturesNormalized).validate(df)
+print(report.summary())
+valid_df = report.valid_rows_to_dataframe()
+errors_df = report.errors_to_dataframe()
 ```
 
-### Cost Control
+### Compare extractions with the ground truth
 
 ```python
-# Limit PDF pages to control costs
-config = PDFClassificationConfig(
-    max_pdf_pages=10,  # Only first 10 pages
-    max_output_tokens=2048  # Limit response size
+from llm_metadata.groundtruth_eval import (
+    DEFAULT_FIELD_STRATEGIES, EvaluationConfig, evaluate_indexed, micro_average, macro_f1,
 )
 
-# Use cheaper model
-config = TextClassificationConfig(
-    model="gpt-5-nano",  # Cheaper alternative
-    reasoning=None
-)
+config = EvaluationConfig(field_strategies=DEFAULT_FIELD_STRATEGIES)
+
+# Both dicts map a record ID (e.g. a DOI) to a Pydantic feature model
+report = evaluate_indexed(true_by_id=gt_by_doi, pred_by_id=pred_by_doi, config=config)
+
+species = report.metrics_for("species")
+print(species.precision, species.recall, species.f1)
+
+overall = micro_average(report.field_metrics.values())
+print(overall.f1, macro_f1(report.field_metrics.values()))
+
+report.metrics_to_pandas()     # one row per field
+report.save("artifacts/runs/my_report.json")
 ```
 
-## Performance Tips
+The same strategies are saved in `configs/eval_default.json` (fuzzy species: `eval_fuzzy_species.json`; exact only: `eval_strict.json`). The field-by-field logic is explained in [`evaluation_audit_guide.md`](evaluation_audit_guide.md).
 
-1. **Use the right pipeline**: Don't use section_pipeline if you don't need sections
-2. **Batch processing**: Process multiple records in one flow call for parallelization
-3. **Page limits**: Set `max_pdf_pages` for PDF pipeline to reduce costs
-4. **Caching**: Results are cached by joblib - identical inputs return cached results
-5. **GROBID optimization**: For section pipeline, ensure GROBID server is local
+### Species to GBIF keys
 
-## Migration from fulltext_pipeline.py
-
-Old code:
 ```python
-from llm_metadata.fulltext_pipeline import (
-    FulltextPipelineConfig,
-    fulltext_extraction_pipeline
-)
+from llm_metadata.gbif import match_species, enrich_with_gbif
 
-config = FulltextPipelineConfig(
-    gpt_config=GPTClassifyConfig(extraction_method="raw_pdf")
-)
-results = fulltext_extraction_pipeline(config=config, pdf_paths=pdfs)
+match = match_species("Rangifer tarandus")
+evaluated = enrich_with_gbif(features)   # returns a DatasetFeaturesEvaluation with gbif_keys
 ```
 
-New code:
+### Extraction and evaluation in one call
+
 ```python
-from llm_metadata.extraction import extract, PDFClassificationConfig
-
-config = PDFClassificationConfig()
-results = extract(source=pdfs, pipeline="pdf", config=config)
+from llm_metadata.prompt_eval import run_eval
 ```
 
-## Troubleshooting
-
-### GROBID Connection Error
-**Problem**: Section pipeline fails with "Connection refused"  
-**Solution**: Start GROBID server: `docker-compose up -d grobid`
-
-### PDF Extraction Fails
-**Problem**: PDF pipeline returns "No text extracted"  
-**Solution**: PDF may be corrupted, scanned, or HTML. Try section pipeline with GROBID
-
-### High Costs
-**Problem**: Processing costs higher than expected  
-**Solution**: 
-- Use `max_pdf_pages` to limit extraction
-- Choose appropriate model (gpt-5-nano vs gpt-5-mini)
-- Use text pipeline if text already available
-
-### Slow Processing
-**Problem**: Batch processing takes too long  
-**Solution**:
-- Increase `max_workers` in config
-- Use faster pipeline (text > pdf > section)
-- Process in smaller batches
-
-## API Reference
-
-See individual module documentation:
-- [`text_pipeline.py`](../src/llm_metadata/text_pipeline.py)
-- [`pdf_pipeline.py`](../src/llm_metadata/pdf_pipeline.py)
-- [`section_pipeline.py`](../src/llm_metadata/section_pipeline.py)
-- [`extraction.py`](../src/llm_metadata/extraction.py) - Unified interface
+`run_eval` combines the two steps and writes a run artifact. See the README, under "Running evaluations".

@@ -35,6 +35,7 @@ Either answer is a result:
 
 ### Framing (to be discussed)
 
+- **Context:** biodiversity observation networks need data that covers taxa, regions and periods well enough to track progress toward the Kunming-Montreal Global Biodiversity Framework. Many useful datasets are known only through unstructured text, so taxonomic, spatial and temporal gaps stay hidden.
 - **Motivation:** help identify, from extracted features, which datasets can feed the indicators and analyses of Biodiversité Québec. This is stated as motivation and outlook, not as a goal the article tests.
 - **End-to-end flow:** the introduction sketches the full flow the work fits into:
   - datasets and papers harvested from Dryad, Zenodo and Semantic Scholar;
@@ -57,7 +58,7 @@ Either answer is a result:
 - Main counts: valid records, records with a PDF, share that is open access.
 - **Scope:**
   - only records annotated as valid. Records the search returned but that were judged off-topic (non-biodiversity datasets) are excluded from performance;
-  - only open-access records for the full-text conditions.
+  - only open-access records for the full-text conditions: the PDFs come from open-access sources, and the counts reported per condition include open-access PDFs only.
 
 ### Inputs: short vs long text
 - **Short text:** the dataset abstract or the data paper (repository) description.
@@ -147,6 +148,16 @@ Species extraction is the weakest feature. The supplement documents the failure 
 
 **Interpretation:** this keeps a technical weakness out of the main text while explaining why rule-based scoring suffers where taxa matter, and why direct scoring can do better there.
 
+### S2: cost per approach
+Tokens and cost in US dollars per record, for each approach and input (short text, PDF), and the cost of scaling to a full repository harvest.
+
+**Interpretation:** long text and stronger models cost more. This supplement lets a reader weigh the performance gains in Table 1 against the cost of running each approach at Biodiversité Québec's scale.
+
+### S3: data gaps (to be discussed)
+Coverage of Biodiversité Québec data by taxonomic group (and possibly by region and period), against the expected diversity.
+
+**Interpretation:** it grounds the motivation in real numbers by showing which gaps the extracted features could help fill. Including it requires figures computed from the Atlas data.
+
 ---
 
 ## 7. Case study (to be discussed)
@@ -160,7 +171,8 @@ Species extraction is the weakest feature. The supplement documents the failure 
 ## 8. Results and discussion themes
 
 - Gains from prompt engineering (baseline vs improved prompt).
-- Short vs long text: performance, cost (tokens) and repeatability.
+- Short vs long text: performance, cost (detailed in S2) and repeatability.
+- Reproducibility: cached calls and fixed evaluation subsets make runs repeatable; a fresh run vs a cached run measures how stable the model is.
 - Per-field insights: location and time benefit from full text; species is hard everywhere.
 - Rule-based vs direct scoring: transparency and evolving rules vs simplicity and robustness to missing features.
 - Comparison with the NLP classification of Fuster-Calvo et al. The main challenge is not defining relevance but recovering the metadata needed to apply that definition. Direct LLM scoring works best when full text is available.
@@ -180,9 +192,18 @@ Species extraction is the weakest feature. The supplement documents the failure 
 | Table 3, confusion matrices | Partly done (four-class results exist; no figure yet) |
 | Table 4, model quality | Partly done (one stronger-model run and a repeatability test) |
 | S1, taxa extraction | Analysis exists; dedicated species prompt block still open |
+| S2, cost per approach | Cost tracked for every call in every run; table not assembled |
+| S3, data gaps | Placeholder figure only; needs real Atlas data; inclusion to be discussed |
+| Open-access-only counts for full text | To check: confirm every PDF used in the full-text conditions is open access |
 | Figures 1 and 2 | Not started |
 | Insect case study | Not started; inclusion to be discussed |
 | Introduction and Discussion | Being drafted by Alex Fuster |
+
+---
+
+## Out of scope
+
+- **Embedding-based retrieval** (chunk embeddings and a vector database to select relevant passages before extraction). It was explored, but the full-text conditions use the whole PDF or its parsed sections instead.
 
 ---
 
