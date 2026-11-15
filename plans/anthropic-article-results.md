@@ -98,6 +98,13 @@ Prices per million tokens (input / output): Haiku 5.5 0.10 / 0.50, Sonnet 5.5 2 
 - Criteria: share of PDFs with Methods and Results sections found, install effort, maintainability for the team
 - Output: a recommendation. Section-based input enters the final runs only if the recommendation is positive
 
+**First evaluation done (2026-11-15, 7 dev PDFs):** see [`docs/results/section_parsing_evaluation.md`](../docs/results/section_parsing_evaluation.md).
+
+- GROBID 0.7.3 builds and runs directly with Java 11, no Docker (versions 0.8 and later need Java 17). The existing `call_grobid` works unchanged. Methods and Results found in 7 of 7 PDFs, about 3 s per PDF
+- PyMuPDF heading detection also finds them in 7 of 7, faster, but needs our own parser and leaves page headers and footers in the text
+- Recommendation so far: GROBID 0.7.3 with Java. Still a recommendation, not a decision
+- Remaining before deciding: run it on all 30 dev PDFs (the 7 tested were mostly standard PLOS and Frontiers layouts), and add a rule for subsections, which this GROBID version returns as separate top-level sections that the normalizer files under "other"
+
 ### Round 2: harden the evaluation (no API cost)
 
 #### WU-E1: Relevance scoring as code, two targets `sonnet`
@@ -227,15 +234,51 @@ Kept separable: its own schema, module, results folder (`docs/atlas_contribution
 
 ---
 
+## Review checkpoints
+
+Independent review by a fresh subagent that does not share the main session's context, so it reads the repo as an outside reviewer would. The reviewer reports findings; it never edits code or results. Findings go in `notebooks/README.md` and the main session decides what to do. No API cost: reviews run in Claude Code.
+
+#### WU-V1: Review of the evaluation code `sonnet`
+
+**deps:** WU-E1, WU-E2, WU-E3 | **blocks:** WU-P1
+
+- Metrics (class-level, multi-rank taxa, confidence intervals) and the relevance rule module: bugs, edge cases, tests that really test something
+- Why here: a wrong metric makes every later prompt round uninterpretable
+
+#### WU-V2: Review before the held-out pass `sonnet`
+
+**deps:** WU-P1, WU-P2 | **blocks:** WU-F1
+
+- No held-out record leaked into prompts, examples, notes or the lab log
+- The frozen configuration matches what the rounds retained
+- Remaining budget covers the planned held-out runs
+- Why here: the held-out pass happens once
+
+#### WU-V3: Review of the filled outline `opus`
+
+**deps:** WU-F1
+
+- Every number in the outline traces back to a run artifact
+- Conclusions do not claim more than the confidence intervals allow
+- Why here: this is what Alex Fuster and reviewers will read
+
+#### WU-V4 (optional): Ecological review of the contribution scores `opus`
+
+**deps:** WU-G4 | **blocks:** comparison part of WU-G5
+
+- Are the scores and their thresholds ecologically defensible, or arbitrary? Checked before divergences with the Fuster relevance are interpreted
+
 ## Execution rounds
 
 ```
 Round 1: WU-A1 || WU-C1 || WU-E1 || WU-G1
 Round 2: WU-C2 || WU-E2 || WU-E3 || WU-E4          (deps: WU-C1 for WU-C2)
-Round 3: WU-P1, then WU-P2                          (deps: WU-A1, WU-E1..E3)
+         then WU-V1 (review of the evaluation code)
+Round 3: WU-P1, then WU-P2                          (deps: WU-A1, WU-E1..E3, WU-V1)
          in parallel, no API: WU-G2, WU-G4, ceiling part of WU-G5
 Round 4: WU-G3, optional WU-P3
-Round 5: WU-F1, then held-out part of WU-G5
+         optional WU-V4 before the comparison part of WU-G5
+Round 5: WU-V2, then WU-F1, then WU-V3 and the held-out part of WU-G5
 ```
 
 ## Done
@@ -246,7 +289,8 @@ Round 5: WU-F1, then held-out part of WU-G5
 - [ ] Multi-rank taxonomic evaluation documented in the supplement on taxa
 - [ ] Each prompt round committed separately with its hypothesis, result and decision in `notebooks/README.md`
 - [ ] Held-out results in the outline for Tables 1 to 3 and the cost supplement; Table 4 filled from the dev subset and flagged
-- [ ] Section parsing without Docker evaluated, with a recommendation
+- [ ] Section parsing without Docker evaluated on all 30 dev PDFs, with a recommendation (first pass on 7 PDFs done)
+- [ ] Three review checkpoints done (evaluation code, before the held-out pass, filled outline), findings logged
 - [ ] Register of doubtful annotations and discussion points on the Fuster schema committed
 - [ ] Track B: reference aggregates, matching, scores, ceiling results and the insect case committed; recommendation on article 1 vs second article
 - [ ] Total API spending at or under 4.50 USD, ledger committed

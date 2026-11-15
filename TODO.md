@@ -8,7 +8,7 @@
 Track A — article 1 (fill `docs/article_outline.md`)
 - [ ] WU-A1 — Complete the Claude adapter (PDF inputs, prompt caching, cost guard) `sonnet`
 - [ ] WU-C1 — Rebuild the open-access corpus (98 records) and freeze the held-out list `sonnet`
-- [ ] WU-C2 — Evaluate section parsing without Docker (recommendation, not a decision) `sonnet`
+- [ ] WU-C2 — Evaluate section parsing without Docker (recommendation, not a decision) `sonnet` *(first pass on 7 dev PDFs done 2026-11-15: GROBID 0.7.3 runs with Java 11; still to run on all 30)*
 - [ ] WU-E1 — Relevance rules as a tested module; human vs rule label agreement `sonnet`
 - [ ] WU-E2 — Class-level and evidence-aware metrics, confidence intervals `sonnet`
 - [ ] WU-E3 — Taxonomic resolution and multi-rank evaluation `opus`
@@ -17,6 +17,12 @@ Track A — article 1 (fill `docs/article_outline.md`)
 - [ ] WU-P2 — Relevance with Claude: direct scoring and the combined variant `sonnet`
 - [ ] WU-P3 — Claim grounding, only if a diagnosis stays open `sonnet`
 - [ ] WU-F1 — Freeze, run once on the held-out set, fill the outline `opus`
+
+Review checkpoints (fresh subagent, reports only, never edits)
+- [ ] WU-V1 — Review of the evaluation code, before the prompt rounds `sonnet`
+- [ ] WU-V2 — Review before the held-out pass (no leak, frozen config, budget) `sonnet`
+- [ ] WU-V3 — Review of the filled outline (numbers traceable, claims within intervals) `opus`
+- [ ] WU-V4 — Optional: ecological review of the Atlas contribution scores `opus`
 
 Track B — Atlas contribution potential (candidate second article)
 - [ ] WU-G1 — Atlas reference tables (aggregates only in git) `sonnet`
