@@ -6,7 +6,7 @@
 
 ## Goal statement (paste into the fresh session)
 
-> Execute `plans/anthropic-article-results.md` on branch `feat/anthropic-extraction` until its "Done" checklist is met. Fill the results of `docs/article_outline.md` with Claude models, evaluated on a held-out set, within a hard API budget of 4.50 USD. Work autonomously: one commit and one push per experiment, each logged in `notebooks/README.md`. Think like an ecologist, test hypotheses, do not just run extractions. Stop and report if a stop condition of the plan is hit.
+> Execute `plans/anthropic-article-results.md` on branch `feat/anthropic-extraction` until its "Done" checklist is met. Fill the results of `docs/article_outline.md` with Claude models, evaluated on a held-out set, within a hard API budget of 4.50 USD. Work autonomously: one local commit per experiment (no push), each logged in `notebooks/README.md`. Think like an ecologist, test hypotheses, do not just run extractions. Stop and report if a stop condition of the plan is hit.
 
 ## Why this plan exists
 
@@ -25,7 +25,7 @@ It also opens a second track: scoring a dataset by what it would add to the Atla
 | Third approach | Atlas contribution scores, validated by comparison with the Fuster relevance and illustrated by the "insects in northern Quebec" case. Own extraction schema allowed. **Candidate second article** | No human label measures contribution to the Atlas |
 | Atlas data in this public repo | Commit only per-dataset scores and aggregates (broad taxonomic group × administrative region). Raw per-species extracts stay git-ignored, with the SQL to rebuild them. Sensitive species excluded or masked | Data-sharing policy |
 | Priority if time or budget runs short | Article 1 tables first, Atlas track second, claim grounding and extras last | Vincent's call |
-| Git | One commit and one push per experiment on this branch. Never push to `main`, never open a PR unless asked | Progress visible on GitHub |
+| Git | One local commit per experiment on this branch. **No push**: Vincent pushes himself after review. No PR | Vincent reviews before anything goes to GitHub |
 | API spending | The Anthropic API pays for extraction calls only (and claim grounding if judged useful). Analysis, coding and reasoning run in Claude Code (main session and subagents) | Vincent's call |
 
 ## Operating rules for the executing session
@@ -250,4 +250,4 @@ Round 5: WU-F1, then held-out part of WU-G5
 - [ ] Register of doubtful annotations and discussion points on the Fuster schema committed
 - [ ] Track B: reference aggregates, matching, scores, ceiling results and the insect case committed; recommendation on article 1 vs second article
 - [ ] Total API spending at or under 4.50 USD, ledger committed
-- [ ] `TODO.md` updated, branch pushed
+- [ ] `TODO.md` updated, all work committed locally (not pushed)
