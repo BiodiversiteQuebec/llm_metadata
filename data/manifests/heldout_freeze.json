@@ -1,0 +1,12 @@
+{
+  "frozen_on": "2026-11-15",
+  "n": 68,
+  "by_source": {
+    "semantic_scholar": 36,
+    "zenodo": 17,
+    "dryad": 15
+  },
+  "ids_sha256": "3e3aebf3bba6689880f0ecc38667207786bfb3a6ca22e2148712d527cc7b6007",
+  "digest_input": "comma-joined sorted gt_record_id",
+  "rule": "valid_yn==yes and is_oa==1 in data/dataset_092624_validated.xlsx, minus the 30 dev records"
+}
