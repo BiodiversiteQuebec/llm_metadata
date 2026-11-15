@@ -1,2 +1,3 @@
 date,run,model,effort,mode,records,budget_line,estimated_usd,actual_usd,cumulative_usd,note
 2026-11-15,20261115_082643_haiku55_abstract_low,claude-haiku-5-5,low,abstract,30,prompt_rounds,,0.0276,0.0276,First Claude baseline on the dev subset (before this plan's execution)
+2026-11-15,adapter_smoke_test,claude-haiku-5-5,low,abstract x2 + pdf_native + pdf_text + structured-output attempt,1,prompt_rounds,0.0100,0.0100,0.0376,Adapter end-to-end check on dev record 9; native structured output rejected (schema too complex; no charge)
