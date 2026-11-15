@@ -86,7 +86,12 @@ def _is_missing(value: Any) -> bool:
 # --------------------------------------------------------------------------
 
 def _single_type_class(dt: str) -> Optional[str]:
-    """Class of one data type phrase, or None when no rule matches."""
+    """Class of one data type phrase, or None when no rule matches.
+
+    Enum spellings (``genetic_analysis``, ``species_richness``) are read like the
+    annotation text (underscores as spaces).
+    """
+    dt = dt.replace("_", " ")
     if dt in {"other", "unknown"}:
         return "X"
     if "non-ebv" in dt or ("genetic analysis" in dt and "ebv genetic" not in dt):

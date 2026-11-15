@@ -132,6 +132,15 @@ class CoreFeatureModel(BaseModel):
         None,
         description="List of EBV data type categories (e.g. ['abundance', 'density']).",
     )
+    ebv_genetic: Optional[bool] = Field(
+        None,
+        description=(
+            "Only when data_type includes genetic_analysis: true if the genetic data describe "
+            "variation within species (population genetic diversity, structure, gene flow, "
+            "relatedness, effective size); false if they only identify or detect taxa "
+            "(barcoding, eDNA, metabarcoding, diet) or build phylogenies. Null otherwise."
+        ),
+    )
     geospatial_info_dataset: Optional[list[GeospatialInfoType]] = Field(
         None,
         description="List of geospatial info categories in the dataset (sample, site, range, etc.).",
@@ -232,7 +241,11 @@ class DatasetFeaturesNormalized(DatasetFeaturesExtraction):
                 stripped = value.strip()
                 if stripped.lower() in null_placeholders:
                     cleaned[key] = None
+                elif re.fullmatch(r"\d{1,3}(,\d{3})+", stripped):
+                    # "15,000": comma as thousands separator
+                    cleaned[key] = stripped.replace(",", "")
                 elif "," in stripped and stripped.replace(",", "").replace(".", "").replace("-", "").isdigit():
+                    # "0,5": European decimal comma
                     cleaned[key] = stripped.replace(",", ".")
                 else:
                     cleaned[key] = stripped
@@ -458,7 +471,11 @@ class DatasetFeaturesNormalized(DatasetFeaturesExtraction):
                 return None
             return float(value)
         if isinstance(value, str):
-            cleaned = value.strip().replace(",", ".").replace(" ", "")
+            cleaned = value.strip().replace(" ", "")
+            if re.fullmatch(r"\d{1,3}(,\d{3})+", cleaned):
+                cleaned = cleaned.replace(",", "")  # thousands separator
+            else:
+                cleaned = cleaned.replace(",", ".")  # European decimal comma
             try:
                 return float(cleaned)
             except ValueError:

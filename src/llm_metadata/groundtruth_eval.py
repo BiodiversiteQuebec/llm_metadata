@@ -1466,5 +1466,8 @@ def bootstrap_report(
 		return out
 
 	result = {f: build(point[i], boot[:, i, :]) for f, i in f_idx.items()}
-	result[MICRO_KEY] = build(point.sum(axis=0), boot.sum(axis=1))
+	# Micro average over primary fields only: the derived class fields restate the km2 and
+	# year fields, so including them would count spatial and temporal facts twice.
+	primary = [i for f, i in f_idx.items() if f not in DERIVED_FIELDS] or list(f_idx.values())
+	result[MICRO_KEY] = build(point[primary].sum(axis=0), boot[:, primary, :].sum(axis=1))
 	return result

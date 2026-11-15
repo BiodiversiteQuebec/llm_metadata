@@ -63,6 +63,8 @@ def targets() -> pd.DataFrame:
         "human": raw["dataset_relevance"].map(normalize_human_label),
         **{f"true_{c}": raw[col].map(_clean) for c, col in _MC.items()},
     })
+    # One id (306, outside the open-access corpus) appears twice in the spreadsheet: keep the first.
+    out = out.drop_duplicates("gt_record_id", keep="first")
     return out.set_index("gt_record_id")
 
 
@@ -85,7 +87,11 @@ def _rule_inputs(output: dict) -> dict:
     feats = features_from_row({k: output.get(k) for k in (
         "temp_range_i", "temp_range_f", "spatial_range_km2", "multispecies", "threatened_species",
         "new_species_science", "new_species_region", "bias_north_south")})
-    feats["data_type"] = ", ".join(str(d).replace("_", " ") for d in data_type) or None
+    phrases = [str(d).replace("_", " ") for d in data_type]
+    if output.get("ebv_genetic") is True:
+        # The rules rank EBV genetic data High and other genetic data Low.
+        phrases = ["EBV genetic analysis" if p == "genetic analysis" else p for p in phrases]
+    feats["data_type"] = ", ".join(phrases) or None
     return feats
 
 
@@ -130,11 +136,12 @@ def _scores(y: np.ndarray, p: np.ndarray) -> dict[str, float]:
     """Four-class accuracy and kappa; binary (H+M relevant) precision, recall, F1."""
     yb = np.isin(y, list(RELEVANT_LABELS))
     pb = np.isin(p, list(RELEVANT_LABELS))
+    ok = np.isin(p, list(LABELS))  # a failed prediction ("none") is wrong in every measure
     tp, fp, fn = int(np.sum(yb & pb)), int(np.sum(~yb & pb)), int(np.sum(yb & ~pb))
     return {
         "acc4": float(np.mean(y == p)) if len(y) else float("nan"),
         "kappa4": _kappa(y, p),
-        "acc2": float(np.mean(yb == pb)) if len(y) else float("nan"),
+        "acc2": float(np.mean((yb == pb) & ok)) if len(y) else float("nan"),
         "precision": tp / (tp + fp) if tp + fp else float("nan"),
         "recall": tp / (tp + fn) if tp + fn else float("nan"),
         "f1": 2 * tp / (2 * tp + fp + fn) if (2 * tp + fp + fn) else float("nan"),
@@ -214,7 +221,11 @@ def main(argv: Optional[list[str]] = None) -> None:
     ap = argparse.ArgumentParser(description="Relevance scores of a run against the rule and human labels.")
     ap.add_argument("run_json")
     ap.add_argument("--subset", default="dev", choices=["dev", "heldout", "all"])
+    ap.add_argument("--final", action="store_true",
+                    help="Required with --subset heldout or all: the held-out set is scored once, at the end.")
     a = ap.parse_args(argv)
+    if a.subset != "dev" and not a.final:
+        ap.error("--subset heldout/all scores held-out records: add --final if this is the final pass.")
     print(summarize(a.run_json, a.subset))
 
 

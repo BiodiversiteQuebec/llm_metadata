@@ -19,6 +19,7 @@ import pandas as pd
 
 from llm_metadata.evidence_ceiling import FIELD_SOURCES, ceiling_recall, evidence_table
 from llm_metadata.groundtruth_eval import (
+    DERIVED_FIELDS,
     MICRO_KEY,
     EvaluationConfig,
     EvaluationReport,
@@ -55,21 +56,31 @@ def rescore_run(
     held_ids = set(pd.read_csv(HELDOUT_IDS)["gt_record_id"].astype(int))
     allowed = {"dev": dev_ids, "heldout": held_ids, "all": None}[subset]
 
-    preds, ids = {}, []
+    run_ids = [int(rec["gt_record_id"]) for rec in run["records"]]
+    if len(run_ids) != len(set(run_ids)):
+        raise ValueError(f"Duplicate record ids in run file {run_json}")
+
+    # A record whose extraction failed is scored as an empty prediction (every annotated
+    # value missed), so that failures lower recall instead of disappearing.
+    preds, ids, failed = {}, [], []
     for rec in run["records"]:
         gid = int(rec["gt_record_id"])
-        if rec.get("status") != "success" or rec.get("output") is None:
-            continue
         if allowed is not None and gid not in allowed:
             continue
-        preds[str(gid)] = DatasetFeaturesExtraction.model_validate(rec["output"])
+        if rec.get("status") != "success" or rec.get("output") is None:
+            preds[str(gid)] = DatasetFeaturesExtraction()
+            failed.append(gid)
+        else:
+            preds[str(gid)] = DatasetFeaturesExtraction.model_validate(rec["output"])
         ids.append(gid)
 
     trues = {}
     for entry in json.loads(Path(gt).read_text()):
         entry = dict(entry)
         gid = int(entry.pop("gt_record_id"))
-        if str(gid) in preds:
+        # The ground truth holds one duplicated id (306, not in the open-access corpus):
+        # keep the first entry.
+        if str(gid) in preds and str(gid) not in trues:
             trues[str(gid)] = DatasetFeaturesNormalized.model_validate(entry)
 
     report = evaluate_indexed(
@@ -78,6 +89,7 @@ def rescore_run(
     meta = {
         "name": run.get("name"), "mode": run.get("mode"), "model": run.get("model"),
         "effort": run.get("reasoning_effort"), "ids": sorted(ids), "subset": subset,
+        "failed": sorted(failed),
     }
     return report, meta
 
@@ -97,12 +109,21 @@ def summarize_run(
     table = evidence_table()
 
     def cell(field, metric):
-        return ci[field][metric].format(2) if field in ci else "N/A"
+        if field not in ci:
+            return "N/A"
+        iv = ci[field][metric]
+        # "~": the metric was undefined in more than 10 % of replicates (few positives),
+        # so the interval is conditional and looks narrower than it is.
+        thin = iv.point is not None and iv.n_defined < 0.9 * n_boot
+        return iv.format(2) + ("~" if thin else "")
 
     lines = [
         f"Run: {meta['name']}  model={meta['model']}  effort={meta['effort']}  mode={meta['mode']}",
-        f"Records scored: {len(meta['ids'])} ({meta['subset']})   bootstrap: {n_boot} replicates, seed {seed}, 95 % percentile intervals",
-        "Cells: value [low, high]. N/A: undefined (no positive in the denominator).",
+        f"Records scored: {len(meta['ids'])} ({meta['subset']}), of which failed extractions "
+        f"(scored as empty): {len(meta['failed'])}   bootstrap: {n_boot} replicates, seed {seed}, 95 % percentile intervals",
+        "Cells: value [low, high]. N/A: undefined (no positive in the denominator). "
+        "~: undefined in over 10 % of replicates, interval unreliable.",
+        "Micro excludes the class-level fields (they restate the km2 and year fields).",
         "",
     ]
     header = f"{'field':<25}{'precision':<19}{'recall':<19}{'F1':<19}{'exact match':<19}{'ceiling R':>9}"
@@ -169,7 +190,9 @@ def compare_runs(
 
     rep_a, meta_a = rescore_run(run_a, gt, config, subset)
     rep_b, meta_b = rescore_run(run_b, gt, config, subset)
-    rec_ids = sorted({str(i) for i in meta_a["ids"]} & {str(i) for i in meta_b["ids"]})
+    ids_a, ids_b = {str(i) for i in meta_a["ids"]}, {str(i) for i in meta_b["ids"]}
+    rec_ids = sorted(ids_a & ids_b)
+    only_one = sorted(ids_a ^ ids_b, key=int)
     fields = [f for f in rep_a.fields() if f in set(rep_b.fields())]
     ca, cb = _count_cube(rep_a, rec_ids, fields), _count_cube(rep_b, rec_ids, fields)
 
@@ -185,13 +208,18 @@ def compare_runs(
     lines = [
         f"A: {meta_a['name']} ({meta_a['model']}, {meta_a['effort']}, {meta_a['mode']})",
         f"B: {meta_b['name']} ({meta_b['model']}, {meta_b['effort']}, {meta_b['mode']})",
-        f"Paired on {len(rec_ids)} records ({subset}); {n_boot} paired bootstrap replicates, seed {seed}.",
+        f"Paired on {len(rec_ids)} records ({subset}); {n_boot} paired bootstrap replicates, seed {seed}. "
+        f"Failed extractions (scored as empty): A {len(meta_a['failed'])}, B {len(meta_b['failed'])}.",
+        *( [f"WARNING: records in only one run, left out: {', '.join(only_one)}"] if only_one else [] ),
+        "Micro excludes the class-level fields. With about 15 fields, one 'gain' or 'loss' at 95 % is"
+        " expected by chance: trust a verdict that matches the hypothesis, not a stray one.",
         "",
         f"{'field':<25}{'F1 A':>7}{'F1 B':>7}{'B - A [95 % interval]':>28}{'P(B>A)':>8}  verdict",
         "-" * 88,
     ]
     rows = [(f, ca[:, i, :], cb[:, i, :]) for i, f in enumerate(fields)]
-    rows.append((MICRO_KEY, ca.sum(axis=1), cb.sum(axis=1)))
+    primary = [i for i, f in enumerate(fields) if f not in DERIVED_FIELDS] or list(range(len(fields)))
+    rows.append((MICRO_KEY, ca[:, primary, :].sum(axis=1), cb[:, primary, :].sum(axis=1)))
     for f, a, b in rows:
         name = "micro (all fields)" if f == MICRO_KEY else f
         fa, fb = float(f1(a.sum(axis=0))), float(f1(b.sum(axis=0)))
@@ -202,7 +230,10 @@ def compare_runs(
             continue
         lo, hi = np.percentile(d, [2.5, 97.5])
         p_better = float((d > 0).mean())
-        verdict = "gain" if lo > 0 else ("loss" if hi < 0 else "no clear change")
+        if np.all(d == 0):
+            verdict = "identical"
+        else:
+            verdict = "gain" if lo > 0 else ("loss" if hi < 0 else "no clear change")
         out[f] = {"f1_a": fa, "f1_b": fb, "delta": fb - fa, "low": float(lo), "high": float(hi),
                   "p_b_better": p_better, "verdict": verdict}
         lines.append(
@@ -221,7 +252,11 @@ def main(argv: Optional[list[str]] = None) -> None:
     ap.add_argument("--subset", default="dev", choices=["dev", "heldout", "all"])
     ap.add_argument("--n-boot", type=int, default=1000)
     ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--final", action="store_true",
+                    help="Required with --subset heldout or all: the held-out set is scored once, at the end.")
     a = ap.parse_args(argv)
+    if a.subset != "dev" and not a.final:
+        ap.error("--subset heldout/all scores held-out records: add --final if this is the final pass.")
     if a.compare:
         print(compare_runs(a.run_json, a.compare, a.gt, a.config, a.subset, max(a.n_boot, 2000), a.seed)[0])
         return
