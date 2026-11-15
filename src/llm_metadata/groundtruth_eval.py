@@ -1381,7 +1381,9 @@ def _metrics_from_counts(tp, fp, fn, exact, n):
 	with np.errstate(divide="ignore", invalid="ignore"):
 		p = np.where(tp + fp > 0, tp / (tp + fp), np.nan)
 		r = np.where(tp + fn > 0, tp / (tp + fn), np.nan)
-		f1 = np.where((p + r) > 0, 2 * p * r / (p + r), np.nan)
+		# 2TP / (2TP + FP + FN): equals 2PR / (P + R) when defined, and is 0 (not undefined)
+		# when there are positives but no true positive.
+		f1 = np.where(2 * tp + fp + fn > 0, 2 * tp / (2 * tp + fp + fn), np.nan)
 		em = np.where(n > 0, exact / n, np.nan)
 	return {"precision": p, "recall": r, "f1": f1, "exact_match_rate": em}
 

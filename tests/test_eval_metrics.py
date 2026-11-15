@@ -202,3 +202,29 @@ def test_summarize_run_on_synthetic_artifact(tmp_path):
     assert "Records scored: 5 (dev)" in text  # held-out records in the file are not scored
     assert "geospatial_info_dataset" in text and "spatial_range_class" in text
     assert "ceiling R" in text
+
+
+def test_compare_runs_paired_delta(tmp_path):
+    """A run compared with itself gives zero difference; a run with an extra error loses."""
+    import json as _json
+
+    from llm_metadata.run_summary import compare_runs
+
+    gt = {int(e["gt_record_id"]): e for e in _json.loads(open("data/gt/fuster_gt.json").read())}
+    ids = [5, 9, 11]
+
+    def run(path, spoil):
+        recs = []
+        for gid in ids:
+            out = {k: v for k, v in gt[gid].items() if k in ("temp_range_i", "temp_range_f", "time_series")}
+            if spoil and gid == 9:
+                out["temp_range_i"] = 1800
+            recs.append({"gt_record_id": gid, "status": "success", "output": out})
+        path.write_text(_json.dumps({"name": path.stem, "mode": "abstract", "records": recs}))
+        return path
+
+    a, b = run(tmp_path / "a.json", False), run(tmp_path / "b.json", True)
+    _, same = compare_runs(a, a, n_boot=200)
+    assert all(abs(v["delta"]) < 1e-12 for v in same.values())
+    _, diff = compare_runs(a, b, n_boot=200)
+    assert diff["temp_range_i"]["delta"] < 0
