@@ -86,6 +86,7 @@ Prices per million tokens (input / output): Haiku 5.5 0.10 / 0.50, Sonnet 5.5 2 
 
 - Build the manifest of the 98 valid open-access records through `DataPaperManifest`
 - Download PDFs from open sources only: OpenAlex, Unpaywall, Europe PMC, repository pages. No Sci-Hub, no EZproxy. Chromium is available as a fallback for publishers that block scripts
+- Expect blocked downloads: in the first test, 6 of 14 dev PDFs returned 403 to a script and one link returned a web page (records 5, 19, 39, 123, 271, 343 and 30). Seven dev PDFs are already in `data/pdfs/fuster/` (records 9, 11, 38, 101, 104, 208, 225). Try Europe PMC and repository copies, then Chromium, before giving up on a record; report what stays unreachable
 - Record for each PDF: URL, licence, SHA-256, page count. PDFs stay git-ignored; the script and manifest make the corpus reproducible
 - Freeze the held-out list (ids and digest) in the same commit, before any run
 - Report coverage per source and per licence
@@ -103,7 +104,16 @@ Prices per million tokens (input / output): Haiku 5.5 0.10 / 0.50, Sonnet 5.5 2 
 - GROBID 0.7.3 builds and runs directly with Java 11, no Docker (versions 0.8 and later need Java 17). The existing `call_grobid` works unchanged. Methods and Results found in 7 of 7 PDFs, about 3 s per PDF
 - PyMuPDF heading detection also finds them in 7 of 7, faster, but needs our own parser and leaves page headers and footers in the text
 - Recommendation so far: GROBID 0.7.3 with Java. Still a recommendation, not a decision
-- Remaining before deciding: run it on all 30 dev PDFs (the 7 tested were mostly standard PLOS and Frontiers layouts), and add a rule for subsections, which this GROBID version returns as separate top-level sections that the normalizer files under "other"
+
+Remaining before deciding:
+
+- Run it on all 30 dev PDFs. The 7 tested were mostly standard PLOS and Frontiers layouts; Wiley, Oxford and Royal Society papers were not tested
+- Subsections: this GROBID version returns them as separate top-level sections, and the normalizer files many under "other". Add a rule such as "everything between the Methods heading and the Results heading is Methods", with a test
+- Known misclassifications to cover in that test: a Nature paper (record 104) whose first section comes back "Untitled", and a "Model" subsection under Results that was classified as Methods
+- Check the section text itself on a few papers. So far only heading classification and character counts were checked, plus one spot check
+- Compare cost and extraction scores of section input against PDF text and native PDF on the dev subset before keeping it for the final runs
+
+Practical notes: GROBID lives in `scratch/grobid/grobid-0.7.3` (git-ignored, 1.3 GB, plus 0.6 GB in `~/.gradle`). The server is stopped; the restart command and health check are in the evaluation report. The first call takes about 36 s (warm-up).
 
 ### Round 2: harden the evaluation (no API cost)
 
