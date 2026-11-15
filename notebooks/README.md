@@ -2394,3 +2394,37 @@ Goal : Manual deep dive into the Fuster dataset to understand the data and its s
 
 **Next Steps:**
 - If we want a guaranteed fresh API rerun later, execute the same notebook command in a shell where `uv run` loads `.env` or where `OPENAI_API_KEY` is exported before launch.
+
+---
+
+## Article results on Claude models (plan `plans/anthropic-article-results.md`)
+
+Rules for these entries: each experiment states its hypothesis before the run, and is judged with the paired comparison (`uv run python -m llm_metadata.run_summary A.json --compare B.json`), never by eye. Relevance is scored against both the rule label and the human label (`uv run python -m llm_metadata.relevance_eval run.json`). Costs are in `docs/results/cost_ledger.csv`. Only the 30 dev records are used until the final held-out pass.
+
+### 2026-11-15: Setup before the prompt rounds
+
+**Done (no API cost unless stated):**
+- Held-out list frozen: the 68 valid open-access records outside the dev subset (`data/manifests/heldout_ids.csv`, SHA-256 in `heldout_freeze.json`).
+- Claude adapter completed: native PDF and PDF text inputs, prompt caching, one repair retry on invalid replies, `--max-cost` guard (smoke test 0.01 USD). The system prompt is about 4 900 tokens and caches (reads cost 10 %). One native PDF is about 52 000 input tokens, four times its PyMuPDF text.
+- Fuster rules moved to `relevance_rules.py`: they reproduce 178 of 180 released relevance classes. Human and rule labels agree on 54 % of records (four classes) and 76 % (relevant vs not). That agreement is the ceiling shown next to every relevance result (`docs/results/relevance_targets.md`).
+- Evaluation hardened: class-level spatial and temporal scores, bootstrap intervals, an evidence ceiling from the annotators' position columns, and a paired comparison of two runs.
+- Bug found: `geospatial_info_dataset` had never been scored (configs named it `geospatial_info`). Real F1 on the Haiku baseline: 0.31.
+
+### 2026-11-15: Repeatability of the Haiku baseline (noise floor)
+
+**Hypothesis:** rerunning the same prompt (Claude Haiku 5.5, low effort, 30 dev abstracts) moves micro F1 by less than 0.03, with a few flips on rare yes/no fields.
+
+**Run:** `artifacts/runs/20261115_100154_haiku55_abstract_low_repeat.json` vs the first baseline `20261115_082643_haiku55_abstract_low.json`. Cost 0.018 USD (the guard estimated 0.040: its 1 500 output tokens per record is cautious; low effort uses about 600).
+
+**Result:**
+- Micro F1 0.45 → 0.44, difference −0.01 [−0.04, +0.01]. Hypothesis holds.
+- Single fields move by chance: `time_series` −0.18 [−0.43, 0.00], `temp_range_i` −0.06, `species` −0.04. Rare yes/no fields (new species, north-south) swing by up to ±0.2.
+- Rule-based relevance from these abstracts, first and second run: 43 % and 40 % four-class agreement with the rule label, binary F1 0.53 and 0.48. The errors go one way: 17 of 30 records rated too low, at most 1 too high.
+
+**Diagnosis of the relevance errors (error attribution, first run):**
+- **Spatial extent:** wrong in 19 of 30 records, always "not stated" instead of a class. The annotators mostly derived the area themselves from place names (56 of 107 annotated areas are written nowhere in the text), while the prompt forbids inference.
+- **Data type:** wrong in 17 records, of which 9 are High → Low on genetic data. The rules rank *EBV* genetic data (intraspecific genetic diversity, population structure) High and other genetic data Low. The extraction vocabulary has a single `genetic_analysis` value, so the model can never reach High there. Annotators wrote "EBV genetic" 28 times and plain "genetic" 3 times among valid records.
+
+**Decision:**
+- A prompt change counts only when the paired interval excludes 0. Rare yes/no fields need a change larger than about 0.2.
+- Next rounds, in this order: (1) split EBV genetic data from other genetic data in the vocabulary; (2) let the model estimate the spatial extent from named places, as the annotators did.
