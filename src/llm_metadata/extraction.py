@@ -18,6 +18,7 @@ from llm_metadata.gpt_extract import (
     extract_from_pdf_text,
     extract_from_text,
 )
+from llm_metadata import anthropic_extract
 from llm_metadata.logging_utils import configure_extraction_logging, logger
 from llm_metadata.pdf_parsing import ParsedDocument, Section, process_pdf
 from llm_metadata.schemas import DatasetAbstractMetadata
@@ -38,6 +39,13 @@ DEFAULT_PROMPT_MODULES = {
     ExtractionMode.PDF_NATIVE: "prompts.pdf_file",
     ExtractionMode.SECTIONS: "prompts.section",
 }
+
+
+def _extract_text(text: str, *, model: str, **kwargs: Any) -> dict[str, Any]:
+    """Route text extraction to Claude for ``claude-*`` models, OpenAI otherwise."""
+    if anthropic_extract.is_claude_model(model):
+        return anthropic_extract.extract_from_text(text, model=model, **kwargs)
+    return extract_from_text(text, model=model, **kwargs)
 
 
 def _usage_cost_total(record: RunRecord) -> str:
@@ -203,7 +211,7 @@ def _run_abstract_mode(
     if not record.abstract:
         return RunRecord(**_record_result_base(record, ExtractionMode.ABSTRACT), status="skipped", error_message="Missing abstract.")
 
-    result = extract_from_text(
+    result = _extract_text(
         record.abstract,
         system_message=system_message,
         temperature=config.temperature,
@@ -317,7 +325,7 @@ def _run_sections_mode(
         sections,
         include_abstract=config.section_config.include_abstract,
     )
-    result = extract_from_text(
+    result = _extract_text(
         prompt_text,
         system_message=system_message,
         temperature=config.temperature,

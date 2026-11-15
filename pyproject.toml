@@ -15,6 +15,7 @@ dependencies = [
     "requests",
     "prefect",
     "openai",
+    "anthropic",
     "pandera",
     "lxml",
     "qdrant-client",
