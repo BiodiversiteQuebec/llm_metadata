@@ -11,7 +11,7 @@
     "temp_range_f":        {"match": "exact", "threshold": 80},
     "spatial_range_km2":   {"match": "exact", "threshold": 80},
     "data_type":           {"match": "exact", "threshold": 80},
-    "geospatial_info":     {"match": "exact", "threshold": 80},
+    "geospatial_info_dataset": {"match": "exact", "threshold": 80},
     "species":             {"match": "fuzzy", "threshold": 70},
     "time_series":         {"match": "exact", "threshold": 80},
     "multispecies":        {"match": "exact", "threshold": 80},
