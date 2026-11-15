@@ -20,13 +20,22 @@ from llm_metadata.groundtruth_eval import (
     FieldEvalStrategy,
     evaluate_indexed,
 )
-from llm_metadata.extraction import ExtractionConfig, ExtractionMode, run_manifest_extraction
+from llm_metadata.extraction import (
+    ExtractionConfig,
+    ExtractionMode,
+    estimate_run_cost,
+    run_manifest_extraction,
+)
 from llm_metadata.logging_utils import configure_extraction_logging, logger
 from llm_metadata.schemas.data_paper import DataPaperManifest, DataPaperRecord, RunArtifact
 from llm_metadata.schemas.fuster_features import (
     DatasetFeaturesExtraction,
     DatasetFeaturesNormalized,
 )
+
+
+class CostLimitExceeded(RuntimeError):
+    """The pre-run cost estimate is above the allowed maximum."""
 
 
 _OUTPUT_DIR = Path(os.getenv("PROMPT_EVAL_OUTPUT_DIR", "artifacts/runs"))
@@ -107,8 +116,18 @@ def run_eval(
     skip_cache: bool = False,
     text_format: type[BaseModel] = DatasetFeaturesExtraction,
     gt_model: type[BaseModel] = DatasetFeaturesNormalized,
-) -> EvaluationReport:
-    """Run extraction + evaluation for one explicit mode over one manifest."""
+    max_cost_usd: Optional[float] = None,
+    estimate_only: bool = False,
+    assumed_output_tokens: int = 1500,
+    structured_output: bool = False,
+) -> Optional[EvaluationReport]:
+    """Run extraction + evaluation for one explicit mode over one manifest.
+
+    Claude models only: ``max_cost_usd`` estimates the run with ``count_tokens``
+    (cached records excluded, ``assumed_output_tokens`` per record) and raises
+    ``CostLimitExceeded`` before any extraction call when the estimate is above
+    the limit. ``estimate_only`` prints the estimate and returns None.
+    """
 
     requested_output_path = Path(output_path) if output_path is not None else None
     resolved_output_path = _resolve_output_path(
@@ -130,6 +149,7 @@ def run_eval(
             reasoning_effort=reasoning_effort,
             description=description,
             skip_cache=skip_cache,
+            structured_output=structured_output,
         )
     )
 
@@ -161,7 +181,29 @@ def run_eval(
                 model=model,
                 reasoning={"effort": reasoning_effort},
                 text_format=text_format,
+                structured_output=structured_output,
             )
+            if max_cost_usd is not None or estimate_only:
+                estimate = estimate_run_cost(
+                    manifest_obj,
+                    mode=mode,
+                    config=run_config,
+                    prompt=prompt,
+                    assumed_output_tokens=assumed_output_tokens,
+                    skip_cache=skip_cache,
+                )
+                print(
+                    f"Cost estimate: ${estimate['estimated_cost_usd']:.4f} "
+                    f"({estimate['to_call']} records to call, {estimate['already_cached']} already cached, "
+                    f"{estimate['skipped_no_input']} without input; {estimate['input_tokens']} input tokens, "
+                    f"{estimate['assumed_output_tokens']} assumed output tokens)"
+                )
+                if max_cost_usd is not None and estimate["estimated_cost_usd"] > max_cost_usd:
+                    raise CostLimitExceeded(
+                        f"Estimated cost ${estimate['estimated_cost_usd']:.4f} exceeds --max-cost ${max_cost_usd:.4f}; nothing was spent."
+                    )
+                if estimate_only:
+                    return None
             run_artifact = run_manifest_extraction(
                 manifest_obj,
                 mode=mode,
@@ -278,6 +320,7 @@ def _build_recreate_command(
     reasoning_effort: str,
     description: Optional[str],
     skip_cache: bool,
+    structured_output: bool = False,
 ) -> str:
     command = [
         "uv",
@@ -306,6 +349,8 @@ def _build_recreate_command(
         command.extend(["--description", description])
     if skip_cache:
         command.append("--skip-cache")
+    if structured_output:
+        command.append("--structured-output")
     return " ".join(shlex.quote(part) for part in command)
 
 
@@ -324,10 +369,14 @@ def main() -> None:
     parser.add_argument("--fields", default=None, help="Comma-separated field names to evaluate.")
     parser.add_argument("--output", default=None, help="Path to save the run artifact JSON.")
     parser.add_argument("--name", default=None, help="Run name stem for auto-generated output paths.")
-    parser.add_argument("--model", default="gpt-5-mini", help="OpenAI model name.")
-    parser.add_argument("--reasoning-effort", default="low", help="GPT-5 reasoning effort.")
+    parser.add_argument("--model", default="gpt-5-mini", help="Model name: an OpenAI model (gpt-5-mini) or a Claude model (claude-haiku-5-5, claude-sonnet-5-5, claude-opus-5-5).")
+    parser.add_argument("--reasoning-effort", default="low", help="Reasoning effort (GPT-5 reasoning.effort, or Claude output_config.effort).")
     parser.add_argument("--description", default=None, help="Short description stored with the run artifact.")
     parser.add_argument("--skip-cache", action="store_true", help="Bypass extraction cache.")
+    parser.add_argument("--max-cost", type=float, default=None, help="Claude only: abort before any call if the estimated cost (USD) exceeds this.")
+    parser.add_argument("--estimate-only", action="store_true", help="Claude only: print the cost estimate and exit without extracting.")
+    parser.add_argument("--assumed-output-tokens", type=int, default=1500, help="Output tokens per record assumed by the cost estimate.")
+    parser.add_argument("--structured-output", action="store_true", help="Claude only: use the API's native json_schema output instead of schema-in-prompt.")
     args = parser.parse_args()
 
     # Load manifest CSV → list[DataPaperRecord]
@@ -372,6 +421,10 @@ def main() -> None:
         description=args.description,
         output_path=args.output,
         skip_cache=args.skip_cache,
+        max_cost_usd=args.max_cost,
+        estimate_only=args.estimate_only,
+        assumed_output_tokens=args.assumed_output_tokens,
+        structured_output=args.structured_output,
     )
 
 
