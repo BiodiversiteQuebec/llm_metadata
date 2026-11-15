@@ -45,7 +45,26 @@ def _extract_text(text: str, *, model: str, **kwargs: Any) -> dict[str, Any]:
     """Route text extraction to Claude for ``claude-*`` models, OpenAI otherwise."""
     if anthropic_extract.is_claude_model(model):
         return anthropic_extract.extract_from_text(text, model=model, **kwargs)
+    kwargs.pop("structured_output", None)
     return extract_from_text(text, model=model, **kwargs)
+
+
+def _provider_kwargs(config: "ExtractionConfig") -> dict[str, Any]:
+    """Keyword arguments shared by every extraction helper, adapted to the provider."""
+    claude = anthropic_extract.is_claude_model(config.model)
+    max_tokens = config.max_output_tokens
+    if max_tokens is None:
+        max_tokens = anthropic_extract.MAX_OUTPUT_TOKENS if claude else 4096
+    kwargs: dict[str, Any] = {
+        "temperature": config.temperature,
+        "model": config.model,
+        "max_output_tokens": max_tokens,
+        "text_format": config.text_format,
+        "reasoning": config.reasoning,
+    }
+    if claude:
+        kwargs["structured_output"] = config.structured_output
+    return kwargs
 
 
 def _usage_cost_total(record: RunRecord) -> str:
@@ -95,7 +114,10 @@ class SectionSelectionConfig:
 class ExtractionConfig:
     model: str = "gpt-5-mini"
     reasoning: Optional[Dict[str, Any]] = field(default_factory=lambda: {"effort": "low"})
-    max_output_tokens: int = 4096
+    # None = provider default: 4096 for OpenAI, 16000 for Claude (thinking tokens count as output).
+    max_output_tokens: Optional[int] = None
+    # Claude only: use the API's native json_schema output instead of schema-in-prompt + Pydantic.
+    structured_output: bool = False
     temperature: Optional[float] = None
     text_format: Type[BaseModel] = DatasetAbstractMetadata
     max_pdf_pages: Optional[int] = None
@@ -188,6 +210,7 @@ def _run_record_safe(
     try:
         return runner(record, config=config, system_message=system_message, skip_cache=skip_cache)
     except Exception as exc:
+        usage_cost = getattr(exc, "usage_cost", None)  # set by ClaudeValidationError
         logger.exception(
             "Extraction failed gt_record_id={} mode={} title={}",
             record.gt_record_id,
@@ -198,6 +221,7 @@ def _run_record_safe(
             **_record_result_base(record, mode),
             status="error",
             error_message=str(exc),
+            usage_cost=usage_cost,
         )
 
 
@@ -214,11 +238,7 @@ def _run_abstract_mode(
     result = _extract_text(
         record.abstract,
         system_message=system_message,
-        temperature=config.temperature,
-        model=config.model,
-        max_output_tokens=config.max_output_tokens,
-        text_format=config.text_format,
-        reasoning=config.reasoning,
+        **_provider_kwargs(config),
         skip_cache=skip_cache,
     )
     return RunRecord(
@@ -241,14 +261,15 @@ def _run_pdf_text_mode(
     if not record.pdf_local_path:
         return RunRecord(**_record_result_base(record, ExtractionMode.PDF_TEXT), status="skipped", error_message="Missing pdf_local_path.")
 
-    result = extract_from_pdf_text(
+    pdf_text_fn = (
+        anthropic_extract.extract_from_pdf_text
+        if anthropic_extract.is_claude_model(config.model)
+        else extract_from_pdf_text
+    )
+    result = pdf_text_fn(
         record.pdf_local_path,
         system_message=system_message,
-        temperature=config.temperature,
-        model=config.model,
-        max_output_tokens=config.max_output_tokens,
-        text_format=config.text_format,
-        reasoning=config.reasoning,
+        **_provider_kwargs(config),
         max_pages=config.max_pdf_pages,
         skip_cache=skip_cache,
     )
@@ -272,14 +293,15 @@ def _run_pdf_native_mode(
     if not record.pdf_local_path:
         return RunRecord(**_record_result_base(record, ExtractionMode.PDF_NATIVE), status="skipped", error_message="Missing pdf_local_path.")
 
-    result = extract_from_pdf_file(
+    pdf_file_fn = (
+        anthropic_extract.extract_from_pdf_file
+        if anthropic_extract.is_claude_model(config.model)
+        else extract_from_pdf_file
+    )
+    result = pdf_file_fn(
         record.pdf_local_path,
         system_message=system_message,
-        temperature=config.temperature,
-        model=config.model,
-        max_output_tokens=config.max_output_tokens,
-        text_format=config.text_format,
-        reasoning=config.reasoning,
+        **_provider_kwargs(config),
         skip_cache=skip_cache,
     )
     return RunRecord(
@@ -328,11 +350,7 @@ def _run_sections_mode(
     result = _extract_text(
         prompt_text,
         system_message=system_message,
-        temperature=config.temperature,
-        model=config.model,
-        max_output_tokens=config.max_output_tokens,
-        text_format=config.text_format,
-        reasoning=config.reasoning,
+        **_provider_kwargs(config),
         skip_cache=skip_cache,
     )
     return RunRecord(
@@ -477,6 +495,16 @@ def run_manifest_extraction(
         artifact.save_json(output_path)
         artifact.save_extraction_csv(Path(output_path).with_suffix(".csv"))
         logger.info("Saved extraction artifact to {}", output_path)
+    stats = validation_stats(artifact.records)
+    if stats["records_with_usage"]:
+        logger.info(
+            "Validation: failed={}/{} ({:.1%}) repaired_by_retry={} retries_used={}",
+            stats["failed"],
+            stats["records_with_usage"],
+            stats["failure_rate"],
+            stats["repaired"],
+            stats["retries"],
+        )
     logger.info(
         "Completed manifest extraction mode={} records={} total_cost=${:.4f}",
         mode.value,
@@ -486,11 +514,97 @@ def run_manifest_extraction(
     return artifact
 
 
+def validation_stats(records: list[RunRecord]) -> dict[str, Any]:
+    """Run-level validation failure rate from per-record ``validation_*`` fields (Claude runs)."""
+    usage = [r.usage_cost for r in records if r.usage_cost and "validation_failed" in r.usage_cost]
+    failed = sum(1 for u in usage if u["validation_failed"])
+    retries = sum(int(u.get("validation_retries") or 0) for u in usage)
+    return {
+        "records_with_usage": len(usage),
+        "failed": failed,
+        "retries": retries,
+        "repaired": retries - failed,
+        "failure_rate": (failed / len(usage)) if usage else 0.0,
+    }
+
+
+def estimate_run_cost(
+    manifest: DataPaperManifest,
+    *,
+    mode: ExtractionMode | str,
+    config: ExtractionConfig,
+    prompt: Optional[str] = None,
+    assumed_output_tokens: int = 1500,
+    skip_cache: bool = False,
+    client: Any = None,
+) -> dict[str, Any]:
+    """Estimate the cost of a Claude run before spending anything.
+
+    Counts the real input tokens of each record (system + user, PDF included) with
+    the free ``count_tokens`` endpoint, skips records already in the joblib cache,
+    and assumes ``assumed_output_tokens`` output tokens per record. Inputs are priced
+    as uncached (an upper bound: prompt caching only lowers the bill).
+    """
+    mode = ExtractionMode(mode)
+    if not anthropic_extract.is_claude_model(config.model):
+        raise ValueError(f"Cost estimation needs a claude-* model, got {config.model!r}.")
+    if mode == ExtractionMode.SECTIONS:
+        raise ValueError("Cost estimation is not supported for sections mode (it needs GROBID output).")
+    system_message = prompt or _load_system_message(DEFAULT_PROMPT_MODULES[mode])
+    prices = anthropic_extract.MODEL_COST_PER_1M_TOKENS[config.model]
+    max_pages = config.max_pdf_pages if mode == ExtractionMode.PDF_TEXT else None
+    common = dict(
+        model=config.model,
+        system_message=system_message,
+        text_format=config.text_format,
+        reasoning=config.reasoning,
+        structured_output=config.structured_output,
+    )
+    max_tokens = config.max_output_tokens or anthropic_extract.MAX_OUTPUT_TOKENS
+    counted = cached = skipped = input_tokens = 0
+    for record in manifest.records:
+        kind: str
+        inputs: dict[str, Any]
+        if mode == ExtractionMode.ABSTRACT:
+            kind, inputs = "text", {"text": record.abstract}
+            usable = bool(record.abstract)
+        elif mode == ExtractionMode.PDF_TEXT:
+            usable = bool(record.pdf_local_path)
+            kind = "text"
+            inputs = {"text": anthropic_extract.extract_pdf_text_pymupdf(record.pdf_local_path, max_pages) if usable else None}
+        else:
+            kind, inputs = "pdf_native", {"pdf_path": record.pdf_local_path}
+            usable = bool(record.pdf_local_path)
+        if not usable:
+            skipped += 1
+            continue
+        if not skip_cache and anthropic_extract.is_call_cached(
+            kind=kind, max_output_tokens=max_tokens, **common, **inputs
+        ):
+            cached += 1
+            continue
+        input_tokens += anthropic_extract.count_input_tokens(kind=kind, client=client, **common, **inputs)
+        counted += 1
+    output_tokens = counted * assumed_output_tokens
+    cost = (input_tokens * prices["input"] + output_tokens * prices["output"]) / 1_000_000
+    return {
+        "records": len(manifest.records),
+        "to_call": counted,
+        "already_cached": cached,
+        "skipped_no_input": skipped,
+        "input_tokens": input_tokens,
+        "assumed_output_tokens": output_tokens,
+        "estimated_cost_usd": round(cost, 6),
+    }
+
+
 __all__ = [
     "ExtractionMode",
     "ExtractionConfig",
     "SectionSelectionConfig",
     "run_manifest_extraction",
+    "estimate_run_cost",
+    "validation_stats",
     "collect_relevant_sections",
     "build_section_prompt",
 ]
