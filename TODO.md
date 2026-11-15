@@ -1,6 +1,33 @@
 # TODO
 
-## Prompt Engineering — Phase 3 ← **CURRENT FOCUS**
+## Article results on Claude models + Atlas contribution track ← **CURRENT FOCUS**
+
+> **Plan:** [`plans/anthropic-article-results.md`](plans/anthropic-article-results.md) · **Branch:** `feat/anthropic-extraction` · **API budget:** 4.50 USD
+> Supersedes the open items of Prompt Engineering Phase 3 (species block) and "Assemble article outline materials" below.
+
+Track A — article 1 (fill `docs/article_outline.md`)
+- [ ] WU-A1 — Complete the Claude adapter (PDF inputs, prompt caching, cost guard) `sonnet`
+- [ ] WU-C1 — Rebuild the open-access corpus (98 records) and freeze the held-out list `sonnet`
+- [ ] WU-C2 — Evaluate section parsing without Docker (recommendation, not a decision) `sonnet`
+- [ ] WU-E1 — Relevance rules as a tested module; human vs rule label agreement `sonnet`
+- [ ] WU-E2 — Class-level and evidence-aware metrics, confidence intervals `sonnet`
+- [ ] WU-E3 — Taxonomic resolution and multi-rank evaluation `opus`
+- [ ] WU-E4 — Register of doubtful annotations + discussion points on the Fuster schema `sonnet`
+- [ ] WU-P1 — Hypothesis-driven prompt rounds on the dev subset `opus`
+- [ ] WU-P2 — Relevance with Claude: direct scoring and the combined variant `sonnet`
+- [ ] WU-P3 — Claim grounding, only if a diagnosis stays open `sonnet`
+- [ ] WU-F1 — Freeze, run once on the held-out set, fill the outline `opus`
+
+Track B — Atlas contribution potential (candidate second article)
+- [ ] WU-G1 — Atlas reference tables (aggregates only in git) `sonnet`
+- [ ] WU-G2 — Matching taxa, regions and period to the Atlas `opus`
+- [ ] WU-G3 — Extraction schema for contribution `opus`
+- [ ] WU-G4 — Contribution scores `opus`
+- [ ] WU-G5 — Validation against the Fuster relevance + insects in northern Quebec case `opus`
+
+---
+
+## Prompt Engineering — Phase 3
 
 > **Plans:** [`plans/prompt-engineering-flow.md`](plans/prompt-engineering-flow.md) · [`plans/taxonomic-relevance-refactor.md`](plans/taxonomic-relevance-refactor.md)
 > **Sequencing:** WU-3.2 and WU-T1 both modify `common.py` — run in the same session or sequentially.
