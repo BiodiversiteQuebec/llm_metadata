@@ -8,3 +8,6 @@ date,run,model,effort,mode,records,budget_line,estimated_usd,actual_usd,cumulati
 2026-11-15,20261115_220956_effort_haiku_medium_abstract,claude-haiku-5-5,medium,abstract,30,model_effort_comparison,0.0647,0.0217,0.1377,Effort sweep
 2026-11-15,20261115_221040_effort_haiku_high_abstract,claude-haiku-5-5,high,abstract,30,model_effort_comparison,0.0647,0.0284,0.1661,Effort sweep
 2026-11-15,20261115_221256_sonnet_low_abstract,claude-sonnet-5-5,low,abstract,30,model_effort_comparison,0.6934,0.2051,0.3712,Sonnet vs Haiku on abstracts (estimate ignores caching)
+2026-11-15,20261115_221358_r4_exception_in_philosophy_haiku,claude-haiku-5-5,low,abstract,30,prompt_rounds,0.0430,0.0221,0.3933,Round 4: exception named in philosophy
+2026-11-15,20261115_221454_r2_replicate_haiku,claude-haiku-5-5,low,abstract,30,prompt_rounds,0.0430,0.0176,0.4109,Replicate of round 2 (noise)
+2026-11-15,20261115_221552_r4_exception_in_philosophy_sonnet,claude-sonnet-5-5,low,abstract,30,model_effort_comparison,0.6934,0.2193,0.6302,Round 4 prompt on Sonnet

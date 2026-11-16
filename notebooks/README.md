@@ -2515,3 +2515,20 @@ An independent review of the evaluation code (fresh agent, read-only) found two 
 **Reading:** the round 2 prompt contradicts itself. The philosophy block says "Do NOT guess or infer"; the spatial section grants an exception. Haiku follows the exception, Sonnet follows the general rule. A prompt tuned on one model did not transfer to a stronger one because of an internal contradiction, not because of model quality. This is a result for the article's prompt-engineering section.
 
 **Decision:** next round removes the contradiction (the philosophy block names the exception), tested on Haiku first (cheap, must not regress), then once on Sonnet.
+
+### 2026-11-15: Round 4, a prompt without contradiction; and the real noise on relevance
+
+**Hypothesis:** naming the spatial exception in the philosophy block itself ("Do NOT guess or infer… One exception: spatial_range_km2…") restores Sonnet's spatial estimates without changing Haiku.
+
+**Runs (0.259 USD in total):** Haiku with the round 4 prompt `20261115_221358_r4_exception_in_philosophy_haiku.json`; a replicate of round 2 on Haiku with the round 2 prompt unchanged `20261115_221454_r2_replicate_haiku.json`; Sonnet with the round 4 prompt `20261115_221552_r4_exception_in_philosophy_sonnet.json`.
+
+**Noise finding (methods):** the replicate of round 2, same prompt, differs from the first round 2 run by −0.17 [−0.30, −0.03] in four-class relevance against the rule label, and −0.12 on the spatial class. The paired bootstrap resamples records but not the model's own run-to-run randomness, so on relevance it understates the noise. Consequences:
+- Round 2's four-class 0.60 was a favourable draw; across later Haiku runs the level is 0.43–0.50. Its binary gain over round 1 holds (binary F1 0.43 → 0.79–0.86 across the two round 2 runs).
+- From now on, a relevance change counts only if it exceeds the replicate difference, and the effort, round 3 and round 4 "drops" against the first round 2 run are read against the replicate instead: all within run-to-run noise.
+
+**Result:**
+- Haiku, round 4 vs round 2 replicate: equal (spatial class 0.45 vs 0.45; relevance within noise). Round 4 estimates an area for 29 of 30 records (round 2: 22), so it now also sizes places the annotators left without an area.
+- Sonnet, round 4 vs round 2 prompt: spatial class 0.31 → 0.45 (+0.14 [−0.02, +0.34]); relevance against the rule label binary F1 0.59 → 0.83, +0.23 [+0.08, +0.41] (gain), binary accuracy +0.23 (gain). Against the human label within noise.
+- Sonnet vs Haiku, both with the round 4 prompt: relevance equal (four-class 0.47 vs 0.47, binary F1 0.83 vs 0.81). Sonnet keeps a small edge on feature fields (micro F1 about +0.02 to +0.04).
+
+**Decision:** adopt the round 4 prompt (coherent, no loss on Haiku, fixes Sonnet). Haiku 5.5 at low effort stays the working model: same relevance as Sonnet for about one tenth of the cost. Lesson for the article: prompt engineering on a cheap model can hide contradictions that a stronger model resolves the other way; check transfer before comparing models.
