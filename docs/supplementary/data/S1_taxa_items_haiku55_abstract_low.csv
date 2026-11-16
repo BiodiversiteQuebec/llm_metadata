@@ -1,0 +1,150 @@
+record_id,side,raw,mention,kind,resolved_as,gbif_key,rank,family,broad_groups,method,count,best_rank,status,reason
+5,annotation,Glyptemys insculpta,Glyptemys insculpta,taxon,Glyptemys insculpta [species],2443115.0,SPECIES,Emydidae,reptiles,scientific,,exact,match,same taxon
+5,extraction,Glyptemys insculpta,Glyptemys insculpta,taxon,Glyptemys insculpta [species],2443115.0,SPECIES,Emydidae,reptiles,scientific,,exact,match,same taxon
+9,annotation,raccoons,raccoons,taxon,Procyon lotor [species],5218786.0,SPECIES,Procyonidae,mammals,vernacular,,exact,match,same taxon (different wording)
+9,annotation,striped skunks,striped skunks,taxon,Mephitis mephitis [species],5219380.0,SPECIES,Mephitidae,mammals,vernacular,,exact,match,same taxon (different wording)
+9,extraction,Procyon lotor,Procyon lotor,taxon,Procyon lotor [species],5218786.0,SPECIES,Procyonidae,mammals,scientific,,exact,match,same taxon (different wording)
+9,extraction,Mephitis mephitis,Mephitis mephitis,taxon,Mephitis mephitis [species],5219380.0,SPECIES,Mephitidae,mammals,scientific,,exact,match,same taxon (different wording)
+9,extraction,raccoon,raccoon,taxon,Procyon lotor [species],5218786.0,SPECIES,Procyonidae,mammals,vernacular,,exact,match,same taxon (different wording)
+9,extraction,striped skunk,striped skunk,taxon,Mephitis mephitis [species],5219380.0,SPECIES,Mephitidae,mammals,vernacular,,exact,match,same taxon (different wording)
+11,annotation,Rangifer tarandus caribou,Rangifer tarandus caribou,taxon,Rangifer tarandus caribou [subspecies],5220115.0,SUBSPECIES,Cervidae,mammals,scientific,,exact,match,same taxon
+11,extraction,Rangifer tarandus caribou,Rangifer tarandus caribou,taxon,Rangifer tarandus caribou [subspecies],5220115.0,SUBSPECIES,Cervidae,mammals,scientific,,exact,match,same taxon
+11,extraction,Canis lupus,Canis lupus,taxon,Canis lupus [species],5219173.0,SPECIES,Canidae,mammals,scientific,,broad_group,partial (broad_group),same broad group only
+12,annotation,Rangifer tarandus caribou,Rangifer tarandus caribou,taxon,Rangifer tarandus caribou [subspecies],5220115.0,SUBSPECIES,Cervidae,mammals,scientific,,exact,match,same taxon (different wording)
+12,extraction,woodland caribou (Rangifer tarandus caribou),woodland caribou (Rangifer tarandus caribou),taxon,Rangifer tarandus caribou [subspecies],5220115.0,SUBSPECIES,Cervidae,mammals,scientific,,exact,match,same taxon (different wording)
+19,annotation,black-legged tick,black-legged tick,taxon,Ixodes scapularis [species],2182727.0,SPECIES,Ixodidae,other arthropods,vernacular,,exact,match,same taxon (different wording)
+19,extraction,Ixodes scapularis,Ixodes scapularis,taxon,Ixodes scapularis [species],2182727.0,SPECIES,Ixodidae,other arthropods,scientific,,exact,match,same taxon (different wording)
+24,annotation,Acer saccharum,Acer saccharum,taxon,Acer saccharum [species],3189859.0,SPECIES,Sapindaceae,vascular plants,scientific,,exact,match,same taxon (different wording)
+24,extraction,Acer saccharum Marshall,Acer saccharum Marshall,taxon,Acer saccharum [species],3189859.0,SPECIES,Sapindaceae,vascular plants,scientific,,exact,match,same taxon (different wording)
+27,annotation,Eastern coyote,Eastern coyote,taxon,Canis latrans [species],5219153.0,SPECIES,Canidae,mammals,vernacular,,exact,match,same taxon (different wording)
+27,annotation,eastern wolf,eastern wolf,taxon,Canis lycaon [species],8441206.0,SPECIES,Canidae,mammals,vernacular,,exact,match,same taxon (different wording)
+27,extraction,Eastern Wolf (Canis lycaon),Eastern Wolf (Canis lycaon),taxon,Canis lycaon [species],8441206.0,SPECIES,Canidae,mammals,scientific,,exact,match,same taxon (different wording)
+27,extraction,Eastern Coyote (Canis latrans),Eastern Coyote (Canis latrans),taxon,Canis latrans [species],5219153.0,SPECIES,Canidae,mammals,scientific,,exact,match,same taxon (different wording)
+27,extraction,Canis lupus familiaris,Canis lupus familiaris,taxon,Canis lupus familiaris [subspecies],6164210.0,SUBSPECIES,Canidae,mammals,scientific,,genus,partial (genus),same genus only
+27,extraction,Canis lycaon sp. cf,Canis lycaon sp. cf,taxon,Canis lycaon [species],8441206.0,SPECIES,Canidae,mammals,scientific,,exact,match,same taxon (different wording)
+27,extraction,Canis individuals (admixed Canis types),Canis individuals (admixed Canis types),taxon,Canis [genus],5219142.0,GENUS,Canidae,mammals,scientific,,genus,partial (genus),same genus only
+29,annotation,Rhododendron groenlandicum,Rhododendron groenlandicum,taxon,Rhododendron groenlandicum [species],2882984.0,SPECIES,Ericaceae,vascular plants,scientific,,exact,match,same taxon
+29,annotation,Kalmia angustifolia,Kalmia angustifolia,taxon,Kalmia angustifolia [species],2883007.0,SPECIES,Ericaceae,vascular plants,scientific,,exact,match,same taxon
+29,annotation,Chamaedaphne calyculata,Chamaedaphne calyculata,taxon,Chamaedaphne calyculata [species],5333436.0,SPECIES,Ericaceae,vascular plants,scientific,,exact,match,same taxon
+29,annotation,Vaccinium spp,Vaccinium spp,taxon,Vaccinium [genus],2882813.0,GENUS,Ericaceae,vascular plants,scientific,,exact,match,same taxon
+29,extraction,Rhododendron groenlandicum,Rhododendron groenlandicum,taxon,Rhododendron groenlandicum [species],2882984.0,SPECIES,Ericaceae,vascular plants,scientific,,exact,match,same taxon
+29,extraction,Kalmia angustifolia,Kalmia angustifolia,taxon,Kalmia angustifolia [species],2883007.0,SPECIES,Ericaceae,vascular plants,scientific,,exact,match,same taxon
+29,extraction,Chamaedaphne calyculata,Chamaedaphne calyculata,taxon,Chamaedaphne calyculata [species],5333436.0,SPECIES,Ericaceae,vascular plants,scientific,,exact,match,same taxon
+29,extraction,Vaccinium spp,Vaccinium spp,taxon,Vaccinium [genus],2882813.0,GENUS,Ericaceae,vascular plants,scientific,,exact,match,same taxon
+30,annotation,Rangifer tarandus,Rangifer tarandus,taxon,Rangifer tarandus [species],5220114.0,SPECIES,Cervidae,mammals,scientific,,species,partial (species),same species only
+30,extraction,Rangifer tarandus caribou,Rangifer tarandus caribou,taxon,Rangifer tarandus caribou [subspecies],5220115.0,SUBSPECIES,Cervidae,mammals,scientific,,species,within annotation,inside the annotated 'Rangifer tarandus'; same species
+31,annotation,Atlantic salmon,Atlantic salmon,taxon,Salmo salar [species],7595433.0,SPECIES,Salmonidae,fish,vernacular,,exact,match,same taxon (different wording)
+31,extraction,Salmo salar,Salmo salar,taxon,Salmo salar [species],7595433.0,SPECIES,Salmonidae,fish,scientific,,exact,match,same taxon (different wording)
+37,annotation,Populus balsamifera,Populus balsamifera,taxon,Populus balsamifera [species],3040184.0,SPECIES,Salicaceae,vascular plants,scientific,,exact,match,same taxon
+37,annotation,Populus deltoides,Populus deltoides,taxon,Populus deltoides [species],3040232.0,SPECIES,Salicaceae,vascular plants,scientific,,exact,match,same taxon
+37,annotation,hybrids,hybrids,other,,,,,,,,,not scored,hybrid label
+37,extraction,Populus balsamifera,Populus balsamifera,taxon,Populus balsamifera [species],3040184.0,SPECIES,Salicaceae,vascular plants,scientific,,exact,match,same taxon
+37,extraction,Populus deltoides,Populus deltoides,taxon,Populus deltoides [species],3040232.0,SPECIES,Salicaceae,vascular plants,scientific,,exact,match,same taxon
+37,extraction,Populus hybrids (natural hybrids),Populus hybrids (natural hybrids),other,,,,,,,,,not scored,hybrid label
+37,extraction,Melampsora larici-populina,Melampsora larici-populina,taxon,Melampsora larici-populina [species],5897564.0,SPECIES,Melampsoraceae,fungi and lichens,scientific,,,extra,not in the annotation (incidental taxon or over-extraction)
+37,extraction,Melampsora medusae f.sp. deltoidae,Melampsora medusae f.sp. deltoidae,taxon,Melampsora medusae [species],8395654.0,SPECIES,Melampsoraceae,fungi and lichens,scientific,,,extra,not in the annotation (incidental taxon or over-extraction)
+37,extraction,Melampsora occidentalis,Melampsora occidentalis,taxon,Melampsora occidentalis [species],2514069.0,SPECIES,Melampsoraceae,fungi and lichens,scientific,,,extra,not in the annotation (incidental taxon or over-extraction)
+38,annotation,12 mammal,12 mammal,count,Mammalia [class],359.0,CLASS,,mammals,group label,12.0,broad_group,count statement,count 12 (Mammalia [class]); group mentioned on the other side
+38,annotation,199 ground-dwelling beetles,199 ground-dwelling beetles,count,Coleoptera [order],1470.0,ORDER,,insects,group label,199.0,broad_group,count statement,count 199 (Coleoptera [order]); group mentioned on the other side
+38,annotation,240 flying-beetles species,240 flying-beetles species,count,Coleoptera [order],1470.0,ORDER,,insects,group label,240.0,broad_group,count statement,count 240 (Coleoptera [order]); group mentioned on the other side
+38,extraction,small mammals,small mammals,group,Mammalia [class],359.0,CLASS,,mammals,group label,,broad_group,group label,group matched on the other side
+38,extraction,beetles,beetles,group,Coleoptera [order],1470.0,ORDER,,insects,group label,,broad_group,group label,group matched on the other side
+38,extraction,flying beetles,flying beetles,group,Coleoptera [order],1470.0,ORDER,,insects,group label,,broad_group,group label,group matched on the other side
+38,extraction,ground dwelling beetles,ground dwelling beetles,group,Coleoptera [order],1470.0,ORDER,,insects,group label,,broad_group,group label,group matched on the other side
+38,extraction,rock vole (Microtus chrotorrhinus),rock vole (Microtus chrotorrhinus),taxon,Microtus chrotorrhinus [species],2438667.0,SPECIES,Cricetidae,mammals,scientific,,broad_group,within annotation,inside the annotated '12 mammal'; same broad group
+38,extraction,southern bog lemming (Synaptomys cooperi),southern bog lemming (Synaptomys cooperi),taxon,Synaptomys cooperi [species],2438954.0,SPECIES,Cricetidae,mammals,scientific,,broad_group,within annotation,inside the annotated '12 mammal'; same broad group
+38,extraction,lemming and rock vole,lemming and rock vole,taxon,Microtus chrotorrhinus [species],2438667.0,SPECIES,Cricetidae,mammals,"vernacular, qualifier dropped",,broad_group,within annotation,inside the annotated '12 mammal'; same broad group
+39,annotation,Tachycineta bicolor,Tachycineta bicolor,taxon,Tachycineta bicolor [species],2489181.0,SPECIES,Hirundinidae,birds,scientific,,exact,match,same taxon
+39,extraction,Tachycineta bicolor,Tachycineta bicolor,taxon,Tachycineta bicolor [species],2489181.0,SPECIES,Hirundinidae,birds,scientific,,exact,match,same taxon
+56,annotation,Tachycineta bicolor,Tachycineta bicolor,taxon,Tachycineta bicolor [species],2489181.0,SPECIES,Hirundinidae,birds,scientific,,exact,match,same taxon
+56,extraction,Tachycineta bicolor,Tachycineta bicolor,taxon,Tachycineta bicolor [species],2489181.0,SPECIES,Hirundinidae,birds,scientific,,exact,match,same taxon
+71,annotation,c.150 plant species,c.150 plant species,count,Tracheophyta [phylum],7707728.0,PHYLUM,,vascular plants,group label,150.0,broad_group,count statement,count 150 (Tracheophyta [phylum]); group mentioned on the other side
+71,extraction,herbaceous plant species,herbaceous plant species,group,Tracheophyta [phylum],7707728.0,PHYLUM,,vascular plants,group label,,broad_group,group label,group matched on the other side
+71,extraction,trees,trees,group,Tracheophyta [phylum],7707728.0,PHYLUM,,vascular plants,group label,,broad_group,group label,group matched on the other side
+71,extraction,shrubs,shrubs,group,Tracheophyta [phylum],7707728.0,PHYLUM,,vascular plants,group label,,broad_group,group label,group matched on the other side
+71,extraction,monocots,monocots,group,Liliopsida [class],196.0,CLASS,,vascular plants,group label,,broad_group,group label,group matched on the other side
+71,extraction,non-native species,non-native species,other,,,,,,,,,not scored,label without a taxon (trait or functional group)
+71,extraction,shade-tolerant species,shade-tolerant species,other,,,,,,,,,not scored,label without a taxon (trait or functional group)
+71,extraction,light-demanding species,light-demanding species,other,,,,,,,,,not scored,label without a taxon (trait or functional group)
+89,annotation,Rangifer tarandus,Rangifer tarandus,taxon,Rangifer tarandus [species],5220114.0,SPECIES,Cervidae,mammals,scientific,,species,partial (species),same species only
+89,annotation,Alces alces,Alces alces,taxon,Alces alces [species],2440940.0,SPECIES,Cervidae,mammals,scientific,,exact,match,same taxon (different wording)
+89,annotation,Canis lupus,Canis lupus,taxon,Canis lupus [species],5219173.0,SPECIES,Canidae,mammals,scientific,,exact,match,same taxon (different wording)
+89,extraction,Caribou (Rangifer tarandus caribou),Caribou (Rangifer tarandus caribou),taxon,Rangifer tarandus caribou [subspecies],5220115.0,SUBSPECIES,Cervidae,mammals,scientific,,species,within annotation,inside the annotated 'Rangifer tarandus'; same species
+89,extraction,Moose (Alces alces),Moose (Alces alces),taxon,Alces alces [species],2440940.0,SPECIES,Cervidae,mammals,scientific,,exact,match,same taxon (different wording)
+89,extraction,Wolf (Canis lupus),Wolf (Canis lupus),taxon,Canis lupus [species],5219173.0,SPECIES,Canidae,mammals,scientific,,exact,match,same taxon (different wording)
+91,annotation,Myotis lucifugus,Myotis lucifugus,taxon,Myotis lucifugus [species],2432406.0,SPECIES,Vespertilionidae,mammals,scientific,,exact,match,same taxon
+91,extraction,Myotis lucifugus,Myotis lucifugus,taxon,Myotis lucifugus [species],2432406.0,SPECIES,Vespertilionidae,mammals,scientific,,exact,match,same taxon
+101,annotation,caribou,caribou,taxon,Rangifer tarandus [species],5220114.0,SPECIES,Cervidae,mammals,vernacular,,species,partial (species),same species only
+101,extraction,Rangifer tarandus caribou (woodland caribou),Rangifer tarandus caribou (woodland caribou),taxon,Rangifer tarandus caribou [subspecies],5220115.0,SUBSPECIES,Cervidae,mammals,scientific,,species,within annotation,inside the annotated 'caribou'; same species
+104,annotation,caribou,caribou,taxon,Rangifer tarandus [species],5220114.0,SPECIES,Cervidae,mammals,vernacular,,species,partial (species),same species only
+104,extraction,Rangifer tarandus caribou,Rangifer tarandus caribou,taxon,Rangifer tarandus caribou [subspecies],5220115.0,SUBSPECIES,Cervidae,mammals,scientific,,species,within annotation,inside the annotated 'caribou'; same species
+123,annotation,Caribou,Caribou,taxon,Rangifer tarandus [species],5220114.0,SPECIES,Cervidae,mammals,vernacular,,exact,match,same taxon (different wording)
+123,extraction,caribou (Rangifer tarandus),caribou (Rangifer tarandus),taxon,Rangifer tarandus [species],5220114.0,SPECIES,Cervidae,mammals,scientific,,exact,match,same taxon (different wording)
+175,annotation,sapin baumier,sapin baumier,taxon,Abies balsamea [species],2685383.0,SPECIES,Pinaceae,vascular plants,vernacular,,exact,match,same taxon (different wording)
+175,annotation,epinette blanche,epinette blanche,taxon,Picea glauca [species],5284745.0,SPECIES,Pinaceae,vascular plants,vernacular,,family,partial (family),same family only
+175,annotation,bouleau jaune,bouleau jaune,taxon,Betula alleghaniensis [species],5331779.0,SPECIES,Betulaceae,vascular plants,vernacular,,exact,match,same taxon (different wording)
+175,annotation,bouleau a papier,bouleau a papier,taxon,Betula papyrifera [species],5332120.0,SPECIES,Betulaceae,vascular plants,vernacular,,genus,partial (genus),same genus only
+175,annotation,Crable a epis,Crable a epis,unresolved,,,,,,,,,missed,name not resolved by GBIF
+175,annotation,cerisier de Pennsylvanie,cerisier de Pennsylvanie,taxon,Prunus pensylvanica [species],8202030.0,SPECIES,Rosaceae,vascular plants,vernacular,,exact,match,same taxon (different wording)
+175,extraction,balsam fir (Abies balsamea),balsam fir (Abies balsamea),taxon,Abies balsamea [species],2685383.0,SPECIES,Pinaceae,vascular plants,scientific,,exact,match,same taxon (different wording)
+175,extraction,yellow birch (Betula alleghaniensis),yellow birch (Betula alleghaniensis),taxon,Betula alleghaniensis [species],5331779.0,SPECIES,Betulaceae,vascular plants,scientific,,exact,match,same taxon (different wording)
+175,extraction,mountain maple (Acer spicatum),mountain maple (Acer spicatum),taxon,Acer spicatum [species],3189848.0,SPECIES,Sapindaceae,vascular plants,scientific,,broad_group,partial (broad_group),same broad group only
+175,extraction,pin cherry (Prunus pensylvanica),pin cherry (Prunus pensylvanica),taxon,Prunus pensylvanica [species],8202030.0,SPECIES,Rosaceae,vascular plants,scientific,,exact,match,same taxon (different wording)
+201,annotation,Moxostoma anisurum,Moxostoma anisurum,taxon,Moxostoma anisurum [species],2358964.0,SPECIES,Catostomidae,fish,scientific,,exact,match,same taxon
+201,annotation,Moxostoma carinatum,Moxostoma carinatum,taxon,Moxostoma carinatum [species],2358998.0,SPECIES,Catostomidae,fish,scientific,,exact,match,same taxon
+201,annotation,Moxostoma macrolepidotum,Moxostoma macrolepidotum,taxon,Moxostoma macrolepidotum [species],2359006.0,SPECIES,Catostomidae,fish,scientific,,exact,match,same taxon
+201,extraction,Moxostoma anisurum,Moxostoma anisurum,taxon,Moxostoma anisurum [species],2358964.0,SPECIES,Catostomidae,fish,scientific,,exact,match,same taxon
+201,extraction,Moxostoma carinatum,Moxostoma carinatum,taxon,Moxostoma carinatum [species],2358998.0,SPECIES,Catostomidae,fish,scientific,,exact,match,same taxon
+201,extraction,Moxostoma macrolepidotum,Moxostoma macrolepidotum,taxon,Moxostoma macrolepidotum [species],2359006.0,SPECIES,Catostomidae,fish,scientific,,exact,match,same taxon
+201,extraction,silver redhorse,silver redhorse,taxon,Moxostoma anisurum [species],2358964.0,SPECIES,Catostomidae,fish,vernacular,,exact,match,same taxon (different wording)
+201,extraction,river redhorse,river redhorse,taxon,Moxostoma carinatum [species],2358998.0,SPECIES,Catostomidae,fish,vernacular,,exact,match,same taxon (different wording)
+201,extraction,shorthead redhorse,shorthead redhorse,taxon,Moxostoma macrolepidotum [species],2359006.0,SPECIES,Catostomidae,fish,vernacular,,exact,match,same taxon (different wording)
+208,annotation,c.132 species of benthic community,c.132 species of benthic community,count,benthic community,,,,"insects, other arthropods, molluscs, other invertebrates",group label,132.0,broad_group,count statement,count 132 (benthic community); group mentioned on the other side
+208,extraction,benthic communities,benthic communities,group,benthic community,,,,"insects, other arthropods, molluscs, other invertebrates",group label,,broad_group,group label,group matched on the other side
+225,annotation,Benthic intertidal community (c.20 algae,Benthic intertidal community c.20 algae,count,alga,,,,algae,group label,20.0,broad_group,count statement,count 20 (alga); group mentioned on the other side
+225,annotation,c.15 molluscs,c.15 molluscs,count,Mollusca [phylum],52.0,PHYLUM,,molluscs,group label,15.0,broad_group,count statement,count 15 (Mollusca [phylum]); group mentioned on the other side
+225,annotation,c.15 annelid species,c.15 annelid species,count,Annelida [phylum],42.0,PHYLUM,,other invertebrates,group label,15.0,,count statement,count 15 (Annelida [phylum]); group not mentioned on the other side
+225,annotation,and others),and others,other,,,,,,,,,not scored,noise (e.g. 'and others')
+225,extraction,Fucus distichus edentatus,Fucus distichus edentatus,taxon,Fucus distichus edentatus [variety],6448793.0,VARIETY,Fucaceae,algae,scientific,,broad_group,within annotation,inside the annotated 'Benthic intertidal community c.20 algae'; same broad group
+225,extraction,Fucus vesiculosus,Fucus vesiculosus,taxon,Fucus vesiculosus [species],8222574.0,SPECIES,Fucaceae,algae,scientific,,broad_group,within annotation,inside the annotated 'Benthic intertidal community c.20 algae'; same broad group
+225,extraction,Mytilus spp.,Mytilus spp,taxon,Mytilus [genus],2285679.0,GENUS,Mytilidae,molluscs,scientific,,broad_group,within annotation,inside the annotated 'c.15 molluscs'; same broad group
+253,annotation,Salvelinus alpinus,Salvelinus alpinus,taxon,Salvelinus alpinus [species],4284021.0,SPECIES,Salmonidae,fish,scientific,,exact,match,same taxon
+253,extraction,Salvelinus alpinus,Salvelinus alpinus,taxon,Salvelinus alpinus [species],4284021.0,SPECIES,Salmonidae,fish,scientific,,exact,match,same taxon
+258,annotation,16 damselfly species,16 damselfly species,count,Odonata [order],789.0,ORDER,,insects,group label,16.0,broad_group,count statement,count 16 (Odonata [order]); group mentioned on the other side
+258,annotation,water mite,water mite,group,Arachnida [class],367.0,CLASS,,other arthropods,group label,,broad_group,group label,group matched on the other side
+258,extraction,Coenagrionidae (damselflies; 16 host species),Coenagrionidae (damselflies; 16 host species),count,Coenagrionidae [family],8577.0,FAMILY,Coenagrionidae,insects,scientific,16.0,broad_group,count statement,count 16 (Coenagrionidae [family]); group mentioned on the other side
+258,extraction,Arrenuridae (water mites; 15 OTUs),Arrenuridae (water mites; 15 OTUs),count,Arrenuridae [family],3661.0,FAMILY,Arrenuridae,other arthropods,scientific,15.0,broad_group,count statement,count 15 (Arrenuridae [family]); group mentioned on the other side
+271,annotation,11 mite species,11 mite species,count,Arachnida [class],367.0,CLASS,,other arthropods,group label,11.0,broad_group,count statement,count 11 (Arachnida [class]); group mentioned on the other side
+271,extraction,Amblyseius fallacis (Garman),Amblyseius fallacis (Garman),taxon,Neoseiulus fallacis [species],2187305.0,SPECIES,Phytoseiidae,other arthropods,scientific,,broad_group,within annotation,inside the annotated '11 mite species'; same broad group
+271,extraction,Typhlodromus caudiglans Schuster,Typhlodromus caudiglans Schuster,taxon,Typhlodromus caudiglans [species],2186938.0,SPECIES,Phytoseiidae,other arthropods,scientific,,broad_group,within annotation,inside the annotated '11 mite species'; same broad group
+271,extraction,Agistemus fleschneri Summers,Agistemus fleschneri Summers,taxon,Agistemus [genus],2128625.0,GENUS,Stigmaeidae,other arthropods,scientific,,broad_group,within annotation,inside the annotated '11 mite species'; same broad group
+271,extraction,Typhlodromus conspicuous (Garman),Typhlodromus conspicuous (Garman),taxon,Typhlodromina conspicua [species],2185744.0,SPECIES,Phytoseiidae,other arthropods,scientific,,broad_group,within annotation,inside the annotated '11 mite species'; same broad group
+271,extraction,Typhlodromus herbertae Chant,Typhlodromus herbertae Chant,taxon,Typhlodromus [genus],2186588.0,GENUS,Phytoseiidae,other arthropods,scientific,,broad_group,within annotation,inside the annotated '11 mite species'; same broad group
+271,extraction,Typhlodromus longipilus Nesbitt,Typhlodromus longipilus Nesbitt,taxon,Galendromus longipilus [species],2187016.0,SPECIES,Phytoseiidae,other arthropods,scientific,,broad_group,within annotation,inside the annotated '11 mite species'; same broad group
+271,extraction,Typhlodromus bakeri (Garman),Typhlodromus bakeri (Garman),taxon,Typhlodromus bakeri [species],2186891.0,SPECIES,Phytoseiidae,other arthropods,scientific,,broad_group,within annotation,inside the annotated '11 mite species'; same broad group
+271,extraction,Typhlodromus pyri Scheuten,Typhlodromus pyri Scheuten,taxon,Typhlodromus pyri [species],2186608.0,SPECIES,Phytoseiidae,other arthropods,scientific,,broad_group,within annotation,inside the annotated '11 mite species'; same broad group
+271,extraction,Amblyseius okanagensis (Chant),Amblyseius okanagensis (Chant),taxon,Amblyseius [genus],7534409.0,GENUS,Phytoseiidae,other arthropods,scientific,,broad_group,within annotation,inside the annotated '11 mite species'; same broad group
+271,extraction,Amblyseius finlandicus (Oudemans),Amblyseius finlandicus (Oudemans),taxon,Euseius finlandicus [species],2187178.0,SPECIES,Phytoseiidae,other arthropods,scientific,,broad_group,within annotation,inside the annotated '11 mite species'; same broad group
+271,extraction,Anystis baccarum (L.),Anystis baccarum (L.),taxon,Anystis baccarum [species],2131874.0,SPECIES,Anystidae,other arthropods,scientific,,broad_group,within annotation,inside the annotated '11 mite species'; same broad group
+271,extraction,Balaustium sp.,Balaustium sp,taxon,Balaustium [genus],4336779.0,GENUS,Erythraeidae,other arthropods,scientific,,broad_group,within annotation,inside the annotated '11 mite species'; same broad group
+271,extraction,Tetranychid mites,Tetranychid mites,group,Arachnida [class],367.0,CLASS,,other arthropods,group label,,broad_group,group label,group matched on the other side
+315,annotation,c.30 beetle species,c.30 beetle species,count,Coleoptera [order],1470.0,ORDER,,insects,group label,30.0,broad_group,count statement,count 30 (Coleoptera [order]); group mentioned on the other side
+315,extraction,Coprophilous and necrophagous beetles,Coprophilous and necrophagous beetles,group,Coleoptera [order],1470.0,ORDER,,insects,group label,,broad_group,group label,group matched on the other side
+315,extraction,Histeridae,Histeridae,taxon,Histeridae [family],4733.0,FAMILY,Histeridae,insects,scientific,,broad_group,within annotation,inside the annotated 'c.30 beetle species'; same broad group
+315,extraction,Hydrophilidae,Hydrophilidae,taxon,Hydrophilidae [family],7830.0,FAMILY,Hydrophilidae,insects,scientific,,broad_group,within annotation,inside the annotated 'c.30 beetle species'; same broad group
+315,extraction,Scarabaeidae,Scarabaeidae,taxon,Scarabaeidae [family],5840.0,FAMILY,Scarabaeidae,insects,scientific,,broad_group,within annotation,inside the annotated 'c.30 beetle species'; same broad group
+315,extraction,Silphidae,Silphidae,taxon,Silphidae [family],4762.0,FAMILY,Silphidae,insects,scientific,,broad_group,within annotation,inside the annotated 'c.30 beetle species'; same broad group
+315,extraction,Ptilidae,Ptilidae,unresolved,,,,,,,,,extra,name not resolved by GBIF
+343,annotation,c.30 bird species,c.30 bird species,count,Aves [class],212.0,CLASS,,birds,group label,30.0,broad_group,count statement,count 30 (Aves [class]); group mentioned on the other side
+343,extraction,resident bird species,resident bird species,group,Aves [class],212.0,CLASS,,birds,group label,,broad_group,group label,group matched on the other side
+351,annotation,73 weevil species,73 weevil species,count,Coleoptera [order],1470.0,ORDER,,insects,group label,73.0,broad_group,count statement,count 73 (Coleoptera [order]); group mentioned on the other side
+351,extraction,weevils (Curculionoidea),weevils (Curculionoidea),group,Coleoptera [order],1470.0,ORDER,,insects,group label,,broad_group,group label,group matched on the other side
+351,extraction,73 species in three families,73 species in three families,count,,,,,,,73.0,,count statement,count 73 (no group found); group not mentioned on the other side
+351,extraction,Madarellus undulatus (Say),Madarellus undulatus (Say),taxon,Madarellus undulatus [species],1174597.0,SPECIES,Curculionidae,insects,scientific,,broad_group,within annotation,inside the annotated '73 weevil species'; same broad group
+351,extraction,Barypeithes pellucidus (Boheman),Barypeithes pellucidus (Boheman),taxon,Exomias pellucidus [species],1232526.0,SPECIES,Curculionidae,insects,scientific,,broad_group,within annotation,inside the annotated '73 weevil species'; same broad group
+351,extraction,Otiorhynchus ovatus (L.),Otiorhynchus ovatus (L.),taxon,Otiorhynchus ovatus [species],1195043.0,SPECIES,Curculionidae,insects,scientific,,broad_group,within annotation,inside the annotated '73 weevil species'; same broad group
+351,extraction,Otiorhynchus sulcatus (F.),Otiorhynchus sulcatus (F.),taxon,Otiorhynchus sulcatus [species],1195129.0,SPECIES,Curculionidae,insects,scientific,,broad_group,within annotation,inside the annotated '73 weevil species'; same broad group
+351,extraction,Ceutorhynchus oregonensis Dietz,Ceutorhynchus oregonensis Dietz,taxon,Ceutorhynchus oregonensis [species],4291962.0,SPECIES,Curculionidae,insects,scientific,,broad_group,within annotation,inside the annotated '73 weevil species'; same broad group
+351,extraction,Pelenomus waltoni (Boheman),Pelenomus waltoni (Boheman),taxon,Phytobius waltoni [species],1204500.0,SPECIES,Curculionidae,insects,scientific,,broad_group,within annotation,inside the annotated '73 weevil species'; same broad group
+351,extraction,Rhinoncus perpendicularis (Reiche),Rhinoncus perpendicularis (Reiche),taxon,Rhinoncus perpendicularis [species],4464351.0,SPECIES,Curculionidae,insects,scientific,,broad_group,within annotation,inside the annotated '73 weevil species'; same broad group
+351,extraction,Sphenophorus minimus Hart,Sphenophorus minimus Hart,taxon,Sphenophorus minimus [species],4291608.0,SPECIES,Dryophthoridae,insects,scientific,,broad_group,within annotation,inside the annotated '73 weevil species'; same broad group
