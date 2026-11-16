@@ -2475,3 +2475,13 @@ An independent review of the evaluation code (fresh agent, read-only) found two 
 **Change:** a `flag` strategy in `groundtruth_eval.py`, used for the six yes/no fields in `configs/eval_article.json`: null counts as False and only True is a positive. Every run is rescored with the same config, so comparisons stay valid; numbers from before this change are not comparable with those after.
 
 **Round 2 run, rescored (precision / recall / F1):** threatened species 1.00 / 0.80 / 0.89; north–south 1.00 / 0.60 / 0.75; time series 0.80 / 0.80 / 0.80; multispecies 0.56 / 1.00 / 0.72 (over-flagged); new species to the region one true case on dev; new species to science no true case on dev (not measurable here). The "low modulator recall" in the outline came from the scoring, not the model.
+
+### 2026-11-15: Round 3, data type decision rules (abstracts, Haiku 5.5, low effort) — not adopted
+
+**Hypothesis:** `data_type` errors come from listing secondary kinds of data (13 of 23 mismatches add traits, habitat structure or richness computed from counts) and from leaving out the annotators' "presence-only" next to genetic samples (5 of 23). Decision rules (one value, at most two; nothing computed from or measured to explain the records; genetic samples of located individuals are also presence-only) should raise precision from about 0.36 to at least 0.50 without losing recall. Relevance should not move. The 5 density-vs-abundance mismatches were left alone: both are High for the rules, and the dev convention is ambiguous.
+
+**Run:** `artifacts/runs/20261115_220845_r3_data_type_rules_abstract.json`, 0.022 USD, compared with round 2.
+
+**Result:** `data_type` F1 0.40 → 0.50 (precision 0.45, recall 0.56), difference +0.10 [−0.02, +0.20], B better in 95 % of resamples but the interval includes 0. Relevance against the rule label −0.10 [−0.23, +0.03] four-class, also within noise. Micro F1 +0.01 [−0.01, +0.04].
+
+**Decision:** not adopted under the rule set at the start (a change counts only when its paired interval excludes 0). The prompt is reverted to round 2. The direction is consistent with the hypothesis; it can be retested on the PDF input, where more data kinds are mentioned and the effect should be larger.
