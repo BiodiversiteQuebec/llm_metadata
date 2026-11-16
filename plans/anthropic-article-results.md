@@ -91,6 +91,15 @@ Prices per million tokens (input / output): Haiku 5.5 0.10 / 0.50, Sonnet 5.5 2 
 - Freeze the held-out list (ids and digest) in the same commit, before any run
 - Report coverage per source and per licence
 
+**First pass done (2026-11-15):** 31 of 98 PDFs (9 of 30 dev, 22 of 68 held-out). Held-out list frozen before any run. Most failures are publisher bot protection (403, Cloudflare), not missing open copies. No local copy exists on Vincent's machine.
+
+**Second pass (decided by Vincent, 2026-11-15):**
+- The server is on the Université de Sherbrooke network; Playwright's Chromium is installed (`~/.cache/ms-playwright`) and may be used headless, autonomously. Headless Chromium still meets the Cloudflare page on Wiley, Europe PMC and Oxford; no bot-protection evasion is attempted.
+- Try every open location (OpenAlex and Unpaywall, not only the best one), the PMC open-access subset through official channels, publisher direct-PDF patterns, Semantic Scholar and CORE. Preprints are accepted but flagged.
+- Where only open full text in JATS XML exists, keep it for the PDF-text condition (`text_source = jats_xml`); the native-PDF condition then has fewer records.
+- Keep what works as small per-publisher recipes in `src/llm_metadata/publisher_pdf.py`, so the next article is quicker.
+- If coverage stays incomplete, continue: long-text results are reported on the records with full text, with the count per condition (the outline already asks for counts per condition).
+
 #### WU-C2: Evaluate section parsing without Docker `sonnet`
 
 **deps:** WU-C1 (dev PDFs only) | **files:** `docs/results/section_parsing_evaluation.md`
