@@ -7,3 +7,4 @@ date,run,model,effort,mode,records,budget_line,estimated_usd,actual_usd,cumulati
 2026-11-15,20261115_220845_r3_data_type_rules_abstract,claude-haiku-5-5,low,abstract,30,prompt_rounds,0.0430,0.0217,0.1160,Round 3: data type decision rules (not adopted)
 2026-11-15,20261115_220956_effort_haiku_medium_abstract,claude-haiku-5-5,medium,abstract,30,model_effort_comparison,0.0647,0.0217,0.1377,Effort sweep
 2026-11-15,20261115_221040_effort_haiku_high_abstract,claude-haiku-5-5,high,abstract,30,model_effort_comparison,0.0647,0.0284,0.1661,Effort sweep
+2026-11-15,20261115_221256_sonnet_low_abstract,claude-sonnet-5-5,low,abstract,30,model_effort_comparison,0.6934,0.2051,0.3712,Sonnet vs Haiku on abstracts (estimate ignores caching)

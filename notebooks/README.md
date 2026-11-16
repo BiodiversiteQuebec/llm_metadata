@@ -2499,3 +2499,19 @@ An independent review of the evaluation code (fresh agent, read-only) found two 
 - Why: higher effort does not make the model more cautious; it estimates larger areas (17 records in the High spatial class at medium and high, 14 at low), which pushes categories up.
 
 **Decision:** hypothesis rejected. Low effort stays the default for Haiku: cheaper and at least as good. For Table 4: effort is not a useful lever on this task with this model.
+
+### 2026-11-15: Sonnet 5.5 vs Haiku 5.5 (abstracts, low effort, round 2 prompt)
+
+**Hypothesis:** Sonnet gains on judgment-heavy fields (species, data type) but not on the spatial class; micro gain at most +0.05, so Haiku at about one twentieth of the price stays the default.
+
+**Run:** `artifacts/runs/20261115_221256_sonnet_low_abstract.json`, 0.205 USD (Haiku: 0.021). The guard estimated 0.69 because it ignores prompt caching.
+
+**Result (paired, Sonnet minus Haiku):**
+- Micro F1 +0.04 [+0.01, +0.07]: gain. Species +0.05 [0.00, +0.12] (B better in 97 % of resamples), data type +0.03, threatened species +0.06: small and within noise.
+- Spatial class F1 −0.26 [−0.46, −0.07]: loss. Sonnet leaves 18 of 30 areas empty (Haiku 8).
+- Relevance against the rule label: four-class −0.23 [−0.43, −0.07], binary F1 −0.27 [−0.45, −0.12]: losses. Against the human label: −0.03 and −0.14, within noise.
+- Sonnet writes 220 output tokens per record at low effort (Haiku 913): it barely reasons.
+
+**Reading:** the round 2 prompt contradicts itself. The philosophy block says "Do NOT guess or infer"; the spatial section grants an exception. Haiku follows the exception, Sonnet follows the general rule. A prompt tuned on one model did not transfer to a stronger one because of an internal contradiction, not because of model quality. This is a result for the article's prompt-engineering section.
+
+**Decision:** next round removes the contradiction (the philosophy block names the exception), tested on Haiku first (cheap, must not regress), then once on Sonnet.
