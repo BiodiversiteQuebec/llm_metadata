@@ -122,10 +122,27 @@ Reading: record 363 adds species the Atlas has never recorded; record 38 is the 
 
 The corpus itself reflects the gap: only 5 of 231 records hold insects north of the 49th. A targeted harvest (insect taxa, northern places) is the way to find more, which is what the extraction schema is for.
 
+## From extracted features (Claude Haiku 5.5, abstracts)
+
+The contribution schema (`schemas/atlas_contribution.py`: focal taxa with rank, places with Quebec and 49th-parallel flags, years, kind of record, whether occurrence records are deposited) was run with native structured output on the 30 dev abstracts and, after the frozen held-out pass, on the 68 held-out abstracts. 0 validation failures, 0.040 USD in total. Scores from the extraction compared with the same scores from the annotations (Spearman, 95 % interval), from `scripts/score_atlas_extraction.py`:
+
+| Score | Dev (30) | Held-out (68) |
+|---|---|---|
+| Taxonomic novelty | 0.63 [0.54, 1.00], n = 12 | 0.51 [−0.03, 0.89], n = 42 |
+| Spatial novelty | 0.52 [0.25, 0.82], n = 30 | 0.48 [0.09, 0.82], n = 34 |
+| Temporal gain | 0.56 [−0.05, 0.99], n = 13 | 0.94 [0.65, 1.00], n = 10 |
+| Group gap | 0.98 [0.94, 1.00], n = 30 | 1.00 [0.99, 1.00], n = 60 |
+| Gaps filled (count) | 0.49 [0.22, 0.73], n = 30 | 0.49 [0.22, 0.74], n = 60 |
+
+- The ranking of datasets by what they add is recovered moderately from abstracts (gaps filled 0.49 on both sets), and identically on dev and held-out: no sign of tuning optimism on this track (its prompt was written once, not tuned).
+- The extraction scores more datasets than the annotations can: on held-out, taxonomic novelty is defined for 56 records (annotations 43) and spatial novelty for 58 (35), because the extraction reads place names. Of the held-out place mentions, 18 match an administrative region, 30 only a side of the 49th parallel, 46 only the province, and 32 lie outside Quebec.
+- **Deposited occurrence records:** the model judges that only 7 of 68 held-out datasets deposit taxon records with place and date that could be loaded into the Atlas (33 do not, 28 unclear). For the Atlas, this filter matters more than relevance: a High-relevance dataset without loadable records adds nothing directly.
+- Extracted scores vs the Fuster rule label (held-out, 41 labelled): the count of gaps filled barely follows the relevance category (cross-table in `extraction_heldout.md`).
+
 ## Limits
 
-- Only the human annotations are scored here. No extraction was run (no API cost on this track yet), so nothing is known yet about how well an LLM recovers these inputs.
-- Places come from one flag; region-level spatial novelty awaits extracted place names.
+- The extraction was run on abstracts only, with Haiku at low effort and an untuned prompt.
+- Annotation-based places come from one flag; region-level spatial novelty rests on the extracted place names, which have no human annotation to check them against.
 - Sensitive species are invisible to the scores (see `scores.md`).
 - Whether records are actually deposited and loadable is not in the annotations, and it decides whether a dataset can add anything.
 - The scores have not had the planned ecological review.
@@ -134,7 +151,7 @@ The corpus itself reflects the gap: only 5 of 231 records hold insects north of 
 
 **For article 1 (data-gap supplement S3):** the coverage figure, the insect case (Atlas numbers plus the five northern records) and the two divergence tables. They make one point the Fuster relevance cannot: what is "relevant" in general is not what fills the Atlas's gaps, and the gaps are measurable. This needs no new runs.
 
-**For a second article:** contribution scoring as a method, once (1) the contribution schema is run on the corpus to get place names, years and whether occurrence records are deposited, (2) the held-out records are added, (3) the sensitive-species blind spot is handled with the Atlas sensitive list, and (4) the scores have had an ecological review. On the annotations alone, place is binary and only 79 records support taxonomic novelty: too thin for a stand-alone paper.
+**For a second article:** contribution scoring as a method, once (1) the contribution schema is run on the corpus to get place names, years and whether occurrence records are deposited, (2) the held-out records are added, (3) the sensitive-species blind spot is handled with the Atlas sensitive list, and (4) the scores have had an ecological review. Points (1) and (2) are now done on abstracts (section above); (3) and (4) remain, plus a human check of extracted place names.
 
 ## Files
 

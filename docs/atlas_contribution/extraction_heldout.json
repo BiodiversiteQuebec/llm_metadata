@@ -1,0 +1,88 @@
+{
+  "run": "artifacts/runs/20261115_225748_heldout_atlas_abstract.json",
+  "correlations": {
+    "taxonomic": {
+      "rho": 0.5134443021766965,
+      "low": -0.03491112611807545,
+      "high": 0.8858152675760139,
+      "n": 42,
+      "defined_extraction": 56,
+      "defined_annotation": 43
+    },
+    "spatial": {
+      "rho": 0.4758745051935042,
+      "low": 0.09149898978073777,
+      "high": 0.8227989422500267,
+      "n": 34,
+      "defined_extraction": 58,
+      "defined_annotation": 35
+    },
+    "temporal": {
+      "rho": 0.9393939393939393,
+      "low": 0.6538461538461539,
+      "high": 1.0,
+      "n": 10,
+      "defined_extraction": 17,
+      "defined_annotation": 30
+    },
+    "group_gap": {
+      "rho": 0.9966708863212118,
+      "low": 0.9861517111231901,
+      "high": 1.0,
+      "n": 60,
+      "defined_extraction": 65,
+      "defined_annotation": 61
+    },
+    "n_gaps": {
+      "rho": 0.49020123934070453,
+      "low": 0.21508835105496782,
+      "high": 0.7397443581826614,
+      "n": 60,
+      "defined_extraction": 65,
+      "defined_annotation": 61
+    }
+  },
+  "fuster": {
+    "n": 42,
+    "spearman_ci": {
+      "taxonomic": [
+        -0.034673143946575745,
+        -0.36651398458156026,
+        0.27583685905500066,
+        38
+      ],
+      "spatial": [
+        0.3626095727176035,
+        0.08160740031029357,
+        0.6063677288707532,
+        37
+      ],
+      "temporal": [
+        0.16526684880256934,
+        -0.641725563526596,
+        0.7938469888336047,
+        10
+      ],
+      "group_gap": [
+        0.024876213522390184,
+        -0.2640801859380138,
+        0.31195059326761276,
+        41
+      ],
+      "n_gaps": [
+        0.24727227279354674,
+        -0.04532310161194417,
+        0.5144528495122813,
+        41
+      ]
+    },
+    "crosstab": "n_gaps  0.0  1.0  2.0  All\nfuster                    \nH         8    3    1   12\nM         6    4    0   10\nL        11    1    0   12\nX         6    1    0    7\nAll      31    9    1   41"
+  },
+  "record_kinds": {
+    "traits_or_genetics": 25,
+    "abundance": 17,
+    "presence_absence": 12,
+    "environmental_or_other": 8,
+    "occurrence": 6
+  }
+}

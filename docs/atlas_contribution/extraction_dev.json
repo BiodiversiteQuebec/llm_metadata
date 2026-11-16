@@ -1,0 +1,88 @@
+{
+  "run": "artifacts/runs/20261115_225438_atlas_abstract_dev.json",
+  "correlations": {
+    "taxonomic": {
+      "rho": 0.6305476678616638,
+      "low": 0.5380275868489703,
+      "high": 1.0,
+      "n": 12,
+      "defined_extraction": 16,
+      "defined_annotation": 12
+    },
+    "spatial": {
+      "rho": 0.5217368947385496,
+      "low": 0.24515669876850127,
+      "high": 0.8177872181455058,
+      "n": 30,
+      "defined_extraction": 30,
+      "defined_annotation": 30
+    },
+    "temporal": {
+      "rho": 0.5623290272868763,
+      "low": -0.04526825197837078,
+      "high": 0.9942697503069995,
+      "n": 13,
+      "defined_extraction": 14,
+      "defined_annotation": 21
+    },
+    "group_gap": {
+      "rho": 0.984570168993387,
+      "low": 0.9371445674947618,
+      "high": 1.0,
+      "n": 30,
+      "defined_extraction": 30,
+      "defined_annotation": 30
+    },
+    "n_gaps": {
+      "rho": 0.4943647962022963,
+      "low": 0.22455217265309885,
+      "high": 0.7278004892308645,
+      "n": 30,
+      "defined_extraction": 30,
+      "defined_annotation": 30
+    }
+  },
+  "fuster": {
+    "n": 30,
+    "spearman_ci": {
+      "taxonomic": [
+        0.31524416249564025,
+        -0.11355197392120114,
+        0.7484811885651197,
+        16
+      ],
+      "spatial": [
+        0.3533283532004191,
+        0.04943859376322253,
+        0.5952123320504048,
+        30
+      ],
+      "temporal": [
+        0.3044108830178277,
+        -0.12971020804997443,
+        0.6897722703148749,
+        14
+      ],
+      "group_gap": [
+        0.062135316382186126,
+        -0.3153703446282111,
+        0.4097501958771979,
+        30
+      ],
+      "n_gaps": [
+        0.336110427442733,
+        0.03731030606003918,
+        0.5758289219624358,
+        30
+      ]
+    },
+    "crosstab": "n_gaps     0    1    2   All\nfuster                      \nH        7.0  3.0  0.0  10.0\nM       11.0  0.0  1.0  12.0\nL        8.0  0.0  0.0   8.0\nX        NaN  NaN  NaN   NaN\nAll     26.0  3.0  1.0  30.0"
+  },
+  "record_kinds": {
+    "traits_or_genetics": 13,
+    "abundance": 11,
+    "environmental_or_other": 2,
+    "occurrence": 2,
+    "presence_absence": 2
+  }
+}

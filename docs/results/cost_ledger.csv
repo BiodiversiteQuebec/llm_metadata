@@ -28,3 +28,5 @@ date,run,model,effort,mode,records,budget_line,estimated_usd,actual_usd,cumulati
 2026-11-15,20261115_224538_heldout_r2_combined_pdf_text,claude-haiku-5-5,low,pdf_text,31,heldout_final,,0.0958,2.1861,Held-out pass
 2026-11-15,20261115_224630_heldout_r3_scoring_abstract,claude-haiku-5-5,low,abstract,68,heldout_final,,0.0170,2.2031,Held-out pass
 2026-11-15,20261115_224712_heldout_r3_scoring_pdf_text,claude-haiku-5-5,low,pdf_text,31,heldout_final,,0.0813,2.2843,Held-out pass
+2026-11-15,20261115_225438_atlas_abstract_dev,claude-haiku-5-5,low,abstract,30,atlas_track,0.0201,0.0127,2.2970,Atlas contribution extraction dev (native structured output)
+2026-11-15,20261115_225748_heldout_atlas_abstract,claude-haiku-5-5,low,abstract,68,atlas_track,0.0460,0.0273,2.3243,Atlas contribution extraction held-out
