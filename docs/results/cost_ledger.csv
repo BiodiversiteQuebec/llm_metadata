@@ -3,3 +3,4 @@ date,run,model,effort,mode,records,budget_line,estimated_usd,actual_usd,cumulati
 2026-11-15,adapter_smoke_test,claude-haiku-5-5,low,abstract x2 + pdf_native + pdf_text + structured-output attempt,1,prompt_rounds,0.0100,0.0100,0.0376,Adapter end-to-end check on dev record 9; native structured output rejected (schema too complex; no charge)
 2026-11-15,20261115_100154_haiku55_abstract_low_repeat,claude-haiku-5-5,low,abstract,30,model_effort_comparison,0.0398,0.0176,0.0552,Repeatability rerun of the baseline (noise floor)
 2026-11-15,20261115_220315_r1_ebv_genetic_abstract,claude-haiku-5-5,low,abstract,30,prompt_rounds,0.0409,0.0178,0.0730,Round 1: EBV genetic flag
+2026-11-15,20261115_220455_r2_spatial_estimate_abstract,claude-haiku-5-5,low,abstract,30,prompt_rounds,0.0422,0.0213,0.0943,Round 2: spatial extent estimated from named places

@@ -217,15 +217,47 @@ def summarize(run_json: str | Path, subset: str = "dev") -> str:
     return "\n".join(lines)
 
 
+def compare(run_a: str | Path, run_b: str | Path, subset: str = "dev", n_boot: int = 2000, seed: int = 0) -> tuple[str, dict]:
+    """Paired comparison of the relevance of two runs (B minus A) on the records both
+    scored, against each target: the same bootstrap resample is applied to both runs."""
+    a, b = predictions(run_a, subset), predictions(run_b, subset)
+    out: dict[str, dict] = {}
+    lines = [f"A: {Path(run_a).name}", f"B: {Path(run_b).name}", ""]
+    rng = np.random.default_rng(seed)
+    for target in ("rule", "human"):
+        ids = [i for i in a.index.intersection(b.index) if a.loc[i, target] is not None]
+        if not ids:
+            continue
+        y = a.loc[ids, target].to_numpy(dtype=object)
+        pa = a.loc[ids, "pred"].fillna("none").to_numpy(dtype=object)
+        pb = b.loc[ids, "pred"].fillna("none").to_numpy(dtype=object)
+        idx = rng.integers(0, len(ids), size=(n_boot, len(ids)))
+        lines.append(f"Target: {target} label (n={len(ids)})")
+        for metric in ("acc4", "acc2", "f1"):
+            va, vb = _scores(y, pa)[metric], _scores(y, pb)[metric]
+            d = np.array([_scores(y[i], pb[i])[metric] - _scores(y[i], pa[i])[metric] for i in idx], dtype=float)
+            d = d[~np.isnan(d)]
+            lo, hi = np.percentile(d, [2.5, 97.5])
+            verdict = "gain" if lo > 0 else ("loss" if hi < 0 else "no clear change")
+            out[f"{target}_{metric}"] = {"a": va, "b": vb, "delta": vb - va, "low": float(lo), "high": float(hi), "verdict": verdict}
+            lines.append(f"  {metric:<6}{va:6.2f} ->{vb:6.2f}   {vb - va:+.2f} [{lo:+.2f}, {hi:+.2f}]  {verdict}")
+        lines.append("")
+    return "\n".join(lines), out
+
+
 def main(argv: Optional[list[str]] = None) -> None:
     ap = argparse.ArgumentParser(description="Relevance scores of a run against the rule and human labels.")
     ap.add_argument("run_json")
+    ap.add_argument("--compare", default=None, metavar="RUN_B", help="Paired comparison: this run = A, RUN_B = B.")
     ap.add_argument("--subset", default="dev", choices=["dev", "heldout", "all"])
     ap.add_argument("--final", action="store_true",
                     help="Required with --subset heldout or all: the held-out set is scored once, at the end.")
     a = ap.parse_args(argv)
     if a.subset != "dev" and not a.final:
         ap.error("--subset heldout/all scores held-out records: add --final if this is the final pass.")
+    if a.compare:
+        print(compare(a.run_json, a.compare, a.subset)[0])
+        return
     print(summarize(a.run_json, a.subset))
 
 

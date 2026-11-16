@@ -2450,3 +2450,20 @@ An independent review of the evaluation code (fresh agent, read-only) found two 
 **Why relevance did not move:** the rules take a majority vote of three classes (data type, temporal, spatial). On abstracts, spatial extent is "not stated" for 19 of 30 records and temporal for 9. Two "not stated" classes outvote a correct High data type, so the final category stays where it was. Fixing data type is necessary but not enough; spatial extent is the bottleneck.
 
 **Decision:** keep the change (it fixes the component, with no cost elsewhere). Round 2 targets the spatial extent. The relevance gain from round 1 should only appear once spatial classes exist.
+
+### 2026-11-15: Round 2, spatial extent estimated from named places (abstracts, Haiku 5.5, low effort)
+
+**Hypothesis:** the annotators derived most areas themselves from place names. Letting the model do the same (an explicit exception to the no-inference rule, with reference sizes for Quebec regions) raises the spatial class recall well above 0.05 and lifts rule-based relevance above 0.50 four-class agreement, with round 1's data type fix now able to count. Risk: false positives, because annotators also left some named places as "not given" (records 5 and 271 on dev).
+
+**Change:** a `spatial_range_km2` section at the end of the vocabulary block (`prompts/common.py`). Run `artifacts/runs/20261115_220455_r2_spatial_estimate_abstract.json`, 0.021 USD. Compared with round 1.
+
+**Result:**
+- Spatial class F1 0.10 → 0.57, +0.48 [+0.23, +0.70]: gain. Exact km² F1 stays near 0 (as expected: estimates are orders of magnitude, not values).
+- Relevance against the rule label: binary F1 0.43 → 0.86, +0.44 [+0.21, +0.69], gain; binary accuracy +0.33 [+0.10, +0.57], gain; four-class agreement 0.40 → 0.60, +0.20 [−0.03, +0.43], not yet clear.
+- Relevance against the human label: binary F1 0.42 → 0.75, +0.33 [+0.07, +0.61], gain; four-class unchanged at 0.47.
+- Errors are no longer one-sided: against the rule label 18 exact, 7 too high, 5 too low (before: 0 too high, 17 too low). The new over-ratings come mostly from records where the annotator gave no area ("not given") and the model estimated a large region (5 records, X → H).
+- Other fields unchanged (micro F1 −0.01 [−0.04, +0.01]).
+
+**Reading:** the spatial class was the bottleneck of rule-based scoring on short text. The extraction failure was not a model weakness but a prompt that forbade what the annotators themselves did. The remaining spatial errors are partly annotation inconsistency (named places left without an area), which belongs in the register of doubtful annotations rather than in prompt tuning.
+
+**Decision:** keep. Next: check whether temporal extent can be recovered the same way (no: years cannot be estimated from place names; the abstract ceiling is low), then move on to the species block, data type definitions and the PDF inputs.
