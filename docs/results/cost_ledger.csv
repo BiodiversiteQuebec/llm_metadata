@@ -11,3 +11,5 @@ date,run,model,effort,mode,records,budget_line,estimated_usd,actual_usd,cumulati
 2026-11-15,20261115_221358_r4_exception_in_philosophy_haiku,claude-haiku-5-5,low,abstract,30,prompt_rounds,0.0430,0.0221,0.3933,Round 4: exception named in philosophy
 2026-11-15,20261115_221454_r2_replicate_haiku,claude-haiku-5-5,low,abstract,30,prompt_rounds,0.0430,0.0176,0.4109,Replicate of round 2 (noise)
 2026-11-15,20261115_221552_r4_exception_in_philosophy_sonnet,claude-sonnet-5-5,low,abstract,30,model_effort_comparison,0.6934,0.2193,0.6302,Round 4 prompt on Sonnet
+2026-11-15,20261115_221703_haiku_pdf_text_dev16,claude-haiku-5-5,low,pdf_text,16,prompt_rounds,0.0683,0.0518,0.6820,Long text: PDF text
+2026-11-15,20261115_221727_haiku_pdf_native_dev16,claude-haiku-5-5,low,pdf_native,16,prompt_rounds,0.1090,0.0932,0.7752,Long text: native PDF

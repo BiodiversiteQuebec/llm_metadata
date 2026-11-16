@@ -2532,3 +2532,20 @@ An independent review of the evaluation code (fresh agent, read-only) found two 
 - Sonnet vs Haiku, both with the round 4 prompt: relevance equal (four-class 0.47 vs 0.47, binary F1 0.83 vs 0.81). Sonnet keeps a small edge on feature fields (micro F1 about +0.02 to +0.04).
 
 **Decision:** adopt the round 4 prompt (coherent, no loss on Haiku, fixes Sonnet). Haiku 5.5 at low effort stays the working model: same relevance as Sonnet for about one tenth of the cost. Lesson for the article: prompt engineering on a cheap model can hide contradictions that a stronger model resolves the other way; check transfer before comparing models.
+
+### 2026-11-15: Long text on the 16 dev records with a PDF (Haiku 5.5, low effort, round 4 prompt)
+
+**Corpus:** a second PDF pass (per-publisher recipes, PMC open-access bucket on AWS) brought coverage to 47 of 98 (16 of 30 dev, 31 of 68 held-out); see `docs/results/corpus_report.md`. Manifest of the 16 dev records with a PDF: `data/manifests/dev_subset_with_pdf.csv`.
+
+**Hypotheses:** (3) long text raises temporal and spatial recall (the annotators found years in the article for 97 % of records, in the abstract for 24 %) and lowers species precision (more incidental taxa); (5) the native PDF beats PyMuPDF text where maps and tables carry the extent.
+
+**Runs:** `20261115_221703_haiku_pdf_text_dev16.json` (0.052 USD) and `20261115_221727_haiku_pdf_native_dev16.json` (0.093 USD), compared with the round 4 abstract run on the same 16 records.
+
+**Result, PDF text vs abstract (n = 16):**
+- Spatial km² F1 0.08 → 0.64, +0.56 [+0.27, +0.80] (gain); spatial class 0.54 → 0.80, +0.26 [+0.06, +0.52] (gain); temporal class 0.63 → 0.86, +0.23 [−0.02, +0.52] (B better in 96 % of resamples).
+- Species −0.10, data type −0.10, threatened −0.17: lower as predicted for species, within noise. `geospatial_info_dataset` −0.13 [−0.21, −0.05] (loss).
+- Relevance: binary F1 against the rule label 0.75 → 0.86 (+0.11 [−0.04, +0.30]), against the human label 0.70 → 0.81: direction of the outline's claim that long text helps, within noise on 16 records.
+
+**Result, native PDF vs PDF text:** no field gains; spatial class −0.11 [−0.26, 0.00], relevance four-class −0.12. Hypothesis 5 rejected on Haiku: the native PDF costs 1.8 times more and is not better.
+
+**Decision:** PDF text is the main long-text condition; native PDF is kept for the held-out pass as a reported condition (the outline asks for it) but not tuned further. Next: species precision on long text (focal taxa rules), the section input, and direct relevance scoring.
