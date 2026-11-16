@@ -556,6 +556,15 @@ def _normalize_value(value: Any, config: EvaluationConfig) -> Any:
 	return value
 
 
+def _flag_true(value: Any) -> bool:
+	"""True only for an explicit yes (True, "true", "yes", "1"); None and False are no."""
+	if value is True:
+		return True
+	if isinstance(value, str):
+		return value.strip().lower() in ("true", "yes", "1")
+	return False
+
+
 def _is_set_like(value: Any) -> bool:
 	return isinstance(value, (set, frozenset))
 
@@ -614,6 +623,20 @@ def compare_models(
 		# --- Strategy-registry dispatch (takes priority when field_strategies is populated) ---
 		if config.field_strategies:
 			strategy = config.field_strategies[field]
+
+			if strategy.match == "flag":
+				# Yes/no flag where "not stated" (None) means the same as False, as in the
+				# relevance rules. Only True is a positive: TP = both True, FP = predicted True
+				# only, FN = annotated True only, TN = neither. So recall is "recall of the
+				# flagged datasets", not agreement on False values.
+				t_flag, p_flag = _flag_true(true_raw), _flag_true(pred_raw)
+				results.append(FieldResult(
+					record_id=record_id, field=field, true_value=true_raw, pred_value=pred_raw,
+					match=t_flag == p_flag,
+					tp=int(t_flag and p_flag), fp=int(p_flag and not t_flag),
+					fn=int(t_flag and not p_flag), tn=int(not t_flag and not p_flag),
+				))
+				continue
 
 			if strategy.match == "enhanced_species":
 				if isinstance(true_raw, (list, tuple)) or isinstance(pred_raw, (list, tuple)):

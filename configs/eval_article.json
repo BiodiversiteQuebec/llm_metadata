@@ -1,5 +1,5 @@
 {
-  "description": "Article evaluation: the default per-field strategies (eval_default.json, with the corrected geospatial_info_dataset name) plus class-level scoring of spatial and temporal range (classes H/M/L from relevance_rules.py; 'not stated' = no class).",
+  "description": "Article evaluation: the default per-field strategies (eval_default.json, with the corrected geospatial_info_dataset name) plus class-level scoring of spatial and temporal range (classes H/M/L from relevance_rules.py; 'not stated' = no class). Yes/no fields use the 'flag' strategy: not stated counts as False and only True is a positive, as in the relevance rules.",
   "casefold_strings": true,
   "strip_strings": true,
   "collapse_whitespace": true,
@@ -33,27 +33,27 @@
       "threshold": 70
     },
     "time_series": {
-      "match": "exact",
+      "match": "flag",
       "threshold": 80
     },
     "multispecies": {
-      "match": "exact",
+      "match": "flag",
       "threshold": 80
     },
     "threatened_species": {
-      "match": "exact",
+      "match": "flag",
       "threshold": 80
     },
     "new_species_science": {
-      "match": "exact",
+      "match": "flag",
       "threshold": 80
     },
     "new_species_region": {
-      "match": "exact",
+      "match": "flag",
       "threshold": 80
     },
     "bias_north_south": {
-      "match": "exact",
+      "match": "flag",
       "threshold": 80
     },
     "spatial_range_class": {

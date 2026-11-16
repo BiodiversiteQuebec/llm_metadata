@@ -2467,3 +2467,11 @@ An independent review of the evaluation code (fresh agent, read-only) found two 
 **Reading:** the spatial class was the bottleneck of rule-based scoring on short text. The extraction failure was not a model weakness but a prompt that forbade what the annotators themselves did. The remaining spatial errors are partly annotation inconsistency (named places left without an area), which belongs in the register of doubtful annotations rather than in prompt tuning.
 
 **Decision:** keep. Next: check whether temporal extent can be recovered the same way (no: years cannot be estimated from place names; the abstract ceiling is low), then move on to the species block, data type definitions and the PDF inputs.
+
+### 2026-11-15: Yes/no fields scored as flags (evaluation change, no API cost)
+
+**Finding:** almost every "error" on the five modifier fields and `time_series` was an annotated False against a predicted null. The prompt asks for null unless there is evidence, and the relevance rules treat null and False alike. Exact matching therefore measured agreement on False values, not whether the model flags the datasets it should.
+
+**Change:** a `flag` strategy in `groundtruth_eval.py`, used for the six yes/no fields in `configs/eval_article.json`: null counts as False and only True is a positive. Every run is rescored with the same config, so comparisons stay valid; numbers from before this change are not comparable with those after.
+
+**Round 2 run, rescored (precision / recall / F1):** threatened species 1.00 / 0.80 / 0.89; north–south 1.00 / 0.60 / 0.75; time series 0.80 / 0.80 / 0.80; multispecies 0.56 / 1.00 / 0.72 (over-flagged); new species to the region one true case on dev; new species to science no true case on dev (not measurable here). The "low modulator recall" in the outline came from the scoring, not the model.

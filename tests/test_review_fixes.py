@@ -65,3 +65,26 @@ def test_binary_failure_counts_as_wrong():
 def test_comma_numbers():
     assert DatasetFeaturesNormalized.model_validate({"spatial_range_km2": "15,000"}).spatial_range_km2 == 15000
     assert DatasetFeaturesNormalized.model_validate({"spatial_range_km2": "0,5"}).spatial_range_km2 == 0.5
+
+
+def test_flag_strategy_treats_none_as_false():
+    from llm_metadata.groundtruth_eval import EvaluationConfig, FieldEvalStrategy, compare_models
+    from llm_metadata.schemas.fuster_features import DatasetFeaturesExtraction
+
+    cfg = EvaluationConfig(field_strategies={"threatened_species": FieldEvalStrategy(match="flag")})
+
+    def one(t, p):
+        return compare_models(
+            true_model=DatasetFeaturesNormalized(threatened_species=t),
+            pred_model=DatasetFeaturesExtraction(threatened_species=p),
+            record_id="r", config=cfg,
+        )[0]
+
+    r = one(False, None)
+    assert r.match and (r.tp, r.fp, r.fn, r.tn) == (0, 0, 0, 1)
+    r = one(True, None)
+    assert not r.match and r.fn == 1
+    r = one(None, True)
+    assert r.fp == 1
+    r = one(True, True)
+    assert r.tp == 1
