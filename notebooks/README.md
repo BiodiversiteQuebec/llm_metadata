@@ -2595,3 +2595,16 @@ An independent review of the evaluation code (fresh agent, read-only) found two 
 - The multi-rank numbers above use the evaluator before its review fixes (uncapped set-asides); they are rescored when the capped version is merged.
 
 **Decision:** adopted. The hypothesis holds, and as predicted the effect is larger on long text.
+
+### 2026-11-15: Sonnet 5.5 vs Haiku 5.5 on long text (PDF text, 10 random dev records)
+
+**Hypothesis (7, long-text part):** Sonnet's edge on judgment fields (focal taxa, data type) is larger on long text, where there is more to filter.
+
+**Run:** `20261115_223105_sonnet_low_pdf_text_dev10.json`, 10 dev records drawn at random among the 16 with a PDF (seed 0; manifest `data/manifests/dev_subset_pdf10_sonnet.csv`), round 5 prompt, low effort, 0.726 USD (Haiku on the same records: about 0.033). Compared with the Haiku round 5 PDF-text run on the same records.
+
+**Result (paired, n = 10, Sonnet minus Haiku):**
+- Species (fuzzy string) −0.18 [−0.36, −0.06] (loss); north–south −0.27 [−0.67, −0.06] (loss); micro F1 −0.06 [−0.11, +0.01].
+- Exact-taxon scores identical (precision 1.00, recall 0.77 for both), but Sonnet lists more taxa inside the annotators' count statements (17 set aside vs 9): more enumeration, which the capped taxa scoring will count as over-extraction.
+- Relevance: within noise (binary F1 0.75 → 0.80, four-class 0.40 → 0.50 against the rule label, n = 10).
+
+**Decision:** hypothesis rejected. On this task a stronger model does not pay for itself: on abstracts Sonnet matched Haiku on relevance once the prompt was coherent, and on long text it is no better and about 22 times dearer. Haiku 5.5 at low effort is frozen as the model for the held-out pass. Table 4 is filled from the dev runs: Haiku low / medium / high, Sonnet low on abstracts (two prompts) and on 10 PDF texts, and the repeatability replicates.

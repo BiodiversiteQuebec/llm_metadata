@@ -1,0 +1,83 @@
+Logging to: artifacts/runs/20261115_223105_sonnet_low_pdf_text_dev10.log
+Recreate command: uv run python -m llm_metadata.prompt_eval --mode pdf_text --parallelism 4 --model claude-sonnet-5-5 --reasoning-effort low --config configs/eval_article.json --name sonnet_low_pdf_text_dev10 --description 'Model comparison on long text: Sonnet 5.5 low, round 5 prompt, 10 random dev PDFs (seed 0)' --skip-cache
+2026-11-15 22:31:05 | INFO     | __main__:run_eval:161 | Starting prompt_eval mode=pdf_text records=10 parallelism=4 model=claude-sonnet-5-5 reasoning_effort=low description=Model comparison on long text: Sonnet 5.5 low, round 5 prompt, 10 random dev PDFs (seed 0) skip_cache=True
+2026-11-15 22:31:05 | INFO     | __main__:run_eval:171 | Loaded manifest records=10
+Cost estimate: $0.7946 (10 records to call, 0 already cached, 0 without input; 377279 input tokens, 4000 assumed output tokens)
+2026-11-15 22:31:08 | INFO     | llm_metadata.extraction:run_manifest_extraction:392 | Starting manifest extraction mode=pdf_text records=10 parallelism=4 model=claude-sonnet-5-5 reasoning_effort=low prompt_module=prompts.abstract description=Model comparison on long text: Sonnet 5.5 low, round 5 prompt, 10 random dev PDFs (seed 0) skip_cache=True
+2026-11-15 22:31:08 | INFO     | llm_metadata.extraction:run_manifest_extraction:460 | [1/10] Queueing gt_record_id=9 record_id=10.1371/journal.pone.0128238 title=Data from: Resampling method for applying density-dependent habitat selection theory to wildlife surveys
+2026-11-15 22:31:08 | INFO     | llm_metadata.extraction:run_manifest_extraction:460 | [2/10] Queueing gt_record_id=24 record_id=10.1002/ece3.3906 title=Data from: Influence of northern limit range on genetic diversity and structure in a widespread North American tree, sugar maple (Acer saccharum Marshall)
+2026-11-15 22:31:08 | INFO     | llm_metadata.extraction:run_manifest_extraction:460 | [3/10] Queueing gt_record_id=29 record_id=10.1002/ece3.1476 title=Data from: Ecological gradients driving the distribution of four Ericaceae in boreal Quebec, Canada
+2026-11-15 22:31:08 | INFO     | llm_metadata.extraction:run_manifest_extraction:460 | [4/10] Queueing gt_record_id=31 record_id=10.1111/eva.12028 title=Data from: Reduced fitness of Atlantic salmon released in the wild after one generation of captive-breeding
+2026-11-15 22:31:08 | INFO     | llm_metadata.extraction:run_manifest_extraction:460 | [5/10] Queueing gt_record_id=37 record_id=10.1002/ece3.1029 title=Data from: Fitness dynamics within a poplar hybrid zone: I. Prezygotic and postzygotic barriers impacting a native poplar hybrid stand.
+2026-11-15 22:31:08 | INFO     | llm_metadata.extraction:run_manifest_extraction:460 | [6/10] Queueing gt_record_id=38 record_id=10.1371/journal.pone.0204445 title=Data from: Temporal dynamics in animal community assembly during post-logging succession in boreal forest
+2026-11-15 22:31:08 | INFO     | llm_metadata.extraction:run_manifest_extraction:460 | [7/10] Queueing gt_record_id=101 record_id=10.1371/journal.pone.0077514 title=Data from: Disentangling woodland caribou movements in response to clearcuts and roads across temporal scales
+2026-11-15 22:31:08 | INFO     | llm_metadata.extraction:run_manifest_extraction:460 | [8/10] Queueing gt_record_id=104 record_id=10.1038/s41598-018-34822-9 title=Data from: Compensatory conservation measures for an endangered caribou population under climate change
+2026-11-15 22:31:08 | INFO     | llm_metadata.extraction:run_manifest_extraction:460 | [9/10] Queueing gt_record_id=208 record_id=10.3389/fmars.2021.637546 title=Determining the Ecological Status of Benthic Coastal Communities: A Case in an Anthropized Sub-Arctic Area
+2026-11-15 22:31:08 | INFO     | llm_metadata.extraction:run_manifest_extraction:460 | [10/10] Queueing gt_record_id=253 record_id=10.1111/eva.13248 title=Genomic data support management of anadromous Arctic Char fisheries in Nunavik by highlighting neutral and putatively adaptive genetic variation
+2026-11-15 22:31:09 | INFO     | llm_metadata.anthropic_extract:_run:333 | Starting claude text extraction model=claude-sonnet-5-5 schema=DatasetFeaturesExtraction cache=bypass
+2026-11-15 22:31:09 | INFO     | llm_metadata.anthropic_extract:_run:333 | Starting claude text extraction model=claude-sonnet-5-5 schema=DatasetFeaturesExtraction cache=bypass
+2026-11-15 22:31:09 | INFO     | llm_metadata.anthropic_extract:_run:333 | Starting claude text extraction model=claude-sonnet-5-5 schema=DatasetFeaturesExtraction cache=bypass
+2026-11-15 22:31:09 | INFO     | llm_metadata.anthropic_extract:_run:333 | Starting claude text extraction model=claude-sonnet-5-5 schema=DatasetFeaturesExtraction cache=bypass
+2026-11-15 22:31:09 | DEBUG    | llm_metadata.anthropic_extract:_call:257 | Calling Anthropic Messages API model=claude-sonnet-5-5 kind=text schema=DatasetFeaturesExtraction
+2026-11-15 22:31:09 | DEBUG    | llm_metadata.anthropic_extract:_call:257 | Calling Anthropic Messages API model=claude-sonnet-5-5 kind=text schema=DatasetFeaturesExtraction
+2026-11-15 22:31:09 | DEBUG    | llm_metadata.anthropic_extract:_call:257 | Calling Anthropic Messages API model=claude-sonnet-5-5 kind=text schema=DatasetFeaturesExtraction
+2026-11-15 22:31:09 | DEBUG    | llm_metadata.anthropic_extract:_call:257 | Calling Anthropic Messages API model=claude-sonnet-5-5 kind=text schema=DatasetFeaturesExtraction
+2026-11-15 22:31:11 | INFO     | llm_metadata.anthropic_extract:_run:339 | Completed claude text extraction model=claude-sonnet-5-5 cache=bypass cost=$0.067074 output_tokens=226 cache_read=0 cache_write=6229 retries=0
+2026-11-15 22:31:11 | INFO     | llm_metadata.extraction:run_manifest_extraction:483 | [1/10] Finished gt_record_id=9 status=success method=pdf_text cost=$0.0671
+2026-11-15 22:31:11 | INFO     | llm_metadata.anthropic_extract:_run:333 | Starting claude text extraction model=claude-sonnet-5-5 schema=DatasetFeaturesExtraction cache=bypass
+2026-11-15 22:31:11 | DEBUG    | llm_metadata.anthropic_extract:_call:257 | Calling Anthropic Messages API model=claude-sonnet-5-5 kind=text schema=DatasetFeaturesExtraction
+2026-11-15 22:31:11 | INFO     | llm_metadata.anthropic_extract:_run:339 | Completed claude text extraction model=claude-sonnet-5-5 cache=bypass cost=$0.076797 output_tokens=289 cache_read=0 cache_write=6229 retries=0
+2026-11-15 22:31:11 | INFO     | llm_metadata.extraction:run_manifest_extraction:483 | [3/10] Finished gt_record_id=29 status=success method=pdf_text cost=$0.0768
+2026-11-15 22:31:11 | INFO     | llm_metadata.anthropic_extract:_run:333 | Starting claude text extraction model=claude-sonnet-5-5 schema=DatasetFeaturesExtraction cache=bypass
+2026-11-15 22:31:11 | DEBUG    | llm_metadata.anthropic_extract:_call:257 | Calling Anthropic Messages API model=claude-sonnet-5-5 kind=text schema=DatasetFeaturesExtraction
+2026-11-15 22:31:11 | INFO     | llm_metadata.anthropic_extract:_run:339 | Completed claude text extraction model=claude-sonnet-5-5 cache=bypass cost=$0.076270 output_tokens=219 cache_read=0 cache_write=6229 retries=0
+2026-11-15 22:31:11 | INFO     | llm_metadata.extraction:run_manifest_extraction:483 | [4/10] Finished gt_record_id=31 status=success method=pdf_text cost=$0.0763
+2026-11-15 22:31:12 | INFO     | llm_metadata.anthropic_extract:_run:333 | Starting claude text extraction model=claude-sonnet-5-5 schema=DatasetFeaturesExtraction cache=bypass
+2026-11-15 22:31:12 | DEBUG    | llm_metadata.anthropic_extract:_call:257 | Calling Anthropic Messages API model=claude-sonnet-5-5 kind=text schema=DatasetFeaturesExtraction
+2026-11-15 22:31:12 | INFO     | llm_metadata.anthropic_extract:_run:339 | Completed claude text extraction model=claude-sonnet-5-5 cache=bypass cost=$0.083583 output_tokens=213 cache_read=0 cache_write=6229 retries=0
+2026-11-15 22:31:12 | INFO     | llm_metadata.extraction:run_manifest_extraction:483 | [2/10] Finished gt_record_id=24 status=success method=pdf_text cost=$0.0836
+2026-11-15 22:31:12 | INFO     | llm_metadata.anthropic_extract:_run:333 | Starting claude text extraction model=claude-sonnet-5-5 schema=DatasetFeaturesExtraction cache=bypass
+2026-11-15 22:31:12 | DEBUG    | llm_metadata.anthropic_extract:_call:257 | Calling Anthropic Messages API model=claude-sonnet-5-5 kind=text schema=DatasetFeaturesExtraction
+2026-11-15 22:31:13 | INFO     | llm_metadata.anthropic_extract:_run:339 | Completed claude text extraction model=claude-sonnet-5-5 cache=bypass cost=$0.082518 output_tokens=253 cache_read=6229 cache_write=0 retries=0
+2026-11-15 22:31:13 | INFO     | llm_metadata.extraction:run_manifest_extraction:483 | [5/10] Finished gt_record_id=37 status=success method=pdf_text cost=$0.0825
+2026-11-15 22:31:13 | INFO     | llm_metadata.anthropic_extract:_run:333 | Starting claude text extraction model=claude-sonnet-5-5 schema=DatasetFeaturesExtraction cache=bypass
+2026-11-15 22:31:13 | DEBUG    | llm_metadata.anthropic_extract:_call:257 | Calling Anthropic Messages API model=claude-sonnet-5-5 kind=text schema=DatasetFeaturesExtraction
+2026-11-15 22:31:14 | INFO     | llm_metadata.anthropic_extract:_run:339 | Completed claude text extraction model=claude-sonnet-5-5 cache=bypass cost=$0.052658 output_tokens=209 cache_read=6229 cache_write=0 retries=0
+2026-11-15 22:31:14 | INFO     | llm_metadata.extraction:run_manifest_extraction:483 | [7/10] Finished gt_record_id=101 status=success method=pdf_text cost=$0.0527
+2026-11-15 22:31:15 | INFO     | llm_metadata.anthropic_extract:_run:333 | Starting claude text extraction model=claude-sonnet-5-5 schema=DatasetFeaturesExtraction cache=bypass
+2026-11-15 22:31:15 | DEBUG    | llm_metadata.anthropic_extract:_call:257 | Calling Anthropic Messages API model=claude-sonnet-5-5 kind=text schema=DatasetFeaturesExtraction
+2026-11-15 22:31:15 | INFO     | llm_metadata.anthropic_extract:_run:339 | Completed claude text extraction model=claude-sonnet-5-5 cache=bypass cost=$0.055782 output_tokens=378 cache_read=6229 cache_write=0 retries=0
+2026-11-15 22:31:15 | INFO     | llm_metadata.extraction:run_manifest_extraction:483 | [6/10] Finished gt_record_id=38 status=success method=pdf_text cost=$0.0558
+2026-11-15 22:31:15 | INFO     | llm_metadata.anthropic_extract:_run:339 | Completed claude text extraction model=claude-sonnet-5-5 cache=bypass cost=$0.044858 output_tokens=331 cache_read=6229 cache_write=0 retries=0
+2026-11-15 22:31:15 | INFO     | llm_metadata.extraction:run_manifest_extraction:483 | [8/10] Finished gt_record_id=104 status=success method=pdf_text cost=$0.0449
+2026-11-15 22:31:18 | INFO     | llm_metadata.anthropic_extract:_run:339 | Completed claude text extraction model=claude-sonnet-5-5 cache=bypass cost=$0.107524 output_tokens=201 cache_read=6229 cache_write=0 retries=0
+2026-11-15 22:31:18 | INFO     | llm_metadata.extraction:run_manifest_extraction:483 | [10/10] Finished gt_record_id=253 status=success method=pdf_text cost=$0.1075
+2026-11-15 22:31:18 | INFO     | llm_metadata.anthropic_extract:_run:339 | Completed claude text extraction model=claude-sonnet-5-5 cache=bypass cost=$0.078670 output_tokens=280 cache_read=6229 cache_write=0 retries=0
+2026-11-15 22:31:18 | INFO     | llm_metadata.extraction:run_manifest_extraction:483 | [9/10] Finished gt_record_id=208 status=success method=pdf_text cost=$0.0787
+2026-11-15 22:31:18 | INFO     | llm_metadata.extraction:run_manifest_extraction:500 | Validation: failed=0/10 (0.0%) repaired_by_retry=0 retries_used=0
+2026-11-15 22:31:18 | INFO     | llm_metadata.extraction:run_manifest_extraction:508 | Completed manifest extraction mode=pdf_text records=10 total_cost=$0.7257
+2026-11-15 22:31:18 | INFO     | __main__:run_eval:226 | Building ground truth from 299 GT records
+2026-11-15 22:31:18 | INFO     | __main__:run_eval:236 | Evaluating predictions matched_records=10 fields=default
+2026-11-15 22:31:18 | INFO     | __main__:run_eval:254 | Saved prompt_eval artifact to artifacts/runs/20261115_223105_sonnet_low_pdf_text_dev10.json
+2026-11-15 22:31:18 | INFO     | __main__:run_eval:255 | Saved extraction results CSV to artifacts/runs/20261115_223105_sonnet_low_pdf_text_dev10.csv
+2026-11-15 22:31:18 | INFO     | __main__:run_eval:257 | Completed prompt_eval mode=pdf_text records=10 total_cost=$0.7257
+Field                         N       P       R      F1
+-------------------------------------------------------
+bias_north_south             10   0.800   0.667   0.727
+data_type                    10   0.467   0.583   0.519
+geospatial_info_dataset      10   0.111   0.500   0.182
+multispecies                 10   0.400   1.000   0.571
+new_species_region           10     N/A     N/A     N/A
+new_species_science          10     N/A     N/A     N/A
+spatial_range_class          10   0.625   0.714   0.667
+spatial_range_km2            10   0.500   0.571   0.533
+species                      10   0.382   0.722   0.500
+temp_range_f                 10   0.556   0.625   0.588
+temp_range_i                 10   0.875   0.875   0.875
+temporal_range_class         10   0.875   0.875   0.875
+threatened_species           10   1.000   1.000   1.000
+time_series                  10     N/A   0.000     N/A
+
+Total API cost: $0.7257
+
+Run artifact saved to: artifacts/runs/20261115_223105_sonnet_low_pdf_text_dev10.json
