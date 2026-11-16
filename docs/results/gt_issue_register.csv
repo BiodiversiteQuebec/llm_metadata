@@ -1,0 +1,22 @@
+record_id,split,field,annotated_value,evidence,proposed_reading,found_by
+344,non_heldout,temporal_range / MC_temporal_range,"1690-2004, released class L","Span of 315 years; the rules give H for 12 years or more","Class H; the released L looks like a slip",rule audit (relevance_rules)
+176,non_heldout,spatial_range_km2 / MC_spatial_range,"""0,5"", released class X","0.5 km2 with a decimal comma; the rules give L for under 5 000 km2","Class L, or explain why X",rule audit (relevance_rules)
+175,dev,species,"""Crable a epis""","Typo for Erable a epis (Acer spicatum); the rest of the list is French without accents","Acer spicatum; accents restored",taxa evaluation (GBIF resolution)
+225,dev,species,"""(c.20 algae"" ... ""and others)"" as separate items","One statement split at the commas inside its parenthesis; the habitat-forming species named in the abstract (Fucus, Mytilus) are not annotated","One count statement; add Fucus and Mytilus as focal taxa",taxa evaluation
+30,dev,species,"""Rangifer tarandus""","The abstract names the subspecies R. t. caribou (woodland caribou)","Rangifer tarandus caribou",taxa evaluation
+89,dev,species,"""Rangifer tarandus""","The abstract names the subspecies R. t. caribou","Rangifer tarandus caribou",taxa evaluation
+11 12 30 89 101 104 123,dev,species,caribou written three ways,"Subspecies, species and the vernacular 'caribou' are used for the same focal taxon across records","One convention: Rangifer tarandus caribou for woodland caribou in Quebec",taxa evaluation
+37,dev,species,"""hybrids""","Not a taxon; the three Melampsora rust fungi of the dataset's inoculation file are not annotated","Populus hybrids as plant taxa, plus the Melampsora species",taxa evaluation
+258,dev,species,mites without a count,"The abstract gives 15 OTUs and names two families that are not annotated","Count 15; add the two families",taxa evaluation
+315,dev,species,"""c.30 beetle species""","The count is not in the abstract; four families were identified to species (Histeridae, Hydrophilidae, Scarabaeidae, Silphidae)","Check the count in the paper; list the four families",taxa evaluation
+71,dev,species,"""c.150"" plant species","Not in the abstract; the PDF extraction lists 203 plant species","Check the count in the paper",taxa evaluation
+343,dev,species,"""c.30"" bird species","Not in the abstract; the PDF extraction lists 37 birds","Check the count in the paper",taxa evaluation
+208,dev,species,"""132 species""","The paper says 132 taxa (not all at species rank)","132 taxa",taxa evaluation
+5,dev,spatial_range_km2,not given (class X),"The study area is a named river in Quebec (Shawinigan River); for other records the annotators estimated the area of a named region (record 24: 500 000 km2)","Apply one rule: estimate from the smallest named unit, or record X only when no place is named",prompt round 2
+271,dev,spatial_range_km2,not given (class X),"Commercial apple orchards in Quebec (several sites named in the paper); compare record 24","As above",prompt round 2
+9 56 71 175 208 225,dev,data_type,density,"Counts per trap, plot or transect annotated as density; similar counts elsewhere annotated as abundance (315, 351, 258, 271)","Write the convention down (counts standardised by effort or area = density?); both are class H, so relevance is unaffected",prompt round 3
+19 27 123 253,dev,data_type,"presence only + EBV genetic analysis","Genetic samples of located individuals are also annotated as occurrence records","Keep, but write the convention down: it is not obvious to an extractor",prompt round 3
+306,all,id,duplicated id,"The id appears twice in data/dataset_092624.xlsx (outside the open-access corpus)","Remove or renumber one row",corpus rebuild
+(30 records),all,temporal_range_position,empty,"30 records have a year value but no position",Fill the position (where the years were found),evaluation metrics audit
+(several),all,dataset_location / *_position,"""artcile"", ""no  "", ""not given"" vs ""no""","Spelling variants and two words for the same meaning in the position columns","Normalise the vocabulary",evaluation metrics audit
+(all),all,five modulator flags + time_series,False vs empty,"Annotators wrote False where the text is silent; the rules treat empty and False alike, exact matching does not","Record 'not stated' separately from 'stated false'",flag scoring (evaluation)
