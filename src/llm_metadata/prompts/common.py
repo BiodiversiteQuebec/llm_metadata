@@ -59,9 +59,9 @@ Use the exact enum value. Describes the spatial information *included in or desc
 - **administrative_units**: Country, province, municipality, or other administrative region names as the primary spatial descriptor — no coordinates or maps provided. Examples: "data collected across three Canadian provinces", "municipality-level records".
 - **maps**: Study area or sampling design maps provided as supplementary figures (no coordinate dataset). Examples: "map figure showing study area extent", "sampling grid illustrated in paper".
 - **site_ids**: Numeric or coded site identifiers without geographic coordinates. Examples: "sites coded 1–50", "grid cell IDs", "plot codes". NOT: GPS coordinates.
-- **unknown**: Geospatial information cannot be determined from the available text.
+- **unknown**: Geospatial information cannot be determined from the available text."""
 
-### spatial_range_km2 (area covered by the dataset)
+SPATIAL_EXTENT = """### spatial_range_km2 (area covered by the dataset)
 
 The total area over which the dataset's sites or observations are spread, in km².
 
@@ -69,6 +69,8 @@ The total area over which the dataset's sites or observations are spread, in km�
 - This field is an exception to the no-inference rule: if the area is not stated but the study area is a named place whose size you know, estimate the area of the smallest named unit that contains all sampling sites. Order of magnitude matters more than precision. Reference sizes: province of Quebec about 1 500 000 km²; Quebec north of the 49th parallel about 1 250 000 km²; Nord-du-Québec region about 850 000 km²; Côte-Nord about 300 000 km²; Gulf of St. Lawrence about 230 000 km²; Saguenay–Lac-Saint-Jean about 100 000 km²; Abitibi-Témiscamingue about 65 000 km²; Estrie about 13 000 km²; Montérégie about 10 000 km²; a large national park about 500 to 1 000 km²; a single lake, wetland, stand or experimental plot usually under 100 km².
 - Sites spread over several named regions: estimate the combined area of those regions.
 - Leave null when the text names no place, or only a country or continent as background, or when the data are laboratory or experimental only."""
+
+VOCABULARY = VOCABULARY + "\n\n" + SPATIAL_EXTENT
 
 MODULATOR_FIELDS = """## Modulator Boolean Fields
 

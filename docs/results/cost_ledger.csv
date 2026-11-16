@@ -13,3 +13,8 @@ date,run,model,effort,mode,records,budget_line,estimated_usd,actual_usd,cumulati
 2026-11-15,20261115_221552_r4_exception_in_philosophy_sonnet,claude-sonnet-5-5,low,abstract,30,model_effort_comparison,0.6934,0.2193,0.6302,Round 4 prompt on Sonnet
 2026-11-15,20261115_221703_haiku_pdf_text_dev16,claude-haiku-5-5,low,pdf_text,16,prompt_rounds,0.0683,0.0518,0.6820,Long text: PDF text
 2026-11-15,20261115_221727_haiku_pdf_native_dev16,claude-haiku-5-5,low,pdf_native,16,prompt_rounds,0.1090,0.0932,0.7752,Long text: native PDF
+2026-11-15,20261115_222127_r3_scoring_abstract,claude-haiku-5-5,low,abstract,30,relevance_direct,,0.0152,0.7904,R3 scoring only (2 validation failures)
+2026-11-15,20261115_222213_r3_scoring_abstract_native_so,claude-haiku-5-5,low,abstract,30,relevance_direct,,0.0081,0.7985,R3 scoring only native structured output
+2026-11-15,20261115_222252_r2_combined_abstract,claude-haiku-5-5,low,abstract,30,relevance_direct,,0.0277,0.8262,R2 combined
+2026-11-15,20261115_222406_r3_scoring_pdf_text_dev16,claude-haiku-5-5,low,pdf_text,16,relevance_direct,,0.0494,0.8756,R3 scoring only PDF text
+2026-11-15,20261115_222429_r2_combined_pdf_text_dev16,claude-haiku-5-5,low,pdf_text,16,relevance_direct,,0.0559,0.9315,R2 combined PDF text

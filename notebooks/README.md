@@ -2549,3 +2549,35 @@ An independent review of the evaluation code (fresh agent, read-only) found two 
 **Result, native PDF vs PDF text:** no field gains; spatial class −0.11 [−0.26, 0.00], relevance four-class −0.12. Hypothesis 5 rejected on Haiku: the native PDF costs 1.8 times more and is not better.
 
 **Decision:** PDF text is the main long-text condition; native PDF is kept for the held-out pass as a reported condition (the outline asks for it) but not tuned further. Next: species precision on long text (focal taxa rules), the section input, and direct relevance scoring.
+
+### 2026-11-15: Relevance by the LLM: combined variant (R2) and scoring only (R3), abstracts and PDF text
+
+**Context:** the April "direct" runs on OpenAI were in fact the combined variant (the prompt asked for the features and the category). Scoring only had never been run. Naming from now on: R1 rules on extracted features, R2 combined, R3 scoring only. New code: `prompts/relevance.py` (rules written from the constants of `relevance_rules.py`, plus the spatial-extent guidance), `schemas/relevance.py`, `scripts/run_relevance_variant.py`.
+
+**Hypotheses:** (a) scoring only is worse than R1 on short text, because it skips the feature-by-feature reasoning (the outline's claim); (b) the small scoring schema works with native structured output and removes validation failures (hypothesis 6).
+
+**Runs (Haiku 5.5, low effort, 0.156 USD in total):**
+- R3 abstract, schema in the prompt: `20261115_222127_r3_scoring_abstract.json` — 2 of 30 replies failed validation (the model listed features anyway).
+- R3 abstract, native structured output: `20261115_222213_r3_scoring_abstract_native_so.json` — 0 failures, 0.008 USD for 30 records.
+- R2 abstract `20261115_222252_r2_combined_abstract.json`; R3 PDF text `20261115_222406_r3_scoring_pdf_text_dev16.json`; R2 PDF text `20261115_222429_r2_combined_pdf_text_dev16.json`. R1 = round 4 abstract run and the PDF-text run of the previous entry.
+
+**Result (dev, against the rule label / the human label):**
+
+| Approach | Input | n | Four-class (rule) | Binary F1 (rule) | Four-class (human) | Binary F1 (human) |
+|---|---|---|---|---|---|---|
+| R1 rules on features | abstract | 30 | 0.47 | 0.81 | 0.33 | 0.70 |
+| R2 combined | abstract | 30 | 0.57 | 0.86 | 0.40 | 0.77 |
+| R3 scoring only | abstract | 30 | 0.43 | 0.81 | 0.30 | 0.65 |
+| R1 rules on features | PDF text | 16 | 0.50 | 0.86 | 0.31 | 0.81 |
+| R2 combined | PDF text | 16 | 0.44 | 0.88 | 0.19 | 0.75 |
+| R3 scoring only | PDF text | 16 | 0.38 | 0.77 | 0.31 | 0.72 |
+
+- Every paired difference between approaches is within run-to-run noise (four-class moves by up to 0.17 between identical runs). On dev, no approach wins.
+- Hypothesis (a) not supported: scoring only is not clearly worse than R1 on short text.
+- Hypothesis (b) confirmed: native structured output accepts the small schema and removes validation failures; the large feature schema is still rejected ("too complex").
+- R2 applies the rules faithfully: its category equals the rules applied to its own extracted features in 26 of 30 records. It over-rates (12 of 30 too high against the rule label, 17 against the human label).
+- Agreement with the human label (four-class 0.19–0.40) stays below the agreement between the rule label and the human label on dev (0.63), the ceiling.
+
+**Reading:** in April, the gap between short and long text (combined variant on gpt-5-mini: binary F1 0.55 on abstracts, 0.88 on PDFs) looked like a lack of information in abstracts. With the spatial extent estimated from named places, short text reaches the same level (0.86 vs 0.88). On this evidence most of the April gap came from the instruction not to infer the area, not from the abstracts. To be confirmed on the held-out set, which has 68 abstracts and 31 PDFs, enough to separate approaches by more than the noise.
+
+**Decision:** all three approaches go to the held-out pass on both inputs; R3 with native structured output. No more tuning of the relevance prompts on dev: differences there are within noise.
