@@ -411,6 +411,268 @@ class ParsedTaxon(BaseModel):
         return data
 
 
+# ---------------------------------------------------------------------------
+# Taxon mentions: splitting decorated strings and finding name candidates
+# ---------------------------------------------------------------------------
+#
+# A raw `species` item can hold one taxon ("Atlantic salmon (Salmo salar)"),
+# several taxa ("Histeridae; Silphidae; Nicrophorus sayi"), a count statement
+# ("73 weevil species"), a broad-group label ("benthic communities"), or noise
+# ("and others)"). The helpers below are pure string processing: they split
+# an item into mentions and list the names worth sending to GBIF. Network
+# resolution lives in `llm_metadata.gbif`.
+
+_BINOMIAL_RE = re.compile(
+    r"\b(?P<genus>[A-Z][a-z]{2,})\s+"
+    r"(?P<epithet>[a-z][a-z-]{1,}\.?)"
+    r"(?:\s+(?:(?:subsp|ssp|var|f)\.\s+)?(?P<infra>[a-z][a-z-]{2,}))?"
+)
+_UNINOMIAL_RE = re.compile(r"\b[A-Z][a-z]{3,}\b")
+_COUNT_RE = re.compile(
+    r"(?<![\w.,])(?P<approx>(?:c(?:irca)?\.?|ca\.?|approx(?:\.|imately)?|about|around|~)\s*)?"
+    r"(?P<count>\d{1,5})\s+(?=[A-Za-z(])",
+    re.IGNORECASE,
+)
+_GENUS_ONLY_EPITHETS = {"sp", "sp.", "spp", "spp.", "cf", "cf.", "aff", "aff.", "individuals", "indet", "indet."}
+_HYBRID_RE = re.compile(r"\bhybrid|\s×\s|\sx\s(?=[A-Z])", re.IGNORECASE)
+_NOISE_RE = re.compile(r"^\s*(?:and\s+)?(?:others?|etc\.?|various|unidentified|unknown)\s*\)?\s*$", re.IGNORECASE)
+_GENERIC_LABEL_RE = re.compile(r"\b(?:species|taxa|taxon|individuals|morphospecies|otus?)\b\s*$", re.IGNORECASE)
+
+
+def strip_unbalanced_parens(text: str) -> str:
+    """Drop parentheses that have no partner (e.g. a GT list split inside a parenthesis)."""
+    out: list[str] = []
+    depth = 0
+    for i, ch in enumerate(text):
+        if ch == "(":
+            if text.find(")", i) == -1:
+                out.append(" ")
+                continue
+            depth += 1
+        elif ch == ")":
+            if depth == 0:
+                out.append(" ")
+                continue
+            depth -= 1
+        out.append(ch)
+    return _WHITESPACE_RE.sub(" ", "".join(out)).strip()
+
+
+def _split_top_level(text: str, separators: str) -> list[str]:
+    """Split on separator characters that sit outside parentheses."""
+    parts: list[str] = []
+    depth = 0
+    current: list[str] = []
+    for ch in text:
+        if ch == "(":
+            depth += 1
+        elif ch == ")":
+            depth = max(0, depth - 1)
+        if ch in separators and depth == 0:
+            parts.append("".join(current))
+            current = []
+            continue
+        current.append(ch)
+    parts.append("".join(current))
+    return [p.strip() for p in parts if p.strip()]
+
+
+def split_taxon_items(raw: str) -> list[str]:
+    """Split one raw `species` item into individual mentions.
+
+    Splits on top-level semicolons, and on a top-level colon followed by a
+    comma-separated list ("16 damselfly species (Coenagrionidae): A b, C d").
+    Separators inside parentheses are kept, so "weevils (Coleoptera:
+    Curculionoidea)" stays whole. Unbalanced parentheses are dropped.
+
+    Examples:
+        >>> split_taxon_items("Histeridae; Silphidae")
+        ['Histeridae', 'Silphidae']
+        >>> split_taxon_items("16 damselfly species: Enallagma boreale, Ischnura posita")
+        ['16 damselfly species', 'Enallagma boreale', 'Ischnura posita']
+    """
+    if not raw or not isinstance(raw, str):
+        return []
+    text = strip_unbalanced_parens(raw.strip())
+    out: list[str] = []
+    for part in _split_top_level(text, ";"):
+        colon_parts = _split_top_level(part, ":")
+        if len(colon_parts) == 2 and len(_split_top_level(colon_parts[1], ",")) >= 2:
+            out.append(colon_parts[0])
+            out.extend(_split_top_level(colon_parts[1], ","))
+        else:
+            out.append(part)
+    return [p.strip(" ,.") for p in out if p.strip(" ,.")]
+
+
+def normalize_group_label(text: str) -> str:
+    """Lowercase, hyphen-free, stopword-free label used for vocabulary lookups."""
+    s = text.replace("-", " ").replace("_", " ")
+    s = _PARENS_RE.sub(" ", s)
+    s = _GROUP_STOPWORDS_RE.sub(" ", s)
+    s = re.sub(r"[^\w\s]", " ", s)
+    s = _WHITESPACE_RE.sub(" ", s).strip().lower()
+    return s
+
+
+def scientific_name_candidates(text: str) -> list[str]:
+    """List binomial/trinomial and genus-level names embedded in a string.
+
+    Finds names anywhere in the string, including inside parentheses and after
+    a vernacular prefix ("migratory caribou Rangifer tarandus caribou").
+    "Genus sp." / "Genus spp." yield "Genus spp." so GBIF returns the genus.
+    """
+    names: list[str] = []
+    for m in _BINOMIAL_RE.finditer(text):
+        genus, epithet, infra = m.group("genus"), m.group("epithet"), m.group("infra")
+        if epithet.lower() in _GENUS_ONLY_EPITHETS:
+            name = f"{genus} spp."
+        else:
+            name = f"{genus} {epithet.rstrip('.')}"
+            if infra and infra.lower() not in _GENUS_ONLY_EPITHETS:
+                name = f"{name} {infra}"
+        if name not in names:
+            names.append(name)
+    return names
+
+
+def uninomial_candidates(text: str) -> list[str]:
+    """List single capitalised words that may be higher-taxon names.
+
+    Only whole segments count: the text outside parentheses, or a piece of a
+    parenthesis split on ":", ";" or ",". So "Histeridae", "Nematoda (adults)"
+    and "weevils (Coleoptera: Curculionoidea)" give candidates, while the
+    adjective in "Eastern Wolf" does not.
+    """
+    outside = _WHITESPACE_RE.sub(" ", _PARENS_RE.sub(" ", text)).strip(" ,.;:")
+    segments = [outside]
+    for inner in _PARENS_RE.findall(text):
+        segments.extend(re.split(r"[:;,]", inner.strip("() ")))
+    out: list[str] = []
+    for segment in segments:
+        segment = segment.strip(" ,.;:")
+        if _UNINOMIAL_RE.fullmatch(segment) and segment not in out:
+            out.append(segment)
+    return out
+
+
+def vernacular_candidates(text: str) -> list[str]:
+    """List vernacular phrases to try: text outside and inside parentheses."""
+    outside = _WHITESPACE_RE.sub(" ", _PARENS_RE.sub(" ", text)).strip(" ,.;:")
+    inside = [m.strip("() ") for m in _PARENS_RE.findall(text)]
+    out: list[str] = []
+    for phrase in [outside, *inside]:
+        phrase = _GROUP_STOPWORDS_RE.sub(" ", phrase)
+        phrase = _WHITESPACE_RE.sub(" ", phrase).strip(" ,.;:")
+        if phrase and re.search(r"[A-Za-z]", phrase) and phrase not in out:
+            out.append(phrase)
+    return out
+
+
+class TaxonMention(BaseModel):
+    """One mention found in a `species` item, before any GBIF lookup.
+
+    Attributes:
+        original: The mention text as split from the raw item.
+        kind: "name" (a taxon or group name to resolve), "count" (a count
+            statement such as "73 weevil species"), "hybrid" (hybrid labels),
+            or "noise" ("and others").
+        count: The stated number of taxa, for count statements.
+        approximate: True when the count is prefixed by "c.", "about", etc.
+        group_texts: For count statements, the texts that may name the counted
+            group, in priority order (after the number, then the whole string).
+        generic_label: True for labels that end in "species"/"taxa" and may not
+            name any taxon ("shade-tolerant species").
+    """
+
+    original: str
+    kind: str = "name"
+    count: Optional[int] = None
+    approximate: bool = False
+    group_texts: list[str] = []
+    generic_label: bool = False
+
+    @model_validator(mode="before")
+    @classmethod
+    def parse_raw_string(cls, data: Any) -> Any:
+        if isinstance(data, str):
+            return parse_taxon_mention(data)
+        return data
+
+
+def parse_taxon_mention(text: str) -> dict:
+    """Classify one mention (already split) as a name, count, hybrid or noise."""
+    s = (text or "").strip()
+    out: dict[str, Any] = {"original": s, "kind": "name", "count": None, "approximate": False,
+                           "group_texts": [], "generic_label": False}
+    if not s or _NOISE_RE.match(s) or not re.search(r"[A-Za-z]", s):
+        out["kind"] = "noise"
+        return out
+    if _HYBRID_RE.search(s):
+        out["kind"] = "hybrid"
+        return out
+    count_match = None
+    for m in _COUNT_RE.finditer(s):
+        value = int(m.group("count"))
+        if 1700 <= value <= 2100 and len(m.group("count")) == 4:
+            continue  # a year, e.g. authorship "(Linnaeus, 1758)"
+        count_match = m
+        break
+    if count_match is not None:
+        out["kind"] = "count"
+        out["count"] = int(count_match.group("count"))
+        out["approximate"] = bool(count_match.group("approx"))
+        after = s[count_match.end():]
+        before = s[:count_match.start()]
+        texts = []
+        # Parenthesised scientific names often name the counted group: "(Coenagrionidae)"
+        for inner in _PARENS_RE.findall(s):
+            inner = inner.strip("() ")
+            if uninomial_candidates(inner) or scientific_name_candidates(inner):
+                texts.append(inner)
+        after_clean = re.split(r"[(:;,]", after)[0].strip()
+        for candidate in (after_clean, before.strip(" ,(:;"), _COUNT_RE.sub(" ", s)):
+            candidate = strip_unbalanced_parens(_WHITESPACE_RE.sub(" ", candidate)).strip(" ,.;:()")
+            if candidate and normalize_group_label(candidate) and candidate not in texts:
+                texts.append(candidate)
+        out["group_texts"] = texts
+        return out
+    out["generic_label"] = bool(_GENERIC_LABEL_RE.search(s)) and not scientific_name_candidates(s)
+    return out
+
+
+def normalize_vernacular(text: str) -> str:
+    """Accent-, case- and punctuation-insensitive form of a vernacular name."""
+    import unicodedata
+
+    s = unicodedata.normalize("NFKD", text)
+    s = "".join(ch for ch in s if not unicodedata.combining(ch))
+    s = s.lower().replace("-", " ").replace("'", " ").replace("’", " ")
+    s = re.sub(r"[^\w\s]", " ", s)
+    return _WHITESPACE_RE.sub(" ", s).strip()
+
+
+def singularize_phrase(text: str) -> str:
+    """Singularize the last word of a normalized phrase ("striped skunks" -> "striped skunk")."""
+    words = text.split()
+    if not words:
+        return text
+    last = words[-1]
+    irregular = {"wolves": "wolf", "mice": "mouse", "geese": "goose", "lice": "louse",
+                 "fishes": "fish", "algae": "alga", "fungi": "fungus", "larvae": "larva",
+                 "leaves": "leaf", "calves": "calf", "halves": "half", "molluscs": "mollusc",
+                 "mollusks": "mollusk"}
+    if last in irregular:
+        words[-1] = irregular[last]
+    elif len(last) > 4 and last.endswith("ies"):
+        words[-1] = last[:-3] + "y"
+    elif len(last) > 4 and last.endswith(("ches", "shes", "sses", "xes")):
+        words[-1] = last[:-2]
+    elif len(last) > 3 and last.endswith("s") and not last.endswith(("ss", "us", "is")):
+        words[-1] = last[:-1]
+    return " ".join(words)
+
+
 class TaxonRichnessMention(BaseModel):
     """Structured count + group mention parsed from a taxonomic string."""
 
