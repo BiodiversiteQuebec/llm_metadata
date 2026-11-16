@@ -1,5 +1,7 @@
 # Atlas contribution potential: reference tables
 
+> Scores built on these tables: [`scores.md`](scores.md) (method) and [`results.md`](results.md) (first results on the annotations, insect case, recommendation).
+
 **Track:** candidate second article. Kept separate from the article 1 results.
 **Database:** Biodiversité Québec Atlas, **staging**, read-only role, queried 2026-11-15 through `atlas_api.obs_counts` (pre-aggregated observations per region × taxon × dataset × year; a materialized view, so it may lag the source tables by one refresh).
 

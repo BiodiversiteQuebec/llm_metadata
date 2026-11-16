@@ -2581,3 +2581,15 @@ An independent review of the evaluation code (fresh agent, read-only) found two 
 **Reading:** in April, the gap between short and long text (combined variant on gpt-5-mini: binary F1 0.55 on abstracts, 0.88 on PDFs) looked like a lack of information in abstracts. With the spatial extent estimated from named places, short text reaches the same level (0.86 vs 0.88). On this evidence most of the April gap came from the instruction not to infer the area, not from the abstracts. To be confirmed on the held-out set, which has 68 abstracts and 31 PDFs, enough to separate approaches by more than the noise.
 
 **Decision:** all three approaches go to the held-out pass on both inputs; R3 with native structured output. No more tuning of the relevance prompts on dev: differences there are within noise.
+
+### 2026-11-15: Atlas contribution scores on the human annotations (Track B, no API cost)
+
+**Context:** the Fuster relevance ignores what the Atlas already holds. New code: `atlas_match.py` (taxa, places and years matched to the Atlas tables), `atlas_contribution.py` (four separate scores), `scripts/atlas_contribution_ceiling.py`. Method: `docs/atlas_contribution/scores.md`; results: `docs/atlas_contribution/results.md`. Only the 231 valid non-held-out records were read.
+
+**Result:**
+- 90 % of the 273 annotated taxon mentions reach the Atlas (55 % matched to an Atlas taxon, 16 % absent from the extract, often species at risk, 19 % group only); 10 % unresolved or ambiguous.
+- Agreement with the Fuster rule label is weak (Spearman 0.34 on the count of gaps filled, 0.24 before modulators); taxonomic novelty and group gap go the other way. The six labelled records that bring taxa new to the Atlas are all rated Low or Excluded.
+- Thresholds ±50 % leave ranks unchanged (Spearman ≥ 0.91); the count of gaps filled is threshold-sensitive (0.63 to 0.72).
+- Insects north of the 49th: 6 % of the Atlas insect records for 75 % of the area; 5 records in the corpus, the best being a chironomid revision with three species absent from the Atlas.
+
+**Decision:** no composite score (the four scores are nearly independent and each is missing for different records). Figure, insect case and Fuster divergences proposed for the article 1 data-gap supplement; a full contribution article only after extracting place names and record availability.

@@ -1,0 +1,5 @@
+,taxonomic,spatial,temporal,group_gap
+taxonomic,1.0,-0.03,0.03,0.6
+spatial,-0.03,1.0,-0.11,-0.05
+temporal,0.03,-0.11,1.0,0.12
+group_gap,0.6,-0.05,0.12,1.0

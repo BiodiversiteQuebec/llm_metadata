@@ -1,0 +1,232 @@
+record_id,taxonomic,spatial,temporal,group_gap,n_scores,n_gaps,groups,regions,periods,n_taxa,n_taxa_below_group,n_taxa_absent,n_taxa_unresolved,title,fuster_rule
+3,,,,,0,,,unknown,,1,0,0,1,Fish mock community with 41 species from 13 orders,X
+5,,0.0,0.347,0.0,3,0.0,REPTILES,sud_49,2000s,1,1,1,0,Data from: Paternity analysis of wood turtles (Glyptemys insculpta) reveals complex mating patterns,M
+7,,,,0.343,1,0.0,"INSECTS, OTHER_ARTHROPODS, MOLLUSKS, OTHER_INVERTEBRATES",unknown,,1,0,0,0,"Data from: 60 specific eDNA qPCR assays to detect invasive, threatened and exploited freshwater vertebrates and invertebrates in Eastern Canada",X
+9,0.0,0.0,0.0,0.0,4,0.0,MAMMALS,sud_49,2000s,2,2,0,0,Data from: Resampling method for applying density-dependent habitat selection theory to wildlife surveys,L
+10,0.0,0.0,0.319,0.0,4,0.0,MAMMALS,sud_49,2020s,1,1,0,0,Occupancy modeling of habitat use by white-tailed deer after more than a decade of exclusion in the boreal forest,L
+11,,0.0,0.121,0.0,3,0.0,MAMMALS,sud_49,"1990s, 2000s, 2010s",1,1,1,0,Data from: Impacts of human disturbance on large prey species: do behavioral reactions translate to fitness consequences?,M
+12,,0.0,0.03,0.0,3,0.0,MAMMALS,sud_49,"2000s, 2010s",1,1,1,0,"Data from: Natal habitat preference induction in large mammals – Like mother, like child?",H
+13,0.7,0.0,,0.774,3,2.0,FUNGI,sud_49,,1,1,0,0,"Data from: Aspicilia bicensis (Megasporaceae), a new sterile, pustulose lichen from eastern Canada",L
+16,0.0,0.805,0.233,0.0,4,1.0,FISH,nord_49,"2000s, 2010s",1,1,0,0,Data from: Do genetic drift and accumulation of deleterious mutations preclude adaptation? Empirical investigation using RADseq in a northern lacustrine fish,H
+17,0.0,0.0,0.419,0.0,4,0.0,BIRDS,sud_49,"2000s, 2010s",2,2,0,0,Nonideal nest box selection by tree swallows breeding in farmlands: evidence for an ecological trap?,M
+19,0.0,0.0,0.0,0.296,4,0.0,OTHER_ARTHROPODS,sud_49,2010s,1,1,0,0,Data from: The genetic signature of range expansion in a disease vector - the black-legged tick,M
+20,0.0,0.619,0.377,0.0,4,1.0,VASCULAR_PLANTS,nord_49,"1970s, 1980s, 1990s, 2000s, 2010s",4,4,0,0,Data from: Irregular forest structures originating after fire: an opportunity to promote alternatives to even-aged management in boreal forests,H
+24,0.0,0.619,0.551,0.0,4,2.0,VASCULAR_PLANTS,nord_49,2000s,1,1,0,0,"Data from: Influence of northern limit range on genetic diversity and structure in a widespread North American tree, sugar maple (Acer saccharum Marshall)",H
+25,,0.0,0.268,0.0,3,0.0,FISH,sud_49,"1990s, 2000s",1,1,1,0,Data from: Population genetics of the American eel (Anguilla rostrata): FST = 0 and NAO effects on demographic fluctuations of a panmictic species,H
+27,0.121,0.0,0.06,0.0,4,0.0,MAMMALS,sud_49,2010s,2,2,0,0,Data from: Patchy distribution and low effective population size raise concern for an at-risk top predator,M
+28,,0.0,0.391,0.0,3,0.0,VASCULAR_PLANTS,sud_49,2010s,1,0,0,0,Effects of different moose browsing pressures on the succession of plant communities within the herbaceous and saplings layers of a boreal forest,H
+29,0.0,0.619,0.278,0.0,4,1.0,VASCULAR_PLANTS,nord_49,"1980s, 1990s, 2000s",4,4,0,0,"Data from: Ecological gradients driving the distribution of four Ericaceae in boreal Quebec, Canada",H
+30,,0.689,1.0,0.0,3,2.0,MAMMALS,nord_49,"before_1950, 1950s, 1960s, 1970s, 1980s",1,1,1,0,"Data from: Caribou, water, and ice – fine-scale movements of a migratory arctic ungulate in the context of climate change",H
+31,0.0,0.0,0.137,0.0,4,0.0,FISH,sud_49,2000s,1,1,0,0,Data from: Reduced fitness of Atlantic salmon released in the wild after one generation of captive-breeding,L
+35,,,,0.0,1,0.0,MAMMALS,unknown,,1,1,1,0,Integrating functional connectivity in designing networks of protected areas under climate change: a caribou case-study,M
+37,0.0,0.0,0.278,0.0,4,0.0,VASCULAR_PLANTS,sud_49,"2000s, 2010s",2,2,0,0,Data from: Fitness dynamics within a poplar hybrid zone: I. Prezygotic and postzygotic barriers impacting a native poplar hybrid stand.,M
+38,,0.896,0.338,0.211,3,1.0,"INSECTS, MAMMALS",nord_49,"2000s, 2010s",3,0,0,0,Data from: Temporal dynamics in animal community assembly during post-logging succession in boreal forest,H
+39,0.0,0.0,0.419,0.0,4,0.0,BIRDS,sud_49,"2000s, 2010s",1,1,0,0,Data from: Severe recent decrease of adult body mass in a declining insectivorous bird population,M
+40,0.0,0.0,0.0,0.0,4,0.0,FISH,sud_49,2010s,1,1,0,0,Data from: Convergence in organ size but not energy metabolism enzyme activities among wild Lake Whitefish (Coregonus clupeaformis) species pairs,L
+46,0.0,0.0,,0.0,3,0.0,FISH,sud_49,,1,1,0,0,Data from: Parallel and nonparallel genome-wide divergence among replicate population pairs of freshwater and anadromous Atlantic salmon,L
+47,,0.689,0.015,0.0,3,1.0,MAMMALS,nord_49,"2000s, 2010s",1,1,1,0,Data from: Many places called home: the adaptive value of seasonal adjustments in range fidelity,H
+56,0.0,0.0,0.419,0.0,4,0.0,BIRDS,sud_49,"2000s, 2010s",1,1,0,0,Data from: Multidimensional environmental influences on timing of breeding in a tree swallow population facing climate change,M
+58,,0.0,0.555,0.0,3,1.0,BIRDS,sud_49,"1990s, 2000s, 2010s",1,0,0,0,Factors influencing fall departure phenology in migratory birds that bred in northeastern North America,H
+60,,0.0,0.028,0.0,3,0.0,AMPHIBIANS,sud_49,2010s,1,1,1,0,"Data for the detection of the boreal chorus frog (Pseudacris maculata) using environmental DNA and call surveys at 180 ponds sampled in 2017-2018 in southeastern Québec, Canada",M
+61,,0.0,0.391,0.0,3,0.0,VASCULAR_PLANTS,sud_49,2010s,1,0,0,0,Data from: Hedging at the rear edge: Intraspecific trait variability drives the trajectory of marginal populations in a widespread boreal tree species,H
+62,,0.0,,0.378,2,0.0,OTHER_INVERTEBRATES,sud_49,,1,1,1,0,Data from: A new method for studying population genetics of cyst nematodes based on Pool-Seq and genome-wide allele frequency analysis,X
+63,0.27,0.793,0.092,0.0,4,1.0,"MAMMALS, BIRDS",nord_49,"2000s, 2010s",4,2,1,1,A mechanistic model of functional response provides new insights into indirect interactions among arctic tundra prey,H
+69,,0.313,0.416,0.774,3,1.0,FUNGI,nord_49,2010s,1,0,0,0,Patterns and determinants of lichen abundance and diversity across a subarctic to arctic latitudinal gradient,H
+71,,0.0,0.391,0.0,3,0.0,VASCULAR_PLANTS,sud_49,2010s,1,0,0,0,Data from: Threshold dynamics in plant succession after tree planting in agricultural riparian zones,M
+75,0.48,,,0.0,2,0.0,VASCULAR_PLANTS,unknown,,1,1,0,0,Genomic analyses of phenotypic differences between native and invasive populations of diffuse knapweed (Centaurea diffusa),X
+80,,1.0,0.0,0.316,3,1.0,INSECTS,nord_49,2010s,1,0,0,0,"Community-wide trait adaptation, but not plasticity, explain ant community structure in extreme environments",H
+81,,0.0,0.24,0.0,3,0.0,VASCULAR_PLANTS,sud_49,"2000s, 2010s, 2020s",1,1,1,0,"Range shifts in butternut, a rare, endangered tree, in response to past climate and modern conditions",H
+83,,0.0,0.185,0.0,3,0.0,VASCULAR_PLANTS,sud_49,"1990s, 2000s, 2010s",1,0,0,0,Data from: Large herbivores trigger spatiotemporal changes in forest plant diversity,H
+85,0.0,0.0,0.0,0.0,4,0.0,FISH,sud_49,2010s,1,1,0,0,Data from: Nonparallelism in MHC IIβ diversity accompanies nonparallelism in pathogen infection of lake whitefish (Coregonus clupeaformis) species pairs as revealed by next generation sequencing,L
+86,0.0,0.0,0.06,0.0,4,0.0,MAMMALS,sud_49,2010s,1,1,0,0,Testing the precision and sensitivity of density estimates obtained with a camera-trap method revealed limitations and opportunities,L
+89,0.0,0.689,0.0,0.0,4,1.0,MAMMALS,nord_49,2000s,3,3,1,0,Data from: Logging-induced changes in habitat network connectivity shape behavioral interactions in the wolf-caribou-moose system,M
+91,,0.0,0.03,0.0,3,0.0,MAMMALS,sud_49,"2000s, 2010s",1,1,1,0,Data from: Genetic connectivity among swarming sites in the wide ranging and recently declining little brown bat (Myotis lucifugus),M
+92,0.0,0.0,0.391,0.0,4,0.0,VASCULAR_PLANTS,sud_49,2010s,1,1,0,0,Data from: Local adaptation of trees at the range margins impact range shifts in the face of climate change,X
+94,0.0,1.0,0.413,0.0,4,1.0,BIRDS,nord_49,"1990s, 2000s, 2010s",1,1,0,0,Evidence for synergistic cumulative impacts of marking and hunting in a wildlife species.,M
+95,0.0,0.0,0.068,0.0,4,0.0,FISH,sud_49,"2000s, 2010s",1,1,0,0,Data from: Investigating genomic and phenotypic parallelism between piscivorous and planktivorous lake trout (Salvelinus namaycush) ecotypes by means of RADseq and morphometrics analyses,L
+100,0.0,0.0,0.28,0.0,4,0.0,BIRDS,sud_49,"2000s, 2010s, 2020s",1,1,0,0,Determinants of nest box local recruitment and natal dispersal in a declining bird population,H
+101,,0.689,0.015,0.0,3,1.0,MAMMALS,nord_49,"2000s, 2010s",1,1,1,0,Data from: Disentangling woodland caribou movements in response to clearcuts and roads across temporal scales,L
+103,0.0,0.0,0.155,0.0,4,0.0,BIRDS,sud_49,2010s,1,1,0,0,Data from: Patterns of diversity and spatial variability of β-defensin innate immune genes in a declining wild population of tree swallows,M
+104,,0.0,0.121,0.0,3,0.0,MAMMALS,sud_49,"1990s, 2000s, 2010s",1,1,1,0,Data from: Compensatory conservation measures for an endangered caribou population under climate change,H
+107,0.0,0.0,0.555,0.0,4,1.0,BIRDS,sud_49,"1990s, 2000s, 2010s",3,3,1,0,Data from: Using citizen science monitoring data in species distribution models to inform isotopic assignment of migratory connectivity in wetland birds,H
+109,0.0,0.0,,0.0,3,0.0,FISH,sud_49,,1,1,0,0,Data from: The role of ecotype-environment interactions in intraspecific trophic niche partitioning subsequent to stocking,L
+112,,0.844,0.015,0.0,3,1.0,"BIRDS, MAMMALS",nord_49,2010s,2,1,1,0,Variable strength of predator-mediated effects on species occurrence in an arctic terrestrial vertebrate community,H
+115,,0.689,0.056,0.0,3,1.0,MAMMALS,nord_49,"1990s, 2000s, 2010s",1,1,1,0,Where to spend the winter? The role of intraspecific competition and climate in determining the selection of wintering areas by migratory caribou,H
+116,,0.0,0.827,0.0,3,1.0,BIRDS,sud_49,1990s,1,0,0,0,Organic farming benefits birds most in regions with more intensive agriculture,M
+119,0.0,0.0,0.391,0.0,4,0.0,VASCULAR_PLANTS,sud_49,2010s,8,7,0,1,Priority effects will impede range shifts of temperate tree species into the boreal forest,M
+120,0.0,,,0.316,2,0.0,INSECTS,unknown,,1,1,0,0,Assessment of the systems approach for the phytosanitary treatment of wood infested with wood-boring insects,X
+122,0.0,0.0,0.211,0.105,4,0.0,"MAMMALS, INSECTS, VASCULAR_PLANTS",sud_49,2010s,3,2,0,0,Stuck between the mandibles of an insect and of a rodent: where does the fate of ash-dominated riparian temperate forests lie?,M
+123,,0.689,,0.0,2,1.0,MAMMALS,nord_49,,1,1,1,0,Data from: Temporally dynamic habitat suitability predicts genetic relatedness among caribou,H
+129,0.16,1.0,0.0,0.316,4,1.0,INSECTS,nord_49,2010s,2,2,0,0,VCF files of loci in approximate linkage equilibrium for two common spruce budworm larval parasitoids: Apanteles fumiferanae (Hymenoptera: Braconidae) and Glypta fumiferanae (Hymenoptera: Ichneumonidae),H
+131,,0.619,,0.0,2,1.0,VASCULAR_PLANTS,nord_49,,1,0,0,0,Boreal aspen understory diversity along a continental gradient,L
+135,0.0,0.619,0.278,0.0,4,1.0,VASCULAR_PLANTS,nord_49,"1980s, 1990s, 2000s",1,1,0,0,Data from: Influence of habitat availability and fire disturbance on the northern range boundary of eastern white cedar (Thuja occidentalis L.),H
+137,0.0,0.0,0.391,0.0,4,0.0,VASCULAR_PLANTS,sud_49,2010s,2,2,0,0,Earlier spring reduces potential for gene flow via reduced flowering synchrony across an elevational gradient,L
+140,0.0,0.0,1.0,0.0,4,1.0,MAMMALS,sud_49,"1950s, 1960s",1,1,0,0,"Data from: History matters: contemporary versus historic population structure of bobcats in the New England region, USA",H
+143,,0.0,0.083,0.0,3,0.0,VASCULAR_PLANTS,sud_49,"1990s, 2000s",1,0,0,0,A 249-year chronosequence of forest plots from eight successive fires in the eastern Canada boreal mixedwoods,H
+145,,0.521,0.874,0.271,3,2.0,"ALGAE, FISH, OTHER_ARTHROPODS, OTHER_INVERTEBRATES",nord_49,1980s,3,0,0,0,Large-scale multi-trophic co-response models and environmental control of pelagic food webs in Québec lakes,M
+147,0.0,0.0,0.0,0.296,4,0.0,OTHER_ARTHROPODS,sud_49,2010s,1,1,0,0,Copy number variants outperform SNPs to reveal genotype-temperature association in a marine species,L
+148,,,,,0,,,sud_49,"2000s, 2010s",1,0,0,1,Data set for combined influence of food availability and agricultural intensification on a declining aerial insectivore,L
+149,0.0,0.0,0.0,0.0,4,0.0,FISH,sud_49,2010s,1,1,0,0,Deciphering lifelong thermal niche using otolith δ18O thermometry within supplemented lake trout (Salvelinus namaycush) populations,L
+150,,,,,0,,,nord_49,2010s,1,0,0,1,Data for: Parasitoids indicate major climate-induced shifts in Arctic communities,M
+152,,,,,0,,,unknown,,1,0,0,1,Data from: Mast seeding patterns are asynchronous at a continental scale,X
+159,,,,,0,,,unknown,,0,0,0,0,Data from: Rates of evolution: a quantitative synthesis,X
+160,,,,0.0,1,0.0,MAMMALS,unknown,,1,1,1,0,Data from: Development and validation of an expert-based habitat suitability model to support boreal caribou conservation,X
+175,0.0,0.0,,0.0,3,0.0,VASCULAR_PLANTS,sud_49,,6,5,0,1,"Ã‰valuation de la coupe avec protection de la rÃ©gÃ©nÃ©ration et des sols comme mÃ©thode de rÃ©gÃ©nÃ©ration de peuplements mÃ©langÃ©s du domaine bioclimatique de la sapiniÃ¨re Ã  bouleau jaune de l'est du QuÃ©bec, Canada",L
+176,0.708,0.0,,0.645,3,2.0,"FUNGI, VASCULAR_PLANTS",sud_49,,6,6,0,0,Abondance relative et diversitÃ© des EndogonacÃ©es dans un sol de verger du QuÃ©bec,X
+177,,0.0,,0.0,2,0.0,VASCULAR_PLANTS,sud_49,,1,0,0,0,Afin dâ€™eÌvaluer les facteurs environnementaux controÌ‚lant la distribution du bouleau jaune,H
+179,0.0,,,0.0,2,0.0,VASCULAR_PLANTS,unknown,,2,2,0,0,An occurrence of boron deficiency in the deciduous forest of the Quebec Appalachians and the St. Lawrence Lowlands,X
+181,,,,,0,,,unknown,"1970s, 1980s, 1990s",1,0,0,1,Area prioritization for biodiversity conservation in QuÃ©bec on the basis of species distributions: a preliminary analysis,H
+194,,0.0,,0.774,2,1.0,FUNGI,sud_49,,1,0,0,0,Calicioid Fungi and Lichens from an Unprotected Intact Forest Ecosystem in QuÃ©bec,L
+200,,,,,0,,,sud_49,1990s,1,0,0,1,Community structures of Collembola in sugar maple forests: relations to humus type and seasonal trends,M
+201,0.0,0.0,,0.0,3,0.0,FISH,sud_49,,3,3,1,0,Comparative Physiology and Relative Swimming Performance of Three Redhorse (Moxostoma spp.) Species: Associations with Fishway Passage Success*,L
+202,,0.0,0.0,0.0,3,0.0,FISH,sud_49,2010s,1,0,0,0,Comparison between electrofishing and snorkeling surveys to describe fish assemblages in Laurentian streams,M
+208,,0.533,,0.343,2,1.0,"INSECTS, OTHER_ARTHROPODS, MOLLUSKS, OTHER_INVERTEBRATES",nord_49,,1,0,0,0,Determining the Ecological Status of Benthic Coastal Communities: A Case in an Anthropized Sub-Arctic Area,H
+214,,0.0,,0.0,2,0.0,VASCULAR_PLANTS,sud_49,,1,0,0,0,Divergence between riparian seed banks and standing vegetation increases along successional trajectories,L
+216,,,,,0,,,sud_49,,1,0,0,1,Does submerged aquatic vegetation shape zooplankton community structure and functional diversity? A test with a shallow fluvial lake system,M
+225,,0.0,,0.411,2,0.0,"ALGAE, MOLLUSKS, OTHER_INVERTEBRATES",sud_49,,3,0,0,0,"Effects of Habitat-Forming Species Richness, Evenness, Identity, and Abundance on Benthic Intertidal Community Establishment and Productivity",L
+228,0.0,0.0,,0.316,3,0.0,INSECTS,sud_49,,1,1,0,0,"Emergence of a new turfgrass insect pest on golf courses in Quebec, the European crane fly [Diptera: Tipulidae].",L
+234,0.0,0.0,,0.193,3,0.0,"NON_VASCULAR_PLANTS, FUNGI, VASCULAR_PLANTS",sud_49,,4,1,0,0,"Epiphytic Lichens and Bryophytes on Populus tremuloides Along a Chronosequence in the Southwestern Boreal Forest of QuÃ©bec, Canada",L
+240,,0.0,0.151,0.0,3,0.0,MAMMALS,sud_49,"1990s, 2000s",1,0,0,0,"Facteurs environnementaux et anthropiques influenÃ§ant la variation temporelle dans les Ã©chouages de mammifÃ¨res marins de l'estuaire et du golfe du Saint-Laurent, QuÃ©bec",H
+248,0.0,0.0,0.827,0.0,4,1.0,BIRDS,sud_49,1990s,1,1,0,0,"Food of Double-crested Cormorants, Phalacrocorax auritus, in the Gulf and Estuary of the St. Lawrence River, Quebec, Canada",L
+249,,0.0,,0.0,2,0.0,VASCULAR_PLANTS,sud_49,,1,0,0,0,"Forage diversity, type and abundance influence winter resource selection by whiteâ€tailed deer",L
+250,0.0,0.0,0.276,0.0,4,0.0,"VASCULAR_PLANTS, BIRDS",sud_49,1990s,5,3,1,2,Foraging ecology and use of drumming trees by three-toed woodpeckers,L
+253,,0.805,,0.0,2,1.0,FISH,nord_49,,1,1,1,0,Genomic data support management of anadromous Arctic Char fisheries in Nunavik by highlighting neutral and putatively adaptive genetic variation,H
+258,,0.0,,0.306,2,0.0,"INSECTS, OTHER_ARTHROPODS",sud_49,,2,0,0,0,"Host phenology, geographic range size and regional occurrence explain interspecific variation in damselflyâ€“water mite associations",M
+261,,0.0,0.952,0.316,3,1.0,INSECTS,sud_49,"1970s, 1980s",2,1,1,1,"HYADAPHIS TATARICAE (HOMOPTERA: APHIDIDAE), A PEST OF HONEYSUCKLE NEW TO NORTH AMERICA",M
+262,,0.689,0.379,0.0,3,1.0,MAMMALS,nord_49,"1980s, 1990s, 2000s",1,1,1,0,Impacts of climate change on the seasonal distribution of migratory caribou,H
+263,0.0,0.0,0.615,0.0,4,1.0,VASCULAR_PLANTS,sud_49,"before_1950, 1950s, 1960s, 1970s, 1980s, 1990s, 2000s",6,2,0,4,"In the past two centuries, human activities have caused major changes in the tree species composition of southern QuÃ©bec, Canada",H
+267,,0.0,,0.316,2,0.0,INSECTS,sud_49,,1,0,0,0,"Insect parasites and predators of Phyllophaga anxia (LeConte) (Col., Scarabaeidae) in Quebec, Canada",L
+271,,0.0,0.809,0.296,3,1.0,OTHER_ARTHROPODS,sud_49,"1990s, 2000s",1,0,0,0,Inventory of Predacious Mites in Quebec Commercial Apple Orchards Where Integrated Pest Management Programs Are Implemented,M
+276,,0.0,0.268,0.0,3,0.0,FISH,sud_49,"1990s, 2000s",1,1,1,0,"Management of the Lake Sturgeon Acipenser fulvescens population in the lower St Lawrence River (QuÃ©bec, Canada) from the 1910s to the present",H
+281,0.002,0.0,,0.0,3,0.0,VASCULAR_PLANTS,sud_49,,6,6,0,0,Molecular markers indicate that the narrow QuÃ©bec endemics Rosa rousseauiorum and Rosa williamsii are synonymous with the widespread Rosa blanda,L
+283,0.0,0.0,,0.0,3,0.0,VASCULAR_PLANTS,sud_49,,1,1,0,0,Natural hybridization between black spruce and red spruce,L
+284,,0.0,,0.0,2,0.0,BIRDS,sud_49,,1,0,0,0,Nested bird and micro-habitat assemblages in a peatland archipelago,L
+288,,0.0,,0.0,2,0.0,VASCULAR_PLANTS,sud_49,,1,0,0,0,Nutrient concentration and acid-base status of leaf litter of tree species characteristic of the hardwood forest of southern Quebec,M
+300,0.0,1.0,1.0,0.0,4,2.0,BIRDS,nord_49,"before_1950, 1950s, 1960s, 1970s",1,1,0,0,"Population , reproductive success , ' and analysis of contaminants in Razorbills ( Alea torda ) in the estuary and Gulf of St . Lawrence , Quebec by",H
+301,0.0,,,0.0,2,0.0,VASCULAR_PLANTS,unknown,,1,1,0,0,Population age structure of Pinus banksiana at the southern edge of the Canadian boreal forest,X
+302,0.118,0.0,0.656,0.162,4,1.0,"FISH, OTHER_INVERTEBRATES, BIRDS",sud_49,1990s,7,7,2,0,Population biology of eyeflukes in fish from a large fluvial ecosystem : the importance of gulls and habitat characteristics,L
+303,0.0,0.0,0.623,0.0,4,1.0,MAMMALS,sud_49,"1950s, 1960s, 1970s, 1980s, 1990s, 2000s, 2010s",2,2,0,0,Rapid morphological divergence in two closely related and co-occurring species over the last 50Â years,H
+306,,,,0.0,1,0.0,VASCULAR_PLANTS,unknown,,1,0,0,0,"Relative pollen productivity estimates and changes in Holocene vegetation cover in the deciduous forest of southeastern Quebec, Canada",X
+307,0.0,0.0,0.553,0.316,4,1.0,INSECTS,sud_49,2000s,1,1,0,0,Relevance of using a vegetation-based method to conserve urban carabid diversity,M
+308,0.048,0.0,0.7,0.348,4,1.0,"INSECTS, MOLLUSKS",sud_49,"1990s, 2000s",2,2,0,0,Responses of two sentinel species (Hexagenia limbata--mayfly; Pyganodon grandis--bivalve) along spatial cadmium gradients in lakes and rivers in northwestern QuÃ©bec.,M
+311,,0.0,0.776,0.316,3,1.0,INSECTS,sud_49,"1990s, 2000s",1,0,0,0,"Rove beetles (Coleoptera: Staphylinidae) in yellow birch-dominated stands of southeastern Quebec, Canada: Diversity, abundance, and description of a new species",M
+315,,0.0,,0.316,2,0.0,INSECTS,sud_49,,1,0,0,0,Selected Beetle Assemblages Captured in Pitfall Traps Baited with Deer Dung or Meat in Balsam Fir and Sugar Maple Forests of Central Quebec,L
+320,,0.0,0.048,0.258,3,0.0,"NON_VASCULAR_PLANTS, FUNGI, VASCULAR_PLANTS",sud_49,1990s,3,0,0,0,Spontaneous revegetation of mined peatlands in eastern Canada,H
+324,0.0,,,0.0,2,0.0,VASCULAR_PLANTS,unknown,,2,2,0,0,Temporal variations in the rooting ability of cuttings of Populusbalsamifera and Salixplanifolia from natural clonesâ€“populations of subarctic Quebec,L
+325,,,,,0,,,sud_49,,1,0,0,1,The abundance of phytophilous invertebrates on different species of submerged macrophytes,L
+334,,0.0,,0.316,2,0.0,INSECTS,sud_49,,1,0,0,0,"The effects of urbanization on ant assemblages (Hymenoptera: Formicidae) associated with the Molson Nature Reserve, Quebec",M
+336,,,,,0,,,unknown,,1,0,0,1,"The importance of ecological constraints on the control of multi-species treeline dynamics in eastern Nunavik, Quebec.",X
+339,,0.619,,0.0,2,1.0,VASCULAR_PLANTS,nord_49,,1,0,0,0,The Relationship of Vegetation to Methane Emission and Hydrochemical Gradients in Northern Peatlands,L
+343,,1.0,,0.0,2,1.0,BIRDS,nord_49,,1,0,0,0,Towards Modelling Future Trends of Quebec's Boreal Birds' Species Distribution under Climate Change,L
+344,,0.619,0.627,0.0,3,2.0,VASCULAR_PLANTS,nord_49,"before_1950, 1950s, 1960s, 1970s, 1980s, 1990s, 2000s",1,0,0,0,"Tree-ring evidence extends the historic northern range limit of severe defoliation by insects in the aspen stands of western Quebec, Canada",M
+351,,0.0,1.0,0.316,3,1.0,INSECTS,sud_49,1990s,1,0,0,0,Weevil (Coleoptera: Curculionoidea) Diversity and Abundance in Two Quebec Vineyards,H
+356,0.85,0.0,,0.316,3,1.0,INSECTS,sud_49,,2,2,0,0,New Staphylinidae (Coleoptera) records with new collection data from New Brunswick and an addition to the fauna of Quebec: Staphylininae,L
+357,0.311,0.0,,0.316,3,0.0,INSECTS,sud_49,,4,4,3,0,"New Staphylinidae (Coleoptera) records with new collection data from New Brunswick, and an addition to the fauna of Quebec, Canada: Aleocharinae",L
+363,,1.0,,0.316,2,1.0,INSECTS,nord_49,,3,3,3,0,A new species in the Rheocricotopus (R.) effusus group from Canada with a review of the Nearctic species of Rheocricotopus and Parametriocnemus (Chironomidae: Orthocladiinae),M
+364,,0.0,,0.296,2,0.0,OTHER_ARTHROPODS,sud_49,,1,0,0,0,Colonization dynamics of agroecosystem spider assemblages after snow-melt in Quebec (Canada),M
+365,,0.619,,0.0,2,1.0,VASCULAR_PLANTS,nord_49,,1,0,0,0,Naturalization of exotic plant species in northâ€eastern North America: trends and detection capacity,M
+371,,0.0,,0.0,2,0.0,REPTILES,sud_49,,1,1,1,0,"Conservation genetics of the wood turtle (Glyptemys insculpta) in Quebec, Canada",L
+377,,0.0,,0.0,2,0.0,VASCULAR_PLANTS,sud_49,,1,0,0,0,Recovery of plant community functional traits following severe soil perturbation in plantations: a case-study,L
+380,0.0,0.0,,0.0,3,0.0,VASCULAR_PLANTS,sud_49,,1,1,0,0,Genetic Diversity for Pink Snow Mold Resistance in Greens-Type Annual Bluegrass,X
+382,0.524,0.0,,0.316,3,1.0,INSECTS,sud_49,,2,2,1,0,ADDITIONS TO THE CANADIAN EPHEMEROPTERA,L
+392,0.5,0.0,,0.0,3,1.0,MAMMALS,sud_49,,2,2,0,0,"Phylogeographic analysis of an Arctic rabies host species, the red (Vulpes vulpes) and arctic (Vulpes lagopus) fox, in the Eastern Subarctic region of Canada",L
+393,0.0,0.0,0.684,0.0,4,1.0,BIRDS,sud_49,2000s,2,2,1,0,"Regional patterns of habitat use by a threatened forest bird, the Bicknellâ€™s Thrush, in Quebec",M
+396,0.068,0.0,1.0,0.296,4,1.0,OTHER_ARTHROPODS,sud_49,"1970s, 1980s",3,3,1,0,Size divergence and dietary partitioning enhance coexistence of two herbivorous species of Diaptomus (Copepoda: Calanoida) in some shallow Quebec lakes,L
+399,0.0,0.0,,0.0,3,0.0,VASCULAR_PLANTS,sud_49,,3,2,0,1,Root distribution of different mature tree species growing on contrasting textured soils in temperate windbreaks,X
+401,0.0,0.0,,0.0,3,0.0,VASCULAR_PLANTS,sud_49,,1,1,0,0,Wood density of natural white spruce populations in Quebec,X
+413,,0.375,0.0,0.337,3,0.0,"OTHER_ARTHROPODS, OTHER_INVERTEBRATES",nord_49,2010s,1,0,0,0,Permafrost thaw lakes and ponds as habitats for abundant rotifer populations1,M
+418,0.762,0.0,,0.378,3,1.0,OTHER_INVERTEBRATES,sud_49,,3,3,2,0,"Nematode parasites and leukocyte profiles of Northern Leopard Frogs, Rana pipiens: location, location, location",X
+424,,,,,0,,,sud_49,2010s,1,0,0,1,Cryptic invaders: nonindigenous and cryptogenic freshwater Bryozoa and Entoprocta in the St. Lawrence River,L
+173,,,,,0,,,unknown,,0,0,0,0,A note on the activity and species composition of sesiids [Lepidoptera: Sesiidae] as measured by pheromone traps and trunk sampling in apple orchards of southwestern Quebec,
+182,,,,,0,,,unknown,,1,0,0,1,Québec Ministry of Environment and Wildlife,
+183,,,,0.076,1,0.0,"VASCULAR_PLANTS, BIRDS, MAMMALS, FISH, AMPHIBIANS, REPTILES, INSECTS, OTHER_ARTHROPODS, MOLLUSKS, OTHER_INVERTEBRATES",unknown,,2,0,0,0,Québec Natural Heritage Data Center of,
+184,,,,0.0,1,0.0,BIRDS,unknown,,1,0,0,0,Canadian Wildlife Service,
+185,0.236,,,0.316,2,0.0,INSECTS,unknown,,1,1,0,0,"Arrenodes minutus (Drury, 1770) (Coleoptera: Brentidae) discovered in the Maritime Provinces of Canada.",
+187,,,,,0,,,unknown,,0,0,0,0,Assessing the Effectiveness of Instream Structures for Restoring Salmonid Streams,
+190,,,,,0,,,unknown,,0,0,0,0,BIODIVERSITY AND ECOSYSTEM FUNCTIONING: IMPORTANCE OF SPECIES EVENNESS IN AN OLD FIELD,
+191,,,,,0,,,unknown,,0,0,0,0,Biophysical Features Determining Avian Use of Roadside Verges in Southern QuÃ©bec's Suburban and Rural Landscapes,
+196,,,,,0,,,unknown,,0,0,0,0,"CAREX Ã—CAYOUETTEI (CYPERACEAE), A NEW INTERSECTIONAL SEDGE HYBRID FROM SOUTHERN QUEÌBEC, CANADA",
+198,0.0,,,0.0,2,0.0,VASCULAR_PLANTS,unknown,,1,1,0,0,"Characterization of mycoplasmalike organisms from Fraxinus, Syringa, and associated plants from geographically diverse sites",
+205,,,,,0,,,unknown,,0,0,0,0,Cuscuta indecora (Convolvulaceae) new for Canada,
+210,,,,0.214,1,0.0,MICROORGANISMS,unknown,,1,0,0,0,Diagnostic Fragmentation Filtering for Cyanopeptolin Detection,
+211,0.0,,,0.0,2,0.0,VASCULAR_PLANTS,unknown,,5,5,1,0,Distribution and dynamics of tree species across a fire frequency gradient in the James Bay region of Quebec,
+213,,,,,0,,,unknown,,0,0,0,0,Distribution Patterns of Birds Associated with Snags in Natural and Managed Eastern Boreal Forests 1,
+218,0.0,,,0.0,2,0.0,BIRDS,unknown,,1,1,0,0,Eastern-breeding Lesser Yellowlegs are more likely than western-breeding birds to visit areas with high shorebird hunting during southward migration,
+219,0.326,,,0.0,2,0.0,VASCULAR_PLANTS,unknown,,2,2,0,0,Ecological factors explaining the location of the boundary between the mixedwood and coniferous bioclimatic zones in the boreal biome of eastern North America,
+221,,,,,0,,,unknown,,1,0,0,1,Effect of Drainage Ditches on Brachycera (Diptera) Diversity in a Southern Quebec Peatland,
+222,,,,,0,,,unknown,,0,0,0,0,"Effect of landscape context on anuran communities in breeding ponds in the National Capital Region, Canada",
+224,,,,,0,,,unknown,,0,0,0,0,"Effects of forest disturbance on density, space use, and mortality of woodland caribou",
+226,,,,,0,,,unknown,,0,0,0,0,Effects of natural and anthropogenic stressors on biomarkers of fish health in spottail shiners (Notropis hudsonius),
+231,,,,0.214,1,0.0,MICROORGANISMS,unknown,,1,0,0,0,Empirical study of cyanobacterial toxicity along a trophic gradient of lakes,
+233,0.0,,,0.0,2,0.0,VASCULAR_PLANTS,unknown,,2,1,0,1,Environmental filters and seedling recruitment on a coastal dune in subarctic Quebec (Canada),
+236,0.7,,,0.214,2,1.0,MICROORGANISMS,unknown,,1,1,0,0,Evaluation of a dynamic model for primary infections caused by Plasmopara viticola on grapevine in Quebec,
+239,,,,,0,,,unknown,,1,0,0,1,"Expanded concept of the milliped family Spirobolidae (Diplopoda: Spirobolida: Spirobolidea): Proposals of Aztecolini n. tribe and Floridobolinae/ini and Tylobolini n. stats.; re)descriptions of Floridobolus and F. penneri, both Causey, 1957, and F. orini",
+243,,,,,0,,,unknown,,0,0,0,0,Factors Responsible for the Co-occurrence of Forested and Unforested Rock Outcrops in the Boreal Forest,
+244,,,,,0,,,unknown,,0,0,0,0,Fire return intervals and tree species succession in the North Shore region of eastern Quebec,
+251,,,,,0,,,unknown,,0,0,0,0,Frankia and Actinorhizal Plants,
+252,,,,,0,,,unknown,,0,0,0,0,Gastro-Duodenal Perforations and Coelomitis in a Group of Juvenile Spiny Softshell Turtles (Apalone spinifera),
+266,,,,0.337,1,0.0,"OTHER_ARTHROPODS, OTHER_INVERTEBRATES",unknown,,1,0,0,0,Influence of zooplankton stoichiometry on nutrient sedimentation in a lake system,
+269,,,,,0,,,unknown,,0,0,0,0,nan,
+270,,,,,0,,,unknown,,1,0,0,1,Interactions between overstorey and understorey vegetation along an overstorey compositional gradient,
+275,0.0,,,0.0,2,0.0,MAMMALS,unknown,,2,1,0,1,low responses of understory plants of maple-dominated forests to white-tailed eer experimental exclusion mÃ©lie Collarda,
+277,,,,0.0,1,0.0,FISH,unknown,,1,1,1,0,nan,
+279,,,,,0,,,unknown,,0,0,0,0,Modelling individual tree mortality: Tests using the growth efficiency concept with black spruce stands,
+282,,,,,0,,,unknown,,0,0,0,0,"Mosquito Species Composition and Abundance in Quebec, Eastern Canada",
+285,,,,0.316,1,0.0,INSECTS,unknown,,1,0,0,0,New and noteworthy records of Orthoptera from Maritime Canada,
+290,,,,,0,,,unknown,,0,0,0,0,Offsite effects of mining on the frequency and abundance of five understorey plant species in western QuÃ©bec (Canada),
+291,0.04,,,0.306,2,0.0,"INSECTS, OTHER_ARTHROPODS",unknown,,2,1,0,0,OVIPOSITION AND NICHE PARTITIONING IN APHIDOPHAGOUS INSECTS ON MAIZE,
+296,,,,,0,,,unknown,,0,0,0,0,"Phylogenetic attributes, conservation status and geographical origin of species gained and lost over 50Â years in a UNESCO Biosphere Reserve",
+299,,,,,0,,,unknown,,0,0,0,0,PLAYBACKS OF MOBBING CALLS OF BLACK-CAPPED CHICKADEES AS A METHOD TO ESTIMATE REPRODUCTIVE ACTIVITY OF FOREST BIRDS,
+304,0.399,,,0.774,2,1.0,FUNGI,unknown,,1,1,0,0,Recent insights into the pandemic disease butternut canker caused by the invasive pathogen Ophiognomonia clavigignenti-juglandacearum.,
+305,,,,,0,,,unknown,,0,0,0,0,Reconstructing biogeographic history using phylogenetic-tree analysis of community structure,
+306,,,,0.0,1,0.0,VASCULAR_PLANTS,unknown,,1,0,0,0,"Relative pollen productivity estimates and changes in Holocene vegetation cover in the deciduous forest of southeastern Quebec, Canada",X
+309,0.0,,,0.0,2,0.0,VASCULAR_PLANTS,unknown,,2,2,0,0,"Revisiting the role of migratory caribou in the control of shrub expansion in northern Nunavik (QuÃ©bec, Canada)",
+312,,,,,0,,,unknown,,0,0,0,0,"Ruffed Grouse Winter Habitat Use in Mixed Softwoodâ€“Hardwood Forests, QuÃ©bec, Canada",
+313,,,,0.475,1,0.0,ALGAE,unknown,,1,1,1,0,"Scientific literature on the origins of Didymo , felt soled wading boots , and vectors for some aquatic invasive species",
+316,,,,0.0,1,0.0,VASCULAR_PLANTS,unknown,,1,0,0,0,Short-term response of wildlife to clear-cutting in Quebec boreal forest: multiscale effects and management implications,
+317,0.059,,,0.316,2,0.0,INSECTS,unknown,,1,1,0,0,Soybean Aphid Predators in QuÃ©bec and the Suitability of Aphis glycines as Prey for Three Coccinellidae,
+322,0.0,,,0.0,2,0.0,FISH,unknown,,2,2,0,0,"Structural and functional impairment of the hypothalamo- pituitary-interrenal axis in fish exposed to bleached kraft mill effluent in the St Maurice River, Quebec",
+323,,,,0.0,1,0.0,VASCULAR_PLANTS,unknown,,1,0,0,0,Succession in the southern part of the Canadian boreal forest,
+326,0.33,,,0.0,2,0.0,VASCULAR_PLANTS,unknown,,2,2,1,0,The biology of Canadian weeds. 59. Setaria glauca (L.) Beauv. and S. verticillata (L.) Beauv.,
+329,,,,,0,,,unknown,,0,0,0,0,The Eastern Oyster: Crassostrea Virginica,
+330,,,,,0,,,unknown,,0,0,0,0,The Effect of Light on the Vertical Structure of Epibenthic Diatom Communities,
+335,,,,,0,,,unknown,,0,0,0,0,The Importance of Agricultural Landscapes as Key Nesting Habitats for the American Black Duck in Maritime Canada,
+345,,,,,0,,,unknown,,0,0,0,0,Using bird survey data to associate habitat type and bird species richness in a forest of southern Quebec,
+346,,,,,0,,,unknown,,0,0,0,0,Uvularia sessilifolia L. (Liliaceae): New to Kansas,
+349,,,,,0,,,unknown,,1,0,0,1,Vegetation of Sphagnum bogs in highly disturbed landscapes: relative influence of abiotic and anthropogenic factors,
+352,,,,,0,,,unknown,,0,0,0,0,Widespread Dispersal of Borrelia burgdorferiâ€“Infected Ticks Collected from Songbirds Across Canada,
+353,,,,0.0,1,0.0,VASCULAR_PLANTS,unknown,,1,0,0,0,"Wild and weedy Lactuca species, their distribution, ecogeography and ecobiology in USA and Canada",
+355,,,,,0,,,unknown,,0,0,0,0,The Effects of Moose (Alces alces) Browsing on Boreal Tree Species in Norway and Quebec,
+358,,,,,0,,,unknown,,0,0,0,0,Decomposition process and arthropod succession on pig carcasses in Quebec (Canada),
+359,,,,,0,,,unknown,,0,0,0,0,"The effects of collection date, IBA, plant gender, nutrient availability, and rooting volume on adventitious root and lateral shoot formation by Salix planifolia stem cuttings from the Ungava Bay area (Quebec, Canada)",
+361,,,,,0,,,unknown,,0,0,0,0,Integrating multiple sources of biodiversity information greatly expands the range of a rare species of Hymenoptera (Vanhorniidae),
+362,,,,,0,,,unknown,,0,0,0,0,Herbarium specimens as tools to assess the impact of large herbivores on plant species,
+366,,,,,0,,,unknown,,0,0,0,0,The Regeneration of a Highly Disturbed Ecosystem: A Mined Peatland in Southern QuÃ©bec,
+368,,,,,0,,,unknown,,0,0,0,0,"A NEW LLANDOVERY (EARLY SILURIAN) CONODONT BIOZONATION AND CONODONTS FROM THE BECSCIE, MERRIMACK, AND GUN RIVER FORMATIONS, ANTICOSTI ISLAND, QUÃ‰BEC",
+369,,,,,0,,,unknown,,0,0,0,0,"Elm zigzag sawfly, Aproceros leucopoda (Hymenoptera: Argidae), recorded for the first time in North America through community science",
+373,,,,,0,,,unknown,,0,0,0,0,"Taxonomy of Ordovician ostracodes from western Newfoundland, Anticosti Island and the St. Lawrence Lowlands of QuÃ©bec",
+376,,,,,0,,,unknown,,0,0,0,0,Spatial and temporal dynamics of rabies virus variants in big brown bat populations across Canada: footprints of an emerging zoonosis,
+381,,,,,0,,,unknown,,0,0,0,0,Mercury in Birds and Mammals,
+383,,,,,0,,,unknown,,0,0,0,0,Environmental Fate Studies Relating to the Use of Chondrostereum purpureum as a Bioherbicide,
+389,,,,,0,,,unknown,,0,0,0,0,"Life in mine tailings: microbial population structure across the bulk soil, rhizosphere, and roots of boreal species colonizing mine tailings in northwestern QuÃ©bec",
+394,,,,,0,,,unknown,,0,0,0,0,"Temperature-manipulated dynamics and phenology of Mindarus abietinus (Hemiptera: Aphididae) in commercial Christmas tree plantations in QuÃ©bec, Canada",
+395,,,,,0,,,unknown,,0,0,0,0,"Multipleâ€locus variableâ€number tandemâ€repeat analysis of Francisella tularensis from Quebec, Canada",
+397,,,,,0,,,unknown,,0,0,0,0,"Impacts of spruce budworm defoliation on the habitat of woodland caribou, moose, and their main predators",
+398,,,,,0,,,unknown,,0,0,0,0,"Distribution and abundance of an allergenic weed, common ragweed (Ambrosia artemisiifolia L.), in rural settings of southern Quebec, Canada.",
+400,,,,,0,,,unknown,,0,0,0,0,American Black Duck and Mallard Breeding Distribution and Habitat Relationships along a Forestâ€“Agriculture Gradient in Southern QuÃ©bec,
+404,,,,,0,,,unknown,,0,0,0,0,Estimating the abundance of the Southern Hudson Bay polar bear subpopulation with aerial surveys,
+405,,,,,0,,,unknown,,0,0,0,0,Short-term use of different residual forest structures by three sciurid species in a clear-cut boreal landscape,
+406,,,,,0,,,unknown,,0,0,0,0,"Breeding-season habitat use by sticklebacks (Pisces: Gasterosteidae) at Isle Verte, Quebec",
+407,,,,,0,,,unknown,,0,0,0,0,Increased seedling establishment via enemy release at the upper elevational range limit of sugar maple.,
+408,,,,,0,,,unknown,,0,0,0,0,Distribution of Plant-Parasitic Nematodes in Quebec Apple Orchards,
+409,,,,,0,,,unknown,,0,0,0,0,Sampling Technique and Seasonal Development of Phytophagous Mirids (Hemiptera: Miridae) on Apple in Southwestern Quebec,
+410,,,,,0,,,unknown,,0,0,0,0,Structuring Effects of Deer in Boreal Forest Ecosystems,
+411,,,,,0,,,unknown,,0,0,0,0,Three large fire years threaten resilience of closed crown black spruce forests in eastern Canada,
+412,,,,,0,,,unknown,,0,0,0,0,Diversity of Native Endomycorrhizal Fungi in Selected Strawberry Field Soils of Southern Quebec,
+415,,,,,0,,,unknown,,0,0,0,0,"Modelling recruitment of Populus tremuloides, Pinus banksiana, and Picea mariana following fire in the mixedwood boreal forest",
+416,,,,,0,,,unknown,,0,0,0,0,A field experiment to determine the effect of postâ€fire salvage on seedbeds and tree regeneration,
+417,,,,,0,,,unknown,,0,0,0,0,Owl winter irruptions as an indicator of small mammal population cycles in the boreal forest of eastern North America,
+419,,,,,0,,,unknown,,0,0,0,0,Compositional and functional trajectories of herbaceous communities after deer density control in clear-cut boreal forests,
+420,,,,,0,,,unknown,,0,0,0,0,Neighbouring plants and perception of predation risk modulate winter browsing by white-tailed deer (Odocoileus virginianus),
+421,,,,,0,,,unknown,,0,0,0,0,"Forest composition, hostâ€population density, and parasitism of spruce budworm Choristoneura fumiferana eggs by Trichogramma minutum",
+423,,,,,0,,,unknown,,0,0,0,0,Transforming Abandoned Farm Fields to Conifer Plantations Reduces Ruffed Grouse Density,
