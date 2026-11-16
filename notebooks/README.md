@@ -2581,3 +2581,17 @@ An independent review of the evaluation code (fresh agent, read-only) found two 
 **Reading:** in April, the gap between short and long text (combined variant on gpt-5-mini: binary F1 0.55 on abstracts, 0.88 on PDFs) looked like a lack of information in abstracts. With the spatial extent estimated from named places, short text reaches the same level (0.86 vs 0.88). On this evidence most of the April gap came from the instruction not to infer the area, not from the abstracts. To be confirmed on the held-out set, which has 68 abstracts and 31 PDFs, enough to separate approaches by more than the noise.
 
 **Decision:** all three approaches go to the held-out pass on both inputs; R3 with native structured output. No more tuning of the relevance prompts on dev: differences there are within noise.
+
+### 2026-11-15: Round 5, focal-taxa species block (abstracts and PDF text)
+
+**Hypothesis (1):** the species rules written in February and never integrated (`plans/taxonomic-relevance-refactor.md`: focal taxa only, no predators, hosts or habitat taxa; counts as a group with its count; keep the text's wording and level) raise species precision without losing recall, more on long text, where incidental taxa abound.
+
+**Change:** a `species` section appended to the vocabulary block (`SPECIES_EXTRACTION` in `prompts/common.py`, shared by every input mode). Runs `20261115_222818_r5_focal_taxa_abstract.json` (0.021 USD) and `20261115_222902_r5_focal_taxa_pdf_text.json` (0.053 USD), compared with round 4 (abstract) and the PDF-text run.
+
+**Result:**
+- PDF text: species F1 (fuzzy string matching) 0.47 → 0.60, +0.13 [+0.01, +0.35] (gain). With GBIF resolution, exact-taxon precision 0.50 → 0.93 at unchanged recall 0.78; extracted taxa 28 → 15 with the same 14 matched.
+- Abstract: species F1 +0.07 [−0.01, +0.17]; exact-taxon precision 0.78 → 0.94, recall unchanged (0.81).
+- No other field changes beyond noise.
+- The multi-rank numbers above use the evaluator before its review fixes (uncapped set-asides); they are rescored when the capped version is merged.
+
+**Decision:** adopted. The hypothesis holds, and as predicted the effect is larger on long text.

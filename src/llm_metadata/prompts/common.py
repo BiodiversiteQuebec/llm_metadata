@@ -70,7 +70,16 @@ The total area over which the dataset's sites or observations are spread, in km�
 - Sites spread over several named regions: estimate the combined area of those regions.
 - Leave null when the text names no place, or only a country or continent as background, or when the data are laboratory or experimental only."""
 
-VOCABULARY = VOCABULARY + "\n\n" + SPATIAL_EXTENT
+SPECIES_EXTRACTION = """### species (focal taxa of the dataset)
+
+- Extract only the taxa the dataset holds data on: the organisms sampled, counted, measured or genotyped by this study. Exclude predators, prey, parasites, hosts, vegetation or habitat context, and taxa mentioned only in the introduction, discussion or comparisons with other studies. Examples: a caribou study that mentions wolves as predators → do not extract wolves; "we sampled in spruce-fir forests" → do not extract spruce or fir; a fish survey describing riparian vegetation → do not extract the plants.
+- In a full article, extract taxa from the methods and results that describe this study's data, not from the literature review.
+- Keep the text's own wording, decorated forms included: "wood turtle (Glyptemys insculpta)" is a good output. Drop only sex, age, life-stage or habitat qualifiers ("49 female caribou" → "caribou").
+- When the text gives a count without naming the taxa ("73 weevil species", "12 bird species were recorded"), output the group with its count ("weevils (73 spp.)") and do not list species to fill the count. When it names the taxa, list them.
+- A group label is a valid output when the text describes the focal taxa only at that level ("benthic invertebrates", "ground beetles").
+- Keep the text's taxonomic level: "caribou" stays "caribou"; "woodland caribou (Rangifer tarandus caribou)" stays as written."""
+
+VOCABULARY = VOCABULARY + "\n\n" + SPATIAL_EXTENT + "\n\n" + SPECIES_EXTRACTION
 
 MODULATOR_FIELDS = """## Modulator Boolean Fields
 

@@ -18,3 +18,5 @@ date,run,model,effort,mode,records,budget_line,estimated_usd,actual_usd,cumulati
 2026-11-15,20261115_222252_r2_combined_abstract,claude-haiku-5-5,low,abstract,30,relevance_direct,,0.0277,0.8262,R2 combined
 2026-11-15,20261115_222406_r3_scoring_pdf_text_dev16,claude-haiku-5-5,low,pdf_text,16,relevance_direct,,0.0494,0.8756,R3 scoring only PDF text
 2026-11-15,20261115_222429_r2_combined_pdf_text_dev16,claude-haiku-5-5,low,pdf_text,16,relevance_direct,,0.0559,0.9315,R2 combined PDF text
+2026-11-15,20261115_222818_r5_focal_taxa_abstract,claude-haiku-5-5,low,abstract,30,prompt_rounds,,0.0209,0.9524,Round 5: focal taxa
+2026-11-15,20261115_222902_r5_focal_taxa_pdf_text,claude-haiku-5-5,low,pdf_text,16,prompt_rounds,,0.0527,1.0051,Round 5: focal taxa PDF text
