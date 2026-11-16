@@ -1,0 +1,9 @@
+{
+  "r1_features_abstract": "artifacts/runs/20261115_222818_r5_focal_taxa_abstract.json",
+  "r1_features_pdf_text": "artifacts/runs/20261115_222902_r5_focal_taxa_pdf_text.json",
+  "r1_features_pdf_native": "artifacts/runs/20261115_221727_haiku_pdf_native_dev16.json",
+  "r2_combined_abstract": "artifacts/runs/20261115_222252_r2_combined_abstract.json",
+  "r2_combined_pdf_text": "artifacts/runs/20261115_222429_r2_combined_pdf_text_dev16.json",
+  "r3_scoring_abstract": "artifacts/runs/20261115_222213_r3_scoring_abstract_native_so.json",
+  "r3_scoring_pdf_text": "artifacts/runs/20261115_222406_r3_scoring_pdf_text_dev16.json"
+}
