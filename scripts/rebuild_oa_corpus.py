@@ -31,25 +31,35 @@ import pandas as pd
 import requests
 
 from llm_metadata.doi_utils import doi_filename_stem
+from llm_metadata.publisher_pdf import (
+    candidate_pdf_urls,
+    europepmc_xml_url,
+    idconv_url,
+    is_preprint,
+    pmc_s3_keys_from_listing,
+    pmc_s3_listing_url,
+    pmc_s3_urls,
+    pmcid_from_url,
+    publisher_of,
+)
 from llm_metadata.schemas.data_paper import DataPaperManifest
 
 ROOT = Path(__file__).resolve().parents[1]
+# Data (PDFs, XML, API cache) lives in the main checkout, git-ignored. Override with --data-root.
+DATA_ROOT = Path("/home/vbeaure-claude/code/llm_metadata")
 GT_PATH = "data/dataset_092624_validated.xlsx"
 MANIFEST_DIR = ROOT / "data" / "manifests"
 PDF_DIR_REL = "data/pdfs/fuster"
-CACHE_DIR = ROOT / "artifacts" / "oa_corpus_cache"
-EMAIL = "vincent.beauregard@usherbrooke.ca"
-API_UA = f"llm_metadata-corpus-rebuild (mailto:{EMAIL})"
-BROWSER_UA = (
-    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) "
-    "Chrome/124.0 Safari/537.36"
-)
+CACHE_DIR = DATA_ROOT / "artifacts" / "oa_corpus_cache"
+XML_DIR = DATA_ROOT / "artifacts" / "fulltext"
+EMAIL = "vincent.beauregard@usherbrooke.ca"  # sent ONLY to OpenAlex and Unpaywall (polite pool), as a query parameter
+UA = "llm_metadata research client"  # honest, generic User-Agent for every request
 MIN_DELAY = 1.1  # seconds between requests to the same host
 TIMEOUT = 40
 
 PDF_COLUMNS = [
     "gt_record_id", "split", "source", "article_doi", "pdf_url_used", "pdf_source",
-    "licence", "sha256", "pages", "status", "failure_reason",
+    "licence", "sha256", "pages", "status", "failure_reason", "text_source", "preprint",
 ]
 
 _last_hit: dict[str, float] = {}
@@ -66,19 +76,19 @@ def throttle(url: str) -> None:
 
 def get(url: str, *, api: bool = False, **kw) -> requests.Response:
     throttle(url)
-    headers = {"User-Agent": API_UA if api else BROWSER_UA}
+    headers = {"User-Agent": UA}
     if not api:
         headers["Accept"] = "application/pdf,text/html;q=0.8,*/*;q=0.5"
     return _session.get(url, headers=headers, timeout=TIMEOUT, allow_redirects=True, **kw)
 
 
-def cached_json(name: str, url: str) -> dict | None:
+def cached_json(name: str, url: str, params: dict | None = None) -> dict | None:
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     path = CACHE_DIR / name
     if path.exists():
         return json.loads(path.read_text(encoding="utf-8"))
     try:
-        resp = get(url, api=True)
+        resp = get(url, api=True, params=params)
         data = resp.json() if resp.status_code == 200 else {"_status": resp.status_code}
     except Exception as exc:  # network or JSON error: remember it, do not retry forever
         data = {"_error": str(exc)[:200]}
@@ -88,66 +98,145 @@ def cached_json(name: str, url: str) -> dict | None:
 
 # --- candidate URLs from open sources --------------------------------------
 
-def candidates_for(doi: str, manifest_pdf_url: str | None) -> tuple[list[tuple[str, str]], str | None, dict]:
-    """Return ([(source, url)], licence, notes). Order = order of attempts."""
+def cand_list(doi: str, manifest_pdf_url: str | None, manifest_landing: str | None = None):
+    """Return (candidates, licence, notes, pmcid).
+
+    candidates = [(source, url, preprint_flag)] in order of attempts.
+    Sources: every OpenAlex location, every Unpaywall oa_location, Europe PMC,
+    Semantic Scholar openAccessPdf, CORE, then the URL stored in the annotation file.
+    """
     stem = doi_filename_stem(doi)
-    cands: list[tuple[str, str]] = []
+    cands: list[tuple[str, str, bool]] = []
+    landings: list[str] = []
     licence: str | None = None
     notes: dict = {}
+    pmcid: str | None = None
 
-    oa = cached_json(f"{stem}_openalex.json", f"https://api.openalex.org/works/doi:{quote(doi, safe='/')}?mailto={EMAIL}")
+    oa = cached_json(f"{stem}_openalex.json", f"https://api.openalex.org/works/doi:{quote(doi, safe='/')}", params={"mailto": EMAIL})
     if oa and "id" in oa:
         best = oa.get("best_oa_location") or {}
         licence = best.get("license") or licence
         for loc in [best] + (oa.get("locations") or []):
-            if loc and loc.get("pdf_url"):
+            if not loc:
+                continue
+            land = loc.get("landing_page_url") or ""
+            pmcid = pmcid or (pmcid_from_url(land) if "ncbi.nlm.nih.gov" in land or "europepmc" in land else None)
+            if land:
+                landings.append(land)
+            if loc.get("pdf_url"):
                 kind = "repository" if (loc.get("source") or {}).get("type") == "repository" else "openalex"
-                cands.append((kind, loc["pdf_url"]))
-            if loc and not licence and loc.get("license"):
+                cands.append((kind, loc["pdf_url"], is_preprint(loc["pdf_url"], loc.get("version")) or is_preprint(land, loc.get("version"))))
+            if not licence and loc.get("license"):
                 licence = loc["license"]
     else:
         notes["openalex"] = "no record"
 
-    up = cached_json(f"{stem}_unpaywall.json", f"https://api.unpaywall.org/v2/{quote(doi, safe='/')}?email={EMAIL}")
+    up = cached_json(f"{stem}_unpaywall.json", f"https://api.unpaywall.org/v2/{quote(doi, safe='/')}", params={"email": EMAIL})
     if up and "doi" in up:
         best = up.get("best_oa_location") or {}
         if best.get("license"):
             licence = licence or best["license"]
         for loc in [best] + (up.get("oa_locations") or []):
-            if loc and loc.get("url_for_pdf"):
+            if not loc:
+                continue
+            land = loc.get("url") or ""
+            if land:
+                landings.append(land)
+                pmcid = pmcid or (pmcid_from_url(land) if "ncbi.nlm.nih.gov" in land or "europepmc" in land else None)
+            if loc.get("url_for_pdf"):
                 kind = "repository" if loc.get("host_type") == "repository" else "unpaywall"
-                cands.append((kind, loc["url_for_pdf"]))
-            if loc and not licence and loc.get("license"):
+                cands.append((kind, loc["url_for_pdf"], is_preprint(loc["url_for_pdf"], loc.get("version")) or is_preprint(land, loc.get("version"))))
+            if not licence and loc.get("license"):
                 licence = loc["license"]
     else:
         notes["unpaywall"] = "no record"
 
     epmc = cached_json(
         f"{stem}_europepmc.json",
-        "https://www.ebi.ac.uk/europepmc/webservices/rest/search?"
-        f"query=DOI:%22{quote(doi, safe='/')}%22&format=json&resultType=core",
+        "https://www.ebi.ac.uk/europepmc/webservices/rest/search",
+        params={"query": f'DOI:"{doi}"', "format": "json", "resultType": "core"},
     )
     try:
         hit = (epmc or {}).get("resultList", {}).get("result", [None])[0]
     except (IndexError, AttributeError):
         hit = None
     if hit and hit.get("pmcid"):
-        pmc = hit["pmcid"]
-        cands.append(("europepmc", f"https://europepmc.org/backend/ptpmcrender.fcgi?accid={pmc}&blobtype=pdf"))
-        cands.append(("europepmc", f"https://www.ncbi.nlm.nih.gov/pmc/articles/{pmc}/pdf/"))
+        pmcid = pmcid or hit["pmcid"]
         if not licence and hit.get("license"):
             licence = hit["license"]
+    if not pmcid:
+        idc = cached_json(f"{stem}_idconv.json", idconv_url(doi))
+        try:
+            pmcid = (idc or {}).get("records", [{}])[0].get("pmcid")
+        except (IndexError, AttributeError):
+            pmcid = None
 
-    # The URL carried by the annotation file goes after the API ones: it is usually the publisher.
+    s2 = cached_json(f"{stem}_s2.json", f"https://api.semanticscholar.org/graph/v1/paper/DOI:{quote(doi, safe='/')}", params={"fields": "openAccessPdf"})
+    s2url = ((s2 or {}).get("openAccessPdf") or {}).get("url")
+    if s2url:
+        cands.append(("semanticscholar", s2url, is_preprint(s2url)))
+
+    core = cached_json(f"{stem}_core.json", "https://api.core.ac.uk/v3/search/works", params={"q": f'doi:"{doi}"', "limit": 3})
+    for w in ((core or {}).get("results") or []):
+        if (w.get("doi") or "").lower() == doi.lower() and w.get("downloadUrl"):
+            cands.append(("core", w["downloadUrl"], is_preprint(w["downloadUrl"])))
+
+    # Publisher recipes (mostly 403 from scripts, see publisher_pdf.py), tried after the repositories.
+    for land in ([manifest_landing] if manifest_landing else []) + landings[:1]:
+        for u in candidate_pdf_urls(doi, land):
+            cands.append(("recipe:" + (publisher_of(doi) or "site"), u, False))
+        break
+    else:
+        for u in candidate_pdf_urls(doi, None):
+            cands.append(("recipe:" + (publisher_of(doi) or "site"), u, False))
+
+    # The URL carried by the annotation file goes last: it is usually the publisher.
     if manifest_pdf_url:
-        cands.append(("manifest", manifest_pdf_url))
+        cands.append(("manifest", manifest_pdf_url, is_preprint(manifest_pdf_url)))
 
     seen, ordered = set(), []
-    for src, url in cands:
+    for src, url, pre in cands:
         if url not in seen and url.startswith("http"):
             seen.add(url)
-            ordered.append((src, url))
-    return ordered, licence, notes
+            ordered.append((src, url, pre))
+    return ordered, licence, notes, pmcid
+
+
+def fetch_pmc_open(pmcid: str, gt_id: int, dest: Path, xml_dest: Path) -> tuple[str | None, str | None, str | None]:
+    """Official PMC routes. Return (pdf_url, xml_url, error). Saves the PDF to dest or the XML to xml_dest.
+
+    1. PMC Open Access bucket on AWS (PDF, then XML).  2. Europe PMC REST full-text XML.
+    PDF wins; the XML is only kept when no PDF exists (text_only).
+    """
+    err = None
+    try:
+        r = get(pmc_s3_listing_url(pmcid), api=True)
+        urls = pmc_s3_urls(pmc_s3_keys_from_listing(r.text)) if r.status_code == 200 else {}
+    except Exception as exc:
+        urls, err = {}, f"pmc-s3 {type(exc).__name__}"
+    if "pdf" in urls and try_url(urls["pdf"], dest) is None:
+        return urls["pdf"], None, None
+    xml_candidates = ([urls["xml"]] if "xml" in urls else []) + [europepmc_xml_url(pmcid)]
+    for xu in xml_candidates:
+        try:
+            r = get(xu, api=True)
+            if r.status_code == 200 and valid_xml(r.content):
+                xml_dest.parent.mkdir(parents=True, exist_ok=True)
+                xml_dest.write_bytes(r.content)
+                return None, xu, None
+        except Exception:
+            pass
+    return None, None, err or ("no PDF or XML in PMC open-access bucket" if not urls else "pmc: PDF download failed")
+
+
+def valid_xml(data: bytes) -> bool:
+    """Well-formed JATS article (root tag only). Never reads the text."""
+    import xml.etree.ElementTree as ET
+    try:
+        root = ET.fromstring(data)
+        return root.tag.split("}")[-1] in ("article", "pmc-articleset") and len(data) > 5000
+    except ET.ParseError:
+        return False
 
 
 # --- download and validation ------------------------------------------------
@@ -172,8 +261,6 @@ def try_url(url: str, dest: Path) -> str | None:
     tmp = dest.with_suffix(".part")
     try:
         resp = get(url)
-        if resp.status_code in (403, 406):  # some hosts block browser-like agents but accept an honest one
-            resp = get(url, api=True)
         if resp.status_code != 200:
             return f"HTTP {resp.status_code} {urlparse(url).netloc}"
         body = resp.content
@@ -213,7 +300,7 @@ def try_chromium(doi: str, urls: list[str], dest: Path) -> str | None:
     try:
         with sync_playwright() as pw:
             browser = pw.chromium.launch()
-            ctx = browser.new_context(user_agent=BROWSER_UA, accept_downloads=True)
+            ctx = browser.new_context(accept_downloads=True)
             for url in targets:
                 page = ctx.new_page()
                 try:
@@ -278,7 +365,7 @@ def main() -> None:
     if pdfs_csv.exists():
         prev_rows = {int(r["gt_record_id"]): r for r in csv.DictReader(pdfs_csv.open(encoding="utf-8"))}
 
-    (ROOT / PDF_DIR_REL).mkdir(parents=True, exist_ok=True)
+    (DATA_ROOT / PDF_DIR_REL).mkdir(parents=True, exist_ok=True)
     rows = []
     for rec in sorted(corpus, key=lambda r: r.gt_record_id):
         split = "dev" if rec.gt_record_id in dev_ids else "heldout"
@@ -291,48 +378,78 @@ def main() -> None:
             continue
         api_doi = unquote(rec.article_doi)
         name = dev_names.get(rec.gt_record_id) or f"{doi_filename_stem(rec.article_doi)}.pdf"
-        dest = ROOT / PDF_DIR_REL / name
+        dest = DATA_ROOT / PDF_DIR_REL / name
         row["_dest"] = dest
         row["_pdf_rel"] = f"{PDF_DIR_REL}/{name}"
 
+        xml_saved = None
+        pmcid = None
         if args.no_download:
             cands, licence, notes = [], None, {}
         else:
-            cands, licence, notes = candidates_for(api_doi, rec.pdf_url)
+            cands, licence, notes, pmcid = cand_list(api_doi, rec.pdf_url, rec.article_url)
         row["licence"] = licence or ""
 
         prev = prev_rows.get(rec.gt_record_id)
         info = inspect_pdf(dest) if dest.exists() else None
+        xml_dest = XML_DIR / f"{rec.gt_record_id}.xml"
         errors: list[str] = []
         if info is not None:
+            row["text_source"] = "pdf"
             if prev and prev.get("sha256") == info[0] and prev.get("status") == "ok":
-                row.update(pdf_url_used=prev["pdf_url_used"], pdf_source=prev["pdf_source"])
+                pre = prev.get("preprint") == "true" or is_preprint(prev["pdf_url_used"])
+                row.update(pdf_url_used=prev["pdf_url_used"], pdf_source=prev["pdf_source"], preprint=str(pre).lower())
             else:
-                row.update(pdf_source="preexisting")
+                row.update(pdf_source="preexisting", preprint="false")
         elif dest.exists():
             dest.unlink()  # not a real PDF: delete
         if info is None and not args.no_download:
-            for source_kind, url in cands:
+            blocked_hosts: set[str] = set()
+            # 1. PMC official channels first (open bucket, no bot protection)
+            if pmcid:
+                pdf_u, xml_u, err = fetch_pmc_open(pmcid, rec.gt_record_id, dest, xml_dest)
+                if pdf_u:
+                    info = inspect_pdf(dest)
+                    row.update(pdf_url_used=pdf_u, pdf_source="pmc_s3", preprint="false")
+                elif err:
+                    errors.append(err)
+                elif xml_u:
+                    xml_saved = xml_u
+            # 2. every other open location, then publisher recipes
+            for source_kind, url, pre in ([] if info else cands):
+                host = urlparse(url).netloc
+                if host in blocked_hosts:
+                    continue  # one 403 per host is final: do not ask again
                 err = try_url(url, dest)
                 if err is None:
                     info = inspect_pdf(dest)
-                    row.update(pdf_url_used=url, pdf_source=source_kind)
+                    row.update(pdf_url_used=url, pdf_source=source_kind, preprint=str(pre).lower())
                     break
+                if err.startswith("HTTP 403"):
+                    blocked_hosts.add(host)
                 errors.append(f"{source_kind}: {err}")
             if info is None and args.chromium:
-                err = try_chromium(api_doi, [u for _, u in cands], dest)
+                err = try_chromium(api_doi, [u for _, u, _ in cands], dest)
                 if err is None:
                     info = inspect_pdf(dest)
                     row.update(pdf_source="chromium", pdf_url_used=f"https://doi.org/{api_doi}")
                 else:
                     errors.append(err)
         if info is not None:
-            row.update(sha256=info[0], pages=info[1], status="ok")
+            row.update(sha256=info[0], pages=info[1], status="ok", text_source="pdf")
+            xml_dest.unlink(missing_ok=True)  # the PDF wins; no stale XML
+        elif xml_dest.exists() and valid_xml(xml_dest.read_bytes()):
+            row.update(status="text_only", text_source="jats_xml", pdf_source="pmc_xml", preprint="false",
+                       pdf_url_used=xml_saved or prev_rows.get(rec.gt_record_id, {}).get("pdf_url_used", ""),
+                       sha256=hashlib.sha256(xml_dest.read_bytes()).hexdigest(),
+                       failure_reason="no PDF reachable; open JATS XML saved in artifacts/fulltext")
         else:
             reasons = "; ".join(dict.fromkeys(errors)) or ("no open PDF location found" if not cands else "not attempted")
             if notes and not cands:
                 reasons = "no open PDF location found (" + ", ".join(f"{k}: {v}" for k, v in notes.items()) + ")"
-            row.update(status="unreachable", failure_reason=reasons[:300])
+            if args.no_download and prev and prev.get("failure_reason"):
+                reasons = prev["failure_reason"]  # keep the reason recorded by the last download run
+            row.update(status="unreachable", text_source="none", failure_reason=reasons[:300])
         rows.append(row)
         print(f"{rec.gt_record_id:>4} {split:8} {src:17} {row['status']:11} {row['pdf_source']:11} {row['failure_reason'][:70]}", flush=True)
 
