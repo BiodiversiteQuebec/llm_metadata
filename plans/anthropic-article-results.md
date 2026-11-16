@@ -186,6 +186,13 @@ Search strategy: screen variants on a stratified 10-record slice of the dev subs
 - Add the variant that extracts features and gives the category in one call (the outline's intermediate task)
 - Error attribution for rule-based scoring: which feature (data type, temporal, spatial, modulators) causes each wrong category
 
+**Check of earlier work (2026-11-15).** All April relevance experiments are on `main` (R0, R1-A/B, R2-A/B in `notebooks/relevance_*.ipynb`, `plans/automated_relevance_classification.md`, results in `notebooks/results/`). No unmerged remote branch holds relevant work: `prompt-engineering` is an earlier copy of commits on `main`, the February `claude/*` branches use modules since renamed, `app` is the viewer's deployment branch. What this means here:
+- R0 is reused as `relevance_rules.py` (same rules, tested); error attribution is done (`relevance_eval.error_attribution`).
+- **The April "direct" runs (R2-A, R2-B) are the combined variant**: their prompt (`RELEVANCE_BLOCK` in `relevance_llm_direct*.ipynb`) asks for the features *and* the category in one call. The outline's Table 1 row "Direct LLM scoring" therefore holds combined-variant numbers, and scoring only has never been run. Correct this in the outline at the held-out pass.
+- Naming kept from April, used in the logs and the outline: R1 = rules on extracted features, R2 = combined (features + category, one call), **R3 = scoring only (new)**: category and a short reason, no features; a small schema that fits native structured output.
+- The April gpt-5-mini numbers stay as the historical reference: R1-A binary F1 0.53, R1-B 0.71, R2-A 0.55, R2-B 0.88 against the rule label (30 dev records, OpenAI).
+- Port the `RELEVANCE_BLOCK` thresholds from `relevance_rules.py` constants (one source of truth), and add the Biodiversité Québec priorities only if Alex Fuster provides them; otherwise state that the instructions hold the Fuster rules alone.
+
 #### WU-P3: Claim grounding, only if useful `sonnet`
 
 **deps:** WU-P1 | **files:** see [`plans/claim-grounding.md`](claim-grounding.md)
