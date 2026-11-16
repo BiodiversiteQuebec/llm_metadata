@@ -2651,3 +2651,13 @@ An independent review of the evaluation code (fresh agent, read-only) found two 
 - Insects north of the 49th: 6 % of the Atlas insect records for 75 % of the area; 5 records in the corpus, the best being a chironomid revision with three species absent from the Atlas.
 
 **Decision:** no composite score (the four scores are nearly independent and each is missing for different records). Figure, insect case and Fuster divergences proposed for the article 1 data-gap supplement; a full contribution article only after extracting place names and record availability.
+
+### 2026-11-15: Atlas contribution features extracted (Track B, dev then held-out)
+
+**Hypothesis:** the small contribution schema (focal taxa, places, years, record kind, deposited records) is accepted by native structured output and recovers the dataset ranking of the annotation-based scores with a rank correlation of at least 0.5, equally on dev and held-out (the prompt was written once, not tuned).
+
+**Runs:** `20261115_225438_atlas_abstract_dev.json` (0.013 USD) and, after the frozen pass, `20261115_225748_heldout_atlas_abstract.json` (0.027 USD); 0 validation failures. Scoring: `scripts/score_atlas_extraction.py` → `docs/atlas_contribution/extraction_dev.md`, `extraction_heldout.md`.
+
+**Result:** gaps filled (count of scores above the gap cut) correlates with the annotation-based count at 0.49 on both dev and held-out; spatial 0.52 / 0.48, taxonomic 0.63 / 0.51, group gap 0.98 / 1.00. The extraction defines more scores than the annotations (place names). Only 7 of the 68 held-out datasets are judged to deposit loadable occurrence records.
+
+**Decision:** the hypothesis about holds (0.49, at the threshold); the structured-output route works for this schema. Results added to `docs/atlas_contribution/results.md`. Remaining steps for a second article: a check of the extracted places by a person, the sensitive-species list, and an ecological review of the scores.
