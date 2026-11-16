@@ -1,0 +1,113 @@
+Logging to: artifacts/runs/20261115_221727_haiku_pdf_native_dev16.log
+Recreate command: uv run python -m llm_metadata.prompt_eval --mode pdf_native --parallelism 4 --model claude-haiku-5-5 --reasoning-effort low --config configs/eval_article.json --name haiku_pdf_native_dev16 --description 'Long text, pdf_native, round 4 prompt, 16 dev records with PDF' --skip-cache
+2026-11-15 22:17:27 | INFO     | __main__:run_eval:161 | Starting prompt_eval mode=pdf_native records=16 parallelism=4 model=claude-haiku-5-5 reasoning_effort=low description=Long text, pdf_native, round 4 prompt, 16 dev records with PDF skip_cache=True
+2026-11-15 22:17:27 | INFO     | __main__:run_eval:171 | Loaded manifest records=16
+Cost estimate: $0.1090 (16 records to call, 0 already cached, 0 without input; 969499 input tokens, 24000 assumed output tokens)
+2026-11-15 22:17:34 | INFO     | llm_metadata.extraction:run_manifest_extraction:392 | Starting manifest extraction mode=pdf_native records=16 parallelism=4 model=claude-haiku-5-5 reasoning_effort=low prompt_module=prompts.pdf_file description=Long text, pdf_native, round 4 prompt, 16 dev records with PDF skip_cache=True
+2026-11-15 22:17:34 | INFO     | llm_metadata.extraction:run_manifest_extraction:460 | [1/16] Queueing gt_record_id=9 record_id=10.1371/journal.pone.0128238 title=Data from: Resampling method for applying density-dependent habitat selection theory to wildlife surveys
+2026-11-15 22:17:34 | INFO     | llm_metadata.extraction:run_manifest_extraction:460 | [2/16] Queueing gt_record_id=11 record_id=10.1371/journal.pone.0073695 title=Data from: Impacts of human disturbance on large prey species: do behavioral reactions translate to fitness consequences?
+2026-11-15 22:17:34 | INFO     | llm_metadata.extraction:run_manifest_extraction:460 | [3/16] Queueing gt_record_id=12 record_id=10.1002/ece3.4685 title=Data from: Natal habitat preference induction in large mammals – Like mother, like child?
+2026-11-15 22:17:34 | INFO     | llm_metadata.extraction:run_manifest_extraction:460 | [4/16] Queueing gt_record_id=24 record_id=10.1002/ece3.3906 title=Data from: Influence of northern limit range on genetic diversity and structure in a widespread North American tree, sugar maple (Acer saccharum Marshall)
+2026-11-15 22:17:34 | INFO     | llm_metadata.anthropic_extract:_run:333 | Starting claude pdf_native extraction model=claude-haiku-5-5 schema=DatasetFeaturesExtraction cache=bypass
+2026-11-15 22:17:34 | INFO     | llm_metadata.extraction:run_manifest_extraction:460 | [5/16] Queueing gt_record_id=29 record_id=10.1002/ece3.1476 title=Data from: Ecological gradients driving the distribution of four Ericaceae in boreal Quebec, Canada
+2026-11-15 22:17:34 | INFO     | llm_metadata.anthropic_extract:_run:333 | Starting claude pdf_native extraction model=claude-haiku-5-5 schema=DatasetFeaturesExtraction cache=bypass
+2026-11-15 22:17:34 | INFO     | llm_metadata.anthropic_extract:_run:333 | Starting claude pdf_native extraction model=claude-haiku-5-5 schema=DatasetFeaturesExtraction cache=bypass
+2026-11-15 22:17:34 | INFO     | llm_metadata.extraction:run_manifest_extraction:460 | [6/16] Queueing gt_record_id=30 record_id=10.1186/s40462-016-0079-4 title=Data from: Caribou, water, and ice – fine-scale movements of a migratory arctic ungulate in the context of climate change
+2026-11-15 22:17:34 | INFO     | llm_metadata.extraction:run_manifest_extraction:460 | [7/16] Queueing gt_record_id=31 record_id=10.1111/eva.12028 title=Data from: Reduced fitness of Atlantic salmon released in the wild after one generation of captive-breeding
+2026-11-15 22:17:34 | INFO     | llm_metadata.extraction:run_manifest_extraction:460 | [8/16] Queueing gt_record_id=37 record_id=10.1002/ece3.1029 title=Data from: Fitness dynamics within a poplar hybrid zone: I. Prezygotic and postzygotic barriers impacting a native poplar hybrid stand.
+2026-11-15 22:17:34 | INFO     | llm_metadata.anthropic_extract:_run:333 | Starting claude pdf_native extraction model=claude-haiku-5-5 schema=DatasetFeaturesExtraction cache=bypass
+2026-11-15 22:17:34 | INFO     | llm_metadata.extraction:run_manifest_extraction:460 | [9/16] Queueing gt_record_id=38 record_id=10.1371/journal.pone.0204445 title=Data from: Temporal dynamics in animal community assembly during post-logging succession in boreal forest
+2026-11-15 22:17:34 | INFO     | llm_metadata.extraction:run_manifest_extraction:460 | [10/16] Queueing gt_record_id=56 record_id=10.1111/eva.12315 title=Data from: Multidimensional environmental influences on timing of breeding in a tree swallow population facing climate change
+2026-11-15 22:17:34 | INFO     | llm_metadata.extraction:run_manifest_extraction:460 | [11/16] Queueing gt_record_id=91 record_id=10.1002/ece3.1266 title=Data from: Genetic connectivity among swarming sites in the wide ranging and recently declining little brown bat (Myotis lucifugus)
+2026-11-15 22:17:34 | INFO     | llm_metadata.extraction:run_manifest_extraction:460 | [12/16] Queueing gt_record_id=101 record_id=10.1371/journal.pone.0077514 title=Data from: Disentangling woodland caribou movements in response to clearcuts and roads across temporal scales
+2026-11-15 22:17:34 | INFO     | llm_metadata.extraction:run_manifest_extraction:460 | [13/16] Queueing gt_record_id=104 record_id=10.1038/s41598-018-34822-9 title=Data from: Compensatory conservation measures for an endangered caribou population under climate change
+2026-11-15 22:17:34 | INFO     | llm_metadata.extraction:run_manifest_extraction:460 | [14/16] Queueing gt_record_id=208 record_id=10.3389/fmars.2021.637546 title=Determining the Ecological Status of Benthic Coastal Communities: A Case in an Anthropized Sub-Arctic Area
+2026-11-15 22:17:34 | INFO     | llm_metadata.extraction:run_manifest_extraction:460 | [15/16] Queueing gt_record_id=225 record_id=10.1371/journal.pone.0109261 title=Effects of Habitat-Forming Species Richness, Evenness, Identity, and Abundance on Benthic Intertidal Community Establishment and Productivity
+2026-11-15 22:17:34 | INFO     | llm_metadata.extraction:run_manifest_extraction:460 | [16/16] Queueing gt_record_id=253 record_id=10.1111/eva.13248 title=Genomic data support management of anadromous Arctic Char fisheries in Nunavik by highlighting neutral and putatively adaptive genetic variation
+2026-11-15 22:17:34 | DEBUG    | llm_metadata.anthropic_extract:_call:257 | Calling Anthropic Messages API model=claude-haiku-5-5 kind=pdf_native schema=DatasetFeaturesExtraction
+2026-11-15 22:17:34 | DEBUG    | llm_metadata.anthropic_extract:_call:257 | Calling Anthropic Messages API model=claude-haiku-5-5 kind=pdf_native schema=DatasetFeaturesExtraction
+2026-11-15 22:17:34 | DEBUG    | llm_metadata.anthropic_extract:_call:257 | Calling Anthropic Messages API model=claude-haiku-5-5 kind=pdf_native schema=DatasetFeaturesExtraction
+2026-11-15 22:17:34 | DEBUG    | llm_metadata.anthropic_extract:_call:257 | Calling Anthropic Messages API model=claude-haiku-5-5 kind=pdf_native schema=DatasetFeaturesExtraction
+2026-11-15 22:17:36 | INFO     | llm_metadata.anthropic_extract:_run:339 | Completed claude pdf_native extraction model=claude-haiku-5-5 cache=bypass cost=$0.006119 output_tokens=218 cache_read=0 cache_write=6493 retries=0
+2026-11-15 22:17:36 | INFO     | llm_metadata.extraction:run_manifest_extraction:483 | [1/16] Finished gt_record_id=9 status=success method=pdf_native cost=$0.0061
+2026-11-15 22:17:36 | INFO     | llm_metadata.anthropic_extract:_run:333 | Starting claude pdf_native extraction model=claude-haiku-5-5 schema=DatasetFeaturesExtraction cache=bypass
+2026-11-15 22:17:36 | DEBUG    | llm_metadata.anthropic_extract:_call:257 | Calling Anthropic Messages API model=claude-haiku-5-5 kind=pdf_native schema=DatasetFeaturesExtraction
+2026-11-15 22:17:37 | INFO     | llm_metadata.anthropic_extract:_run:339 | Completed claude pdf_native extraction model=claude-haiku-5-5 cache=bypass cost=$0.005164 output_tokens=217 cache_read=0 cache_write=6493 retries=0
+2026-11-15 22:17:37 | INFO     | llm_metadata.extraction:run_manifest_extraction:483 | [3/16] Finished gt_record_id=12 status=success method=pdf_native cost=$0.0052
+2026-11-15 22:17:37 | INFO     | llm_metadata.anthropic_extract:_run:333 | Starting claude pdf_native extraction model=claude-haiku-5-5 schema=DatasetFeaturesExtraction cache=bypass
+2026-11-15 22:17:37 | DEBUG    | llm_metadata.anthropic_extract:_call:257 | Calling Anthropic Messages API model=claude-haiku-5-5 kind=pdf_native schema=DatasetFeaturesExtraction
+2026-11-15 22:17:37 | INFO     | llm_metadata.anthropic_extract:_run:339 | Completed claude pdf_native extraction model=claude-haiku-5-5 cache=bypass cost=$0.006442 output_tokens=207 cache_read=0 cache_write=6493 retries=0
+2026-11-15 22:17:37 | INFO     | llm_metadata.extraction:run_manifest_extraction:483 | [4/16] Finished gt_record_id=24 status=success method=pdf_native cost=$0.0064
+2026-11-15 22:17:37 | INFO     | llm_metadata.anthropic_extract:_run:333 | Starting claude pdf_native extraction model=claude-haiku-5-5 schema=DatasetFeaturesExtraction cache=bypass
+2026-11-15 22:17:37 | DEBUG    | llm_metadata.anthropic_extract:_call:257 | Calling Anthropic Messages API model=claude-haiku-5-5 kind=pdf_native schema=DatasetFeaturesExtraction
+2026-11-15 22:17:37 | INFO     | llm_metadata.anthropic_extract:_run:339 | Completed claude pdf_native extraction model=claude-haiku-5-5 cache=bypass cost=$0.004495 output_tokens=274 cache_read=0 cache_write=6493 retries=0
+2026-11-15 22:17:37 | INFO     | llm_metadata.extraction:run_manifest_extraction:483 | [2/16] Finished gt_record_id=11 status=success method=pdf_native cost=$0.0045
+2026-11-15 22:17:37 | INFO     | llm_metadata.anthropic_extract:_run:333 | Starting claude pdf_native extraction model=claude-haiku-5-5 schema=DatasetFeaturesExtraction cache=bypass
+2026-11-15 22:17:37 | DEBUG    | llm_metadata.anthropic_extract:_call:257 | Calling Anthropic Messages API model=claude-haiku-5-5 kind=pdf_native schema=DatasetFeaturesExtraction
+2026-11-15 22:17:39 | INFO     | llm_metadata.anthropic_extract:_run:339 | Completed claude pdf_native extraction model=claude-haiku-5-5 cache=bypass cost=$0.005158 output_tokens=206 cache_read=6493 cache_write=0 retries=0
+2026-11-15 22:17:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:483 | [7/16] Finished gt_record_id=31 status=success method=pdf_native cost=$0.0052
+2026-11-15 22:17:39 | INFO     | llm_metadata.anthropic_extract:_run:333 | Starting claude pdf_native extraction model=claude-haiku-5-5 schema=DatasetFeaturesExtraction cache=bypass
+2026-11-15 22:17:39 | DEBUG    | llm_metadata.anthropic_extract:_call:257 | Calling Anthropic Messages API model=claude-haiku-5-5 kind=pdf_native schema=DatasetFeaturesExtraction
+2026-11-15 22:17:39 | INFO     | llm_metadata.anthropic_extract:_run:339 | Completed claude pdf_native extraction model=claude-haiku-5-5 cache=bypass cost=$0.004310 output_tokens=314 cache_read=6493 cache_write=0 retries=0
+2026-11-15 22:17:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:483 | [6/16] Finished gt_record_id=30 status=success method=pdf_native cost=$0.0043
+2026-11-15 22:17:39 | INFO     | llm_metadata.anthropic_extract:_run:333 | Starting claude pdf_native extraction model=claude-haiku-5-5 schema=DatasetFeaturesExtraction cache=bypass
+2026-11-15 22:17:39 | DEBUG    | llm_metadata.anthropic_extract:_call:257 | Calling Anthropic Messages API model=claude-haiku-5-5 kind=pdf_native schema=DatasetFeaturesExtraction
+2026-11-15 22:17:39 | INFO     | llm_metadata.anthropic_extract:_run:339 | Completed claude pdf_native extraction model=claude-haiku-5-5 cache=bypass cost=$0.005697 output_tokens=371 cache_read=6493 cache_write=0 retries=0
+2026-11-15 22:17:39 | INFO     | llm_metadata.extraction:run_manifest_extraction:483 | [5/16] Finished gt_record_id=29 status=success method=pdf_native cost=$0.0057
+2026-11-15 22:17:39 | INFO     | llm_metadata.anthropic_extract:_run:333 | Starting claude pdf_native extraction model=claude-haiku-5-5 schema=DatasetFeaturesExtraction cache=bypass
+2026-11-15 22:17:39 | DEBUG    | llm_metadata.anthropic_extract:_call:257 | Calling Anthropic Messages API model=claude-haiku-5-5 kind=pdf_native schema=DatasetFeaturesExtraction
+2026-11-15 22:17:41 | INFO     | llm_metadata.anthropic_extract:_run:339 | Completed claude pdf_native extraction model=claude-haiku-5-5 cache=bypass cost=$0.006911 output_tokens=257 cache_read=6493 cache_write=0 retries=0
+2026-11-15 22:17:41 | INFO     | llm_metadata.extraction:run_manifest_extraction:483 | [8/16] Finished gt_record_id=37 status=success method=pdf_native cost=$0.0069
+2026-11-15 22:17:41 | INFO     | llm_metadata.anthropic_extract:_run:333 | Starting claude pdf_native extraction model=claude-haiku-5-5 schema=DatasetFeaturesExtraction cache=bypass
+2026-11-15 22:17:41 | DEBUG    | llm_metadata.anthropic_extract:_call:257 | Calling Anthropic Messages API model=claude-haiku-5-5 kind=pdf_native schema=DatasetFeaturesExtraction
+2026-11-15 22:17:41 | INFO     | llm_metadata.anthropic_extract:_run:339 | Completed claude pdf_native extraction model=claude-haiku-5-5 cache=bypass cost=$0.004416 output_tokens=203 cache_read=6493 cache_write=0 retries=0
+2026-11-15 22:17:41 | INFO     | llm_metadata.extraction:run_manifest_extraction:483 | [10/16] Finished gt_record_id=56 status=success method=pdf_native cost=$0.0044
+2026-11-15 22:17:41 | INFO     | llm_metadata.anthropic_extract:_run:333 | Starting claude pdf_native extraction model=claude-haiku-5-5 schema=DatasetFeaturesExtraction cache=bypass
+2026-11-15 22:17:41 | DEBUG    | llm_metadata.anthropic_extract:_call:257 | Calling Anthropic Messages API model=claude-haiku-5-5 kind=pdf_native schema=DatasetFeaturesExtraction
+2026-11-15 22:17:41 | INFO     | llm_metadata.anthropic_extract:_run:339 | Completed claude pdf_native extraction model=claude-haiku-5-5 cache=bypass cost=$0.007107 output_tokens=232 cache_read=6493 cache_write=0 retries=0
+2026-11-15 22:17:41 | INFO     | llm_metadata.extraction:run_manifest_extraction:483 | [11/16] Finished gt_record_id=91 status=success method=pdf_native cost=$0.0071
+2026-11-15 22:17:41 | INFO     | llm_metadata.anthropic_extract:_run:333 | Starting claude pdf_native extraction model=claude-haiku-5-5 schema=DatasetFeaturesExtraction cache=bypass
+2026-11-15 22:17:41 | DEBUG    | llm_metadata.anthropic_extract:_call:257 | Calling Anthropic Messages API model=claude-haiku-5-5 kind=pdf_native schema=DatasetFeaturesExtraction
+2026-11-15 22:17:43 | INFO     | llm_metadata.anthropic_extract:_run:339 | Completed claude pdf_native extraction model=claude-haiku-5-5 cache=bypass cost=$0.005539 output_tokens=364 cache_read=6493 cache_write=0 retries=0
+2026-11-15 22:17:43 | INFO     | llm_metadata.extraction:run_manifest_extraction:483 | [9/16] Finished gt_record_id=38 status=success method=pdf_native cost=$0.0055
+2026-11-15 22:17:43 | INFO     | llm_metadata.anthropic_extract:_run:333 | Starting claude pdf_native extraction model=claude-haiku-5-5 schema=DatasetFeaturesExtraction cache=bypass
+2026-11-15 22:17:43 | DEBUG    | llm_metadata.anthropic_extract:_call:257 | Calling Anthropic Messages API model=claude-haiku-5-5 kind=pdf_native schema=DatasetFeaturesExtraction
+2026-11-15 22:17:43 | INFO     | llm_metadata.anthropic_extract:_run:339 | Completed claude pdf_native extraction model=claude-haiku-5-5 cache=bypass cost=$0.004337 output_tokens=209 cache_read=6493 cache_write=0 retries=0
+2026-11-15 22:17:43 | INFO     | llm_metadata.extraction:run_manifest_extraction:483 | [12/16] Finished gt_record_id=101 status=success method=pdf_native cost=$0.0043
+2026-11-15 22:17:43 | INFO     | llm_metadata.anthropic_extract:_run:333 | Starting claude pdf_native extraction model=claude-haiku-5-5 schema=DatasetFeaturesExtraction cache=bypass
+2026-11-15 22:17:43 | DEBUG    | llm_metadata.anthropic_extract:_call:257 | Calling Anthropic Messages API model=claude-haiku-5-5 kind=pdf_native schema=DatasetFeaturesExtraction
+2026-11-15 22:17:45 | INFO     | llm_metadata.anthropic_extract:_run:339 | Completed claude pdf_native extraction model=claude-haiku-5-5 cache=bypass cost=$0.006381 output_tokens=439 cache_read=6493 cache_write=0 retries=0
+2026-11-15 22:17:45 | INFO     | llm_metadata.extraction:run_manifest_extraction:483 | [14/16] Finished gt_record_id=208 status=success method=pdf_native cost=$0.0064
+2026-11-15 22:17:45 | INFO     | llm_metadata.anthropic_extract:_run:339 | Completed claude pdf_native extraction model=claude-haiku-5-5 cache=bypass cost=$0.004070 output_tokens=283 cache_read=6493 cache_write=0 retries=0
+2026-11-15 22:17:45 | INFO     | llm_metadata.extraction:run_manifest_extraction:483 | [15/16] Finished gt_record_id=225 status=success method=pdf_native cost=$0.0041
+2026-11-15 22:17:46 | INFO     | llm_metadata.anthropic_extract:_run:339 | Completed claude pdf_native extraction model=claude-haiku-5-5 cache=bypass cost=$0.012833 output_tokens=209 cache_read=6493 cache_write=0 retries=0
+2026-11-15 22:17:46 | INFO     | llm_metadata.extraction:run_manifest_extraction:483 | [16/16] Finished gt_record_id=253 status=success method=pdf_native cost=$0.0128
+2026-11-15 22:17:48 | INFO     | llm_metadata.anthropic_extract:_run:339 | Completed claude pdf_native extraction model=claude-haiku-5-5 cache=bypass cost=$0.004233 output_tokens=1245 cache_read=6493 cache_write=0 retries=0
+2026-11-15 22:17:48 | INFO     | llm_metadata.extraction:run_manifest_extraction:483 | [13/16] Finished gt_record_id=104 status=success method=pdf_native cost=$0.0042
+2026-11-15 22:17:48 | INFO     | llm_metadata.extraction:run_manifest_extraction:500 | Validation: failed=0/16 (0.0%) repaired_by_retry=0 retries_used=0
+2026-11-15 22:17:48 | INFO     | llm_metadata.extraction:run_manifest_extraction:508 | Completed manifest extraction mode=pdf_native records=16 total_cost=$0.0932
+2026-11-15 22:17:48 | INFO     | __main__:run_eval:226 | Building ground truth from 299 GT records
+2026-11-15 22:17:48 | INFO     | __main__:run_eval:236 | Evaluating predictions matched_records=16 fields=default
+2026-11-15 22:17:48 | INFO     | __main__:run_eval:254 | Saved prompt_eval artifact to artifacts/runs/20261115_221727_haiku_pdf_native_dev16.json
+2026-11-15 22:17:48 | INFO     | __main__:run_eval:255 | Saved extraction results CSV to artifacts/runs/20261115_221727_haiku_pdf_native_dev16.csv
+2026-11-15 22:17:48 | INFO     | __main__:run_eval:257 | Completed prompt_eval mode=pdf_native records=16 total_cost=$0.0932
+Field                         N       P       R      F1
+-------------------------------------------------------
+bias_north_south             16   0.636   1.000   0.778
+data_type                    16   0.257   0.500   0.340
+geospatial_info_dataset      16   0.135   0.625   0.222
+multispecies                 16   0.429   1.000   0.600
+new_species_region           16     N/A     N/A     N/A
+new_species_science          16     N/A     N/A     N/A
+spatial_range_class          16   0.600   0.818   0.692
+spatial_range_km2            16   0.467   0.636   0.538
+species                      16   0.295   0.667   0.409
+temp_range_f                 16   0.600   0.692   0.643
+temp_range_i                 16   0.786   0.846   0.815
+temporal_range_class         16   0.857   0.923   0.889
+threatened_species           16   1.000   0.667   0.800
+time_series                  16   0.750   1.000   0.857
+
+Total API cost: $0.0932
+
+Run artifact saved to: artifacts/runs/20261115_221727_haiku_pdf_native_dev16.json

@@ -6,7 +6,7 @@
 
 ## Goal statement (paste into the fresh session)
 
-> Execute `plans/anthropic-article-results.md` on branch `feat/anthropic-extraction` until its "Done" checklist is met. Fill the results of `docs/article_outline.md` with Claude models, evaluated on a held-out set, within a hard API budget of 4.50 USD. Work autonomously: one commit and one push per experiment, each logged in `notebooks/README.md`. Think like an ecologist, test hypotheses, do not just run extractions. Stop and report if a stop condition of the plan is hit.
+> Execute `plans/anthropic-article-results.md` on branch `feat/anthropic-extraction` until its "Done" checklist is met. Fill the results of `docs/article_outline.md` with Claude models, evaluated on a held-out set, within a hard API budget of 4.50 USD. Work autonomously: one local commit per experiment (no push), each logged in `notebooks/README.md`. Think like an ecologist, test hypotheses, do not just run extractions. Stop and report if a stop condition of the plan is hit.
 
 ## Why this plan exists
 
@@ -25,7 +25,7 @@ It also opens a second track: scoring a dataset by what it would add to the Atla
 | Third approach | Atlas contribution scores, validated by comparison with the Fuster relevance and illustrated by the "insects in northern Quebec" case. Own extraction schema allowed. **Candidate second article** | No human label measures contribution to the Atlas |
 | Atlas data in this public repo | Commit only per-dataset scores and aggregates (broad taxonomic group × administrative region). Raw per-species extracts stay git-ignored, with the SQL to rebuild them. Sensitive species excluded or masked | Data-sharing policy |
 | Priority if time or budget runs short | Article 1 tables first, Atlas track second, claim grounding and extras last | Vincent's call |
-| Git | One commit and one push per experiment on this branch. No PR | Changed 2026-11-15 by the goal Vincent set for the executing session (earlier rule: local commits only). The repository is public: check every commit for Atlas raw extracts and secrets before pushing |
+| Git | One local commit per experiment on this branch. **No push**: Vincent pushes himself after review. No PR | Vincent reviews before anything goes to GitHub. Confirmed 2026-11-15 after two early commits (this rule's brief reversal and the held-out freeze) were already pushed |
 | API spending | The Anthropic API pays for extraction calls only (and claim grounding if judged useful). Analysis, coding and reasoning run in Claude Code (main session and subagents) | Vincent's call |
 
 ## Operating rules for the executing session
@@ -90,6 +90,15 @@ Prices per million tokens (input / output): Haiku 5.5 0.10 / 0.50, Sonnet 5.5 2 
 - Record for each PDF: URL, licence, SHA-256, page count. PDFs stay git-ignored; the script and manifest make the corpus reproducible
 - Freeze the held-out list (ids and digest) in the same commit, before any run
 - Report coverage per source and per licence
+
+**First pass done (2026-11-15):** 31 of 98 PDFs (9 of 30 dev, 22 of 68 held-out). Held-out list frozen before any run. Most failures are publisher bot protection (403, Cloudflare), not missing open copies. No local copy exists on Vincent's machine.
+
+**Second pass (decided by Vincent, 2026-11-15):**
+- The server is on the Université de Sherbrooke network; Playwright's Chromium is installed (`~/.cache/ms-playwright`) and may be used headless, autonomously. Headless Chromium still meets the Cloudflare page on Wiley, Europe PMC and Oxford; no bot-protection evasion is attempted.
+- Try every open location (OpenAlex and Unpaywall, not only the best one), the PMC open-access subset through official channels, publisher direct-PDF patterns, Semantic Scholar and CORE. Preprints are accepted but flagged.
+- Where only open full text in JATS XML exists, keep it for the PDF-text condition (`text_source = jats_xml`); the native-PDF condition then has fewer records.
+- Keep what works as small per-publisher recipes in `src/llm_metadata/publisher_pdf.py`, so the next article is quicker.
+- If coverage stays incomplete, continue: long-text results are reported on the records with full text, with the count per condition (the outline already asks for counts per condition).
 
 #### WU-C2: Evaluate section parsing without Docker `sonnet`
 
@@ -176,6 +185,13 @@ Search strategy: screen variants on a stratified 10-record slice of the dev subs
 - Port direct relevance scoring to Claude, short and long text
 - Add the variant that extracts features and gives the category in one call (the outline's intermediate task)
 - Error attribution for rule-based scoring: which feature (data type, temporal, spatial, modulators) causes each wrong category
+
+**Check of earlier work (2026-11-15).** All April relevance experiments are on `main` (R0, R1-A/B, R2-A/B in `notebooks/relevance_*.ipynb`, `plans/automated_relevance_classification.md`, results in `notebooks/results/`). No unmerged remote branch holds relevant work: `prompt-engineering` is an earlier copy of commits on `main`, the February `claude/*` branches use modules since renamed, `app` is the viewer's deployment branch. What this means here:
+- R0 is reused as `relevance_rules.py` (same rules, tested); error attribution is done (`relevance_eval.error_attribution`).
+- **The April "direct" runs (R2-A, R2-B) are the combined variant**: their prompt (`RELEVANCE_BLOCK` in `relevance_llm_direct*.ipynb`) asks for the features *and* the category in one call. The outline's Table 1 row "Direct LLM scoring" therefore holds combined-variant numbers, and scoring only has never been run. Correct this in the outline at the held-out pass.
+- Naming kept from April, used in the logs and the outline: R1 = rules on extracted features, R2 = combined (features + category, one call), **R3 = scoring only (new)**: category and a short reason, no features; a small schema that fits native structured output.
+- The April gpt-5-mini numbers stay as the historical reference: R1-A binary F1 0.53, R1-B 0.71, R2-A 0.55, R2-B 0.88 against the rule label (30 dev records, OpenAI).
+- Port the `RELEVANCE_BLOCK` thresholds from `relevance_rules.py` constants (one source of truth), and add the Biodiversité Québec priorities only if Alex Fuster provides them; otherwise state that the instructions hold the Fuster rules alone.
 
 #### WU-P3: Claim grounding, only if useful `sonnet`
 
@@ -304,4 +320,4 @@ Round 5: WU-V2, then WU-F1, then WU-V3 and the held-out part of WU-G5
 - [ ] Register of doubtful annotations and discussion points on the Fuster schema committed
 - [ ] Track B: reference aggregates, matching, scores, ceiling results and the insect case committed; recommendation on article 1 vs second article
 - [ ] Total API spending at or under 4.50 USD, ledger committed
-- [ ] `TODO.md` updated, all work committed and pushed
+- [ ] `TODO.md` updated, all work committed locally (not pushed)

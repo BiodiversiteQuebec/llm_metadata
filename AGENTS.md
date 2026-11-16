@@ -46,12 +46,14 @@ Create a `.env` file in the project root (see `.env.example` for all vars):
 OPENAI_API_KEY=your_openai_api_key
 ZENODO_ACCESS_TOKEN=your_zenodo_token            # Optional, for Zenodo features only
 SEMANTIC_SCHOLAR_API_KEY=your_ss_api_key         # Optional, enables dedicated rate limit
+ANTHROPIC_API_KEY=your_anthropic_api_key         # Only for claude-* models
 ```
 
 Base URL overrides (set automatically in devcontainer, not needed locally):
 ```bash
 OPENAI_API_BASE=http://proxy:8080/openai/v1      # Defaults to https://api.openai.com/v1
 SEMANTIC_SCHOLAR_API_BASE=http://proxy:8080/semantic-scholar  # Defaults to https://api.semanticscholar.org/graph/v1
+ANTHROPIC_API_BASE=http://proxy:8080/anthropic   # Optional, defaults to https://api.anthropic.com (the proxy injects the key)
 ```
 
 ### Runtime Requirements
@@ -298,7 +300,30 @@ This creates a research journal that documents the evolution of the project's me
 
 - **Model Selection**: Currently using `gpt-5-mini` (cost-effective, faster than GPT-4)
 - **Reasoning Parameter**: GPT-5 series models use `reasoning={"effort": "low"}` instead of `temperature` for inference control
-- **Structured Output**: All extraction uses OpenAI's `responses.parse()` API with Pydantic `text_format` for guaranteed schema compliance
+- **Structured Output (OpenAI)**: All OpenAI extraction uses OpenAI's `responses.parse()` API with Pydantic `text_format` for guaranteed schema compliance
+
+### Claude models (`anthropic_extract.py`)
+
+Any `--model claude-*` routes all four modes (`abstract`, `pdf_text`, `pdf_native`, `sections`) to Claude through `extraction.py`. Setup: `ANTHROPIC_API_KEY` (or `ANTHROPIC_API_BASE` pointing to a proxy that injects it).
+
+| Model | Input $/MTok | Output $/MTok |
+|---|---|---|
+| `claude-haiku-5-5` | 0.10 | 0.50 |
+| `claude-sonnet-5-5` | 2.00 | 10.00 |
+| `claude-opus-5-5` | 4.00 | 20.00 |
+
+- **Inputs**: `pdf_native` sends the PDF as a base64 `document` block before a short instruction; `pdf_text` extracts text with PyMuPDF (the OpenAI path uses pypdf, so text differs slightly) and sends it as plain text.
+- **Effort and thinking**: `--reasoning-effort` goes to `output_config.effort`. The 5.5 models think adaptively by default; thinking tokens are billed as output. Default `max_tokens` is 16000 (set `ExtractionConfig.max_output_tokens` to override); a `max_tokens` or `refusal` stop is an error.
+- **Prompt caching**: the system block (prompt + schema text) carries `cache_control: ephemeral`. Minimum cacheable prefix is 512 tokens; ours is about 4900 (abstract prompt) and 5600 (PDF prompt), measured with `count_system_prefix_tokens`. Cost = uncached input at base price + cache writes at 1.25x + cache reads at 0.1x + output. The API's `input_tokens` excludes cached tokens. The cache lives 5 minutes, so run records back to back.
+- **Output format**: default is the schema pasted in the prompt plus Pydantic validation. `--structured-output` (`ExtractionConfig.structured_output`) uses the API's native `output_config.format` json_schema instead; the API may reject complex schemas with a 400 (no cost).
+- **Repair retry**: a reply that fails validation is sent back once with the error. Per record, `usage_cost` has `validation_retries` and `validation_failed`; a record still invalid after the retry has status `error` but keeps its cost. `run_manifest_extraction` logs the run-level failure rate.
+- **Cost guard**: `--max-cost USD` counts real input tokens (free `count_tokens`, PDFs included), skips records already in the joblib cache, assumes `--assumed-output-tokens` (default 1500) per record, prints the estimate, and raises `CostLimitExceeded` before any call. `--estimate-only` prints it and stops. Not available for `sections` mode.
+- **Not built**: Message Batches API (half price) is not implemented; results would need to be written into the joblib cache key by key.
+
+```bash
+uv run python -m llm_metadata.prompt_eval --mode pdf_native --model claude-haiku-5-5 --reasoning-effort low \
+  --manifest data/manifests/dev_subset_data_paper.csv --max-cost 0.05 --estimate-only
+```
 
 ## Eval Viewer App
 

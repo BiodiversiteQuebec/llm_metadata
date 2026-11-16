@@ -2394,3 +2394,190 @@ Goal : Manual deep dive into the Fuster dataset to understand the data and its s
 
 **Next Steps:**
 - If we want a guaranteed fresh API rerun later, execute the same notebook command in a shell where `uv run` loads `.env` or where `OPENAI_API_KEY` is exported before launch.
+
+---
+
+## Article results on Claude models (plan `plans/anthropic-article-results.md`)
+
+Rules for these entries: each experiment states its hypothesis before the run, and is judged with the paired comparison (`uv run python -m llm_metadata.run_summary A.json --compare B.json`), never by eye. Relevance is scored against both the rule label and the human label (`uv run python -m llm_metadata.relevance_eval run.json`). Costs are in `docs/results/cost_ledger.csv`. Only the 30 dev records are used until the final held-out pass.
+
+### 2026-11-15: Setup before the prompt rounds
+
+**Done (no API cost unless stated):**
+- Held-out list frozen: the 68 valid open-access records outside the dev subset (`data/manifests/heldout_ids.csv`, SHA-256 in `heldout_freeze.json`).
+- Claude adapter completed: native PDF and PDF text inputs, prompt caching, one repair retry on invalid replies, `--max-cost` guard (smoke test 0.01 USD). The system prompt is about 4 900 tokens and caches (reads cost 10 %). One native PDF is about 52 000 input tokens, four times its PyMuPDF text.
+- Fuster rules moved to `relevance_rules.py`: they reproduce 178 of 180 released relevance classes. Human and rule labels agree on 54 % of records (four classes) and 76 % (relevant vs not). That agreement is the ceiling shown next to every relevance result (`docs/results/relevance_targets.md`).
+- Evaluation hardened: class-level spatial and temporal scores, bootstrap intervals, an evidence ceiling from the annotators' position columns, and a paired comparison of two runs.
+- Bug found: `geospatial_info_dataset` had never been scored (configs named it `geospatial_info`). Real F1 on the Haiku baseline: 0.31.
+
+### 2026-11-15: Repeatability of the Haiku baseline (noise floor)
+
+**Hypothesis:** rerunning the same prompt (Claude Haiku 5.5, low effort, 30 dev abstracts) moves micro F1 by less than 0.03, with a few flips on rare yes/no fields.
+
+**Run:** `artifacts/runs/20261115_100154_haiku55_abstract_low_repeat.json` vs the first baseline `20261115_082643_haiku55_abstract_low.json`. Cost 0.018 USD (the guard estimated 0.040: its 1 500 output tokens per record is cautious; low effort uses about 600).
+
+**Result:**
+- Micro F1 0.45 → 0.44, difference −0.01 [−0.04, +0.01]. Hypothesis holds.
+- Single fields move by chance: `time_series` −0.18 [−0.43, 0.00], `temp_range_i` −0.06, `species` −0.04. Rare yes/no fields (new species, north-south) swing by up to ±0.2.
+- Rule-based relevance from these abstracts, first and second run: 43 % and 40 % four-class agreement with the rule label, binary F1 0.53 and 0.48. The errors go one way: 17 of 30 records rated too low, at most 1 too high.
+
+**Diagnosis of the relevance errors (error attribution, first run):**
+- **Spatial extent:** wrong in 19 of 30 records, always "not stated" instead of a class. The annotators mostly derived the area themselves from place names (56 of 107 annotated areas are written nowhere in the text), while the prompt forbids inference.
+- **Data type:** wrong in 17 records, of which 9 are High → Low on genetic data. The rules rank *EBV* genetic data (intraspecific genetic diversity, population structure) High and other genetic data Low. The extraction vocabulary has a single `genetic_analysis` value, so the model can never reach High there. Annotators wrote "EBV genetic" 28 times and plain "genetic" 3 times among valid records.
+
+**Decision:**
+- A prompt change counts only when the paired interval excludes 0. Rare yes/no fields need a change larger than about 0.2.
+- Next rounds, in this order: (1) split EBV genetic data from other genetic data in the vocabulary; (2) let the model estimate the spatial extent from named places, as the annotators did.
+
+### 2026-11-15: Evaluation review fixes (no API cost)
+
+An independent review of the evaluation code (fresh agent, read-only) found two problems that would have biased every round, now fixed and tested:
+- The micro average counted spatial and temporal facts twice (km² and years, plus their classes). Micro now covers the primary fields only. Baseline micro F1: 0.45 (unchanged at two decimals).
+- Failed extractions disappeared from the feature scores (recall rose when more records failed). They are now scored as empty predictions, and count as wrong in the binary relevance score too.
+- Smaller fixes: "15,000" read as fifteen thousand; the duplicated id 306 (outside the corpus) kept once; held-out scoring needs `--final`; thin intervals flagged with "~". Kept as caveats: the five yes/no fields are scored on true and false values alike, so their "recall" is not "recall of true"; and with about 15 fields, one chance "gain" per comparison is expected.
+
+### 2026-11-15: Round 1, EBV genetic data (abstracts, Haiku 5.5, low effort)
+
+**Hypothesis:** a yes/no field `ebv_genetic` (genetic data describing variation within species: population structure, relatedness, effective size) lets the rules reach High for genetic datasets. Expected: data type class right on at least 20 of 30 records (13 before), four-class relevance agreement with the rule label at least 0.50 (0.40–0.43 before), `data_type` F1 unchanged.
+
+**Change:** new field in the schema (`ebv_genetic`), one paragraph under `genetic_analysis` in the vocabulary block (`prompts/common.py`), and the rule input reads "EBV genetic analysis" when the flag is true. Run `artifacts/runs/20261115_220315_r1_ebv_genetic_abstract.json`, 0.018 USD.
+
+**Result:**
+- Data type class: wrong on 7 records instead of 17 (23 of 30 right). The first half of the hypothesis holds.
+- Relevance: four-class agreement 0.40 [0.23, 0.57], binary F1 0.43. No change. The second half fails.
+- `data_type` F1 −0.03 [−0.07, +0.01], micro F1 −0.00 [−0.02, +0.01]: no regression.
+
+**Why relevance did not move:** the rules take a majority vote of three classes (data type, temporal, spatial). On abstracts, spatial extent is "not stated" for 19 of 30 records and temporal for 9. Two "not stated" classes outvote a correct High data type, so the final category stays where it was. Fixing data type is necessary but not enough; spatial extent is the bottleneck.
+
+**Decision:** keep the change (it fixes the component, with no cost elsewhere). Round 2 targets the spatial extent. The relevance gain from round 1 should only appear once spatial classes exist.
+
+### 2026-11-15: Round 2, spatial extent estimated from named places (abstracts, Haiku 5.5, low effort)
+
+**Hypothesis:** the annotators derived most areas themselves from place names. Letting the model do the same (an explicit exception to the no-inference rule, with reference sizes for Quebec regions) raises the spatial class recall well above 0.05 and lifts rule-based relevance above 0.50 four-class agreement, with round 1's data type fix now able to count. Risk: false positives, because annotators also left some named places as "not given" (records 5 and 271 on dev).
+
+**Change:** a `spatial_range_km2` section at the end of the vocabulary block (`prompts/common.py`). Run `artifacts/runs/20261115_220455_r2_spatial_estimate_abstract.json`, 0.021 USD. Compared with round 1.
+
+**Result:**
+- Spatial class F1 0.10 → 0.57, +0.48 [+0.23, +0.70]: gain. Exact km² F1 stays near 0 (as expected: estimates are orders of magnitude, not values).
+- Relevance against the rule label: binary F1 0.43 → 0.86, +0.44 [+0.21, +0.69], gain; binary accuracy +0.33 [+0.10, +0.57], gain; four-class agreement 0.40 → 0.60, +0.20 [−0.03, +0.43], not yet clear.
+- Relevance against the human label: binary F1 0.42 → 0.75, +0.33 [+0.07, +0.61], gain; four-class unchanged at 0.47.
+- Errors are no longer one-sided: against the rule label 18 exact, 7 too high, 5 too low (before: 0 too high, 17 too low). The new over-ratings come mostly from records where the annotator gave no area ("not given") and the model estimated a large region (5 records, X → H).
+- Other fields unchanged (micro F1 −0.01 [−0.04, +0.01]).
+
+**Reading:** the spatial class was the bottleneck of rule-based scoring on short text. The extraction failure was not a model weakness but a prompt that forbade what the annotators themselves did. The remaining spatial errors are partly annotation inconsistency (named places left without an area), which belongs in the register of doubtful annotations rather than in prompt tuning.
+
+**Decision:** keep. Next: check whether temporal extent can be recovered the same way (no: years cannot be estimated from place names; the abstract ceiling is low), then move on to the species block, data type definitions and the PDF inputs.
+
+### 2026-11-15: Yes/no fields scored as flags (evaluation change, no API cost)
+
+**Finding:** almost every "error" on the five modifier fields and `time_series` was an annotated False against a predicted null. The prompt asks for null unless there is evidence, and the relevance rules treat null and False alike. Exact matching therefore measured agreement on False values, not whether the model flags the datasets it should.
+
+**Change:** a `flag` strategy in `groundtruth_eval.py`, used for the six yes/no fields in `configs/eval_article.json`: null counts as False and only True is a positive. Every run is rescored with the same config, so comparisons stay valid; numbers from before this change are not comparable with those after.
+
+**Round 2 run, rescored (precision / recall / F1):** threatened species 1.00 / 0.80 / 0.89; north–south 1.00 / 0.60 / 0.75; time series 0.80 / 0.80 / 0.80; multispecies 0.56 / 1.00 / 0.72 (over-flagged); new species to the region one true case on dev; new species to science no true case on dev (not measurable here). The "low modulator recall" in the outline came from the scoring, not the model.
+
+### 2026-11-15: Round 3, data type decision rules (abstracts, Haiku 5.5, low effort) — not adopted
+
+**Hypothesis:** `data_type` errors come from listing secondary kinds of data (13 of 23 mismatches add traits, habitat structure or richness computed from counts) and from leaving out the annotators' "presence-only" next to genetic samples (5 of 23). Decision rules (one value, at most two; nothing computed from or measured to explain the records; genetic samples of located individuals are also presence-only) should raise precision from about 0.36 to at least 0.50 without losing recall. Relevance should not move. The 5 density-vs-abundance mismatches were left alone: both are High for the rules, and the dev convention is ambiguous.
+
+**Run:** `artifacts/runs/20261115_220845_r3_data_type_rules_abstract.json`, 0.022 USD, compared with round 2.
+
+**Result:** `data_type` F1 0.40 → 0.50 (precision 0.45, recall 0.56), difference +0.10 [−0.02, +0.20], B better in 95 % of resamples but the interval includes 0. Relevance against the rule label −0.10 [−0.23, +0.03] four-class, also within noise. Micro F1 +0.01 [−0.01, +0.04].
+
+**Decision:** not adopted under the rule set at the start (a change counts only when its paired interval excludes 0). The prompt is reverted to round 2. The direction is consistent with the hypothesis; it can be retested on the PDF input, where more data kinds are mentioned and the effect should be larger.
+
+### 2026-11-15: Effort sweep, Haiku 5.5 (abstracts, round 2 prompt)
+
+**Hypothesis:** more reasoning helps inferred quantities (the spatial extent estimated from place names) more than categorical fields.
+
+**Runs:** low = round 2 run; medium `20261115_220956_effort_haiku_medium_abstract.json`; high `20261115_221040_effort_haiku_high_abstract.json`. Output tokens per record (thinking included) 913 / 1 157 / 1 604; cost 0.021 / 0.022 / 0.028 USD.
+
+**Result (paired against low):**
+- Micro F1: medium −0.01 [−0.03, +0.02], high +0.00 [−0.03, +0.03]. No field gains.
+- Spatial class F1: −0.06 at both medium and high (B better in 3–4 % of resamples), the opposite of the hypothesis.
+- Relevance against the rule label, four-class: medium −0.13 [−0.30, 0.00], high −0.13 [−0.27, −0.03] (loss). Binary F1 −0.08 and −0.05.
+- Why: higher effort does not make the model more cautious; it estimates larger areas (17 records in the High spatial class at medium and high, 14 at low), which pushes categories up.
+
+**Decision:** hypothesis rejected. Low effort stays the default for Haiku: cheaper and at least as good. For Table 4: effort is not a useful lever on this task with this model.
+
+### 2026-11-15: Sonnet 5.5 vs Haiku 5.5 (abstracts, low effort, round 2 prompt)
+
+**Hypothesis:** Sonnet gains on judgment-heavy fields (species, data type) but not on the spatial class; micro gain at most +0.05, so Haiku at about one twentieth of the price stays the default.
+
+**Run:** `artifacts/runs/20261115_221256_sonnet_low_abstract.json`, 0.205 USD (Haiku: 0.021). The guard estimated 0.69 because it ignores prompt caching.
+
+**Result (paired, Sonnet minus Haiku):**
+- Micro F1 +0.04 [+0.01, +0.07]: gain. Species +0.05 [0.00, +0.12] (B better in 97 % of resamples), data type +0.03, threatened species +0.06: small and within noise.
+- Spatial class F1 −0.26 [−0.46, −0.07]: loss. Sonnet leaves 18 of 30 areas empty (Haiku 8).
+- Relevance against the rule label: four-class −0.23 [−0.43, −0.07], binary F1 −0.27 [−0.45, −0.12]: losses. Against the human label: −0.03 and −0.14, within noise.
+- Sonnet writes 220 output tokens per record at low effort (Haiku 913): it barely reasons.
+
+**Reading:** the round 2 prompt contradicts itself. The philosophy block says "Do NOT guess or infer"; the spatial section grants an exception. Haiku follows the exception, Sonnet follows the general rule. A prompt tuned on one model did not transfer to a stronger one because of an internal contradiction, not because of model quality. This is a result for the article's prompt-engineering section.
+
+**Decision:** next round removes the contradiction (the philosophy block names the exception), tested on Haiku first (cheap, must not regress), then once on Sonnet.
+
+### 2026-11-15: Round 4, a prompt without contradiction; and the real noise on relevance
+
+**Hypothesis:** naming the spatial exception in the philosophy block itself ("Do NOT guess or infer… One exception: spatial_range_km2…") restores Sonnet's spatial estimates without changing Haiku.
+
+**Runs (0.259 USD in total):** Haiku with the round 4 prompt `20261115_221358_r4_exception_in_philosophy_haiku.json`; a replicate of round 2 on Haiku with the round 2 prompt unchanged `20261115_221454_r2_replicate_haiku.json`; Sonnet with the round 4 prompt `20261115_221552_r4_exception_in_philosophy_sonnet.json`.
+
+**Noise finding (methods):** the replicate of round 2, same prompt, differs from the first round 2 run by −0.17 [−0.30, −0.03] in four-class relevance against the rule label, and −0.12 on the spatial class. The paired bootstrap resamples records but not the model's own run-to-run randomness, so on relevance it understates the noise. Consequences:
+- Round 2's four-class 0.60 was a favourable draw; across later Haiku runs the level is 0.43–0.50. Its binary gain over round 1 holds (binary F1 0.43 → 0.79–0.86 across the two round 2 runs).
+- From now on, a relevance change counts only if it exceeds the replicate difference, and the effort, round 3 and round 4 "drops" against the first round 2 run are read against the replicate instead: all within run-to-run noise.
+
+**Result:**
+- Haiku, round 4 vs round 2 replicate: equal (spatial class 0.45 vs 0.45; relevance within noise). Round 4 estimates an area for 29 of 30 records (round 2: 22), so it now also sizes places the annotators left without an area.
+- Sonnet, round 4 vs round 2 prompt: spatial class 0.31 → 0.45 (+0.14 [−0.02, +0.34]); relevance against the rule label binary F1 0.59 → 0.83, +0.23 [+0.08, +0.41] (gain), binary accuracy +0.23 (gain). Against the human label within noise.
+- Sonnet vs Haiku, both with the round 4 prompt: relevance equal (four-class 0.47 vs 0.47, binary F1 0.83 vs 0.81). Sonnet keeps a small edge on feature fields (micro F1 about +0.02 to +0.04).
+
+**Decision:** adopt the round 4 prompt (coherent, no loss on Haiku, fixes Sonnet). Haiku 5.5 at low effort stays the working model: same relevance as Sonnet for about one tenth of the cost. Lesson for the article: prompt engineering on a cheap model can hide contradictions that a stronger model resolves the other way; check transfer before comparing models.
+
+### 2026-11-15: Long text on the 16 dev records with a PDF (Haiku 5.5, low effort, round 4 prompt)
+
+**Corpus:** a second PDF pass (per-publisher recipes, PMC open-access bucket on AWS) brought coverage to 47 of 98 (16 of 30 dev, 31 of 68 held-out); see `docs/results/corpus_report.md`. Manifest of the 16 dev records with a PDF: `data/manifests/dev_subset_with_pdf.csv`.
+
+**Hypotheses:** (3) long text raises temporal and spatial recall (the annotators found years in the article for 97 % of records, in the abstract for 24 %) and lowers species precision (more incidental taxa); (5) the native PDF beats PyMuPDF text where maps and tables carry the extent.
+
+**Runs:** `20261115_221703_haiku_pdf_text_dev16.json` (0.052 USD) and `20261115_221727_haiku_pdf_native_dev16.json` (0.093 USD), compared with the round 4 abstract run on the same 16 records.
+
+**Result, PDF text vs abstract (n = 16):**
+- Spatial km² F1 0.08 → 0.64, +0.56 [+0.27, +0.80] (gain); spatial class 0.54 → 0.80, +0.26 [+0.06, +0.52] (gain); temporal class 0.63 → 0.86, +0.23 [−0.02, +0.52] (B better in 96 % of resamples).
+- Species −0.10, data type −0.10, threatened −0.17: lower as predicted for species, within noise. `geospatial_info_dataset` −0.13 [−0.21, −0.05] (loss).
+- Relevance: binary F1 against the rule label 0.75 → 0.86 (+0.11 [−0.04, +0.30]), against the human label 0.70 → 0.81: direction of the outline's claim that long text helps, within noise on 16 records.
+
+**Result, native PDF vs PDF text:** no field gains; spatial class −0.11 [−0.26, 0.00], relevance four-class −0.12. Hypothesis 5 rejected on Haiku: the native PDF costs 1.8 times more and is not better.
+
+**Decision:** PDF text is the main long-text condition; native PDF is kept for the held-out pass as a reported condition (the outline asks for it) but not tuned further. Next: species precision on long text (focal taxa rules), the section input, and direct relevance scoring.
+
+### 2026-11-15: Relevance by the LLM: combined variant (R2) and scoring only (R3), abstracts and PDF text
+
+**Context:** the April "direct" runs on OpenAI were in fact the combined variant (the prompt asked for the features and the category). Scoring only had never been run. Naming from now on: R1 rules on extracted features, R2 combined, R3 scoring only. New code: `prompts/relevance.py` (rules written from the constants of `relevance_rules.py`, plus the spatial-extent guidance), `schemas/relevance.py`, `scripts/run_relevance_variant.py`.
+
+**Hypotheses:** (a) scoring only is worse than R1 on short text, because it skips the feature-by-feature reasoning (the outline's claim); (b) the small scoring schema works with native structured output and removes validation failures (hypothesis 6).
+
+**Runs (Haiku 5.5, low effort, 0.156 USD in total):**
+- R3 abstract, schema in the prompt: `20261115_222127_r3_scoring_abstract.json` — 2 of 30 replies failed validation (the model listed features anyway).
+- R3 abstract, native structured output: `20261115_222213_r3_scoring_abstract_native_so.json` — 0 failures, 0.008 USD for 30 records.
+- R2 abstract `20261115_222252_r2_combined_abstract.json`; R3 PDF text `20261115_222406_r3_scoring_pdf_text_dev16.json`; R2 PDF text `20261115_222429_r2_combined_pdf_text_dev16.json`. R1 = round 4 abstract run and the PDF-text run of the previous entry.
+
+**Result (dev, against the rule label / the human label):**
+
+| Approach | Input | n | Four-class (rule) | Binary F1 (rule) | Four-class (human) | Binary F1 (human) |
+|---|---|---|---|---|---|---|
+| R1 rules on features | abstract | 30 | 0.47 | 0.81 | 0.33 | 0.70 |
+| R2 combined | abstract | 30 | 0.57 | 0.86 | 0.40 | 0.77 |
+| R3 scoring only | abstract | 30 | 0.43 | 0.81 | 0.30 | 0.65 |
+| R1 rules on features | PDF text | 16 | 0.50 | 0.86 | 0.31 | 0.81 |
+| R2 combined | PDF text | 16 | 0.44 | 0.88 | 0.19 | 0.75 |
+| R3 scoring only | PDF text | 16 | 0.38 | 0.77 | 0.31 | 0.72 |
+
+- Every paired difference between approaches is within run-to-run noise (four-class moves by up to 0.17 between identical runs). On dev, no approach wins.
+- Hypothesis (a) not supported: scoring only is not clearly worse than R1 on short text.
+- Hypothesis (b) confirmed: native structured output accepts the small schema and removes validation failures; the large feature schema is still rejected ("too complex").
+- R2 applies the rules faithfully: its category equals the rules applied to its own extracted features in 26 of 30 records. It over-rates (12 of 30 too high against the rule label, 17 against the human label).
+- Agreement with the human label (four-class 0.19–0.40) stays below the agreement between the rule label and the human label on dev (0.63), the ceiling.
+
+**Reading:** in April, the gap between short and long text (combined variant on gpt-5-mini: binary F1 0.55 on abstracts, 0.88 on PDFs) looked like a lack of information in abstracts. With the spatial extent estimated from named places, short text reaches the same level (0.86 vs 0.88). On this evidence most of the April gap came from the instruction not to infer the area, not from the abstracts. To be confirmed on the held-out set, which has 68 abstracts and 31 PDFs, enough to separate approaches by more than the noise.
+
+**Decision:** all three approaches go to the held-out pass on both inputs; R3 with native structured output. No more tuning of the relevance prompts on dev: differences there are within noise.

@@ -15,10 +15,13 @@ If you currently have dicts (e.g. rows from a DataFrame), validate first:
 
 from __future__ import annotations
 
+import warnings
 from dataclasses import dataclass, field
 from typing import Any, Callable, Hashable, Iterable, Optional, Sequence
 
 from pydantic import BaseModel
+
+from llm_metadata.relevance_rules import spatial_range_class, temporal_range_class
 
 
 @dataclass(frozen=True)
@@ -198,6 +201,25 @@ DEFAULT_FIELD_STRATEGIES: dict[str, FieldEvalStrategy] = {
 }
 # temporal_range: DROPPED — redundant with temp_range_i/temp_range_f
 # referred_dataset: DROPPED — too rare in GT, noisy annotations
+
+
+def _class_or_none(label: str) -> Optional[str]:
+	"""Class letter, or None when the rules say X ("not stated")."""
+	return None if label == "X" else label
+
+
+#: Class-level fields computed at evaluation time from the extracted values, using the
+#: same class functions as the relevance rules (relevance_rules.py). H, M and L are the
+#: classes; None means "not stated" (the rules' X). Scoring follows the scalar
+#: convention: right class = TP, wrong class = FP + FN, class where none is annotated =
+#: FP, class annotated but none given = FN, both not stated = TN.
+#: Enable one by listing it in `field_strategies` (see configs/eval_article.json).
+DERIVED_FIELDS: dict[str, Callable[[dict[str, Any]], Optional[str]]] = {
+	"spatial_range_class": lambda d: _class_or_none(spatial_range_class(d.get("spatial_range_km2"))),
+	"temporal_range_class": lambda d: _class_or_none(
+		temporal_range_class(d.get("temp_range_i"), d.get("temp_range_f"))
+	),
+}
 
 
 @dataclass
@@ -397,6 +419,9 @@ class EvaluationReport:
 		from pathlib import Path
 
 		doc = json.loads(Path(path).read_text())
+		if "field_results" not in doc and isinstance(doc.get("evaluation"), dict):
+			# Run artifact written by prompt_eval: the report sits under "evaluation".
+			doc = doc["evaluation"]
 		config = EvaluationConfig.from_dict(doc.get("config", {}))
 
 		field_results = []
@@ -531,6 +556,15 @@ def _normalize_value(value: Any, config: EvaluationConfig) -> Any:
 	return value
 
 
+def _flag_true(value: Any) -> bool:
+	"""True only for an explicit yes (True, "true", "yes", "1"); None and False are no."""
+	if value is True:
+		return True
+	if isinstance(value, str):
+		return value.strip().lower() in ("true", "yes", "1")
+	return False
+
+
 def _is_set_like(value: Any) -> bool:
 	return isinstance(value, (set, frozenset))
 
@@ -552,6 +586,24 @@ def compare_models(
 	pred_data = pred_model.model_dump(mode="python")
 
 	if config.field_strategies:
+		for name, derive in DERIVED_FIELDS.items():
+			if name in config.field_strategies:
+				true_data[name] = derive(true_data)
+				pred_data[name] = derive(pred_data)
+		unknown = sorted(
+			name for name in config.field_strategies
+			if name not in true_data and name not in pred_data
+		)
+		if unknown:
+			# A registry name that matches no model field would silently score every
+			# record as "both empty" (TN) and show N/A for P/R/F1.
+			warnings.warn(
+				f"field_strategies lists fields that exist on neither model and will be "
+				f"scored as empty: {unknown}",
+				stacklevel=2,
+			)
+
+	if config.field_strategies:
 		# Strategy-registry mode: use registry keys as the canonical field list.
 		registry_keys = list(config.field_strategies.keys())
 		if fields is None:
@@ -571,6 +623,20 @@ def compare_models(
 		# --- Strategy-registry dispatch (takes priority when field_strategies is populated) ---
 		if config.field_strategies:
 			strategy = config.field_strategies[field]
+
+			if strategy.match == "flag":
+				# Yes/no flag where "not stated" (None) means the same as False, as in the
+				# relevance rules. Only True is a positive: TP = both True, FP = predicted True
+				# only, FN = annotated True only, TN = neither. So recall is "recall of the
+				# flagged datasets", not agreement on False values.
+				t_flag, p_flag = _flag_true(true_raw), _flag_true(pred_raw)
+				results.append(FieldResult(
+					record_id=record_id, field=field, true_value=true_raw, pred_value=pred_raw,
+					match=t_flag == p_flag,
+					tp=int(t_flag and p_flag), fp=int(p_flag and not t_flag),
+					fn=int(t_flag and not p_flag), tn=int(not t_flag and not p_flag),
+				))
+				continue
 
 			if strategy.match == "enhanced_species":
 				if isinstance(true_raw, (list, tuple)) or isinstance(pred_raw, (list, tuple)):
@@ -1301,3 +1367,130 @@ class EnhancedSpeciesMatchConfig:
 	threshold: int = 70  # Minimum similarity score (0-100)
 	use_enhanced_matching: bool = True  # Use enhanced species matching logic
 
+
+# =============================================================================
+# Bootstrap confidence intervals
+# =============================================================================
+
+#: Metrics reported with an interval. "exact_match_rate" is the share of records where the
+#: field matched exactly (for class-level fields: the class accuracy, "not stated" included).
+BOOTSTRAP_METRICS = ("precision", "recall", "f1", "exact_match_rate")
+
+MICRO_KEY = "__micro__"
+
+
+@dataclass(frozen=True)
+class Interval:
+	"""A metric with its bootstrap percentile interval. None when undefined."""
+
+	point: Optional[float]
+	low: Optional[float]
+	high: Optional[float]
+	n_defined: int = 0  # replicates where the metric was defined
+
+	def format(self, digits: int = 2) -> str:
+		if self.point is None:
+			return "N/A"
+		if self.low is None or self.high is None:
+			return f"{self.point:.{digits}f}"
+		return f"{self.point:.{digits}f} [{self.low:.{digits}f}, {self.high:.{digits}f}]"
+
+
+def _metrics_from_counts(tp, fp, fn, exact, n):
+	"""Vectorised P, R, F1, exact-match rate from count arrays (nan when undefined)."""
+	import numpy as np
+
+	tp, fp, fn, exact, n = (np.asarray(a, dtype=float) for a in (tp, fp, fn, exact, n))
+	with np.errstate(divide="ignore", invalid="ignore"):
+		p = np.where(tp + fp > 0, tp / (tp + fp), np.nan)
+		r = np.where(tp + fn > 0, tp / (tp + fn), np.nan)
+		# 2TP / (2TP + FP + FN): equals 2PR / (P + R) when defined, and is 0 (not undefined)
+		# when there are positives but no true positive.
+		f1 = np.where(2 * tp + fp + fn > 0, 2 * tp / (2 * tp + fp + fn), np.nan)
+		em = np.where(n > 0, exact / n, np.nan)
+	return {"precision": p, "recall": r, "f1": f1, "exact_match_rate": em}
+
+
+def bootstrap_report(
+	report_or_path: "EvaluationReport | str | Any",
+	*,
+	n_boot: int = 1000,
+	seed: int = 0,
+	confidence: float = 0.95,
+	fields: Optional[Sequence[str]] = None,
+	records: Optional[Iterable[Hashable]] = None,
+) -> dict[str, dict[str, Interval]]:
+	"""Bootstrap confidence intervals for every field and the micro average.
+
+	Records are resampled with replacement (all fields of a record move together), counts
+	are re-summed per field, and P, R, F1 and exact-match rate are recomputed on each
+	replicate. Intervals are percentile intervals (default 95 %). The point estimate is the
+	value on the original sample. A replicate where a metric is undefined (for example no
+	predicted positives, so precision has no denominator) is left out for that metric;
+	``n_defined`` says how many replicates were usable.
+
+	Args:
+		report_or_path: an ``EvaluationReport``, or the path of a run artifact or saved
+			report JSON (``artifacts/runs/*.json``).
+		n_boot: number of replicates (default 1000).
+		seed: seed of the random generator (default 0, so results are reproducible).
+		confidence: interval level (default 0.95).
+		fields: restrict to these fields (the micro average then covers only them).
+		records: restrict to these record ids (compared as strings).
+
+	Returns:
+		``{field: {metric: Interval}}`` plus the key ``"__micro__"`` (counts summed over
+		the selected fields, then metrics derived).
+	"""
+	import numpy as np
+
+	report = report_or_path
+	if not isinstance(report, EvaluationReport):
+		report = EvaluationReport.load(report_or_path)
+
+	keep_records = None if records is None else {str(r) for r in records}
+	rows = [
+		r for r in report.field_results
+		if (keep_records is None or str(r.record_id) in keep_records)
+		and (fields is None or r.field in fields)
+	]
+	field_names = sorted({r.field for r in rows})
+	rec_ids = sorted({str(r.record_id) for r in rows})
+	if not rows:
+		return {}
+	f_idx = {f: i for i, f in enumerate(field_names)}
+	r_idx = {rid: i for i, rid in enumerate(rec_ids)}
+	# counts[record, field, (tp, fp, fn, exact, n)]
+	counts = np.zeros((len(rec_ids), len(field_names), 5))
+	for r in rows:
+		cell = counts[r_idx[str(r.record_id)], f_idx[r.field]]
+		cell += (r.tp, r.fp, r.fn, 1 if r.match else 0, 1)
+
+	rng = np.random.default_rng(seed)
+	picks = rng.integers(0, len(rec_ids), size=(n_boot, len(rec_ids)))
+	boot = counts[picks].sum(axis=1)  # (n_boot, fields, 5)
+	point = counts.sum(axis=0)  # (fields, 5)
+	lo_q, hi_q = (1 - confidence) / 2 * 100, (1 + confidence) / 2 * 100
+
+	def build(point_counts, boot_counts) -> dict[str, Interval]:
+		pm = _metrics_from_counts(*(point_counts[..., k] for k in range(5)))
+		bm = _metrics_from_counts(*(boot_counts[..., k] for k in range(5)))
+		out = {}
+		for metric in BOOTSTRAP_METRICS:
+			p = float(pm[metric])
+			vals = bm[metric][~np.isnan(bm[metric])]
+			if np.isnan(p):
+				out[metric] = Interval(None, None, None, int(len(vals)))
+			elif len(vals) == 0:
+				out[metric] = Interval(p, None, None, 0)
+			else:
+				lo, hi = np.percentile(vals, [lo_q, hi_q])
+				out[metric] = Interval(p, float(lo), float(hi), int(len(vals)))
+		return out
+
+	result = {f: build(point[i], boot[:, i, :]) for f, i in f_idx.items()}
+	# Micro average over primary fields only: the derived class fields restate the km2 and
+	# year fields, so including them would count spatial and temporal facts twice.
+	primary = [i for f, i in f_idx.items() if f not in DERIVED_FIELDS] or list(f_idx.values())
+	result[MICRO_KEY] = build(point[primary].sum(axis=0), boot[:, primary, :].sum(axis=1))
+	return result

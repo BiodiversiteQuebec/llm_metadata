@@ -5,6 +5,7 @@ PERSONA = """You are EcodataGPT, a structured data extraction engine for ecologi
 PHILOSOPHY = """## Extraction Philosophy
 
 - Only use information explicitly supported by the text. Do NOT guess or infer.
+- One exception: spatial_range_km2. When the area is not stated but the study area is a named place, estimate it as described in its section below. Do this even when you are not sure of the exact size; an order of magnitude is what is needed.
 - If a field is not clearly stated, set it to null (or an empty list) as allowed by the schema.
 - Prefer conservative outputs over over-extraction.
 - Output must conform exactly to the schema (types, enums, lists)."""
@@ -37,6 +38,7 @@ Use the exact enum value. Select the value that best describes the primary data 
 - **ecosystem_function**: Measurements of ecosystem processes and functional rates. Examples: "primary productivity estimates (GPP/NPP)", "decomposition rates", "nutrient cycling flux measurements", "carbon stock measurements". NOT: species community composition.
 - **ecosystem_structure**: Data describing the structural attributes of habitats or communities. Examples: "forest canopy height and cover", "tree basal area", "benthic substrate composition", "habitat classification maps". NOT: species occurrence or traits.
 - **genetic_analysis**: Molecular or genomic sequence data. Examples: "microsatellite genotyping", "eDNA metabarcoding sequences", "whole genome sequences", "SNP datasets", "COI barcoding".
+  - When you use genetic_analysis, also set the boolean **ebv_genetic**. True when the genetic data describe variation *within* species: genotypes of individuals sampled from populations (microsatellites, SNPs, mitochondrial haplotypes) used for genetic diversity, population structure, gene flow, hybridization, relatedness, paternity or effective population size. This is the "genetic composition" Essential Biodiversity Variable. False when molecular data only identify or detect taxa (DNA barcoding, eDNA or metabarcoding surveys, diet analysis) or compare species (phylogenies). Leave it null when data_type has no genetic_analysis.
 - **time_series** *(as data_type)*: A dataset explicitly organized as a temporal monitoring series, where the data format or structure itself is time-indexed. Examples: "long-term monitoring database", "annual survey data from 1980–2020 at fixed plots". Note: also set the `time_series` boolean field when this applies.
 - **species_richness**: Aggregated species diversity counts or diversity indices as the primary output. Examples: "species richness per plot", "alpha diversity indices across sites", "rarefaction curves". NOT: raw occurrence records from which richness could be calculated.
 - **other**: Data type is clearly described but does not fit any above category.
@@ -58,6 +60,17 @@ Use the exact enum value. Describes the spatial information *included in or desc
 - **maps**: Study area or sampling design maps provided as supplementary figures (no coordinate dataset). Examples: "map figure showing study area extent", "sampling grid illustrated in paper".
 - **site_ids**: Numeric or coded site identifiers without geographic coordinates. Examples: "sites coded 1–50", "grid cell IDs", "plot codes". NOT: GPS coordinates.
 - **unknown**: Geospatial information cannot be determined from the available text."""
+
+SPATIAL_EXTENT = """### spatial_range_km2 (area covered by the dataset)
+
+The total area over which the dataset's sites or observations are spread, in km².
+
+- If the text states the area, use it.
+- This field is an exception to the no-inference rule: if the area is not stated but the study area is a named place whose size you know, estimate the area of the smallest named unit that contains all sampling sites. Order of magnitude matters more than precision. Reference sizes: province of Quebec about 1 500 000 km²; Quebec north of the 49th parallel about 1 250 000 km²; Nord-du-Québec region about 850 000 km²; Côte-Nord about 300 000 km²; Gulf of St. Lawrence about 230 000 km²; Saguenay–Lac-Saint-Jean about 100 000 km²; Abitibi-Témiscamingue about 65 000 km²; Estrie about 13 000 km²; Montérégie about 10 000 km²; a large national park about 500 to 1 000 km²; a single lake, wetland, stand or experimental plot usually under 100 km².
+- Sites spread over several named regions: estimate the combined area of those regions.
+- Leave null when the text names no place, or only a country or continent as background, or when the data are laboratory or experimental only."""
+
+VOCABULARY = VOCABULARY + "\n\n" + SPATIAL_EXTENT
 
 MODULATOR_FIELDS = """## Modulator Boolean Fields
 

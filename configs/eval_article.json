@@ -1,0 +1,68 @@
+{
+  "description": "Article evaluation: the default per-field strategies (eval_default.json, with the corrected geospatial_info_dataset name) plus class-level scoring of spatial and temporal range (classes H/M/L from relevance_rules.py; 'not stated' = no class). Yes/no fields use the 'flag' strategy: not stated counts as False and only True is a positive, as in the relevance rules.",
+  "casefold_strings": true,
+  "strip_strings": true,
+  "collapse_whitespace": true,
+  "treat_lists_as_sets": true,
+  "enhanced_species_matching": false,
+  "enhanced_species_threshold": 70,
+  "fuzzy_match_fields": {},
+  "field_strategies": {
+    "temp_range_i": {
+      "match": "exact",
+      "threshold": 80
+    },
+    "temp_range_f": {
+      "match": "exact",
+      "threshold": 80
+    },
+    "spatial_range_km2": {
+      "match": "exact",
+      "threshold": 80
+    },
+    "data_type": {
+      "match": "exact",
+      "threshold": 80
+    },
+    "geospatial_info_dataset": {
+      "match": "exact",
+      "threshold": 80
+    },
+    "species": {
+      "match": "enhanced_species",
+      "threshold": 70
+    },
+    "time_series": {
+      "match": "flag",
+      "threshold": 80
+    },
+    "multispecies": {
+      "match": "flag",
+      "threshold": 80
+    },
+    "threatened_species": {
+      "match": "flag",
+      "threshold": 80
+    },
+    "new_species_science": {
+      "match": "flag",
+      "threshold": 80
+    },
+    "new_species_region": {
+      "match": "flag",
+      "threshold": 80
+    },
+    "bias_north_south": {
+      "match": "flag",
+      "threshold": 80
+    },
+    "spatial_range_class": {
+      "match": "exact",
+      "threshold": 80
+    },
+    "temporal_range_class": {
+      "match": "exact",
+      "threshold": 80
+    }
+  }
+}

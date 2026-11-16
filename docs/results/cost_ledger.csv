@@ -1,2 +1,20 @@
 date,run,model,effort,mode,records,budget_line,estimated_usd,actual_usd,cumulative_usd,note
 2026-11-15,20261115_082643_haiku55_abstract_low,claude-haiku-5-5,low,abstract,30,prompt_rounds,,0.0276,0.0276,First Claude baseline on the dev subset (before this plan's execution)
+2026-11-15,adapter_smoke_test,claude-haiku-5-5,low,abstract x2 + pdf_native + pdf_text + structured-output attempt,1,prompt_rounds,0.0100,0.0100,0.0376,Adapter end-to-end check on dev record 9; native structured output rejected (schema too complex; no charge)
+2026-11-15,20261115_100154_haiku55_abstract_low_repeat,claude-haiku-5-5,low,abstract,30,model_effort_comparison,0.0398,0.0176,0.0552,Repeatability rerun of the baseline (noise floor)
+2026-11-15,20261115_220315_r1_ebv_genetic_abstract,claude-haiku-5-5,low,abstract,30,prompt_rounds,0.0409,0.0178,0.0730,Round 1: EBV genetic flag
+2026-11-15,20261115_220455_r2_spatial_estimate_abstract,claude-haiku-5-5,low,abstract,30,prompt_rounds,0.0422,0.0213,0.0943,Round 2: spatial extent estimated from named places
+2026-11-15,20261115_220845_r3_data_type_rules_abstract,claude-haiku-5-5,low,abstract,30,prompt_rounds,0.0430,0.0217,0.1160,Round 3: data type decision rules (not adopted)
+2026-11-15,20261115_220956_effort_haiku_medium_abstract,claude-haiku-5-5,medium,abstract,30,model_effort_comparison,0.0647,0.0217,0.1377,Effort sweep
+2026-11-15,20261115_221040_effort_haiku_high_abstract,claude-haiku-5-5,high,abstract,30,model_effort_comparison,0.0647,0.0284,0.1661,Effort sweep
+2026-11-15,20261115_221256_sonnet_low_abstract,claude-sonnet-5-5,low,abstract,30,model_effort_comparison,0.6934,0.2051,0.3712,Sonnet vs Haiku on abstracts (estimate ignores caching)
+2026-11-15,20261115_221358_r4_exception_in_philosophy_haiku,claude-haiku-5-5,low,abstract,30,prompt_rounds,0.0430,0.0221,0.3933,Round 4: exception named in philosophy
+2026-11-15,20261115_221454_r2_replicate_haiku,claude-haiku-5-5,low,abstract,30,prompt_rounds,0.0430,0.0176,0.4109,Replicate of round 2 (noise)
+2026-11-15,20261115_221552_r4_exception_in_philosophy_sonnet,claude-sonnet-5-5,low,abstract,30,model_effort_comparison,0.6934,0.2193,0.6302,Round 4 prompt on Sonnet
+2026-11-15,20261115_221703_haiku_pdf_text_dev16,claude-haiku-5-5,low,pdf_text,16,prompt_rounds,0.0683,0.0518,0.6820,Long text: PDF text
+2026-11-15,20261115_221727_haiku_pdf_native_dev16,claude-haiku-5-5,low,pdf_native,16,prompt_rounds,0.1090,0.0932,0.7752,Long text: native PDF
+2026-11-15,20261115_222127_r3_scoring_abstract,claude-haiku-5-5,low,abstract,30,relevance_direct,,0.0152,0.7904,R3 scoring only (2 validation failures)
+2026-11-15,20261115_222213_r3_scoring_abstract_native_so,claude-haiku-5-5,low,abstract,30,relevance_direct,,0.0081,0.7985,R3 scoring only native structured output
+2026-11-15,20261115_222252_r2_combined_abstract,claude-haiku-5-5,low,abstract,30,relevance_direct,,0.0277,0.8262,R2 combined
+2026-11-15,20261115_222406_r3_scoring_pdf_text_dev16,claude-haiku-5-5,low,pdf_text,16,relevance_direct,,0.0494,0.8756,R3 scoring only PDF text
+2026-11-15,20261115_222429_r2_combined_pdf_text_dev16,claude-haiku-5-5,low,pdf_text,16,relevance_direct,,0.0559,0.9315,R2 combined PDF text

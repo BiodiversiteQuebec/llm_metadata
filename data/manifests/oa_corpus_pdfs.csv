@@ -1,0 +1,99 @@
+gt_record_id,split,source,article_doi,pdf_url_used,pdf_source,licence,sha256,pages,status,failure_reason,text_source,preprint
+4,heldout,zenodo,10.5281/zenodo.5898699,,,other-oa,,,unreachable,no open PDF location found (unpaywall: no record),none,
+5,dev,zenodo,10.1093/jhered/esx103,,,,,,unreachable,recipe:oxford: HTTP 403 academic.oup.com,none,
+9,dev,dryad,10.1371/journal.pone.0128238,,preexisting,cc-by,972a2495d7d80c9cdc6fb15432b3900bc9d5089cd8e730b2690d2cc9c04ca69a,18,ok,,pdf,false
+11,dev,zenodo,10.1371/journal.pone.0073695,,preexisting,cc-by,0cf5d359cde7fdba70ce41aed1350ec18eab861aeb133292c8a2d8d5d87e3c2a,9,ok,,pdf,false
+12,dev,zenodo,10.1002/ece3.4685,https://pmc-oa-opendata.s3.amazonaws.com/PMC6309006.1/PMC6309006.1.pdf,pmc_s3,cc-by,1beb63ba7a7971e86c0994767f5028f34d1efcc186b47a5964af80edf695df26,12,ok,,pdf,false
+19,dev,dryad,10.1093/jhered/esw073,,,,,,unreachable,recipe:oxford: HTTP 403 academic.oup.com,none,
+24,dev,zenodo,10.1002/ece3.3906,https://depositum.uqat.ca/id/eprint/1048/1/graignicetal_ee_2018.pdf,repository,cc-by,721124ece914752a9d355a7a8a48050eb8f95fac845cf00092da5f3f3d3ef38d,15,ok,,pdf,false
+27,dev,dryad,10.1111/ddi.12496,,,,,,unreachable,recipe:wiley: HTTP 403 onlinelibrary.wiley.com,none,
+29,dev,dryad,10.1002/ece3.1476,https://pmc-oa-opendata.s3.amazonaws.com/PMC4485965.1/PMC4485965.1.pdf,pmc_s3,cc-by,212529df30e76de79e3a6856026eedecd9bf09d7a91bfd348f041a64f66bff52,17,ok,,pdf,false
+30,dev,dryad,10.1186/s40462-016-0079-4,https://pmc-oa-opendata.s3.amazonaws.com/PMC4837602.1/PMC4837602.1.pdf,pmc_s3,cc-by,7e14520b306ac8cf05b8a7d8f8a9d16b021f3527beecc5d4337c21bc0a52ec16,12,ok,,pdf,false
+31,dev,dryad,10.1111/eva.12028,https://pmc-oa-opendata.s3.amazonaws.com/PMC3673475.1/PMC3673475.1.pdf,pmc_s3,cc-by,5be6f058684df804ca5870bc48717144e20a56bd7fd36a5a3e09af9c5136fbcf,14,ok,,pdf,false
+36,heldout,dryad,10.1002/ece3.3947,https://pmc-oa-opendata.s3.amazonaws.com/PMC5916269.1/PMC5916269.1.pdf,pmc_s3,cc-by,0bd6a7452ac7ee1baa3fea34ef7ea8aced7e0a96f36bad6ffea8350a6407f659,13,ok,,pdf,false
+37,dev,dryad,10.1002/ece3.1029,https://pmc-oa-opendata.s3.amazonaws.com/PMC4063464.1/PMC4063464.1.pdf,pmc_s3,cc-by,24fb4572f665331fc91aaba87f07fbdf4811cf45dd80604ad74edfe201ef1354,19,ok,,pdf,false
+38,dev,zenodo,10.1371/journal.pone.0204445,,preexisting,cc-by,188a720f96b90996acaabd3012b50797e0c032222d63a9ead9d6fb69ec532938,18,ok,,pdf,false
+39,dev,dryad,10.1098/rspb.2014.0649,,,,,,unreachable,no PDF or XML in PMC open-access bucket; openalex: HTTP 403 royalsocietypublishing.org,none,
+43,heldout,zenodo,10.1111/1365-2664.12598,,,,,,unreachable,openalex: HTTP 403 onlinelibrary.wiley.com,none,
+48,heldout,zenodo,10.1002/ecs2.1788,,,cc-by,,,unreachable,openalex: HTTP 403 esajournals.onlinelibrary.wiley.com; recipe:wiley: HTTP 403 onlinelibrary.wiley.com,none,
+51,heldout,dryad,10.1111/j.1420-9101.2010.02223.x,https://pmc-oa-opendata.s3.amazonaws.com/PMC3085125.1/PMC3085125.1.pdf,pmc_s3,cc-by,bdbb62db82eab8e4ca42ff085b478959818602e49697ccf96bdea74ffbd9b9ed,16,ok,,pdf,false
+52,heldout,dryad,10.1111/j.1365-294x.2009.04370.x,,,,,,unreachable,recipe:wiley: HTTP 403 onlinelibrary.wiley.com,none,
+53,heldout,dryad,10.1038/hdy.2013.54,https://www.nature.com/articles/hdy201354.pdf,openalex,,40a70347283dcc0fa4839f530f15470bf38dd186af41d8feca8ae942bd5b9579,9,ok,,pdf,false
+54,heldout,dryad,10.1002/eap.1713,https://amu.hal.science/hal-01896060v1/file/Martins%20et%20al%202018%20Ecological%20Applications%2028%284%29%2C%20pp.%201093%E2%80%931105.pdf,repository,other-oa,172d89f1be757676e366aac5febe2971917d339e90bb933ee2c710e9cc23057f,14,ok,,pdf,true
+56,dev,zenodo,10.1111/eva.12315,https://pmc-oa-opendata.s3.amazonaws.com/PMC4662344.1/PMC4662344.1.pdf,pmc_s3,cc-by,168d32937bad79c670d70176c92342f4bb58bb7369717396460bf8f021312805,12,ok,,pdf,false
+65,heldout,zenodo,10.3389/fpls.2019.00932,https://www.frontiersin.org/articles/10.3389/fpls.2019.00932/pdf,openalex,cc-by,a464f293c090bb465a85897c987df06f7b109539dc65634c8aae06cd0282178b,12,ok,,pdf,false
+68,heldout,zenodo,10.1111/1365-2664.13497,,,public-domain,,,unreachable,openalex: HTTP 404 espace.inrs.ca; recipe:wiley: HTTP 403 onlinelibrary.wiley.com,none,
+71,dev,zenodo,10.1111/1365-2664.12675,,,,,,unreachable,openalex: HTTP 403 besjournals.onlinelibrary.wiley.com; recipe:wiley: HTTP 403 onlinelibrary.wiley.com,none,
+74,heldout,zenodo,10.1098/rspb.2015.0973,,,,,,unreachable,no PDF or XML in PMC open-access bucket; semanticscholar: HTTP 403 www.ncbi.nlm.nih.gov; recipe:royal_society: HTTP 403 royalsocietypublishing.org,none,
+78,heldout,dryad,10.1098/rspb.2014.1779,,,,,,unreachable,no PDF or XML in PMC open-access bucket; semanticscholar: HTTP 403 www.ncbi.nlm.nih.gov; recipe:royal_society: HTTP 403 royalsocietypublishing.org,none,
+84,heldout,zenodo,10.1111/1365-2745.13087,,,,,,unreachable,recipe:wiley: HTTP 403 onlinelibrary.wiley.com,none,
+89,dev,zenodo,10.1890/12-2118.1,,,,,,unreachable,manifest: HTTP 403 onlinelibrary.wiley.com,none,
+91,dev,dryad,10.1002/ece3.1266,https://pmc-oa-opendata.s3.amazonaws.com/PMC4242565.1/PMC4242565.1.pdf,pmc_s3,cc-by,8b10517a5e122d747b6454f608f44ef049781e9895be6e5e530db97be85b473c,20,ok,,pdf,false
+98,heldout,zenodo,10.1002/ece3.3397,https://pmc-oa-opendata.s3.amazonaws.com/PMC5773324.1/PMC5773324.1.pdf,pmc_s3,cc-by,9fc10aabccf20eb9fb3685a25ad3f80afe2204c202bf80b3c093a8c41dead513,12,ok,,pdf,false
+101,dev,zenodo,10.1371/journal.pone.0077514,,preexisting,cc-by,405f1c274cf3a366ff40cc0c8ba477f95953bedbd88ee7e2023d60674fbf6c94,11,ok,,pdf,false
+104,dev,zenodo,10.1038/s41598-018-34822-9,,preexisting,cc-by,17b97fc17cb9e5598f8f983fef39458a12841581443ce45d5c178522cb93bcf3,10,ok,,pdf,false
+105,heldout,dryad,10.1038/hdy.2016.92,https://www.nature.com/articles/hdy201692.pdf,openalex,,fa903787fb6477043f3f9fa099d9db85eb4f3d1dac7471fa440d489062016dd9,10,ok,,pdf,false
+110,heldout,zenodo,10.1371/journal.pone.0107929,https://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0107929&type=printable,openalex,public-domain,b0fbb8fbe2810b269db8b739f4bc1735a44e9365f4eb6e3c6dfb7d23e81901a9,8,ok,,pdf,false
+111,heldout,zenodo,10.1002/ece3.1086,https://depositum.uqat.ca/id/eprint/1043/1/prioletal_ee_2014.pdf,repository,cc-by,46b7edd50630a1fc5a4fc9308f18aca43a9fdedb4d2188b49df4d38432d24fec,13,ok,,pdf,false
+117,heldout,dryad,10.1093/jhered/esaa023,https://www.biorxiv.org/content/biorxiv/early/2020/05/01/2020.04.22.053165.full.pdf,repository,,2b8dd06051c44dd1f5241d3d83f7804f4c43aeb04a245981ca7d4002dbc85a8d,18,ok,,pdf,true
+121,heldout,dryad,10.1600/036364416x692514,,,,,,unreachable,"manifest: HTML page, not a PDF (bioone.org)",none,
+123,dev,dryad,10.1098/rspb.2014.0502,,,,,,unreachable,no PDF or XML in PMC open-access bucket; openalex: HTTP 403 royalsocietypublishing.org; repository: HTTP 410 doc.rero.ch,none,
+124,heldout,zenodo,10.1371/journal.pone.0162325,https://spectrum.library.concordia.ca/982273/1/fraser-pone-2016.pdf,repository,cc-by,e947b9fc88a19847da01fd11095ff39eb1d902bc3d082e9a709b6235486933bc,23,ok,,pdf,false
+125,heldout,dryad,10.1111/1365-2664.12517,,,,,,unreachable,openalex: HTTP 403 onlinelibrary.wiley.com,none,
+127,heldout,dryad,10.1371/journal.pone.0176706,https://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0176706&type=printable,openalex,cc-by,03563a0b9946f296af46b928b952635fc6a8265fed4a3d4e655dadfea8653166,20,ok,,pdf,false
+130,heldout,dryad,10.1111/1365-2745.12473,,,,,,unreachable,recipe:wiley: HTTP 403 onlinelibrary.wiley.com,none,
+132,heldout,dryad,10.1111/j.1420-9101.2011.02418.x,,,,,,unreachable,recipe:wiley: HTTP 403 onlinelibrary.wiley.com,none,
+136,heldout,dryad,10.1111/1365-2745.13123,,,,,,unreachable,recipe:wiley: HTTP 403 onlinelibrary.wiley.com,none,
+139,heldout,zenodo,10.1111/1365-2656.12269,,,,,,unreachable,openalex: HTTP 403 onlinelibrary.wiley.com,none,
+141,heldout,dryad,10.1111/2041-210x.12470,,,,,,unreachable,openalex: HTTP 403 onlinelibrary.wiley.com; semanticscholar: HTTP 403 besjournals.onlinelibrary.wiley.com,none,
+151,heldout,zenodo,10.1534/g3.119.400498,https://www.osti.gov/servlets/purl/1637329,repository,cc-by,160dcc01b2775b60a0b3a95fe802c60fe600213df35e683fbf69448ba4719e6c,12,ok,,pdf,false
+153,heldout,zenodo,10.1002/ece3.7260,https://pmc-oa-opendata.s3.amazonaws.com/PMC8019032.1/PMC8019032.1.pdf,pmc_s3,cc-by,ebbc405e5ec371227dd60f4e01d82086bf4ee213e1ab18b33625caf6013adbe0,18,ok,,pdf,false
+155,heldout,zenodo,10.5281/zenodo.2231046,,,cc-by,,,unreachable,no open PDF location found (unpaywall: no record),none,
+158,heldout,zenodo,10.3897/bdj.8.e49450,https://bdj.pensoft.net/article/49450/download/pdf/,manifest,cc-by,cbfb6a489f8ca704a0026f4a38b3dc103ec0789036baf3ef97918052338ca2fe,26,ok,,pdf,false
+162,heldout,zenodo,10.1111/j.1752-4571.2012.00238.x,,,cc-by,,,unreachable,no PDF or XML in PMC open-access bucket; openalex: HTTP 403 onlinelibrary.wiley.com,none,
+163,heldout,semantic_scholar,10.3390/rs12060922,,,cc-by,,,unreachable,openalex: HTTP 403 www.mdpi.com,none,
+171,heldout,semantic_scholar,10.1093/oxfordjournals.molbev.a004014,,,,,,unreachable,openalex: HTTP 403 academic.oup.com,none,
+172,heldout,semantic_scholar,10.3390/f10040325,https://publications.polymtl.ca/4832/1/2019_C%C3%B4t%C3%A9_Conceptual_model_forest_naturalness_assessment.pdf,repository,cc-by,77c2ab51cb9cabead12d58fb4408d53c844538fff9064cb4f65326dd169d4741,30,ok,,pdf,false
+175,dev,semantic_scholar,10.5558/tfc76653-4,,,,,,unreachable,openalex: HTTP 403 pubs.cif-ifc.org; recipe:csp: HTTP 403 cdnsciencepub.com,none,
+188,heldout,semantic_scholar,10.3390/rs11232745,https://constellation.uqac.ca/5392/1/Khare_et_al_2019_RS.pdf,repository,cc-by,7974de488f8a72b87b4953dfa10e5107b8432ab844e19f16195e9b5eeb6dba54,16,ok,,pdf,false
+189,heldout,semantic_scholar,10.1139/x95-150,,,cc-by-nc-nd,,,unreachable,"semanticscholar: HTML page, not a PDF (constellation.uqac.ca); recipe:csp: HTTP 403 cdnsciencepub.com",none,
+192,heldout,semantic_scholar,10.2307/1369707,,,,,,unreachable,openalex: HTTP 403 academic.oup.com; repository: HTTP 403 digitalcommons.usf.edu,none,
+193,heldout,semantic_scholar,10.1139/b88-015,,,cc-by-nc-nd,,,unreachable,"semanticscholar: HTML page, not a PDF (constellation.uqac.ca); recipe:csp: HTTP 403 cdnsciencepub.com",none,
+195,heldout,semantic_scholar,10.1002/ecs2.2022,,,cc-by,,,unreachable,openalex: HTTP 403 esajournals.onlinelibrary.wiley.com; repository: ConnectTimeout r-libre.teluq.ca; recipe:wiley: HTTP 403 onlinelibrary.wiley.com,none,
+201,dev,semantic_scholar,10.1086/671900,,,cc-by,,,unreachable,"semanticscholar: HTML page, linked PDF HTTP 403 researchoutput.csu.edu.au; manifest: HTML page, not a PDF (ri.conicet.gov.ar)",none,
+203,heldout,semantic_scholar,10.1002/mbo3.173,https://pmc-oa-opendata.s3.amazonaws.com/PMC4287171.1/PMC4287171.1.pdf,pmc_s3,cc-by,f7c10509d1bede3f98b35b7a6cbe7d5732a2ca458142f13faae5dc166d7cc501,15,ok,,pdf,false
+207,heldout,semantic_scholar,10.1007/s13592-012-0147-8,https://hal.science/hal-01003668,semanticscholar,other-oa,c4db2a4db03d052914159653b4ec193c2e4186e5535eb67f74ec4d2b78db7245,9,ok,,pdf,false
+208,dev,semantic_scholar,10.3389/fmars.2021.637546,,preexisting,cc-by,6d216891ef3cef337546d541830c64e1ed67feeda906c21e0bd3c0504049107f,16,ok,,pdf,false
+209,heldout,semantic_scholar,10.3390/f8090326,,,cc-by,,,unreachable,openalex: HTTP 403 www.mdpi.com,none,
+215,heldout,semantic_scholar,10.1111/ecog.00836,https://www.dora.lib4ri.ch/wsl/dload/wsl:5060/PDF/view,repository,cc-by,23b67bca5fd1f8bddbe5500273e70a7336e6b66fb9602867dd39ecc0f6632868,12,ok,,pdf,false
+225,dev,semantic_scholar,10.1371/journal.pone.0109261,,preexisting,cc-by,fc62fccfedd5850629d2042c4932374fd41f4edd050f8c28f676e8256c4b07d1,10,ok,,pdf,false
+227,heldout,semantic_scholar,10.1104/pp.75.4.1054,,,,,,unreachable,no PDF or XML in PMC open-access bucket; openalex: HTTP 403 academic.oup.com; repository: HTTP 403 pmc.ncbi.nlm.nih.gov,none,
+235,heldout,semantic_scholar,10.3732/ajb.1200267,,,cc-by-nc-nd,,,unreachable,"semanticscholar: HTML page, not a PDF (constellation.uqac.ca)",none,
+237,heldout,semantic_scholar,10.1371/journal.pone.0201924,https://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0201924&type=printable,openalex,cc-by,92ff20c1d5f7cab6a31eaf6f8fc33fbbf217c6c3cdd8d818c8da62290e3340a6,15,ok,,pdf,false
+246,heldout,semantic_scholar,10.1155/2012%2f387564,,,cc-by,,,unreachable,openalex: HTTP 403 downloads.hindawi.com; recipe:wiley: HTTP 403 onlinelibrary.wiley.com,none,
+247,heldout,semantic_scholar,10.2166/wqrj.2002.009,,,,,,unreachable,manifest: HTTP 403 iwaponline.com,none,
+253,dev,semantic_scholar,10.1111/eva.13248,https://www.biorxiv.org/content/biorxiv/early/2020/12/07/2020.04.29.066449.full.pdf,repository,cc-by,dae333a85c8751c5eb3d3e770f539b2085517301b63cd745f7f13a517b8c0dff,50,ok,,pdf,true
+254,heldout,semantic_scholar,10.1603/0046-225x-34.3.635,,,cc-by-nc,,,unreachable,openalex: HTTP 403 academic.oup.com,none,
+256,heldout,semantic_scholar,10.25071/2292-4736%2f37681,,,cc-by,,,unreachable,"openalex: HTML page, not a PDF (currents.journals.yorku.ca)",none,
+258,dev,semantic_scholar,10.1111/ecog.00997,,,cc-by-nc-nd,,,unreachable,semanticscholar: HTTP 403 doi.org; recipe:wiley: HTTP 403 onlinelibrary.wiley.com,none,
+265,heldout,semantic_scholar,10.14712/23361964.2015.64,https://ejes.cz/index.php/ejes/article/download/34/8,openalex,cc-by,afefa9d8918b1dd1bd7a4d8197b6b868069d23657bfe1a09ac63fedecd99846a,10,ok,,pdf,false
+268,heldout,semantic_scholar,10.1007/s10980-021-01300-z,https://link.springer.com/content/pdf/10.1007/s10980-021-01300-z.pdf,openalex,cc-by,e64fe230c567f27369213409f6adf967281dcfefc6b6636d228d70c3f5940312,15,ok,,pdf,false
+271,dev,semantic_scholar,10.1603/0013-8746%282006%2999%5b536%3aiopmiq%5d2.0.co%3b2,,,cc-by-nc,,,unreachable,semanticscholar: HTTP 403 doi.org; manifest: HTTP 403 academic.oup.com,none,
+272,heldout,semantic_scholar,10.5558/tfc64116-2,,,,,,unreachable,openalex: HTTP 403 pubs.cif-ifc.org; recipe:csp: HTTP 403 cdnsciencepub.com,none,
+278,heldout,semantic_scholar,10.21203/rs.3.rs-651074%2fv1,https://www.researchsquare.com/article/rs-651074/latest.pdf,repository,cc-by,a4ca56cf6fb50dfcbd5c2d3cb52eee4dacef88c1d7a5ae2a6c43d4bd380e2a19,35,ok,,pdf,false
+280,heldout,semantic_scholar,10.3390/f11010003,https://depositum.uqat.ca/id/eprint/1097/1/malekietal_for_dec2019.pdf,repository,cc-by,38a4d80c661abb719096b1c7cc3074af63a908e42b8f48a53c17a607fbe42512,28,ok,,pdf,false
+287,heldout,semantic_scholar,10.5751/ace-01979-160226,http://www.ace-eco.org/vol16/iss2/art26/ACE-ECO-2021-1979.pdf,openalex,cc-by,06f75fb2267b89c7bf476486a98898d73e0d065497bb23d90eb9ed06358c7bc1,6,ok,,pdf,false
+289,heldout,semantic_scholar,10.3897/zookeys.348.6029,https://zookeys.pensoft.net/article/3468/download/pdf/,manifest,cc-by,76c4cfb796918f1d0df778197a67e441e3942c4155d30e6babf42bf029866b13,28,ok,,pdf,false
+295,heldout,semantic_scholar,10.3390/rs12060922,,,cc-by,,,unreachable,openalex: HTTP 403 www.mdpi.com,none,
+297,heldout,semantic_scholar,10.1371/journal.pone.0144112,https://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0144112&type=printable,openalex,cc-by,80b6f485406fdbe94afa2ad2f6ff0330211e3c530a884276dda734ad9a363570,18,ok,,pdf,false
+298,heldout,semantic_scholar,10.5558/tfc65206-3,,,,,,unreachable,openalex: HTTP 403 pubs.cif-ifc.org; recipe:csp: HTTP 403 cdnsciencepub.com,none,
+310,heldout,semantic_scholar,10.22621/cfn.v133i2.2219,https://www.canadianfieldnaturalist.ca/index.php/cfn/article/download/2219/2263,openalex,cc-by-nc-sa,c3e2075bc8771471a137b5e8da1d7070b7a4b221b1279afafdd870ed103c0086,4,ok,,pdf,false
+314,heldout,semantic_scholar,10.1603/en12129,,,cc-by-nc,,,unreachable,openalex: HTTP 403 academic.oup.com,none,
+315,dev,semantic_scholar,10.1603/en10045,,,cc-by-nc,,,unreachable,openalex: HTTP 403 academic.oup.com,none,
+318,heldout,semantic_scholar,10.1038/hdy.1989.90,https://www.nature.com/articles/hdy198990.pdf,openalex,,39aa413c60e3fff11385e7b964928f805deaf1c271295ac64e04e081bd1d790f,9,ok,,pdf,false
+331,heldout,semantic_scholar,10.1002/ece3.3922,https://pmc-oa-opendata.s3.amazonaws.com/PMC5869299.1/PMC5869299.1.pdf,pmc_s3,cc-by,ae60d2d4337371d3fcb9d7e24f0b18b274ffbba51345c227453f1d342a1e5ecc,11,ok,,pdf,false
+343,dev,semantic_scholar,10.3390/ijgi7090335,,,cc-by,,,unreachable,openalex: HTTP 403 www.mdpi.com,none,
+348,heldout,semantic_scholar,10.1046/j.1365-2745.1999.00388.x,,,,,,unreachable,recipe:wiley: HTTP 403 onlinelibrary.wiley.com,none,
+350,heldout,semantic_scholar,10.5558/tfc70369-4,,,,,,unreachable,openalex: HTTP 403 pubs.cif-ifc.org; recipe:csp: HTTP 403 cdnsciencepub.com,none,
+351,dev,semantic_scholar,10.1603/0013-8746%282005%29098%5b0565%3awccdaa%5d2.0.co%3b2,,,cc-by-nc,,,unreachable,semanticscholar: HTTP 403 doi.org; manifest: HTTP 403 academic.oup.com,none,
+354,heldout,semantic_scholar,10.1890/06-1056.1,,,,,,unreachable,manifest: HTTP 403 onlinelibrary.wiley.com,none,
