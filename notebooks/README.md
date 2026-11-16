@@ -2608,3 +2608,14 @@ An independent review of the evaluation code (fresh agent, read-only) found two 
 - Relevance: within noise (binary F1 0.75 → 0.80, four-class 0.40 → 0.50 against the rule label, n = 10).
 
 **Decision:** hypothesis rejected. On this task a stronger model does not pay for itself: on abstracts Sonnet matched Haiku on relevance once the prompt was coherent, and on long text it is no better and about 22 times dearer. Haiku 5.5 at low effort is frozen as the model for the held-out pass. Table 4 is filled from the dev runs: Haiku low / medium / high, Sonnet low on abstracts (two prompts) and on 10 PDF texts, and the repeatability replicates.
+
+### 2026-11-15: Freeze and review before the held-out pass
+
+**Frozen:** `configs/final_heldout.json` (Haiku 5.5, low effort, round 5 prompts, SHA-256 of every prompt), seven conditions: rules on features (abstract 68, PDF text 31, native PDF 31), combined and scoring only (abstract, PDF text). Runner `scripts/run_heldout_pass.py` checks the digests, needs `--final`, and skips a condition already run. Tables are built by `scripts/build_results_tables.py`.
+
+**Independent review (fresh agent, read-only): go.**
+- No held-out id, DOI or title in prompts, logs, tuning runs or docs (only the coverage report names two held-out ids without a PDF).
+- The config matches the retained rounds (1, 2, 4, 5; not 3), and every manifest and PDF path resolves.
+- The ledger arithmetic checks out; the worst case after the pass and the Atlas extraction is 3.35 USD, under the 4.20 stop line.
+- Applied before the pass: abstract cost caps raised (0.10 → 0.13, 0.12 → 0.15), a guard against running a condition twice, a warning for records missing from a run, and a relevance run with no category is now counted as failed.
+- Caveats for the write-up: scoring only on PDF text with native structured output, and the native PDF condition with the round 5 prompt, were not run on dev before the pass.

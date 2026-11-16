@@ -47,6 +47,15 @@ def _split(name: str) -> tuple[str, str]:
     raise ValueError(f"Cannot read approach and input from {name!r}")
 
 
+def _expected_ids(subset: str, inp: str) -> set[int]:
+    """Record ids a run of this subset and input should cover (PDF inputs: records with a PDF)."""
+    files = {("dev", "abstract"): "data/manifests/dev_subset_data_paper.csv",
+             ("heldout", "abstract"): "data/manifests/heldout_data_paper.csv"}
+    pdf_files = {"dev": "data/manifests/dev_subset_with_pdf.csv", "heldout": "data/manifests/heldout_with_pdf.csv"}
+    f = files.get((subset, inp)) or (pdf_files.get(subset) if inp != "abstract" else None)
+    return set(pd.read_csv(f)["gt_record_id"].astype(int)) if f and Path(f).exists() else set()
+
+
 def _iv(t) -> str:
     v, lo, hi = t
     return "n/a" if v != v else f"{v:.2f} [{lo:.2f}, {hi:.2f}]"
@@ -58,6 +67,11 @@ def relevance_table(runs: dict[str, str], subset: str, out: Path) -> dict:
         approach, inp = _split(name)
         df = predictions(path, subset)
         entry = {"run": path, "n_records": int(len(df)), "failed": int(df["pred"].isna().sum())}
+        expected = _expected_ids(subset, inp)
+        missing = sorted(expected - set(int(i) for i in df.index)) if expected else []
+        entry["missing_from_run"] = missing
+        if missing:
+            print(f"WARNING {name}: {len(missing)} expected records missing from the run")
         for target in ("rule", "human"):
             s = score(df, target)
             entry[target] = {"n": s["n"], **{k: list(map(float, v)) for k, v in s["scores"].items()},

@@ -11,7 +11,7 @@
       "approach": "features",
       "mode": "abstract",
       "manifest": "data/manifests/heldout_data_paper.csv",
-      "max_cost": 0.1
+      "max_cost": 0.13
     },
     {
       "name": "r1_features_pdf_text",
@@ -32,7 +32,7 @@
       "approach": "combined",
       "mode": "abstract",
       "manifest": "data/manifests/heldout_data_paper.csv",
-      "max_cost": 0.12
+      "max_cost": 0.15
     },
     {
       "name": "r2_combined_pdf_text",

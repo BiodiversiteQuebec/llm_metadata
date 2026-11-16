@@ -101,6 +101,9 @@ def predictions(run_json: str | Path, subset: str = "dev") -> pd.DataFrame:
     no prediction (they count as errors, not as missing)."""
     run = json.loads(Path(run_json).read_text())
     allowed = subset_ids(subset)
+    # A run whose output schema has a relevance field is a direct (R2/R3) run: a record
+    # without a category there is a failure, not a feature extraction for the rules.
+    direct_run = "relevance" in ((run.get("schema") or {}).get("properties") or {})
     rows = []
     for rec in run["records"]:
         gid = int(rec["gt_record_id"])
@@ -110,6 +113,9 @@ def predictions(run_json: str | Path, subset: str = "dev") -> pd.DataFrame:
         row: dict[str, Any] = {"gt_record_id": gid, "status": rec.get("status")}
         if out is None:
             row["pred"] = None
+        elif direct_run and out.get("relevance") is None:
+            row["pred"] = None
+            row["route"] = "direct"
         elif out.get("relevance") is not None:
             row["pred"] = _clean(out["relevance"])
             row["route"] = "direct"

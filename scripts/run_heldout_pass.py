@@ -79,6 +79,10 @@ def main() -> None:
     for cond in cfg["conditions"]:
         if only and cond["name"] not in only:
             continue
+        done_before = sorted(Path("artifacts/runs").glob(f"*_heldout_{cond['name']}.json"))
+        if done_before:
+            print(f"Skipping {cond['name']}: already run once ({done_before[-1].name}).")
+            continue
         cmd = command(cond, cfg)
         print(f"\n=== {cond['name']}: {' '.join(cmd[1:])}", flush=True)
         done = subprocess.run(cmd)
