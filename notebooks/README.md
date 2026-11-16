@@ -2485,3 +2485,17 @@ An independent review of the evaluation code (fresh agent, read-only) found two 
 **Result:** `data_type` F1 0.40 → 0.50 (precision 0.45, recall 0.56), difference +0.10 [−0.02, +0.20], B better in 95 % of resamples but the interval includes 0. Relevance against the rule label −0.10 [−0.23, +0.03] four-class, also within noise. Micro F1 +0.01 [−0.01, +0.04].
 
 **Decision:** not adopted under the rule set at the start (a change counts only when its paired interval excludes 0). The prompt is reverted to round 2. The direction is consistent with the hypothesis; it can be retested on the PDF input, where more data kinds are mentioned and the effect should be larger.
+
+### 2026-11-15: Effort sweep, Haiku 5.5 (abstracts, round 2 prompt)
+
+**Hypothesis:** more reasoning helps inferred quantities (the spatial extent estimated from place names) more than categorical fields.
+
+**Runs:** low = round 2 run; medium `20261115_220956_effort_haiku_medium_abstract.json`; high `20261115_221040_effort_haiku_high_abstract.json`. Output tokens per record (thinking included) 913 / 1 157 / 1 604; cost 0.021 / 0.022 / 0.028 USD.
+
+**Result (paired against low):**
+- Micro F1: medium −0.01 [−0.03, +0.02], high +0.00 [−0.03, +0.03]. No field gains.
+- Spatial class F1: −0.06 at both medium and high (B better in 3–4 % of resamples), the opposite of the hypothesis.
+- Relevance against the rule label, four-class: medium −0.13 [−0.30, 0.00], high −0.13 [−0.27, −0.03] (loss). Binary F1 −0.08 and −0.05.
+- Why: higher effort does not make the model more cautious; it estimates larger areas (17 records in the High spatial class at medium and high, 14 at low), which pushes categories up.
+
+**Decision:** hypothesis rejected. Low effort stays the default for Haiku: cheaper and at least as good. For Table 4: effort is not a useful lever on this task with this model.
