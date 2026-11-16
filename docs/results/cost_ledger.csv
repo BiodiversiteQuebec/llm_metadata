@@ -21,3 +21,10 @@ date,run,model,effort,mode,records,budget_line,estimated_usd,actual_usd,cumulati
 2026-11-15,20261115_222818_r5_focal_taxa_abstract,claude-haiku-5-5,low,abstract,30,prompt_rounds,,0.0209,0.9524,Round 5: focal taxa
 2026-11-15,20261115_222902_r5_focal_taxa_pdf_text,claude-haiku-5-5,low,pdf_text,16,prompt_rounds,,0.0527,1.0051,Round 5: focal taxa PDF text
 2026-11-15,20261115_223105_sonnet_low_pdf_text_dev10,claude-sonnet-5-5,low,pdf_text,10,model_effort_comparison,0.7946,0.7257,1.7308,Sonnet on long text (10 random dev PDFs)
+2026-11-15,20261115_224105_heldout_r1_features_abstract,claude-haiku-5-5,low,abstract,68,heldout_final,,0.0465,1.7773,Held-out pass
+2026-11-15,20261115_224229_heldout_r1_features_pdf_text,claude-haiku-5-5,low,pdf_text,31,heldout_final,,0.0898,1.8671,Held-out pass
+2026-11-15,20261115_224308_heldout_r1_features_pdf_native,claude-haiku-5-5,low,pdf_native,31,heldout_final,,0.1634,2.0306,Held-out pass
+2026-11-15,20261115_224355_heldout_r2_combined_abstract,claude-haiku-5-5,low,abstract,68,heldout_final,,0.0597,2.0902,Held-out pass
+2026-11-15,20261115_224538_heldout_r2_combined_pdf_text,claude-haiku-5-5,low,pdf_text,31,heldout_final,,0.0958,2.1861,Held-out pass
+2026-11-15,20261115_224630_heldout_r3_scoring_abstract,claude-haiku-5-5,low,abstract,68,heldout_final,,0.0170,2.2031,Held-out pass
+2026-11-15,20261115_224712_heldout_r3_scoring_pdf_text,claude-haiku-5-5,low,pdf_text,31,heldout_final,,0.0813,2.2843,Held-out pass

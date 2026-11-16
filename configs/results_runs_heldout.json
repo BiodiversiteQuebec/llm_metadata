@@ -1,0 +1,9 @@
+{
+  "r1_features_abstract": "artifacts/runs/20261115_224105_heldout_r1_features_abstract.json",
+  "r1_features_pdf_text": "artifacts/runs/20261115_224229_heldout_r1_features_pdf_text.json",
+  "r1_features_pdf_native": "artifacts/runs/20261115_224308_heldout_r1_features_pdf_native.json",
+  "r2_combined_abstract": "artifacts/runs/20261115_224355_heldout_r2_combined_abstract.json",
+  "r2_combined_pdf_text": "artifacts/runs/20261115_224538_heldout_r2_combined_pdf_text.json",
+  "r3_scoring_abstract": "artifacts/runs/20261115_224630_heldout_r3_scoring_abstract.json",
+  "r3_scoring_pdf_text": "artifacts/runs/20261115_224712_heldout_r3_scoring_pdf_text.json"
+}

@@ -2619,3 +2619,23 @@ An independent review of the evaluation code (fresh agent, read-only) found two 
 - The ledger arithmetic checks out; the worst case after the pass and the Atlas extraction is 3.35 USD, under the 4.20 stop line.
 - Applied before the pass: abstract cost caps raised (0.10 → 0.13, 0.12 → 0.15), a guard against running a condition twice, a warning for records missing from a run, and a relevance run with no category is now counted as failed.
 - Caveats for the write-up: scoring only on PDF text with native structured output, and the native PDF condition with the round 5 prompt, were not run on dev before the pass.
+
+### 2026-11-15: The held-out pass (68 records, run once)
+
+**Runs:** seven `artifacts/runs/20261115_22*_heldout_*.json`, 0.554 USD in total, 0 validation failures. Tables in `docs/results/heldout_tables/` (built with `--final`; every number in `tables.json` with its run file). 42 of the 68 records carry a relevance label (19 of the 31 with a PDF); the other 26 are annotated "No dataset" (24) or "can't access" (2).
+
+**Relevance against the rule label (binary F1, all labelled records):** rules on features 0.65 (abstract) / 0.86 (PDF text) / 0.86 (native PDF); combined 0.78 / 0.85; scoring only 0.70 / 0.86. Four-class agreement 0.31–0.63. Human-label results are lower throughout (binary F1 0.55–0.70), under the human–rule agreement on these records (binary 74 %, four-class 52 %).
+
+**Paired comparisons (same records):**
+- Combined vs rules on features, abstracts (n = 42): binary F1 +0.12 [+0.03, +0.24], gain. The only clear difference between approaches.
+- Scoring only vs rules on features, abstracts: four-class against the human label +0.19 [+0.02, +0.36], gain; binary within noise.
+- Long vs short text on the 19 records with a PDF: +0.09 binary F1 for each approach, never clear. The unpaired table overstates the long-text gain: the records that have an open PDF are easier (rules on abstracts: 0.77 on those 19, 0.65 on all 42).
+- Native PDF vs PDF text: no difference.
+
+**Feature extraction is clearly worse than on dev** (micro F1 abstract 0.28 vs 0.47, PDF text 0.34). Two causes found:
+1. The 24 "No dataset" records: their annotations are nearly empty, so every extracted value is a false positive (micro precision 0.12 on them). The dev subset holds no such record, so it overstated precision. On the 42 labelled records: micro F1 0.31 (abstract), 0.45 (PDF text).
+2. Held-out abstracts state fewer years: the evidence ceiling for the start year from the abstract is 0.10 (dev 0.33). From PDF text, start year F1 reaches 0.88 on labelled records.
+
+**The model does not recognise "No dataset" records:** scoring only and combined set `has_dataset` to false on 1–2 of the 24, and the category to X on 3–5. The annotators' "No dataset" means no usable data behind the paper, which the text alone rarely says; the prompt asks whether the authors describe data they produced. A definition to settle with Alex Fuster, and a practical limit at harvest scale (those records become false positives).
+
+**Reading against the dev conclusions:** the dev subset (curated, all with a dataset) overstated short-text performance; on held-out, long text helps the feature-based route (temporal and spatial classes) but the relevance gain stays within noise on 19 records. The combined variant is the most robust on short text. Cost per record: 0.0007 USD (abstract, features), 0.0003 (scoring only), 0.003 (PDF text), 0.005 (native PDF).
