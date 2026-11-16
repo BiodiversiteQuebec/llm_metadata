@@ -44,3 +44,12 @@ def test_failed_record_counts_as_wrong(tmp_path):
     path = tmp_path / "run.json"
     path.write_text(json.dumps({"name": "x", "records": recs}))
     assert score(predictions(path), "rule", n_boot=50)["scores"]["acc4"][0] == 0.5
+
+
+def test_ebv_genetic_flag_lifts_genetic_data_to_high():
+    from llm_metadata.relevance_rules import dataset_type_class
+
+    plain = _rule_inputs({"data_type": ["genetic_analysis"]})
+    ebv = _rule_inputs({"data_type": ["genetic_analysis"], "ebv_genetic": True})
+    assert dataset_type_class(plain["data_type"]) == "L"
+    assert dataset_type_class(ebv["data_type"]) == "H"

@@ -2428,3 +2428,25 @@ Rules for these entries: each experiment states its hypothesis before the run, a
 **Decision:**
 - A prompt change counts only when the paired interval excludes 0. Rare yes/no fields need a change larger than about 0.2.
 - Next rounds, in this order: (1) split EBV genetic data from other genetic data in the vocabulary; (2) let the model estimate the spatial extent from named places, as the annotators did.
+
+### 2026-11-15: Evaluation review fixes (no API cost)
+
+An independent review of the evaluation code (fresh agent, read-only) found two problems that would have biased every round, now fixed and tested:
+- The micro average counted spatial and temporal facts twice (km² and years, plus their classes). Micro now covers the primary fields only. Baseline micro F1: 0.45 (unchanged at two decimals).
+- Failed extractions disappeared from the feature scores (recall rose when more records failed). They are now scored as empty predictions, and count as wrong in the binary relevance score too.
+- Smaller fixes: "15,000" read as fifteen thousand; the duplicated id 306 (outside the corpus) kept once; held-out scoring needs `--final`; thin intervals flagged with "~". Kept as caveats: the five yes/no fields are scored on true and false values alike, so their "recall" is not "recall of true"; and with about 15 fields, one chance "gain" per comparison is expected.
+
+### 2026-11-15: Round 1, EBV genetic data (abstracts, Haiku 5.5, low effort)
+
+**Hypothesis:** a yes/no field `ebv_genetic` (genetic data describing variation within species: population structure, relatedness, effective size) lets the rules reach High for genetic datasets. Expected: data type class right on at least 20 of 30 records (13 before), four-class relevance agreement with the rule label at least 0.50 (0.40–0.43 before), `data_type` F1 unchanged.
+
+**Change:** new field in the schema (`ebv_genetic`), one paragraph under `genetic_analysis` in the vocabulary block (`prompts/common.py`), and the rule input reads "EBV genetic analysis" when the flag is true. Run `artifacts/runs/20261115_220315_r1_ebv_genetic_abstract.json`, 0.018 USD.
+
+**Result:**
+- Data type class: wrong on 7 records instead of 17 (23 of 30 right). The first half of the hypothesis holds.
+- Relevance: four-class agreement 0.40 [0.23, 0.57], binary F1 0.43. No change. The second half fails.
+- `data_type` F1 −0.03 [−0.07, +0.01], micro F1 −0.00 [−0.02, +0.01]: no regression.
+
+**Why relevance did not move:** the rules take a majority vote of three classes (data type, temporal, spatial). On abstracts, spatial extent is "not stated" for 19 of 30 records and temporal for 9. Two "not stated" classes outvote a correct High data type, so the final category stays where it was. Fixing data type is necessary but not enough; spatial extent is the bottleneck.
+
+**Decision:** keep the change (it fixes the component, with no cost elsewhere). Round 2 targets the spatial extent. The relevance gain from round 1 should only appear once spatial classes exist.
