@@ -26,10 +26,10 @@ Review checkpoints (fresh subagent, reports only, never edits)
 
 Track B — Atlas contribution potential (candidate second article)
 - [x] WU-G1 — Atlas reference tables (aggregates only in git) `sonnet`
-- [ ] WU-G2 — Matching taxa, regions and period to the Atlas `opus`
+- [x] WU-G2 — Matching taxa, regions and period to the Atlas `opus`
 - [ ] WU-G3 — Extraction schema for contribution `opus`
-- [ ] WU-G4 — Contribution scores `opus`
-- [ ] WU-G5 — Validation against the Fuster relevance + insects in northern Quebec case `opus`
+- [x] WU-G4 — Contribution scores `opus`
+- [ ] WU-G5 — Validation against the Fuster relevance + insects in northern Quebec case `opus` (annotation ceiling, Fuster comparison and insect case done on the 231 non-held-out records; extraction runs and held-out records still to do)
 
 ---
 

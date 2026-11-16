@@ -1,0 +1,27 @@
+record_id,title,north,place,group_share,taxonomic,spatial,temporal,group_gap,query_score,periods,n_taxa_absent,taxa
+363,A new species in the Rheocricotopus (R.) effusus group from Canada with a review of the Nearctic species of Rheocricotopus and Parametriocnemus (Chironomidae: Orthocladiinae),True,nord_49,1.0,1.0,1.0,,0.316,1.0,,3,Parametriocnemus eoclivus; Parametriocnemus hamatus; Parametriocnemus lundbeckii
+129,VCF files of loci in approximate linkage equilibrium for two common spruce budworm larval parasitoids: Apanteles fumiferanae (Hymenoptera: Braconidae) and Glypta fumiferanae (Hymenoptera: Ichneumonidae),True,nord_49,1.0,0.16,1.0,0.0,0.316,0.08,2010s,0,Apanteles fumiferanae; Glypta fumiferanae
+80,"Community-wide trait adaptation, but not plasticity, explain ant community structure in extreme environments",True,nord_49,1.0,,1.0,0.0,0.316,0.0,2010s,0,37 ant species
+38,Data from: Temporal dynamics in animal community assembly during post-logging succession in boreal forest,True,nord_49,0.667,,1.0,0.5,0.316,0.5,"2000s, 2010s",0,199 ground-dwelling beetles; 240 flying-beetles species
+208,Determining the Ecological Status of Benthic Coastal Communities: A Case in an Anthropized Sub-Arctic Area,True,nord_49,0.25,,1.0,,0.316,,,0,c.132 species of benthic community
+351,Weevil (Coleoptera: Curculionoidea) Diversity and Abundance in Two Quebec Vineyards,False,sud_49,1.0,,0.0,1.0,0.316,1.0,1990s,0,73 weevil species
+261,"HYADAPHIS TATARICAE (HOMOPTERA: APHIDIDAE), A PEST OF HONEYSUCKLE NEW TO NORTH AMERICA",False,sud_49,1.0,1.0,0.0,0.952,0.316,0.976,"1970s, 1980s",1,Hyadaphis tataricae
+356,New Staphylinidae (Coleoptera) records with new collection data from New Brunswick and an addition to the fauna of Quebec: Staphylininae,False,sud_49,1.0,0.85,0.0,,0.316,0.85,,0,Quedius criddlei; Bisnius quediinu
+357,"New Staphylinidae (Coleoptera) records with new collection data from New Brunswick, and an addition to the fauna of Quebec, Canada: Aleocharinae",False,sud_49,1.0,0.828,0.0,,0.316,0.828,,3,Gyrophaena wisconsinica; Gyrophaena wisconsinica; Atheta pseudomodesta; Philhygra luridipennis
+311,"Rove beetles (Coleoptera: Staphylinidae) in yellow birch-dominated stands of southeastern Quebec, Canada: Diversity, abundance, and description of a new species",False,sud_49,1.0,,0.0,0.776,0.316,0.776,"1990s, 2000s",0,116 beetle species
+382,ADDITIONS TO THE CANADIAN EPHEMEROPTERA,False,sud_49,1.0,0.762,0.0,,0.316,0.762,,1,Centroptilum convexum; Centroptilum minor
+307,Relevance of using a vegetation-based method to conserve urban carabid diversity,False,sud_49,1.0,0.0,0.0,0.553,0.316,0.276,2000s,0,c 36 Carabid species
+185,"Arrenodes minutus (Drury, 1770) (Coleoptera: Brentidae) discovered in the Maritime Provinces of Canada.",False,unknown,1.0,0.236,,,0.316,0.236,,0,Arrenodes minutus
+317,Soybean Aphid Predators in QuÃ©bec and the Suitability of Aphis glycines as Prey for Three Coccinellidae,False,unknown,1.0,0.059,,,0.316,0.059,,0,Aphis glycines
+120,Assessment of the systems approach for the phytosanitary treatment of wood infested with wood-boring insects,False,unknown,1.0,0.0,,,0.316,0.0,,0,Agrilus planipennis
+228,"Emergence of a new turfgrass insect pest on golf courses in Quebec, the European crane fly [Diptera: Tipulidae].",False,sud_49,1.0,0.0,0.0,,0.316,0.0,,0,Tipula paludosa
+267,"Insect parasites and predators of Phyllophaga anxia (LeConte) (Col., Scarabaeidae) in Quebec, Canada",False,sud_49,1.0,,0.0,,0.316,,,0,c 50 insect species
+315,Selected Beetle Assemblages Captured in Pitfall Traps Baited with Deer Dung or Meat in Balsam Fir and Sugar Maple Forests of Central Quebec,False,sud_49,1.0,,0.0,,0.316,,,0,c.30 beetle species
+334,"The effects of urbanization on ant assemblages (Hymenoptera: Formicidae) associated with the Molson Nature Reserve, Quebec",False,sud_49,1.0,,0.0,,0.316,,,0,c.30 ant species
+285,New and noteworthy records of Orthoptera from Maritime Canada,False,unknown,1.0,,,,0.316,,,0,c. 10 insect species
+308,Responses of two sentinel species (Hexagenia limbata--mayfly; Pyganodon grandis--bivalve) along spatial cadmium gradients in lakes and rivers in northwestern QuÃ©bec.,False,sud_49,0.5,0.095,0.0,0.776,0.316,0.436,"1990s, 2000s",0,Hexagenia limbata
+291,OVIPOSITION AND NICHE PARTITIONING IN APHIDOPHAGOUS INSECTS ON MAIZE,False,unknown,0.5,0.04,,,0.316,0.04,,0,Trypoxylon politurn
+258,"Host phenology, geographic range size and regional occurrence explain interspecific variation in damselflyâ€“water mite associations",False,sud_49,0.5,,0.0,,0.316,,,0,16 damselfly species
+122,Stuck between the mandibles of an insect and of a rodent: where does the fate of ash-dominated riparian temperate forests lie?,False,sud_49,0.333,0.0,0.0,0.183,0.316,0.091,2010s,0,Agrilus planipennis
+7,"Data from: 60 specific eDNA qPCR assays to detect invasive, threatened and exploited freshwater vertebrates and invertebrates in Eastern Canada",False,unknown,0.25,,,,0.316,,,0,40 freshwater vertebrate and invertebrates
+183,Québec Natural Heritage Data Center of,False,unknown,0.056,,,,0.316,,,0,48 animal species

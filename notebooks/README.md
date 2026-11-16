@@ -2639,3 +2639,15 @@ An independent review of the evaluation code (fresh agent, read-only) found two 
 **The model does not recognise "No dataset" records:** scoring only and combined set `has_dataset` to false on 1–2 of the 24, and the category to X on 3–5. The annotators' "No dataset" means no usable data behind the paper, which the text alone rarely says; the prompt asks whether the authors describe data they produced. A definition to settle with Alex Fuster, and a practical limit at harvest scale (those records become false positives).
 
 **Reading against the dev conclusions:** the dev subset (curated, all with a dataset) overstated short-text performance; on held-out, long text helps the feature-based route (temporal and spatial classes) but the relevance gain stays within noise on 19 records. The combined variant is the most robust on short text. Cost per record: 0.0007 USD (abstract, features), 0.0003 (scoring only), 0.003 (PDF text), 0.005 (native PDF).
+
+### 2026-11-15: Atlas contribution scores on the human annotations (Track B, no API cost)
+
+**Context:** the Fuster relevance ignores what the Atlas already holds. New code: `atlas_match.py` (taxa, places and years matched to the Atlas tables), `atlas_contribution.py` (four separate scores), `scripts/atlas_contribution_ceiling.py`. Method: `docs/atlas_contribution/scores.md`; results: `docs/atlas_contribution/results.md`. Only the 231 valid non-held-out records were read.
+
+**Result:**
+- 90 % of the 273 annotated taxon mentions reach the Atlas (55 % matched to an Atlas taxon, 16 % absent from the extract, often species at risk, 19 % group only); 10 % unresolved or ambiguous.
+- Agreement with the Fuster rule label is weak (Spearman 0.34 on the count of gaps filled, 0.24 before modulators); taxonomic novelty and group gap go the other way. The six labelled records that bring taxa new to the Atlas are all rated Low or Excluded.
+- Thresholds ±50 % leave ranks unchanged (Spearman ≥ 0.91); the count of gaps filled is threshold-sensitive (0.63 to 0.72).
+- Insects north of the 49th: 6 % of the Atlas insect records for 75 % of the area; 5 records in the corpus, the best being a chironomid revision with three species absent from the Atlas.
+
+**Decision:** no composite score (the four scores are nearly independent and each is missing for different records). Figure, insect case and Fuster divergences proposed for the article 1 data-gap supplement; a full contribution article only after extracting place names and record availability.
