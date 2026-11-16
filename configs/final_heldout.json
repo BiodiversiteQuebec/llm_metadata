@@ -1,0 +1,68 @@
+{
+  "description": "Frozen configuration for the single held-out pass (68 abstracts, 31 PDFs). Prompts as of round 5; model and effort chosen on the dev subset (Haiku 5.5 at low effort matched Sonnet 5.5 on relevance for about one tenth to one twentieth of the cost). Approaches: R1 rules on extracted features (approach 'features', scored with relevance_eval), R2 combined, R3 scoring only (native structured output).",
+  "frozen_on": "2026-11-15",
+  "model": "claude-haiku-5-5",
+  "effort": "low",
+  "parallelism": 5,
+  "eval_config": "configs/eval_article.json",
+  "conditions": [
+    {
+      "name": "r1_features_abstract",
+      "approach": "features",
+      "mode": "abstract",
+      "manifest": "data/manifests/heldout_data_paper.csv",
+      "max_cost": 0.1
+    },
+    {
+      "name": "r1_features_pdf_text",
+      "approach": "features",
+      "mode": "pdf_text",
+      "manifest": "data/manifests/heldout_with_pdf.csv",
+      "max_cost": 0.2
+    },
+    {
+      "name": "r1_features_pdf_native",
+      "approach": "features",
+      "mode": "pdf_native",
+      "manifest": "data/manifests/heldout_with_pdf.csv",
+      "max_cost": 0.3
+    },
+    {
+      "name": "r2_combined_abstract",
+      "approach": "combined",
+      "mode": "abstract",
+      "manifest": "data/manifests/heldout_data_paper.csv",
+      "max_cost": 0.12
+    },
+    {
+      "name": "r2_combined_pdf_text",
+      "approach": "combined",
+      "mode": "pdf_text",
+      "manifest": "data/manifests/heldout_with_pdf.csv",
+      "max_cost": 0.22
+    },
+    {
+      "name": "r3_scoring_abstract",
+      "approach": "scoring",
+      "mode": "abstract",
+      "manifest": "data/manifests/heldout_data_paper.csv",
+      "max_cost": 0.08,
+      "structured_output": true
+    },
+    {
+      "name": "r3_scoring_pdf_text",
+      "approach": "scoring",
+      "mode": "pdf_text",
+      "manifest": "data/manifests/heldout_with_pdf.csv",
+      "max_cost": 0.2,
+      "structured_output": true
+    }
+  ],
+  "prompt_sha256": {
+    "abstract": "f812adde358d3ea0558a61026f5bc256c31a3598c413d6ad39ba948c1bef4a31",
+    "pdf_file": "9d6e6c665e5c43940a45d575a6c7e7e44ac767cacbaf969b37005d40254d8bd1",
+    "section": "5ec72ab84bc3196192df03ef2526336435e560d615d664eaecfa545ae6cb38f1",
+    "relevance_combined": "4e46f2e94b462c78da2e673bc78f88bb5a5e115ce91332cfef624b8e1fe6c14c",
+    "relevance_scoring": "af1168806bb13f5b70712ec5278dfaa062d2edbbdadfddb8c7fbafdf7ab0377a"
+  }
+}
