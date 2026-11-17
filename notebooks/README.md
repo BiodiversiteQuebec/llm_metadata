@@ -2592,7 +2592,7 @@ An independent review of the evaluation code (fresh agent, read-only) found two 
 - PDF text: species F1 (fuzzy string matching) 0.47 → 0.60, +0.13 [+0.01, +0.35] (gain). With GBIF resolution, exact-taxon precision 0.50 → 0.93 at unchanged recall 0.78; extracted taxa 28 → 15 with the same 14 matched.
 - Abstract: species F1 +0.07 [−0.01, +0.17]; exact-taxon precision 0.78 → 0.94, recall unchanged (0.81).
 - No other field changes beyond noise.
-- The multi-rank numbers above use the evaluator before its review fixes (uncapped set-asides); they are rescored when the capped version is merged.
+- The multi-rank numbers above used the evaluator before its review fixes (uncapped set-asides). Rescored with the capped version (2026-11-16): PDF text exact-taxon precision 0.47 → 0.82, false positives 16 → 3, recall 0.78 unchanged; abstract 0.66 → 0.78, false positives 15 → 8.
 
 **Decision:** adopted. The hypothesis holds, and as predicted the effect is larger on long text.
 
