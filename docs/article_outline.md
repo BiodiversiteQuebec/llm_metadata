@@ -13,13 +13,13 @@ Either answer is a result:
 ## 1. The two approaches
 
 1. **Relevance scoring from rules applied to extracted features.** The LLM extracts structured features (data type, taxa, temporal and spatial extent, modulator flags). The relevance rules of Fuster-Calvo et al. are then applied in code to produce the relevance category.
-2. **Relevance scoring from rules given to the LLM (direct scoring).** The relevance rules and the Biodiversité Québec priorities are written into the instructions. The LLM returns the relevance category directly.
+2. **Relevance scoring from rules given to the LLM (direct scoring).** The relevance rules and the Biodiversité Québec priorities are written into the instructions. The LLM returns the relevance category directly. In the runs reported in sections 5 to 9, the instructions hold the Fuster rules only: no Biodiversité Québec priorities had been specified.
 
 **Interpretation**
 - The two approaches trade off differently:
   - **Rule-based scoring:** every decision is traceable to a rule, and the rules can change over time without re-running the extraction (for example, if high-richness datasets are no longer a priority).
   - **Direct scoring:** simpler. It does not need the feature-by-feature prompt engineering that accurate extraction of species, location and data type requires.
-- A third variant sits between them: one call that extracts the features **and** gives the relevance category.
+- A third variant sits between them: one call that extracts the features **and** gives the relevance category (approach 2b in the tables; the April "direct" runs were this variant).
 - Applying the rules to the human-annotated features reproduces the original relevance categories exactly. This validates the rule implementation, so any loss of performance in approach 1 comes from extraction, not from the rules.
 
 ---
@@ -176,19 +176,19 @@ Targets:
 - **Rule label:** the Fuster rules applied to the human features; primary.
 - **Human label:** the annotator's own judgement.
 
-Binary: relevant = high or moderate.
+Binary: relevant = high or moderate. κ (kappa) is agreement beyond what chance would give: 0 = chance, 1 = perfect.
 
-| Approach | Input | n | Binary F1, rule label | Four-class agreement, rule label | Binary F1, human label | Four-class agreement, human label |
-|---|---|---|---|---|---|---|
-| 1. Rules on extracted features | Short text | 42 | 0.65 [0.49, 0.79] | 0.31 [0.19, 0.45] | 0.57 [0.36, 0.74] | 0.21 [0.10, 0.36] |
-| 1. Rules on extracted features | Long text (PDF text) | 19 | 0.86 [0.67, 0.97] | 0.42 [0.21, 0.63] | 0.55 [0.25, 0.78] | 0.26 [0.11, 0.47] |
-| 1. Rules on extracted features | Long text (native PDF) | 19 | 0.86 [0.69, 0.97] | 0.47 [0.21, 0.68] | 0.64 [0.33, 0.83] | 0.32 [0.11, 0.53] |
-| 1. Rules on extracted features | Long text (sections) | 19 | 0.86 [0.67, 0.97] | 0.21 [0.05, 0.42] | 0.55 [0.25, 0.76] | 0.16 [0.00, 0.32] |
-| 2. Scoring only | Short text | 42 | 0.70 [0.51, 0.83] | 0.45 [0.31, 0.60] | 0.56 [0.34, 0.73] | 0.40 [0.26, 0.55] |
-| 2. Scoring only | Long text (PDF text) | 19 | 0.86 [0.67, 0.97] | 0.63 [0.42, 0.84] | 0.55 [0.25, 0.78] | 0.37 [0.16, 0.58] |
-| 2b. Combined | Short text | 42 | 0.78 [0.64, 0.89] | 0.40 [0.26, 0.55] | 0.64 [0.45, 0.78] | 0.36 [0.21, 0.50] |
-| 2b. Combined | Long text (PDF text) | 19 | 0.85 [0.67, 0.97] | 0.58 [0.37, 0.79] | 0.70 [0.40, 0.90] | 0.42 [0.21, 0.63] |
-| *Ceiling: rule label vs human label* | | 42 | *binary agreement 74 %, κ 0.48* | *52 %, κ 0.36* | | |
+| Approach | Input | n | Binary F1, rule label | Four-class agreement, rule label | Four-class κ, rule label | Binary F1, human label | Four-class agreement, human label |
+|---|---|---|---|---|---|---|---|
+| 1. Rules on extracted features | Short text | 42 | 0.65 [0.49, 0.79] | 0.31 [0.19, 0.45] | 0.06 | 0.57 [0.36, 0.74] | 0.21 [0.10, 0.36] |
+| 1. Rules on extracted features | Long text (PDF text) | 19 | 0.86 [0.67, 0.97] | 0.42 [0.21, 0.63] | 0.16 | 0.55 [0.25, 0.78] | 0.26 [0.11, 0.47] |
+| 1. Rules on extracted features | Long text (native PDF) | 19 | 0.86 [0.69, 0.97] | 0.47 [0.21, 0.68] | 0.22 | 0.64 [0.33, 0.83] | 0.32 [0.11, 0.53] |
+| 1. Rules on extracted features | Long text (sections) | 19 | 0.86 [0.67, 0.97] | 0.21 [0.05, 0.42] | −0.16 | 0.55 [0.25, 0.76] | 0.16 [0.00, 0.32] |
+| 2. Scoring only | Short text | 42 | 0.70 [0.51, 0.83] | 0.45 [0.31, 0.60] | 0.26 | 0.56 [0.34, 0.73] | 0.40 [0.26, 0.55] |
+| 2. Scoring only | Long text (PDF text) | 19 | 0.86 [0.67, 0.97] | 0.63 [0.42, 0.84] | 0.49 | 0.55 [0.25, 0.78] | 0.37 [0.16, 0.58] |
+| 2b. Combined | Short text | 42 | 0.78 [0.64, 0.89] | 0.40 [0.26, 0.55] | 0.19 | 0.64 [0.45, 0.78] | 0.36 [0.21, 0.50] |
+| 2b. Combined | Long text (PDF text) | 19 | 0.85 [0.67, 0.97] | 0.58 [0.37, 0.79] | 0.39 | 0.70 [0.40, 0.90] | 0.42 [0.21, 0.63] |
+| *Ceiling: the rule label taken as a prediction of the human label* | | 42 | | | | *0.70 (binary agreement 74 %, κ 0.48)* | *52 % (κ 0.36)* |
 
 Reference rows, not a strict benchmark (different corpus, target and protocol):
 - **Supervised bag-of-words classifier** of Fuster-Calvo et al.: F1 0.67.
@@ -200,16 +200,19 @@ Reference rows, not a strict benchmark (different corpus, target and protocol):
 
 **What survives the paired comparisons (same records, same bootstrap draw):**
 - **Combined beats rules on features on short text:** binary F1 +0.12 [+0.03, +0.24] (n = 42).
-- **Scoring only beats rules on features on four-class agreement with the human label:** +0.19 [+0.02, +0.36] (short text).
-- **Long text vs short text:** on the 19 records with a PDF, long text adds about +0.09 binary F1 for each approach, never clearly. The unpaired rows overstate the gain: the records with an open PDF are easier (rules on short text reach 0.77 on those 19, 0.65 on all 42).
+- **Scoring only beats rules on features on four-class agreement with the human label:** +0.19 [+0.02, +0.36] (short text); on binary F1 they do not differ (+0.04 [−0.15, +0.21]).
+- **Combined beats rules on features on long text against the human label:** binary F1 +0.15 [+0.03, +0.34] (n = 19).
+- About 30 paired tests were run, so one chance "gain" at 95 % is expected; the results above are the only ones that survive, with no correction for multiple tests.
+- **Long text vs short text:** on the 19 records with a PDF, rules on features and scoring only gain about +0.09 binary F1 from long text, within noise; the combined variant does not (−0.05 [−0.20, +0.07]). The unpaired rows overstate the gain: the records with an open PDF are easier (rules on short text reach 0.77 on those 19, 0.65 on all 42).
 - **Native PDF vs PDF text:** no difference.
 
 **Interpretation:**
-- **Short text:** the LLM given the rules does better than rules applied in code to features extracted from the same text. The extracted features are incomplete, and the one-call variants appear to compensate.
-- **Long text:** all approaches converge, at about 0.86 binary F1 against the rule label, at or above the bag-of-words reference.
+- **Short text:** the combined variant does better than rules applied in code to the features extracted from the same text (+0.12); scoring only matches the rules on binary F1. The extracted features are incomplete, and the combined call appears to compensate.
+- **Long text:** on binary F1 against the rule label, all approaches converge at about 0.86, level with the bag-of-words reference (0.67, different corpus; our interval reaches down to 0.67). Four-class agreement does not converge (0.21 to 0.63).
 - **Two ceilings:**
-  - Every LLM approach agrees less with the human judgement than the rules do: binary F1 0.55–0.70, while the human and rule labels agree on 74 % of records.
-  - On four classes, no approach goes beyond the human–rule agreement of 52 %.
+  - Measured the same way, every LLM approach agrees less with the human judgement than the rules do: binary agreement with the human label 0.47–0.68, against 74 % between the rule and human labels (binary F1: 0.55–0.70 against 0.70).
+  - On four classes, no approach goes beyond the human–rule agreement of 52 % against the human label. Against the rule label, scoring only on PDF text reaches 0.63.
+  - Four-class κ is low (−0.16 to 0.49 against the rule label; 0.06 for rules on short text): beyond the binary reading, much of the agreement is what chance would give.
 - **What limits relevance scoring:** less the choice of approach than (i) the features absent from short text and (ii) a target that experts themselves apply inconsistently.
 
 ### Table 2: feature extraction performance (main)
@@ -220,15 +223,15 @@ F1 per field and input, held-out set (68 abstracts; 31 PDFs). P / R and interval
 |---|---|---|---|---|
 | Data type | 0.23 | 0.26 | 0.30 | 0.26 |
 | Geospatial information | 0.14 | 0.14 | 0.15 | 0.11 |
-| Taxa, exact taxon (GBIF, capped) | 0.66 | 0.46 | 0.49 | 0.59 |
+| Taxa, exact taxon (GBIF backbone; "capped": taxa listed under an annotated count are tolerated only up to that count) | 0.66 | 0.46 | 0.49 | 0.59 |
 | Taxa, broad group | 0.79 | 0.74 | 0.75 | 0.80 |
 | Taxa, fuzzy string (as in April) | 0.36 | 0.35 | 0.35 | 0.50 |
 | Temporal range, class | 0.41 | 0.65 | 0.64 | 0.65 |
 | Spatial range, class | 0.47 | 0.60 | 0.72 | 0.54 |
-| Time series (flag) | 0.29 | 0.00 | 0.00 | 0.00 |
+| Time series (flag) | 0.29 | no annotated case; every flag raised is a false positive | | |
 | Multispecies (flag) | 0.43 | 0.38 | 0.38 | 0.38 |
 | North–south (flag) | 0.60 | 0.53 | 0.44 | 0.25 |
-| Threatened species, new species (flags) | no true case predicted correctly | | | |
+| Threatened species, new species (flags) | no annotated case in these records; every flag raised is a false positive | | | |
 | Micro average (primary fields) | 0.28 | 0.34 | 0.35 | 0.38 |
 
 Scoring choices:
@@ -236,7 +239,7 @@ Scoring choices:
 - Spatial and temporal extent are scored at the class level used by the rules. Exact km² is almost never right, and the rules do not need it.
 
 **Interpretation:**
-- **Long text recovers what short text lacks: temporal and spatial extent.** On short text the evidence often is not there. For the start year, the annotators found it in the abstract for 10 % of held-out records.
+- **Long text recovers what short text lacks: temporal and spatial extent** (PDF columns cover the 31 records with a PDF, which are easier on average). On short text the evidence often is not there. For the start year, the annotators found it in the abstract for 10 % of held-out records.
 - **Taxa:** once names are resolved to the GBIF backbone, recall is high at every input (0.78–0.92). The error is mainly over-extraction from long text: exact-taxon precision 0.32 from PDF text, against 0.57 from abstracts. Sections, which drop the introduction and discussion, recover part of it (0.59 F1).
 - **The held-out set is harder than the dev subset** (micro F1 0.28 against 0.47 on short text), for two measured reasons:
   - 24 held-out records are annotated "No dataset". Their annotations are nearly empty, so every extracted value counts as a false positive, and the model does not recognise them (it flags "no dataset" for 1–2 of 24).
@@ -245,7 +248,7 @@ Scoring choices:
 
 ### Table 3: confusion matrices
 
-True vs predicted category (H high, M moderate, L low, X not relevant), against the rule label (left) and the human label (right). Held-out set.
+True vs predicted category (H high, M moderate, L low, X not relevant), against the rule label (left) and the human label (right). Held-out set. File names: `r1` = rules on features, `r3` = scoring only, `r2` = combined.
 
 | | Short text | Long text (PDF text) |
 |---|---|---|
@@ -254,8 +257,8 @@ True vs predicted category (H high, M moderate, L low, X not relevant), against 
 | 2b. Combined | ![](results/heldout_tables/table3_confusion_r2_combined_abstract.png) | ![](results/heldout_tables/table3_confusion_r2_combined_pdf_text.png) |
 
 **Interpretation:**
-- **The error direction changed during prompt engineering.** When the model was forbidden to estimate the study area, rules on extracted features underrated almost every dataset: on dev, 17 of 30 too low and none too high. Once it may estimate the area from named places, as the annotators did, the errors became two-sided.
-- **The one-call variants lean high,** especially against the human label. The rules' modulators (multispecies, north–south) lift many datasets by one level.
+- **The error direction changed during prompt engineering.** When the model was forbidden to estimate the study area, rules on extracted features underrated almost every dataset: on dev, 17 of 30 too low and at most 1 too high. Once it may estimate the area from named places, as the annotators did, the errors became two-sided.
+- **All approaches lean high against the human label** (too high / too low on short text: rules 25 / 8, combined 26 / 1, scoring only 19 / 6). Against the rule label, scoring only is the most balanced (13 / 10; rules 18 / 11). The rules' modulators (multispecies, north–south) lift many datasets by one level.
 
 ### Table 4: model and effort (development subset, flagged as such)
 
@@ -263,14 +266,14 @@ True vs predicted category (H high, M moderate, L low, X not relevant), against 
 
 | Comparison (paired, same records) | Features (micro F1) | Relevance, rules on features (binary F1, rule label) | Cost per record |
 |---|---|---|---|
-| Haiku low vs medium effort (abstracts) | −0.01 [−0.03, +0.02] | −0.08 | 0.0007 vs 0.0007 USD |
-| Haiku low vs high effort (abstracts) | +0.00 [−0.03, +0.03] | −0.05 (four-class −0.13, loss) | 0.0007 vs 0.0009 USD |
-| Sonnet 5.5 vs Haiku 5.5, low (abstracts, coherent prompt) | +0.02 to +0.04 | +0.02 (0.81 vs 0.83) | 0.007 vs 0.0007 USD |
-| Sonnet 5.5 vs Haiku 5.5, low (10 PDF texts) | −0.06 [−0.11, +0.01] | +0.05, within noise | 0.073 vs 0.003 USD |
+| Haiku, medium minus low effort (abstracts) | −0.01 [−0.03, +0.02] | −0.08, within noise | 0.0007 vs 0.0007 USD |
+| Haiku, high minus low effort (abstracts) | +0.00 [−0.03, +0.03] | −0.05; four-class −0.13, within run-to-run noise | 0.0009 vs 0.0007 USD |
+| Sonnet 5.5 minus Haiku 5.5, low (abstracts, coherent prompt) | +0.02 to +0.04 | +0.02 (Haiku 0.81, Sonnet 0.83) | 0.007 vs 0.0007 USD |
+| Sonnet 5.5 minus Haiku 5.5, low (10 PDF texts) | −0.06 [−0.11, +0.01] | +0.05, within noise | 0.073 vs 0.003 USD |
 | Repeatability: same prompt, two fresh runs | −0.01 [−0.04, +0.01] | up to 0.17 four-class | |
 
 **Interpretation:**
-- **Neither a stronger model nor more reasoning helps this task.** Higher effort makes the model estimate larger areas and over-rate relevance.
+- **Neither a stronger model nor more reasoning helps this task (dev evidence).** Higher effort makes the model estimate larger areas (17 records in the High spatial class instead of 14); the effect on relevance is within run-to-run noise.
 - **Prompt contradictions do not transfer between models.** Sonnet first scored far worse on relevance (−0.27 binary F1), because it obeyed the general "do not infer" rule rather than the exception for spatial extent. A prompt tuned on a cheap model can hide contradictions that a stronger model resolves the other way.
 - **Repeatability bounds what dev can show.** Identical runs move four-class relevance by up to 0.17. On 30 records, only large effects are measurable, which is why the conclusions above rest on the held-out set.
 
@@ -285,12 +288,12 @@ Full write-up: [`supplementary/S1_taxa.md`](supplementary/S1_taxa.md).
 **Method:**
 - Names on both sides are resolved to the GBIF backbone: scientific names, vernacular names in English and French, decorated strings, group labels.
 - Scores are computed at several ranks: exact taxon, species, genus, family, broad group.
-- Count statements ("c.30 bird species") are scored as their own signal. Extracted taxa inside them are set aside only up to the stated count.
+- Count statements ("c.30 bird species") are scored as their own signal. Extracted taxa inside them are tolerated (neither right nor wrong) only up to the stated count; beyond it they count as false positives. This is the "capped" scoring.
 
 **Held-out results** (Table 2):
 - exact-taxon F1 0.66 (short text), 0.46 (PDF text), 0.59 (sections);
 - broad group 0.74–0.80;
-- string matching, which was used in April: 0.11–0.13 exact, 0.35–0.50 fuzzy.
+- string matching, which was used in April: 0.11–0.26 exact, 0.35–0.50 fuzzy.
 
 **Dev rounds:** a focal-taxa block in the prompt (no predators, hosts or habitat taxa) raised exact-taxon precision on PDF text from 0.47 to 0.82 (false positives 16 → 3) at unchanged recall (capped scoring).
 
@@ -316,7 +319,7 @@ The whole study (tuning, model comparison, held-out pass, Atlas track) cost 2.37
 
 **Interpretation:**
 - A full repository harvest costs a few dollars on short text and a few tens of dollars on full text.
-- The binding cost is obtaining open PDFs, not the model: 47 of 98 open-access articles could be fetched from open sources by script.
+- The binding cost is obtaining open PDFs, not the model: 47 of 98 open-access articles are available. 40 were fetched from open sources by script; 7 dev PDFs were already on disk from an earlier download whose source is not recorded (all 7 articles are open access).
 
 ### S3: data gaps
 
@@ -326,7 +329,7 @@ North of the 49th parallel, which is 75 % of Quebec's area, the Biodiversité Qu
 
 **Interpretation:**
 - The gaps are measurable, and they are specific to each group. The north–south modifier of the Fuster rules treats them as one.
-- A companion analysis scores what each dataset would add to the Atlas ([`atlas_contribution/results.md`](atlas_contribution/results.md)). It shows that general relevance and contribution to the Atlas diverge: Spearman 0.34 on the annotations, and the datasets bringing taxa new to the Atlas are all rated Low or Excluded.
+- A companion analysis scores what each dataset would add to the Atlas ([`atlas_contribution/results.md`](atlas_contribution/results.md)). It shows that general relevance and contribution to the Atlas diverge: Spearman 0.34 on the annotations, and the six labelled datasets bringing taxa new to the Atlas are all rated Low or not relevant (X).
 - From abstracts, the model recovers the contribution ranking at Spearman 0.49 on both dev and held-out. It judges that only 7 of 68 held-out datasets deposit records loadable into the Atlas.
 
 ---
@@ -334,7 +337,7 @@ North of the 49th parallel, which is 75 % of Quebec's area, the Biodiversité Qu
 ## 7. Case study: insects in northern Quebec
 
 - **What the Atlas holds:** 51 455 of its 865 351 insect records lie north of the 49th parallel. That is 41 records per 1 000 km² in the north, against 1 916 in the south.
-- **What the corpus offers:** 26 annotated records hold insect data, and 5 of them are northern. Ranked by contribution to the Atlas:
+- **What the corpus offers:** 26 of the 231 non-held-out valid records hold insect data, and 5 of them are northern. Ranked by contribution to the Atlas:
   1. a chironomid revision with three species absent from the Atlas (record 363);
   2. spruce budworm parasitoids (genetic data only; 129);
   3. 37 ant species, named only as a count (80);
@@ -358,13 +361,13 @@ The ranking differs from general relevance. Whether the case belongs in article 
 - **Separating "EBV genetic" data** cut data-type class errors from 17 to 7 of 30 on dev.
 - **Focal-taxa rules** cut taxa false positives on long text from 16 to 3 (dev).
 - **A contradiction between two prompt rules** broke Sonnet but not Haiku.
-- **Short vs long text:** long text helps the features (time, space) clearly and relevance modestly (about +0.09 binary F1, within noise on 19 records). The records with an open PDF are not a random sample.
-- **Rules on features vs direct scoring:** on short text, asking the LLM for the category (combined or scoring only) is at least as good as applying the rules in code, and the combined variant is clearly better (+0.12). On long text they converge. Transparency (rules in code) costs accuracy only on short text.
+- **Short vs long text:** long text helps the features (time, space) clearly. For relevance it helps rules on features and scoring only modestly (about +0.09 binary F1, within noise on 19 records) and not the combined variant. The records with an open PDF are not a random sample.
+- **Rules on features vs the one-call approaches (2 and 2b):** on short text, the combined variant beats the rules applied in code (+0.12 binary F1), and scoring only matches them. On long text, binary F1 converges against the rule label, but against the human label the combined variant is again ahead (+0.15). These are the only differences that survive about 30 paired tests, with no correction for multiple tests. Transparency (rules in code) costs some accuracy.
 - **Reproducibility:** fresh runs differ by up to 0.17 in four-class agreement. Paired comparisons on a held-out set are necessary; a 30-record tuning set cannot rank approaches.
 - **The target itself:** the human and rule labels agree on 52 % (four classes). Several rules had to be reconstructed from the released labels: the temporal threshold, plain genetic data, the modulators. Discussion points for the schema are in [`discussion_points_fuster_schema.md`](discussion_points_fuster_schema.md); doubtful annotations are in [`results/gt_issue_register.csv`](results/gt_issue_register.csv).
 - **"No dataset" records:** the model does not recognise papers that hold no usable dataset. That is the main source of false positives at harvest scale, and the definition needs to be settled.
-- **Model choice:** a small model at low effort is enough. Cost per 10 000 records is 3–30 USD.
-- **Comparison with Fuster-Calvo et al.:** the main challenge is not defining relevance but recovering the metadata needed to apply it. LLMs given the rules reach the bag-of-words classifier's level on short text and exceed it on long text, but stay below the agreement between the experts' own two labels.
+- **Model choice (dev evidence, 30 records):** a small model at low effort is enough. Cost per 10 000 records is 2.5–53 USD with Haiku, depending on the approach and input.
+- **Comparison with Fuster-Calvo et al.:** the main challenge is not defining relevance but recovering the metadata needed to apply it. LLMs given the rules reach the bag-of-words classifier's level on short text (combined: 0.78) and long text (about 0.86, a different corpus), but stay below the agreement between the experts' own two labels.
 
 ---
 
