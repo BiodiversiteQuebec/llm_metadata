@@ -24,6 +24,14 @@ Review checkpoints (fresh subagent, reports only, never edits)
 - [x] WU-V3 — Review of the filled outline (numbers traceable, claims within intervals) `opus` *(claims corrected, values all traced)*
 - [ ] WU-V4 — Optional: ecological review of the Atlas contribution scores `opus` *(not done; listed as a step before a second article)*
 
+Corpus completion from a desktop (UdeS network, headed Chrome)
+> **Plan:** [`plans/desktop-pdf-corpus.md`](plans/desktop-pdf-corpus.md) · 51 open-access PDFs still missing (14 dev, 37 held-out)
+- [ ] D1 — Desktop setup (Chrome profile, debug port) `haiku`
+- [ ] D2 — Browser download script `sonnet`
+- [ ] D3 — Recipes per publisher, Wiley first `sonnet`
+- [ ] D4 — Transfer to the server and rebuild the manifests `haiku`
+- [ ] D5 — Coverage report and decision on extending the long-text held-out results `opus`
+
 Track B — Atlas contribution potential (candidate second article)
 - [x] WU-G1 — Atlas reference tables (aggregates only in git) `sonnet`
 - [x] WU-G2 — Matching taxa, regions and period to the Atlas `opus`
