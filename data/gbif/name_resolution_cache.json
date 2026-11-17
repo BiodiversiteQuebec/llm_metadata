@@ -1,4 +1,34 @@
 {
+"/occurrence/count?country=CA&taxonKey=11735358": {
+"count": 0
+},
+"/occurrence/count?country=CA&taxonKey=2432406": {
+"count": 6208
+},
+"/occurrence/count?country=CA&taxonKey=4266261": {
+"count": 0
+},
+"/occurrence/count?country=CA&taxonKey=4266262": {
+"count": 0
+},
+"/occurrence/count?country=CA&taxonKey=4266265": {
+"count": 0
+},
+"/occurrence/count?country=CA&taxonKey=4266266": {
+"count": 0
+},
+"/occurrence/count?country=CA&taxonKey=5218786": {
+"count": 20353
+},
+"/occurrence/count?country=CA&taxonKey=5219380": {
+"count": 6781
+},
+"/occurrence/count?country=CA&taxonKey=5219840": {
+"count": 4
+},
+"/occurrence/count?country=CA&taxonKey=6164210": {
+"count": 459
+},
 "/species/match?kingdom=Animalia&name=Canis&verbose=true": {
 "alternatives": [
 {
@@ -209,6 +239,74 @@
 "status": "ACCEPTED",
 "usageKey": 2182727
 },
+"/species/match?kingdom=Animalia&name=Lemmus+lemmus&verbose=true": {
+"canonicalName": "Lemmus lemmus",
+"class": "Mammalia",
+"classKey": 359,
+"confidence": 100,
+"family": "Cricetidae",
+"familyKey": 3240723,
+"genus": "Lemmus",
+"genusKey": 5219834,
+"kingdom": "Animalia",
+"kingdomKey": 1,
+"matchType": "EXACT",
+"order": "Rodentia",
+"orderKey": 1459,
+"phylum": "Chordata",
+"phylumKey": 44,
+"rank": "SPECIES",
+"scientificName": "Lemmus lemmus (Linnaeus, 1758)",
+"species": "Lemmus lemmus",
+"speciesKey": 5219840,
+"status": "ACCEPTED",
+"usageKey": 5219840
+},
+"/species/match?kingdom=Animalia&name=Mephitis&verbose=true": {
+"alternatives": [
+{
+"acceptedUsageKey": 2434843,
+"canonicalName": "Mephitis",
+"class": "Mammalia",
+"classKey": 359,
+"confidence": 94,
+"family": "Mephitidae",
+"familyKey": 9679,
+"genus": "Mydaus",
+"genusKey": 2434843,
+"kingdom": "Animalia",
+"kingdomKey": 1,
+"matchType": "EXACT",
+"order": "Carnivora",
+"orderKey": 732,
+"phylum": "Chordata",
+"phylumKey": 44,
+"rank": "GENUS",
+"scientificName": "Mephitis Desmarest, 1820",
+"status": "SYNONYM",
+"usageKey": 7365180
+}
+],
+"canonicalName": "Mephitis",
+"class": "Mammalia",
+"classKey": 359,
+"confidence": 95,
+"family": "Mephitidae",
+"familyKey": 9679,
+"genus": "Mephitis",
+"genusKey": 5219379,
+"kingdom": "Animalia",
+"kingdomKey": 1,
+"matchType": "EXACT",
+"order": "Carnivora",
+"orderKey": 732,
+"phylum": "Chordata",
+"phylumKey": 44,
+"rank": "GENUS",
+"scientificName": "Mephitis É.Geoffroy Saint-Hilaire & F.G.Cuvier, 1795",
+"status": "ACCEPTED",
+"usageKey": 5219379
+},
 "/species/match?kingdom=Animalia&name=Mephitis+mephitis&verbose=true": {
 "canonicalName": "Mephitis mephitis",
 "class": "Mammalia",
@@ -254,6 +352,50 @@
 "speciesKey": 2438667,
 "status": "ACCEPTED",
 "usageKey": 2438667
+},
+"/species/match?kingdom=Animalia&name=Morus&verbose=true": {
+"alternatives": [
+{
+"canonicalName": "Morus",
+"class": "Magnoliopsida",
+"classKey": 220,
+"confidence": 49,
+"family": "Moraceae",
+"familyKey": 6640,
+"genus": "Morus",
+"genusKey": 2984545,
+"kingdom": "Plantae",
+"kingdomKey": 6,
+"matchType": "EXACT",
+"order": "Rosales",
+"orderKey": 691,
+"phylum": "Tracheophyta",
+"phylumKey": 7707728,
+"rank": "GENUS",
+"scientificName": "Morus L.",
+"status": "ACCEPTED",
+"usageKey": 2984545
+}
+],
+"canonicalName": "Morus",
+"class": "Aves",
+"classKey": 212,
+"confidence": 96,
+"family": "Sulidae",
+"familyKey": 9351,
+"genus": "Morus",
+"genusKey": 2480962,
+"kingdom": "Animalia",
+"kingdomKey": 1,
+"matchType": "EXACT",
+"order": "Suliformes",
+"orderKey": 7192775,
+"phylum": "Chordata",
+"phylumKey": 44,
+"rank": "GENUS",
+"scientificName": "Morus Vieillot, 1816",
+"status": "ACCEPTED",
+"usageKey": 2480962
 },
 "/species/match?kingdom=Animalia&name=Moxostoma+anisurum&verbose=true": {
 "canonicalName": "Moxostoma anisurum",
@@ -340,6 +482,51 @@
 "speciesKey": 2432406,
 "status": "ACCEPTED",
 "usageKey": 2432406
+},
+"/species/match?kingdom=Animalia&name=Procyon&verbose=true": {
+"alternatives": [
+{
+"acceptedUsageKey": 2434325,
+"canonicalName": "Procyon",
+"class": "Mammalia",
+"classKey": 359,
+"confidence": 94,
+"family": "Canidae",
+"familyKey": 9701,
+"genus": "Lycalopex",
+"genusKey": 2434325,
+"kingdom": "Animalia",
+"kingdomKey": 1,
+"matchType": "EXACT",
+"order": "Carnivora",
+"orderKey": 732,
+"phylum": "Chordata",
+"phylumKey": 44,
+"rank": "GENUS",
+"scientificName": "Procyon Fischer, 1814",
+"status": "SYNONYM",
+"usageKey": 3239997
+}
+],
+"canonicalName": "Procyon",
+"class": "Mammalia",
+"classKey": 359,
+"confidence": 95,
+"family": "Procyonidae",
+"familyKey": 5311,
+"genus": "Procyon",
+"genusKey": 2433592,
+"kingdom": "Animalia",
+"kingdomKey": 1,
+"matchType": "EXACT",
+"order": "Carnivora",
+"orderKey": 732,
+"phylum": "Chordata",
+"phylumKey": 44,
+"rank": "GENUS",
+"scientificName": "Procyon Storr, 1780",
+"status": "ACCEPTED",
+"usageKey": 2433592
 },
 "/species/match?kingdom=Animalia&name=Procyon+lotor&verbose=true": {
 "canonicalName": "Procyon lotor",
@@ -665,6 +852,78 @@
 "speciesKey": 5231630,
 "status": "ACCEPTED",
 "usageKey": 5231630
+},
+"/species/match?name=Acer+rubrum&verbose=true": {
+"alternatives": [
+{
+"acceptedUsageKey": 3189837,
+"canonicalName": "Acer rubrum",
+"class": "Magnoliopsida",
+"classKey": 220,
+"confidence": 97,
+"family": "Sapindaceae",
+"familyKey": 6657,
+"genus": "Acer",
+"genusKey": 3189834,
+"kingdom": "Plantae",
+"kingdomKey": 6,
+"matchType": "EXACT",
+"order": "Sapindales",
+"orderKey": 933,
+"phylum": "Tracheophyta",
+"phylumKey": 7707728,
+"rank": "SPECIES",
+"scientificName": "Acer rubrum Lam., 1786",
+"species": "Acer saccharinum",
+"speciesKey": 3189837,
+"status": "SYNONYM",
+"usageKey": 8725355
+},
+{
+"canonicalName": "Acer rubrum",
+"class": "Magnoliopsida",
+"classKey": 220,
+"confidence": 96,
+"family": "Sapindaceae",
+"familyKey": 6657,
+"genus": "Acer",
+"genusKey": 3189834,
+"kingdom": "Plantae",
+"kingdomKey": 6,
+"matchType": "EXACT",
+"order": "Sapindales",
+"orderKey": 933,
+"phylum": "Tracheophyta",
+"phylumKey": 7707728,
+"rank": "SPECIES",
+"scientificName": "Acer rubrum P.Watson",
+"species": "Acer rubrum",
+"speciesKey": 7585041,
+"status": "DOUBTFUL",
+"usageKey": 7585041
+}
+],
+"canonicalName": "Acer rubrum",
+"class": "Magnoliopsida",
+"classKey": 220,
+"confidence": 97,
+"family": "Sapindaceae",
+"familyKey": 6657,
+"genus": "Acer",
+"genusKey": 3189834,
+"kingdom": "Plantae",
+"kingdomKey": 6,
+"matchType": "EXACT",
+"order": "Sapindales",
+"orderKey": 933,
+"phylum": "Tracheophyta",
+"phylumKey": 7707728,
+"rank": "SPECIES",
+"scientificName": "Acer rubrum L.",
+"species": "Acer rubrum",
+"speciesKey": 3189883,
+"status": "ACCEPTED",
+"usageKey": 3189883
 },
 "/species/match?name=Acer+saccharum&verbose=true": {
 "canonicalName": "Acer saccharum",
@@ -1316,6 +1575,9 @@
 "speciesKey": 5275044,
 "status": "ACCEPTED",
 "usageKey": 5275044
+},
+"/species/match?name=Atlantic&verbose=true": {
+"matchType": "NONE"
 },
 "/species/match?name=Atlantic+salmon&verbose=true": {
 "matchType": "NONE"
@@ -2152,6 +2414,9 @@
 "status": "ACCEPTED",
 "usageKey": 5229743
 },
+"/species/match?name=Coprophilous&verbose=true": {
+"matchType": "NONE"
+},
 "/species/match?name=Coprophilous+and+necrophagous&verbose=true": {
 "matchType": "NONE"
 },
@@ -2359,6 +2624,9 @@
 "speciesKey": 5275149,
 "status": "ACCEPTED",
 "usageKey": 5275149
+},
+"/species/match?name=Eastern&verbose=true": {
+"matchType": "NONE"
 },
 "/species/match?name=Eastern+coyote&verbose=true": {
 "matchType": "NONE"
@@ -2848,6 +3116,12 @@
 "speciesKey": 2473502,
 "status": "SYNONYM",
 "usageKey": 2473492
+},
+"/species/match?name=Foo&verbose=true": {
+"matchType": "NONE"
+},
+"/species/match?name=Foo+barus&verbose=true": {
+"matchType": "NONE"
 },
 "/species/match?name=Fraxinus+pennsylvanica&verbose=true": {
 "canonicalName": "Fraxinus pennsylvanica",
@@ -3347,6 +3621,9 @@
 "scientificName": "Leiodidae",
 "status": "ACCEPTED",
 "usageKey": 4738
+},
+"/species/match?name=Lemming&verbose=true": {
+"matchType": "NONE"
 },
 "/species/match?name=Liliopsida&verbose=true": {
 "canonicalName": "Liliopsida",
@@ -3893,6 +4170,79 @@
 "status": "ACCEPTED",
 "usageKey": 52
 },
+"/species/match?name=Morus&verbose=true": {
+"alternatives": [
+{
+"canonicalName": "Morus",
+"class": "Magnoliopsida",
+"classKey": 220,
+"confidence": 99,
+"family": "Moraceae",
+"familyKey": 6640,
+"genus": "Morus",
+"genusKey": 2984545,
+"kingdom": "Plantae",
+"kingdomKey": 6,
+"matchType": "EXACT",
+"order": "Rosales",
+"orderKey": 691,
+"phylum": "Tracheophyta",
+"phylumKey": 7707728,
+"rank": "GENUS",
+"scientificName": "Morus L.",
+"status": "ACCEPTED",
+"usageKey": 2984545
+},
+{
+"canonicalName": "Morus",
+"class": "Aves",
+"classKey": 212,
+"confidence": 99,
+"family": "Sulidae",
+"familyKey": 9351,
+"genus": "Morus",
+"genusKey": 2480962,
+"kingdom": "Animalia",
+"kingdomKey": 1,
+"matchType": "EXACT",
+"order": "Suliformes",
+"orderKey": 7192775,
+"phylum": "Chordata",
+"phylumKey": 44,
+"rank": "GENUS",
+"scientificName": "Morus Vieillot, 1816",
+"status": "ACCEPTED",
+"usageKey": 2480962
+}
+],
+"matchType": "NONE"
+},
+"/species/match?name=Morus+bassanus&verbose=true": {
+"canonicalName": "Morus bassanus",
+"class": "Aves",
+"classKey": 212,
+"confidence": 99,
+"family": "Sulidae",
+"familyKey": 9351,
+"genus": "Morus",
+"genusKey": 2480962,
+"kingdom": "Animalia",
+"kingdomKey": 1,
+"matchType": "EXACT",
+"order": "Suliformes",
+"orderKey": 7192775,
+"phylum": "Chordata",
+"phylumKey": 44,
+"rank": "SPECIES",
+"scientificName": "Morus bassanus (Linnaeus, 1758)",
+"species": "Morus bassanus",
+"speciesKey": 2480964,
+"status": "ACCEPTED",
+"usageKey": 2480964
+},
+"/species/match?name=Morus+xyzus&verbose=true": {
+"matchType": "NONE"
+},
 "/species/match?name=Moxostoma+anisurum&verbose=true": {
 "canonicalName": "Moxostoma anisurum",
 "confidence": 99,
@@ -4356,6 +4706,29 @@
 "status": "ACCEPTED",
 "usageKey": 2481784
 },
+"/species/match?name=Odocoileus+virginianus&verbose=true": {
+"canonicalName": "Odocoileus virginianus",
+"class": "Mammalia",
+"classKey": 359,
+"confidence": 99,
+"family": "Cervidae",
+"familyKey": 5298,
+"genus": "Odocoileus",
+"genusKey": 2440964,
+"kingdom": "Animalia",
+"kingdomKey": 1,
+"matchType": "EXACT",
+"order": "Artiodactyla",
+"orderKey": 731,
+"phylum": "Chordata",
+"phylumKey": 44,
+"rank": "SPECIES",
+"scientificName": "Odocoileus virginianus (Zimmermann, 1780)",
+"species": "Odocoileus virginianus",
+"speciesKey": 2440965,
+"status": "ACCEPTED",
+"usageKey": 2440965
+},
 "/species/match?name=Odonata&verbose=true": {
 "canonicalName": "Odonata",
 "class": "Insecta",
@@ -4465,6 +4838,25 @@
 "status": "ACCEPTED",
 "usageKey": 1195129
 },
+"/species/match?name=Paridae&verbose=true": {
+"canonicalName": "Paridae",
+"class": "Aves",
+"classKey": 212,
+"confidence": 94,
+"family": "Paridae",
+"familyKey": 9327,
+"kingdom": "Animalia",
+"kingdomKey": 1,
+"matchType": "EXACT",
+"order": "Passeriformes",
+"orderKey": 729,
+"phylum": "Chordata",
+"phylumKey": 44,
+"rank": "FAMILY",
+"scientificName": "Paridae",
+"status": "ACCEPTED",
+"usageKey": 9327
+},
 "/species/match?name=Passerella+iliaca&verbose=true": {
 "canonicalName": "Passerella iliaca",
 "class": "Aves",
@@ -4557,6 +4949,25 @@
 "speciesKey": 2437967,
 "status": "ACCEPTED",
 "usageKey": 2437967
+},
+"/species/match?name=Petromyzontidae&verbose=true": {
+"canonicalName": "Petromyzontidae",
+"class": "Petromyzonti",
+"classKey": 11881065,
+"confidence": 94,
+"family": "Petromyzontidae",
+"familyKey": 2212,
+"kingdom": "Animalia",
+"kingdomKey": 1,
+"matchType": "EXACT",
+"order": "Petromyzontiformes",
+"orderKey": 771,
+"phylum": "Chordata",
+"phylumKey": 44,
+"rank": "FAMILY",
+"scientificName": "Petromyzontidae",
+"status": "ACCEPTED",
+"usageKey": 2212
 },
 "/species/match?name=Phalaris+arundinacea&verbose=true": {
 "alternatives": [
@@ -4748,6 +5159,118 @@
 "speciesKey": 5284802,
 "status": "ACCEPTED",
 "usageKey": 5284802
+},
+"/species/match?name=Pieris&verbose=true": {
+"alternatives": [
+{
+"canonicalName": "Pieris",
+"class": "Magnoliopsida",
+"classKey": 220,
+"confidence": 99,
+"family": "Ericaceae",
+"familyKey": 2505,
+"genus": "Pieris",
+"genusKey": 2882626,
+"kingdom": "Plantae",
+"kingdomKey": 6,
+"matchType": "EXACT",
+"order": "Ericales",
+"orderKey": 1353,
+"phylum": "Tracheophyta",
+"phylumKey": 7707728,
+"rank": "GENUS",
+"scientificName": "Pieris D.Don",
+"status": "ACCEPTED",
+"usageKey": 2882626
+},
+{
+"canonicalName": "Pieris",
+"class": "Insecta",
+"classKey": 216,
+"confidence": 99,
+"family": "Pieridae",
+"familyKey": 5481,
+"genus": "Pieris",
+"genusKey": 1920481,
+"kingdom": "Animalia",
+"kingdomKey": 1,
+"matchType": "EXACT",
+"order": "Lepidoptera",
+"orderKey": 797,
+"phylum": "Arthropoda",
+"phylumKey": 54,
+"rank": "GENUS",
+"scientificName": "Pieris Hübner, 1819",
+"status": "ACCEPTED",
+"usageKey": 1920481
+},
+{
+"canonicalName": "Pieris",
+"class": "Insecta",
+"classKey": 216,
+"confidence": 93,
+"family": "Pieridae",
+"familyKey": 5481,
+"genus": "Pieris",
+"genusKey": 11294802,
+"kingdom": "Animalia",
+"kingdomKey": 1,
+"matchType": "EXACT",
+"order": "Lepidoptera",
+"orderKey": 797,
+"phylum": "Arthropoda",
+"phylumKey": 54,
+"rank": "GENUS",
+"scientificName": "Pieris Meinhard",
+"status": "DOUBTFUL",
+"usageKey": 11294802
+},
+{
+"canonicalName": "Pieris",
+"class": "Insecta",
+"classKey": 216,
+"confidence": 93,
+"family": "Pieridae",
+"familyKey": 5481,
+"genus": "Pieris",
+"genusKey": 7236092,
+"kingdom": "Animalia",
+"kingdomKey": 1,
+"matchType": "EXACT",
+"order": "Lepidoptera",
+"orderKey": 797,
+"phylum": "Arthropoda",
+"phylumKey": 54,
+"rank": "GENUS",
+"scientificName": "Pieris Schrank, 1801",
+"status": "DOUBTFUL",
+"usageKey": 7236092
+}
+],
+"matchType": "NONE"
+},
+"/species/match?name=Pieris+rapae&verbose=true": {
+"canonicalName": "Pieris rapae",
+"class": "Insecta",
+"classKey": 216,
+"confidence": 99,
+"family": "Pieridae",
+"familyKey": 5481,
+"genus": "Pieris",
+"genusKey": 1920481,
+"kingdom": "Animalia",
+"kingdomKey": 1,
+"matchType": "EXACT",
+"order": "Lepidoptera",
+"orderKey": 797,
+"phylum": "Arthropoda",
+"phylumKey": 54,
+"rank": "SPECIES",
+"scientificName": "Pieris rapae (Linnaeus, 1758)",
+"species": "Pieris rapae",
+"speciesKey": 1920496,
+"status": "ACCEPTED",
+"usageKey": 1920496
 },
 "/species/match?name=Pinicola+enucleator&verbose=true": {
 "canonicalName": "Pinicola enucleator",
@@ -5807,6 +6330,27 @@
 "status": "ACCEPTED",
 "usageKey": 4284021
 },
+"/species/match?name=Salvelinus+fontinalis&verbose=true": {
+"canonicalName": "Salvelinus fontinalis",
+"confidence": 99,
+"family": "Salmonidae",
+"familyKey": 8615,
+"genus": "Salvelinus",
+"genusKey": 2351241,
+"kingdom": "Animalia",
+"kingdomKey": 1,
+"matchType": "EXACT",
+"order": "Salmoniformes",
+"orderKey": 1313,
+"phylum": "Chordata",
+"phylumKey": 44,
+"rank": "SPECIES",
+"scientificName": "Salvelinus fontinalis (Mitchill, 1814)",
+"species": "Salvelinus fontinalis",
+"speciesKey": 2351271,
+"status": "ACCEPTED",
+"usageKey": 2351271
+},
 "/species/match?name=Sambucus+pubens&verbose=true": {
 "acceptedUsageKey": 8250865,
 "canonicalName": "Sambucus pubens",
@@ -6327,6 +6871,9 @@
 "status": "ACCEPTED",
 "usageKey": 2437282
 },
+"/species/match?name=Tetranychid&verbose=true": {
+"matchType": "NONE"
+},
 "/species/match?name=Tetranychid+mites&verbose=true": {
 "matchType": "NONE"
 },
@@ -6432,6 +6979,29 @@
 "scientificName": "Trogidae",
 "status": "ACCEPTED",
 "usageKey": 5839
+},
+"/species/match?name=Turdus+migratorius&verbose=true": {
+"canonicalName": "Turdus migratorius",
+"class": "Aves",
+"classKey": 212,
+"confidence": 99,
+"family": "Turdidae",
+"familyKey": 5290,
+"genus": "Turdus",
+"genusKey": 2490714,
+"kingdom": "Animalia",
+"kingdomKey": 1,
+"matchType": "EXACT",
+"order": "Passeriformes",
+"orderKey": 729,
+"phylum": "Chordata",
+"phylumKey": 44,
+"rank": "SPECIES",
+"scientificName": "Turdus migratorius Linnaeus, 1766",
+"species": "Turdus migratorius",
+"speciesKey": 9510564,
+"status": "ACCEPTED",
+"usageKey": 9510564
 },
 "/species/match?name=Typhlodromus+bakeri&verbose=true": {
 "canonicalName": "Typhlodromus bakeri",
@@ -6820,6 +7390,71 @@
 "speciesKey": 2487430,
 "status": "ACCEPTED",
 "usageKey": 2487430
+},
+"/species/match?name=Vulpes+foobarus&verbose=true": {
+"canonicalName": "Vulpes",
+"class": "Mammalia",
+"classKey": 359,
+"confidence": 92,
+"family": "Canidae",
+"familyKey": 9701,
+"genus": "Vulpes",
+"genusKey": 5219234,
+"kingdom": "Animalia",
+"kingdomKey": 1,
+"matchType": "HIGHERRANK",
+"order": "Carnivora",
+"orderKey": 732,
+"phylum": "Chordata",
+"phylumKey": 44,
+"rank": "GENUS",
+"scientificName": "Vulpes Frisch, 1775",
+"status": "ACCEPTED",
+"usageKey": 5219234
+},
+"/species/match?name=Vulpes+quuxus&verbose=true": {
+"canonicalName": "Vulpes",
+"class": "Mammalia",
+"classKey": 359,
+"confidence": 92,
+"family": "Canidae",
+"familyKey": 9701,
+"genus": "Vulpes",
+"genusKey": 5219234,
+"kingdom": "Animalia",
+"kingdomKey": 1,
+"matchType": "HIGHERRANK",
+"order": "Carnivora",
+"orderKey": 732,
+"phylum": "Chordata",
+"phylumKey": 44,
+"rank": "GENUS",
+"scientificName": "Vulpes Frisch, 1775",
+"status": "ACCEPTED",
+"usageKey": 5219234
+},
+"/species/match?name=Vulpes+vulpes&verbose=true": {
+"canonicalName": "Vulpes vulpes",
+"class": "Mammalia",
+"classKey": 359,
+"confidence": 99,
+"family": "Canidae",
+"familyKey": 9701,
+"genus": "Vulpes",
+"genusKey": 5219234,
+"kingdom": "Animalia",
+"kingdomKey": 1,
+"matchType": "EXACT",
+"order": "Carnivora",
+"orderKey": 732,
+"phylum": "Chordata",
+"phylumKey": 44,
+"rank": "SPECIES",
+"scientificName": "Vulpes vulpes (Linnaeus, 1758)",
+"species": "Vulpes vulpes",
+"speciesKey": 5219243,
+"status": "ACCEPTED",
+"usageKey": 5219243
 },
 "/species/match?name=Zonotrichia+leucophrys&verbose=true": {
 "canonicalName": "Zonotrichia leucophrys",
@@ -9145,6 +9780,9 @@
 }
 ]
 },
+"/species/search?datasetKey=d7dddbf4-2cf0-4f39-9b2a-bb099caae36c&limit=50&q=coprophilous&qField=VERNACULAR": {
+"results": []
+},
 "/species/search?datasetKey=d7dddbf4-2cf0-4f39-9b2a-bb099caae36c&limit=50&q=coprophilous+and+necrophagous+beetle&qField=VERNACULAR": {
 "results": []
 },
@@ -11411,6 +12049,9 @@
 "/species/search?datasetKey=d7dddbf4-2cf0-4f39-9b2a-bb099caae36c&limit=50&q=flying+beetles&qField=VERNACULAR": {
 "results": []
 },
+"/species/search?datasetKey=d7dddbf4-2cf0-4f39-9b2a-bb099caae36c&limit=50&q=foo+barus&qField=VERNACULAR": {
+"results": []
+},
 "/species/search?datasetKey=d7dddbf4-2cf0-4f39-9b2a-bb099caae36c&limit=50&q=gaspesie+caribou&qField=VERNACULAR": {
 "results": []
 },
@@ -12337,6 +12978,763 @@
 "/species/search?datasetKey=d7dddbf4-2cf0-4f39-9b2a-bb099caae36c&limit=50&q=lakes+boreal+wolf&qField=VERNACULAR": {
 "results": []
 },
+"/species/search?datasetKey=d7dddbf4-2cf0-4f39-9b2a-bb099caae36c&limit=50&q=lemming&qField=VERNACULAR": {
+"results": [
+{
+"canonicalName": "Dicrostonyx",
+"key": 2438382,
+"kingdom": "Animalia",
+"rank": "GENUS",
+"taxonomicStatus": "ACCEPTED",
+"vernacularNames": [
+"collared lemmings",
+"копытные лемминги",
+"obroznik",
+"halsbandlemener",
+"クヒワレミンク属",
+"kaulussopulit",
+"lemming"
+]
+},
+{
+"canonicalName": "Eolagurus",
+"key": 2438163,
+"kingdom": "Animalia",
+"rank": "GENUS",
+"taxonomicStatus": "ACCEPTED",
+"vernacularNames": [
+"東方兔尾鼠屬",
+"желтые пеструшки",
+"stepoleming",
+"キイロステッフレミンク属",
+"kelta arosopulit",
+"desert lemmings",
+"gelblemminge",
+"steppe lemming"
+]
+},
+{
+"canonicalName": "Mictomys",
+"key": 4829012,
+"kingdom": "Animalia",
+"rank": "GENUS",
+"taxonomicStatus": "SYNONYM",
+"vernacularNames": [
+"bog lemming"
+]
+},
+{
+"canonicalName": "Alticola lemminus",
+"key": 2438713,
+"kingdom": "Animalia",
+"rank": "SPECIES",
+"taxonomicStatus": "ACCEPTED",
+"vernacularNames": [
+"lemming gebirgswuhlmaus",
+"lemming mountain vole",
+"lemming vole",
+"lemminggebirgswuhlmaus",
+"tsuktsienylankomyyra",
+"ユキミヤマネスミ",
+"gorzak syberyjski",
+"лемминговидная полевка"
+]
+},
+{
+"canonicalName": "Lemmus trimucronatus",
+"key": 5219836,
+"kingdom": "Animalia",
+"rank": "SPECIES",
+"taxonomicStatus": "ACCEPTED",
+"vernacularNames": [
+"lemming buryi",
+"leming zheltobryukhii",
+"brown lemming",
+"nearctic brown lemming",
+"brun lammel",
+"lemming pardo norteamericano",
+"бурыи лемминг",
+"leming nearktyczny",
+"brunlemen",
+"カナタレミンク",
+"lemming canadese",
+"lemming bruno",
+"lemming brun",
+"brauner lemming",
+"brun lemming",
+"lemming neartico"
+]
+},
+{
+"canonicalName": "Synaptomys cooperi",
+"key": 2438954,
+"kingdom": "Animalia",
+"rank": "SPECIES",
+"taxonomicStatus": "ACCEPTED",
+"vernacularNames": [
+"southern bog lemming",
+"kansas bog lemming",
+"campagnol lemming de cooper",
+"lemming de cooper",
+"sidlicher moorlemming",
+"lemming de pantano meridional",
+"southern lemming mouse",
+"lumik kratkoocasy",
+"cooper s lemming mouse",
+"mississipinsuosopuli",
+"ミナミヌマレミンク",
+"zuidelijke lemmingmuis",
+"sørlig sumplemen",
+"moczarnik południowy",
+"лемминговая мышь купера",
+"южныи мышевидныи лемминг",
+"lemming de pantano sureno"
+]
+},
+{
+"canonicalName": "Dicrostonyx vinogradovi",
+"key": 2438388,
+"kingdom": "Animalia",
+"rank": "SPECIES",
+"taxonomicStatus": "ACCEPTED",
+"vernacularNames": [
+"siberian arctic lemming",
+"lemming kopytnyi",
+"wrangel lemming",
+"wrangel island collared lemming"
+]
+},
+{
+"canonicalName": "Lemmus sibiricus",
+"key": 5219835,
+"kingdom": "Animalia",
+"rank": "SPECIES",
+"taxonomicStatus": "ACCEPTED",
+"vernacularNames": [
+"brown lemming",
+"leming de siberia",
+"siberian brown lemming",
+"siberian lemming",
+"sibirisk lammel",
+"сибирскии лемминг",
+"leming brunatny",
+"sibirlemen",
+"siberische lemming",
+"bruine lemming",
+"シヘリアレミンク",
+"lemming siberiano",
+"lemming de siberie",
+"siperiansopuli",
+"west siberian brown lemming",
+"ob lemming",
+"black footed lemming",
+"sibirischer lemming",
+"lumik sibirsky",
+"lemming de siberia"
+]
+},
+{
+"canonicalName": "Synaptomys borealis",
+"key": 2438953,
+"kingdom": "Animalia",
+"rank": "SPECIES",
+"taxonomicStatus": "ACCEPTED",
+"vernacularNames": [
+"northern bog lemming",
+"okanagan bog lemming",
+"campagnol lemming boreale",
+"lemming boreal",
+"nordlicher moorlemming",
+"lemming de pantano septentrional"
+]
+},
+{
+"canonicalName": "Dicrostonyx torquatus",
+"key": 2438384,
+"kingdom": "Animalia",
+"rank": "SPECIES",
+"taxonomicStatus": "ACCEPTED",
+"vernacularNames": [
+"collared lemming",
+"rata de campo",
+"palearctic collared lemming",
+"arctic lemming",
+"копытныи лемминг",
+"obroznik tundrowy",
+"leming obrozny",
+"sibirsk halsbandlemen",
+"arktisk halsbandlemen",
+"avinngaq",
+"クヒワレミンク",
+"lemming dal collare paleartico",
+"lemming arctique",
+"lemming a collier",
+"siperiankaulussopuli",
+"arctic collared lemming",
+"halsbandlemming",
+"echter halsbandlemming",
+"lumik velky",
+"lemming paleertico de collar"
+]
+},
+{
+"canonicalName": "Lemmus amurensis",
+"key": 5219839,
+"kingdom": "Animalia",
+"rank": "SPECIES",
+"taxonomicStatus": "ACCEPTED",
+"vernacularNames": [
+"amurskii lemming",
+"amur lemming",
+"amur brown lemming",
+"lemming de amur",
+"амурскии лемминг",
+"leming amurski",
+"amurlemen",
+"amoerlemming",
+"アムールレミンク",
+"lemming de amour",
+"amurinsopuli",
+"lumik amursky",
+"lemming del amur",
+"amurlemming"
+]
+},
+{
+"canonicalName": "Dicrostonyx richardsoni",
+"key": 2438386,
+"kingdom": "Animalia",
+"rank": "SPECIES",
+"taxonomicStatus": "ACCEPTED",
+"vernacularNames": [
+"richardson s collared lemming",
+"lemming acollarado de richardson",
+"лемминг ричардсона",
+"obroznik zmienny",
+"リチャートソンクヒワレミンク",
+"lemming de richardson",
+"kanadankaulussopuli",
+"richardson s varying lemming",
+"richardson s hoofed lemming",
+"richardson halsbandlemming",
+"lumik richardsonuv",
+"lemming de collar de richardson"
+]
+},
+{
+"canonicalName": "Dicrostonyx groenlandicus",
+"key": 2438391,
+"kingdom": "Animalia",
+"rank": "SPECIES",
+"taxonomicStatus": "ACCEPTED",
+"vernacularNames": [
+"northern collared lemming",
+"neartic collared lemming",
+"nearctic collared lemming",
+"lemming de collar norteno",
+"гренландскии лемминг",
+"obroznik grenlandzki",
+"leming grenlandzki",
+"amerikansk halsbandlemen",
+"groenlandse halsbandlemming",
+"narlumukaaq",
+"maajooq",
+"avinngaq",
+"avingaq",
+"アメリカクヒワレミンク",
+"lemming dal collare settentrionale",
+"lemming dal collare della groenlandia",
+"lemming dal collare neartico",
+"lemming du groenland",
+"victoriankaulussopuli",
+"barrowinkaulussopuli",
+"amerikankaulussopuli",
+"peary land collared lemming",
+"northern varying lemming",
+"northern hoofed lemming",
+"greenland collared lemming",
+"collared lemming",
+"bering collared lemming",
+"nordlicher halsbandlemming",
+"halsbandslemming",
+"lumik gronsky",
+"lemming neertico de collar"
+]
+},
+{
+"canonicalName": "Dicrostonyx hudsonius",
+"key": 2438389,
+"kingdom": "Animalia",
+"rank": "SPECIES",
+"taxonomicStatus": "ACCEPTED",
+"vernacularNames": [
+"ungava collared lemming",
+"labrador collared lemming",
+"lemming acollarado de ungava",
+"гудзонскии лемминг",
+"obroznik labradorski",
+"gekraagde lemming",
+"ラフラトルクヒワレミンク",
+"lemming dal collare di labrador",
+"lemming a collerette du labrador",
+"lemming d ungava",
+"labradorinkaulussopuli",
+"ungava halsbandlemming",
+"lumik hudsonsky",
+"lemming de collar de ungava"
+]
+},
+{
+"canonicalName": "Lemmus portenkoi",
+"key": 5706758,
+"kingdom": "Animalia",
+"rank": "SPECIES",
+"taxonomicStatus": "ACCEPTED",
+"vernacularNames": [
+"wrangel island lemming"
+]
+},
+{
+"canonicalName": "Dicrostonyx nunatakensis",
+"key": 2438387,
+"kingdom": "Animalia",
+"rank": "SPECIES",
+"taxonomicStatus": "ACCEPTED",
+"vernacularNames": [
+"ogilvie mountains collared lemming",
+"lemming acollarado de las montanas ogilvie",
+"олджилвиискии лемминг",
+"obroznik gorski",
+"オークルヒークヒワレミンク",
+"lemming du yukon",
+"yukoninkaulussopuli",
+"ogilvie mountain collared lemming",
+"ogilvie collared lemming",
+"ogilvie mountains halsbandlemming",
+"lemming de collar de ogilvie"
+]
+},
+{
+"canonicalName": "Dicrostonyx unalascensis",
+"key": 2438385,
+"kingdom": "Animalia",
+"rank": "SPECIES",
+"taxonomicStatus": "ACCEPTED",
+"vernacularNames": [
+"unalaska collared lemming",
+"umnak island collared lemming",
+"lemming de collar de unalaska",
+"аналасканскии лемминг",
+"obroznik wyspowy",
+"ウナラスカクヒワレミンク",
+"lemming des aleoutiennes",
+"aleuttienkaulussopuli",
+"aleutian island collared lemming",
+"unalaska halsbandlemming"
+]
+},
+{
+"canonicalName": "Aschizomys lemminus",
+"key": 11946067,
+"kingdom": "Animalia",
+"rank": "SPECIES",
+"taxonomicStatus": "HOMOTYPIC_SYNONYM",
+"vernacularNames": [
+"campagnol lemming",
+"lemming vole",
+"lemming mountain vole",
+"lemming gebirgswiihimaus",
+"topillo de montana lemming"
+]
+},
+{
+"canonicalName": "Dicrostonyx nelsoni",
+"key": 2438390,
+"kingdom": "Animalia",
+"rank": "SPECIES",
+"taxonomicStatus": "ACCEPTED",
+"vernacularNames": [
+"nelson s collared lemming",
+"ungava collared lemming",
+"nelson s collred lemming",
+"lemming de collar de nelson",
+"лаврентиискии лемминг",
+"obroznik alaskanski",
+"ネルソンクヒワレミンク",
+"lemming de nelson",
+"beringiankaulussopuli",
+"alaskankaulussopuli",
+"st lawrence island collared lemming",
+"st",
+"lawrence island collared lemming",
+"nelson halsbandlemming",
+"lumik limcovy"
+]
+},
+{
+"canonicalName": "Lemmus lemmus",
+"key": 5219840,
+"kingdom": "Animalia",
+"rank": "SPECIES",
+"taxonomicStatus": "ACCEPTED",
+"vernacularNames": [
+"norway lemming",
+"lemming de tundra",
+"fjallammel",
+"leming de tundra",
+"lemming des toundras",
+"berglemming",
+"lemingu",
+"skandinavski leming",
+"lumik",
+"leming da tundra",
+"lemen",
+"kalnu lemings",
+"norveginis lemingas",
+"lemming comune",
+"læmingi",
+"kozonseges lemming",
+"planinski leming",
+"tunturisopuli",
+"norra lemming",
+"lemming",
+"lumik norsky",
+"挪威旅鼠",
+"норвешки леминг",
+"goddesahpan",
+"норвежскии лемминг",
+"амурскии лемминг",
+"lemingue",
+"leming norweski",
+"leming amurski",
+"norsk lemen",
+"amurlemen",
+"amoerlemming",
+"ノルウェーレミンク",
+"norvegiai lemming",
+"lemming de norvege",
+"amurinsopuli",
+"leming arrunt",
+"norwegian lemming",
+"norway brown lemming",
+"amur lemming",
+"νορβηγικο λεμινγκ",
+"lumik amursky",
+"lemming an toundra",
+"lemming de noruega"
+]
+},
+{
+"canonicalName": "Myopus schisticolor",
+"key": 2439358,
+"kingdom": "Animalia",
+"rank": "SPECIES",
+"taxonomicStatus": "ACCEPTED",
+"vernacularNames": [
+"skoglemen",
+"vuovdegoddesahpan",
+"lemming de foret",
+"oin hovholjin",
+"taigyn hovdnii hovholjin",
+"leming de bosque",
+"wood lemming",
+"lumik lesni",
+"skovlemming",
+"waldlemming",
+"metslemming",
+"metsasopuli",
+"sumski leming",
+"erdei lemming",
+"skogarlæmingi",
+"lemming delle foreste",
+"miskinis lemingas",
+"boslemming",
+"gozdni leming",
+"skogslammel",
+"lemming des bois",
+"lemming de bosque",
+"lemming des forets",
+"モリレミンク",
+"leming lesny",
+"lemingowiec lesny",
+"леснои лемминг"
+]
+},
+{
+"canonicalName": "Eolagurus przewalskii",
+"key": 2438164,
+"kingdom": "Animalia",
+"rank": "SPECIES",
+"taxonomicStatus": "ACCEPTED",
+"vernacularNames": [
+"przewalski s steppe lemming",
+"pushi tuweishu",
+"tangad ovol",
+"帕氏兔尾鼠",
+"пеструшка пржевальского",
+"stepoleming przewalskiego",
+"フルシェワリスキーレミンク",
+"campagnol de przewalski",
+"kiinanarosopuli",
+"tibetan yellow steppe lemming",
+"przewalskilemming",
+"przewalski lemming",
+"pestruska prevalskeho",
+"lemming de estepa de przewalski"
+]
+},
+{
+"canonicalName": "Dicrostonyx rubricatus",
+"key": 2438392,
+"kingdom": "Animalia",
+"rank": "SPECIES",
+"taxonomicStatus": "SYNONYM",
+"vernacularNames": [
+"tundra collared lemming",
+"bering collared lemming",
+"bering collard lemming"
+]
+},
+{
+"canonicalName": "Mus lemmus",
+"key": 4409138,
+"kingdom": "Animalia",
+"rank": "SPECIES",
+"taxonomicStatus": "HOMOTYPIC_SYNONYM",
+"vernacularNames": [
+"norway lemming"
+]
+},
+{
+"canonicalName": "Dicrostonyx kilangmiutak",
+"key": 2438393,
+"kingdom": "Animalia",
+"rank": "SPECIES",
+"taxonomicStatus": "SYNONYM",
+"vernacularNames": [
+"victoria collared lemming",
+"kilangmiutak collared lemming"
+]
+},
+{
+"canonicalName": "Mus torquatus",
+"key": 4409179,
+"kingdom": "Animalia",
+"rank": "SPECIES",
+"taxonomicStatus": "HOMOTYPIC_SYNONYM",
+"vernacularNames": [
+"arctic lemming"
+]
+},
+{
+"canonicalName": "Eolagurus luteus",
+"key": 2438165,
+"kingdom": "Animalia",
+"rank": "SPECIES",
+"taxonomicStatus": "ACCEPTED",
+"vernacularNames": [
+"yellow steppe lemming",
+"zheltaya pestrushka",
+"sharga ovol",
+"oviin shar ogotno",
+"黃兔尾鼠",
+"желтая пеструшка",
+"stepoleming zołtawy",
+"сары тоқалтіс",
+"キイロステッフレミンク",
+"campagnol jaune",
+"mongolianarosopuli",
+"gelblemming",
+"pestruska zlutava",
+"lemming de estepa dorado"
+]
+},
+{
+"canonicalName": "Arvicola rubricatus",
+"key": 7628593,
+"kingdom": "Animalia",
+"rank": "SPECIES",
+"taxonomicStatus": "SYNONYM",
+"vernacularNames": [
+"bering collard lemming"
+]
+},
+{
+"canonicalName": "Arvicola borealis",
+"key": 9518983,
+"kingdom": "Animalia",
+"rank": "SPECIES",
+"taxonomicStatus": "HOMOTYPIC_SYNONYM",
+"vernacularNames": [
+"northern bog lemming"
+]
+},
+{
+"canonicalName": "Mus hudsonius",
+"key": 9353654,
+"kingdom": "Animalia",
+"rank": "SPECIES",
+"taxonomicStatus": "HOMOTYPIC_SYNONYM",
+"vernacularNames": [
+"ungava collared lemming"
+]
+},
+{
+"canonicalName": "Mictomys borealis",
+"key": 9439964,
+"kingdom": "Animalia",
+"rank": "SPECIES",
+"taxonomicStatus": "SYNONYM",
+"vernacularNames": [
+"northern bog lemming"
+]
+},
+{
+"canonicalName": "Lagurus lagurus",
+"key": 2439131,
+"kingdom": "Animalia",
+"rank": "SPECIES",
+"taxonomicStatus": "ACCEPTED",
+"vernacularNames": [
+"строкатка степова",
+"lemming des steppes",
+"steppe vole",
+"hokh ov",
+"oviin hokh ogotno",
+"pestrushka stepnaya",
+"steppe lemming",
+"campagnol des steppes",
+"steppenlemming",
+"topillo de estepa",
+"graulemming",
+"pestruska pisecna",
+"arosopuli",
+"lagure des steppes",
+"ステッフレミンク",
+"дала тоқалтісі",
+"steppelemen",
+"piestruszka",
+"piestruszka stepowa",
+"степная пеструшка",
+"草原兔尾草"
+]
+},
+{
+"canonicalName": "Dicrostonyx exsul",
+"key": 2438383,
+"kingdom": "Animalia",
+"rank": "SPECIES",
+"taxonomicStatus": "SYNONYM",
+"vernacularNames": [
+"st lawrence island collared lemming"
+]
+},
+{
+"canonicalName": "Ellobius talpinus",
+"key": 2438760,
+"kingdom": "Animalia",
+"rank": "SPECIES",
+"taxonomicStatus": "ACCEPTED",
+"vernacularNames": [
+"сліпачок звичаинии",
+"northern mole vole",
+"campagnol taupe",
+"nordlicher mull lemming",
+"topillo topo septentrional",
+"slepuska krtci",
+"βορειος τυφλοποντικας",
+"kazakstaninmykra",
+"campagnol fouisseur du nord",
+"arvicola talpa settentrionale",
+"キタモクラレミンク",
+"кəдімгі соқыртышқан",
+"blinde woelmuis",
+"noordelijke aardlemming",
+"nordlig muldvarplemen",
+"ziemioryjka",
+"slepuszonka połnocna",
+"обыкновенная слепушонка",
+"鼴形田鼠"
+]
+},
+{
+"canonicalName": "Ellobius lutescens",
+"key": 2438762,
+"kingdom": "Animalia",
+"rank": "SPECIES",
+"taxonomicStatus": "ACCEPTED",
+"vernacularNames": [
+"mountain mole vole",
+"gornaya slepushonka",
+"zakavkazskaya slepushonka",
+"transcaucasian mole vole",
+"campagnol fauve",
+"transkaukasischer mull lemming",
+"topillo topo del caucaso"
+]
+},
+{
+"canonicalName": "Punomys lemminus",
+"key": 2438863,
+"kingdom": "Animalia",
+"rank": "SPECIES",
+"taxonomicStatus": "ACCEPTED",
+"vernacularNames": [
+"puna mouse",
+"western puna mouse",
+"punomys lemming",
+"westliche puna maus",
+"raton de puna occidental",
+"krecek punovy",
+"punanhiiru",
+"セイフタカネマウス",
+"punamuis",
+"punamus",
+"punowiec zachodni",
+"хомячок пуны"
+]
+},
+{
+"canonicalName": "Prometheomys schaposchnikowi",
+"key": 2438887,
+"kingdom": "Animalia",
+"rank": "SPECIES",
+"taxonomicStatus": "ACCEPTED",
+"vernacularNames": [
+"campagnol promethee",
+"prometeeva polyovka",
+"long clawed mole vole",
+"lemming promethee",
+"prometheus maus",
+"topillo topo de unas largas",
+"promethean vole",
+"krtos kavkazsky",
+"kaukasuksenkynsimyyra",
+"ツメナカモクラレミンク",
+"prometheuswoelmuis",
+"muldvarpmus",
+"prometeuszek gruzinski",
+"прометеева полевка"
+]
+},
+{
+"canonicalName": "Ellobius fuscocapillus",
+"key": 2438759,
+"kingdom": "Animalia",
+"rank": "SPECIES",
+"taxonomicStatus": "ACCEPTED",
+"vernacularNames": [
+"afghan mole vole",
+"quetta mole vole",
+"afganskaya slepushonka",
+"southern mole vole",
+"campagnol du baloutchistan",
+"stdlicher mull lemming",
+"topillo topo meridional"
+]
+}
+]
+},
 "/species/search?datasetKey=d7dddbf4-2cf0-4f39-9b2a-bb099caae36c&limit=50&q=lemming+and+rock+vole&qField=VERNACULAR": {
 "results": []
 },
@@ -13074,6 +14472,12 @@
 ]
 }
 ]
+},
+"/species/search?datasetKey=d7dddbf4-2cf0-4f39-9b2a-bb099caae36c&limit=50&q=necrophagous+beetle&qField=VERNACULAR": {
+"results": []
+},
+"/species/search?datasetKey=d7dddbf4-2cf0-4f39-9b2a-bb099caae36c&limit=50&q=necrophagous+beetles&qField=VERNACULAR": {
+"results": []
 },
 "/species/search?datasetKey=d7dddbf4-2cf0-4f39-9b2a-bb099caae36c&limit=50&q=non+native&qField=VERNACULAR": {
 "results": [
@@ -15812,5 +17216,15 @@
 ]
 }
 ]
+},
+"__meta__": {
+"api_base": "https://api.gbif.org/v1",
+"backbone_dataset_key": "d7dddbf4-2cf0-4f39-9b2a-bb099caae36c",
+"backbone_modified": "2023-11-17T17:05:37.477+00:00",
+"backbone_pubDate": "2023-08-28T00:00:00.000+00:00",
+"backbone_title": "GBIF Backbone Taxonomy",
+"first_stamped": "2026-11-15",
+"last_written": "2026-11-15",
+"stamped_on": "2026-11-15"
 }
 }

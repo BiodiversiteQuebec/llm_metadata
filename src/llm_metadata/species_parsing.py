@@ -505,6 +505,43 @@ def split_taxon_items(raw: str) -> list[str]:
     return [p.strip(" ,.") for p in out if p.strip(" ,.")]
 
 
+_CONJUNCTION_RE = re.compile(r"\s+(?:and|et)\s+|\s*&\s*", re.IGNORECASE)
+
+
+def split_conjunction(text: str) -> list[str]:
+    """Split a mention on a top-level " and " / " et " / "&" ("lemming and rock vole").
+
+    Only proposes the split: "coprophilous and necrophagous beetles" is one
+    label, not two taxa. The caller keeps the split only when every part
+    resolves to a taxon on its own. Separators inside parentheses are kept.
+
+    Examples:
+        >>> split_conjunction("lemming and rock vole")
+        ['lemming', 'rock vole']
+        >>> split_conjunction("beetles (Silphidae and Histeridae)")
+        ['beetles (Silphidae and Histeridae)']
+    """
+    if not text:
+        return []
+    parts: list[str] = []
+    depth, start, i = 0, 0, 0
+    while i < len(text):
+        ch = text[i]
+        if ch == "(":
+            depth += 1
+        elif ch == ")":
+            depth = max(0, depth - 1)
+        elif depth == 0:
+            m = _CONJUNCTION_RE.match(text, i)
+            if m and m.end() > m.start() and i > start:
+                parts.append(text[start:i])
+                start = i = m.end()
+                continue
+        i += 1
+    parts.append(text[start:])
+    return [p.strip(" ,.") for p in parts if p.strip(" ,.")]
+
+
 def normalize_group_label(text: str) -> str:
     """Lowercase, hyphen-free, stopword-free label used for vocabulary lookups."""
     s = text.replace("-", " ").replace("_", " ")

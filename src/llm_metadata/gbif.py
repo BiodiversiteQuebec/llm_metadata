@@ -5,6 +5,7 @@ import os
 import re
 import time
 from dataclasses import asdict, dataclass
+from datetime import date
 from pathlib import Path
 from typing import Any, Optional
 from urllib.parse import urlencode
@@ -443,12 +444,24 @@ _RANK_LEVEL = {
 _FAMILY_LEVEL = _RANK_LEVEL["FAMILY"]
 
 
+META_KEY = "__meta__"
+
+
 class GBIFCache:
-    """JSON file cache for trimmed GBIF responses, keyed by request path and params."""
+    """JSON file cache for trimmed GBIF responses, keyed by request path and params.
+
+    The file also holds a ``__meta__`` entry: the backbone dataset key, the API
+    base, the backbone title/version/modified date when known (see
+    `stamp_backbone_version`) and the dates of the first stamp and last write.
+    A re-run is reproducible offline only when every key it needs is cached.
+    `failures` lists the requests that failed (after retries) during this
+    process; failed requests are never stored.
+    """
 
     def __init__(self, path: Path | str = DEFAULT_TAXA_CACHE_PATH):
         self.path = Path(path)
         self._data: Optional[dict[str, Any]] = None
+        self.failures: list[str] = []
 
     def _load(self) -> dict[str, Any]:
         if self._data is None:
@@ -464,13 +477,42 @@ class GBIFCache:
     def get(self, key: str) -> Any:
         return self._load().get(key)
 
+    @property
+    def meta(self) -> dict[str, Any]:
+        return dict(self._load().get(META_KEY, {}))
+
+    def __len__(self) -> int:
+        """Number of cached responses (the metadata entry is not counted)."""
+        return sum(1 for k in self._load() if k != META_KEY)
+
+    def _write(self) -> None:
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        tmp = self.path.with_suffix(".tmp")
+        tmp.write_text(json.dumps(self._load(), indent=0, sort_keys=True, ensure_ascii=False), encoding="utf-8")
+        tmp.replace(self.path)
+
+    def update_meta(self, **fields: Any) -> None:
+        data = self._load()
+        meta = dict(data.get(META_KEY, {}))
+        today = date.today().isoformat()
+        meta.setdefault("backbone_dataset_key", GBIF_BACKBONE_DATASET_KEY)
+        meta.setdefault("api_base", GBIF_API_BASE)
+        meta.setdefault("first_stamped", today)
+        meta.update(fields)
+        meta["last_written"] = today
+        data[META_KEY] = meta
+        self._write()
+
     def set(self, key: str, value: Any) -> None:
         data = self._load()
         data[key] = value
-        self.path.parent.mkdir(parents=True, exist_ok=True)
-        tmp = self.path.with_suffix(".tmp")
-        tmp.write_text(json.dumps(data, indent=0, sort_keys=True, ensure_ascii=False), encoding="utf-8")
-        tmp.replace(self.path)
+        meta = dict(data.get(META_KEY, {}))
+        meta.setdefault("backbone_dataset_key", GBIF_BACKBONE_DATASET_KEY)
+        meta.setdefault("api_base", GBIF_API_BASE)
+        meta.setdefault("first_stamped", date.today().isoformat())
+        meta["last_written"] = date.today().isoformat()
+        data[META_KEY] = meta
+        self._write()
 
 
 _default_cache: Optional[GBIFCache] = None
@@ -546,7 +588,12 @@ def _http_get_json(url: str, params: dict) -> dict:
 
 
 def _gbif_request(path: str, params: dict, cache: Optional[GBIFCache]) -> Optional[dict]:
-    """Cached GBIF GET. Failed requests return None and are not cached."""
+    """Cached GBIF GET with retries (see `_http_get_json`).
+
+    A request that still fails after the retries returns None, is NOT cached
+    (so a later run asks again) and is listed in ``cache.failures`` so callers
+    can tell "GBIF does not know this name" from "GBIF could not be reached".
+    """
     cache = cache if cache is not None else get_default_cache()
     key = f"{path}?{urlencode(sorted(params.items()))}"
     if key in cache:
@@ -555,10 +602,30 @@ def _gbif_request(path: str, params: dict, cache: Optional[GBIFCache]) -> Option
         data = _http_get_json(f"{GBIF_API_BASE}{path}", params)
     except requests.RequestException as exc:
         logger.warning("GBIF request {} failed: {}", key, exc)
+        cache.failures.append(key)
         return None
-    trimmed = _trim_search(data) if path.endswith("/search") else _trim_match(data)
+    if path.endswith("/search"):
+        trimmed = _trim_search(data)
+    elif path.endswith("/count"):
+        trimmed = {"count": int(data)}
+    else:
+        trimmed = _trim_match(data)
     cache.set(key, trimmed)
     return trimmed
+
+
+def stamp_backbone_version(cache: Optional[GBIFCache] = None) -> dict[str, Any]:
+    """Record the backbone's title, version and dates in the cache file (best effort)."""
+    cache = cache if cache is not None else get_default_cache()
+    try:
+        info = _http_get_json(f"{GBIF_API_BASE}/dataset/{GBIF_BACKBONE_DATASET_KEY}", {})
+    except requests.RequestException as exc:
+        logger.warning("Could not read the GBIF backbone metadata: {}", exc)
+        return cache.meta
+    fields = {f"backbone_{k}": info[k] for k in ("title", "version", "pubDate", "modified") if info.get(k)}
+    fields["stamped_on"] = date.today().isoformat()
+    cache.update_meta(**fields)
+    return cache.meta
 
 
 @dataclass
@@ -611,6 +678,10 @@ class TaxonRecord:
     label: Optional[str] = None
     broad_groups: tuple[str, ...] = ()
     note: Optional[str] = None
+    #: "species_not_in_backbone" (binomial GBIF does not know; classified by its
+    #: genus), "ambiguous_homonym" (unresolved: genus name shared by several
+    #: accepted taxa), or None.
+    status: Optional[str] = None
 
     @property
     def resolved(self) -> bool:
@@ -634,11 +705,25 @@ class TaxonRecord:
         }
         return {k for k in keys if k is not None}
 
-    def key_at(self, rank: str) -> Optional[int]:
-        """Backbone key at "exact", "species", "genus" or "family" rank, if this record reaches it."""
+    @property
+    def exact_id(self) -> Any:
+        """Identity at the exact rank: the backbone key, or a name label for species GBIF lacks."""
+        if self.status == "species_not_in_backbone":
+            return "name:" + normalize_vernacular(self.accepted_name or self.query)
+        return self.key
+
+    def key_at(self, rank: str) -> Any:
+        """Backbone key at "exact", "species", "genus" or "family" rank, if this record reaches it.
+
+        A binomial missing from the backbone ("species_not_in_backbone") has its
+        own name label at the exact and species ranks, so two unknown species
+        never merge, and its genus key at genus rank and above.
+        """
         level = self.rank_level
         if self.kind != "taxon" or level is None:
             return None
+        if self.status == "species_not_in_backbone" and rank in ("exact", "species"):
+            return self.exact_id
         if rank == "exact":
             return self.key
         needed = {"species": _RANK_LEVEL["SPECIES"], "genus": _RANK_LEVEL["GENUS"], "family": _FAMILY_LEVEL}[rank]
@@ -828,23 +913,57 @@ def match_scientific(
 
 
 _VERNACULAR_RANK_PREFERENCE = {"SPECIES": 0, "SUBSPECIES": 1, "VARIETY": 1, "FORM": 1, "GENUS": 2, "FAMILY": 3}
+_VERNACULAR_KINGDOMS = {"Animalia", "Plantae", "Fungi"}
+
+#: Common names whose GBIF vernacular hits are unreliable ("fox" also names
+#: Dasymys foxi, "brook trout" Salmo trutta), mapped to the backbone name an
+#: ecologist in Quebec means. Keys are normalized (lowercase, no accents,
+#: singular); the lookup also tries the singularized phrase.
+VERNACULAR_OVERRIDES: dict[str, str] = {
+    "brook trout": "Salvelinus fontinalis",
+    "fox": "Vulpes vulpes",
+    "red fox": "Vulpes vulpes",
+    "wolf": "Canis lupus",
+    "grey wolf": "Canis lupus",
+    "gray wolf": "Canis lupus",
+    "deer": "Odocoileus virginianus",
+    "white tailed deer": "Odocoileus virginianus",
+    "mesange": "Paridae",
+    "robin": "Turdus migratorius",
+    "american robin": "Turdus migratorius",
+    "caribou": "Rangifer tarandus",
+    "moose": "Alces alces",
+    "orignal": "Alces alces",
+    "orignaux": "Alces alces",
+    "lamprey": "Petromyzontidae",
+    "lamproie": "Petromyzontidae",
+}
+
+#: Canadian occurrences must beat the runner-up by this factor to settle a tie.
+_CANADA_DOMINANCE = 3
+
+
+def _canada_occurrences(key: Any, cache: Optional[GBIFCache]) -> Optional[int]:
+    data = _gbif_request("/occurrence/count", {"taxonKey": key, "country": "CA"}, cache)
+    return None if data is None else data.get("count")
 
 
 def search_vernacular(phrase: str, *, cache: Optional[GBIFCache] = None) -> Optional[dict]:
-    """Find the backbone taxon whose vernacular name equals `phrase`.
+    """Find the backbone taxon whose vernacular name equals `phrase`, or None when in doubt.
 
-    Uses GBIF full-text search on vernacular names (backbone only, singular and
-    plural forms), then keeps only results with a vernacular name equal to the
-    phrase after case, accent, hyphen and plural normalization.
+    Uses GBIF full-text search on vernacular names (backbone only), then keeps
+    only accepted Animalia, Plantae and Fungi results with a vernacular name
+    equal to the phrase after case, accent and hyphen normalization. Names
+    that match only after plural/singular normalization are used only when no
+    result matches the phrase as written.
 
-    Choice among the exact hits: accepted names first, then species over
-    subspecies over genus over family, then the taxon with the most vernacular
-    names (a proxy for the common, well-known taxon: Procyon lotor rather than
-    a raccoon subspecies).
-
-    A name shared by several genera ("water mite" is given to taxa in more
-    than twenty genera and families) is ambiguous and returns None, so the
-    caller can fall back to a broad-group label.
+    Choice among the hits: species over subspecies over genus over family. If
+    several taxa tie at the best rank, the one with far more GBIF occurrences
+    in Canada (country=CA, at least 3 times the runner-up) wins; otherwise the
+    name is doubtful and None is returned (the caller can fall back to a
+    broad-group label). A name shared by more than two genera ("water mite" is
+    given to taxa in more than twenty genera and families, a single word like
+    "lemming" to more than one) is ambiguous and returns None.
 
     Returns:
         The chosen search result (trimmed dict) or None.
@@ -857,7 +976,7 @@ def search_vernacular(phrase: str, *, cache: Optional[GBIFCache] = None) -> Opti
     if singular not in variants:
         variants.append(singular)
 
-    hits_by_key: dict[Any, tuple[int, dict]] = {}
+    hits_by_key: dict[Any, tuple[int, dict, bool]] = {}
     order = 0
     for query in variants:
         data = _gbif_request(
@@ -869,31 +988,45 @@ def search_vernacular(phrase: str, *, cache: Optional[GBIFCache] = None) -> Opti
             order += 1
             if not result.get("canonicalName") or result.get("key") in hits_by_key:
                 continue
-            if any(v in variants or singularize_phrase(v) in variants for v in result.get("vernacularNames", [])):
-                hits_by_key[result.get("key")] = (order, result)
+            if result.get("kingdom") and result["kingdom"] not in _VERNACULAR_KINGDOMS:
+                continue
+            names = result.get("vernacularNames", [])
+            as_written = any(v in variants for v in names)
+            if as_written or any(singularize_phrase(v) in variants for v in names):
+                hits_by_key[result.get("key")] = (order, result, as_written)
     if not hits_by_key:
         return None
 
-    hits = [result for _, result in sorted(hits_by_key.values(), key=lambda item: item[0])]
+    ordered = sorted(hits_by_key.values(), key=lambda item: item[0])
+    if any(written for _, _, written in ordered):
+        ordered = [item for item in ordered if item[2]]
+    hits = [result for _, result, _ in ordered]
     accepted = [r for r in hits if r.get("taxonomicStatus") == "ACCEPTED"] or hits
     genera = {
         r["canonicalName"].split()[0]
         for r in accepted
         if _RANK_LEVEL.get(r.get("rank") or "", 0) >= _RANK_LEVEL["GENUS"]
     }
-    if len(genera) > 2:
+    # A bare generic word ("lemming") naming two genera is as ambiguous as a phrase naming three
+    if len(genera) > (1 if len(norm.split()) == 1 else 2):
         logger.debug("Ambiguous vernacular name {!r}: {} genera", phrase, len(genera))
         return None
 
-    def sort_key(item: tuple[int, dict]) -> tuple:
-        index, r = item
-        return (
-            _VERNACULAR_RANK_PREFERENCE.get(r.get("rank") or "", 4),
-            -len(r.get("vernacularNames", [])),
-            index,
-        )
-
-    return sorted(enumerate(accepted), key=sort_key)[0][1]
+    best = min(_VERNACULAR_RANK_PREFERENCE.get(r.get("rank") or "", 4) for r in accepted)
+    tied = [r for r in accepted if _VERNACULAR_RANK_PREFERENCE.get(r.get("rank") or "", 4) == best]
+    if len(tied) == 1:
+        # A bare generic word ("lemming") that GBIF attaches to one foreign species is a doubtful pick
+        if len(norm.split()) > 1 or (_canada_occurrences(tied[0].get("key"), cache) or 0) > 0:
+            return tied[0]
+        logger.debug("Doubtful vernacular name {!r}: the only hit has no Canadian occurrence", phrase)
+        return None
+    counts = [(_canada_occurrences(r.get("key"), cache), r) for r in tied[:6]]
+    counts = [(c, r) for c, r in counts if c is not None]
+    counts.sort(key=lambda item: -item[0])
+    if counts and counts[0][0] > 0 and (len(counts) == 1 or counts[0][0] >= _CANADA_DOMINANCE * counts[1][0]):
+        return counts[0][1]
+    logger.debug("Doubtful vernacular name {!r}: {} candidates, no clear Canadian one", phrase, len(tied))
+    return None
 
 
 def resolve_vernacular(
@@ -902,7 +1035,15 @@ def resolve_vernacular(
     query: Optional[str] = None,
     cache: Optional[GBIFCache] = None,
 ) -> Optional[TaxonRecord]:
-    """Resolve a vernacular name to a `TaxonRecord` (vernacular search, then match)."""
+    """Resolve a vernacular name to a `TaxonRecord` (curated override, vernacular search, then match)."""
+    norm = normalize_vernacular(phrase)
+    override = VERNACULAR_OVERRIDES.get(norm) or VERNACULAR_OVERRIDES.get(singularize_phrase(norm))
+    if override:
+        data = match_scientific(override, cache=cache)
+        if data is not None:
+            record = _record_from_match(query or phrase, phrase, data, method="vernacular")
+            record.note = f"curated override: '{norm}' read as {override}"
+            return record
     hit = search_vernacular(phrase, cache=cache)
     if hit is None:
         return None
@@ -943,11 +1084,47 @@ def resolve_group_label(
     return None
 
 
+_SPP_WORDS = {"spp.", "spp", "sp.", "sp"}
+
+
+def _is_ambiguous_homonym(name: str, *, kingdom: Optional[str] = None, cache: Optional[GBIFCache] = None) -> bool:
+    """True when the genus (or higher-taxon) name has several accepted exact-name taxa in the backbone.
+
+    "Morus" is a gannet genus and the mulberries; "Pieris" a butterfly and a
+    shrub. GBIF declines to choose, and a vernacular search on such a word would
+    pick an unrelated taxon, so the caller keeps the name unresolved.
+    """
+    words = name.split()
+    if not words:
+        return False
+    target = words[0] if len(words) >= 2 else name
+    params = {"name": target, "verbose": "true"}
+    if kingdom:
+        params["kingdom"] = kingdom
+    data = _gbif_request("/species/match", params, cache)
+    exact = [a for a in (data or {}).get("alternatives", []) if a.get("canonicalName") == target]
+    return len([a for a in exact if a.get("status") == "ACCEPTED"]) >= 2
+
+
+def _as_unknown_species(record: TaxonRecord, candidate: str) -> TaxonRecord:
+    """Re-label a genus record reached from an unknown binomial: own exact-rank label, genus above."""
+    genus = record.accepted_name or record.canonical_name
+    if record.genus_key is None:
+        record.genus_key = record.key
+    record.genus = record.genus or genus
+    record.status = "species_not_in_backbone"
+    record.canonical_name = record.accepted_name = record.species = candidate
+    record.rank = "SPECIES"
+    record.note = f"species not in the GBIF backbone; classified by its genus {genus}"
+    return record
+
+
 def resolve_taxon(
     name: str,
     *,
     cache: Optional[GBIFCache] = None,
     allow_qualifier_drop: bool = True,
+    kingdom: Optional[str] = None,
 ) -> TaxonRecord:
     """Resolve one free-text taxon string to a GBIF backbone record with its classification.
 
@@ -964,6 +1141,12 @@ def resolve_taxon(
     6. Vernacular search after dropping leading qualifiers
        ("boreal caribou" -> "caribou"); flagged in `note`.
 
+    A binomial GBIF does not know, whose genus it does, keeps its own label at the
+    exact and species ranks and the genus above (``status="species_not_in_backbone"``).
+    A genus name shared by several accepted taxa ("Morus", "Pieris") stays
+    unresolved (``status="ambiguous_homonym"``) unless `kingdom` settles it; it
+    never falls through to vernacular search.
+
     A record above family rank (order, class, ...) gets ``kind="group"``.
     The raw string is always kept in ``query``.
 
@@ -971,6 +1154,8 @@ def resolve_taxon(
         name: Raw taxon string (scientific, vernacular, decorated or a group label).
         cache: Optional `GBIFCache`; defaults to the shared JSON cache.
         allow_qualifier_drop: Whether step 6 may run.
+        kingdom: Optional kingdom hint ("Animalia", ...) passed to GBIF scientific
+            matching; it settles homonym genera that exist in several kingdoms.
 
     Returns:
         A `TaxonRecord`; ``kind == "unresolved"`` when nothing matched.
@@ -988,16 +1173,25 @@ def resolve_taxon(
             return record
 
     # 2. Binomials / genus-level names
+    ambiguous: Optional[str] = None
     for candidate in scientific_name_candidates(text):
-        data = match_scientific(candidate, cache=cache)
+        data = match_scientific(candidate, kingdom=kingdom, cache=cache)
         if data is not None:
-            return _record_from_match(raw, candidate, data, method="scientific")
+            record = _record_from_match(raw, candidate, data, method="scientific")
+            words = candidate.split()
+            if len(words) >= 2 and words[1] not in _SPP_WORDS and record.rank == "GENUS":
+                record = _as_unknown_species(record, candidate)
+            return record
+        if ambiguous is None and _is_ambiguous_homonym(candidate, kingdom=kingdom, cache=cache):
+            ambiguous = candidate
 
     # 3. Uninomials (higher taxa), with curated fallbacks for names absent from the backbone
     for candidate in uninomial_candidates(text):
-        data = match_scientific(candidate, cache=cache)
+        data = match_scientific(candidate, kingdom=kingdom, cache=cache)
         if data is not None:
             return _record_from_match(raw, candidate, data, method="scientific")
+        if ambiguous is None and _is_ambiguous_homonym(candidate, kingdom=kingdom, cache=cache):
+            ambiguous = candidate
         if candidate.lower() in GROUP_LABELS:
             record = resolve_group_label(candidate, query=raw, cache=cache)
             if record is not None:
@@ -1005,8 +1199,8 @@ def resolve_taxon(
 
     phrases = vernacular_candidates(text)
 
-    # 4. Vernacular names
-    for phrase in phrases:
+    # 4. Vernacular names (never for a homonym genus: "Morus" must not become a cod)
+    for phrase in ([] if ambiguous else phrases):
         record = resolve_vernacular(phrase, query=raw, cache=cache)
         if record is not None:
             return record
@@ -1017,6 +1211,12 @@ def resolve_taxon(
         if record is not None:
             return record
 
+    if ambiguous is not None:
+        return TaxonRecord(
+            query=raw,
+            status="ambiguous_homonym",
+            note=f"'{ambiguous}' names several accepted taxa in the backbone (homonym); pass a kingdom to choose",
+        )
     # 6. Drop leading qualifiers ("Atlantic-Gaspésie caribou" -> "caribou").
     #    Not for strings holding a scientific name that failed ("Eteone sp").
     if allow_qualifier_drop and not scientific_name_candidates(text):
