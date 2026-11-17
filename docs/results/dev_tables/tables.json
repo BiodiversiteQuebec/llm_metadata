@@ -14,6 +14,7 @@
       "run": "artifacts/runs/20261115_222818_r5_focal_taxa_abstract.json",
       "n_records": 30,
       "failed": 0,
+      "missing_from_run": [],
       "rule": {
         "n": 30,
         "acc4": [
@@ -147,6 +148,7 @@
       "run": "artifacts/runs/20261115_222902_r5_focal_taxa_pdf_text.json",
       "n_records": 16,
       "failed": 0,
+      "missing_from_run": [],
       "rule": {
         "n": 16,
         "acc4": [
@@ -280,6 +282,7 @@
       "run": "artifacts/runs/20261115_221727_haiku_pdf_native_dev16.json",
       "n_records": 16,
       "failed": 0,
+      "missing_from_run": [],
       "rule": {
         "n": 16,
         "acc4": [
@@ -413,6 +416,7 @@
       "run": "artifacts/runs/20261115_222252_r2_combined_abstract.json",
       "n_records": 30,
       "failed": 0,
+      "missing_from_run": [],
       "rule": {
         "n": 30,
         "acc4": [
@@ -546,6 +550,7 @@
       "run": "artifacts/runs/20261115_222429_r2_combined_pdf_text_dev16.json",
       "n_records": 16,
       "failed": 0,
+      "missing_from_run": [],
       "rule": {
         "n": 16,
         "acc4": [
@@ -679,6 +684,7 @@
       "run": "artifacts/runs/20261115_222213_r3_scoring_abstract_native_so.json",
       "n_records": 30,
       "failed": 0,
+      "missing_from_run": [],
       "rule": {
         "n": 30,
         "acc4": [
@@ -812,6 +818,7 @@
       "run": "artifacts/runs/20261115_222406_r3_scoring_pdf_text_dev16.json",
       "n_records": 16,
       "failed": 0,
+      "missing_from_run": [],
       "rule": {
         "n": 16,
         "acc4": [
@@ -1207,14 +1214,14 @@
       "taxa": [
         {
           "rank": "exact",
-          "precision": 0.935,
+          "precision": 0.784,
           "recall": 0.806,
-          "f1": 0.866,
+          "f1": 0.795,
           "annotated": 36,
           "annotated_matched": 29,
-          "extracted": 31,
+          "extracted": 37,
           "extracted_matched": 29,
-          "extracted_not_scored": 32,
+          "extracted_not_scored": 26,
           "records": 26
         },
         {
@@ -1226,31 +1233,31 @@
           "annotated_matched": 32,
           "extracted": 34,
           "extracted_matched": 32,
-          "extracted_not_scored": 19,
+          "extracted_not_scored": 22,
           "records": 26
         },
         {
           "rank": "genus",
-          "precision": 0.935,
+          "precision": 0.879,
           "recall": 0.935,
-          "f1": 0.935,
+          "f1": 0.906,
           "annotated": 31,
           "annotated_matched": 29,
-          "extracted": 31,
+          "extracted": 33,
           "extracted_matched": 29,
-          "extracted_not_scored": 19,
+          "extracted_not_scored": 17,
           "records": 26
         },
         {
           "rank": "family",
-          "precision": 0.926,
+          "precision": 0.758,
           "recall": 0.962,
-          "f1": 0.943,
+          "f1": 0.847,
           "annotated": 26,
           "annotated_matched": 25,
-          "extracted": 27,
+          "extracted": 33,
           "extracted_matched": 25,
-          "extracted_not_scored": 13,
+          "extracted_not_scored": 7,
           "records": 26
         },
         {
@@ -1579,14 +1586,14 @@
       "taxa": [
         {
           "rank": "exact",
-          "precision": 0.933,
+          "precision": 0.824,
           "recall": 0.778,
-          "f1": 0.848,
+          "f1": 0.8,
           "annotated": 18,
           "annotated_matched": 14,
-          "extracted": 15,
+          "extracted": 17,
           "extracted_matched": 14,
-          "extracted_not_scored": 16,
+          "extracted_not_scored": 15,
           "records": 15
         },
         {
@@ -1598,31 +1605,31 @@
           "annotated_matched": 17,
           "extracted": 18,
           "extracted_matched": 17,
-          "extracted_not_scored": 11,
+          "extracted_not_scored": 12,
           "records": 15
         },
         {
           "rank": "genus",
-          "precision": 0.944,
+          "precision": 0.85,
           "recall": 1.0,
-          "f1": 0.971,
+          "f1": 0.919,
           "annotated": 17,
           "annotated_matched": 17,
-          "extracted": 18,
+          "extracted": 20,
           "extracted_matched": 17,
-          "extracted_not_scored": 11,
+          "extracted_not_scored": 9,
           "records": 15
         },
         {
           "rank": "family",
-          "precision": 0.933,
+          "precision": 0.824,
           "recall": 1.0,
-          "f1": 0.966,
+          "f1": 0.903,
           "annotated": 14,
           "annotated_matched": 14,
-          "extracted": 15,
+          "extracted": 17,
           "extracted_matched": 14,
-          "extracted_not_scored": 7,
+          "extracted_not_scored": 5,
           "records": 15
         },
         {
@@ -1951,14 +1958,14 @@
       "taxa": [
         {
           "rank": "exact",
-          "precision": 0.56,
+          "precision": 0.483,
           "recall": 0.778,
-          "f1": 0.651,
+          "f1": 0.596,
           "annotated": 18,
           "annotated_matched": 14,
-          "extracted": 25,
+          "extracted": 29,
           "extracted_matched": 14,
-          "extracted_not_scored": 35,
+          "extracted_not_scored": 31,
           "records": 16
         },
         {
@@ -1975,26 +1982,26 @@
         },
         {
           "rank": "genus",
-          "precision": 0.773,
+          "precision": 0.654,
           "recall": 1.0,
-          "f1": 0.872,
+          "f1": 0.791,
           "annotated": 17,
           "annotated_matched": 17,
-          "extracted": 22,
+          "extracted": 26,
           "extracted_matched": 17,
-          "extracted_not_scored": 28,
+          "extracted_not_scored": 24,
           "records": 16
         },
         {
           "rank": "family",
-          "precision": 0.737,
+          "precision": 0.609,
           "recall": 1.0,
-          "f1": 0.848,
+          "f1": 0.757,
           "annotated": 14,
           "annotated_matched": 14,
-          "extracted": 19,
+          "extracted": 23,
           "extracted_matched": 14,
-          "extracted_not_scored": 23,
+          "extracted_not_scored": 19,
           "records": 16
         },
         {
@@ -2323,14 +2330,14 @@
       "taxa": [
         {
           "rank": "exact",
-          "precision": 0.725,
+          "precision": 0.63,
           "recall": 0.806,
-          "f1": 0.763,
+          "f1": 0.707,
           "annotated": 36,
           "annotated_matched": 29,
-          "extracted": 40,
+          "extracted": 46,
           "extracted_matched": 29,
-          "extracted_not_scored": 32,
+          "extracted_not_scored": 26,
           "records": 27
         },
         {
@@ -2342,31 +2349,31 @@
           "annotated_matched": 31,
           "extracted": 41,
           "extracted_matched": 31,
-          "extracted_not_scored": 19,
+          "extracted_not_scored": 22,
           "records": 27
         },
         {
           "rank": "genus",
-          "precision": 0.8,
+          "precision": 0.757,
           "recall": 0.903,
-          "f1": 0.848,
+          "f1": 0.824,
           "annotated": 31,
           "annotated_matched": 28,
-          "extracted": 35,
+          "extracted": 37,
           "extracted_matched": 28,
-          "extracted_not_scored": 19,
+          "extracted_not_scored": 17,
           "records": 27
         },
         {
           "rank": "family",
-          "precision": 0.781,
+          "precision": 0.658,
           "recall": 0.962,
-          "f1": 0.862,
+          "f1": 0.781,
           "annotated": 26,
           "annotated_matched": 25,
-          "extracted": 32,
+          "extracted": 38,
           "extracted_matched": 25,
-          "extracted_not_scored": 14,
+          "extracted_not_scored": 8,
           "records": 27
         },
         {
@@ -2695,14 +2702,14 @@
       "taxa": [
         {
           "rank": "exact",
-          "precision": 0.778,
+          "precision": 0.7,
           "recall": 0.778,
-          "f1": 0.778,
+          "f1": 0.737,
           "annotated": 18,
           "annotated_matched": 14,
-          "extracted": 18,
+          "extracted": 20,
           "extracted_matched": 14,
-          "extracted_not_scored": 17,
+          "extracted_not_scored": 15,
           "records": 15
         },
         {
@@ -2719,26 +2726,26 @@
         },
         {
           "rank": "genus",
-          "precision": 0.81,
+          "precision": 0.739,
           "recall": 1.0,
-          "f1": 0.895,
+          "f1": 0.85,
           "annotated": 17,
           "annotated_matched": 17,
-          "extracted": 21,
+          "extracted": 23,
           "extracted_matched": 17,
-          "extracted_not_scored": 11,
+          "extracted_not_scored": 9,
           "records": 15
         },
         {
           "rank": "family",
-          "precision": 0.778,
+          "precision": 0.7,
           "recall": 1.0,
-          "f1": 0.875,
+          "f1": 0.824,
           "annotated": 14,
           "annotated_matched": 14,
-          "extracted": 18,
+          "extracted": 20,
           "extracted_matched": 14,
-          "extracted_not_scored": 7,
+          "extracted_not_scored": 5,
           "records": 15
         },
         {

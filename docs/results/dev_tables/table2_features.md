@@ -26,46 +26,46 @@ Feature extraction, precision / recall / F1 [95 % interval of F1]. Yes/no fields
 
 | Condition | Rank | P | R | F1 |
 |---|---|---|---|---|
-| r1 features abstract | exact | 0.94 | 0.81 | 0.87 |
+| r1 features abstract | exact | 0.78 | 0.81 | 0.80 |
 | r1 features abstract | species | 0.94 | 0.91 | 0.93 |
-| r1 features abstract | genus | 0.94 | 0.94 | 0.94 |
-| r1 features abstract | family | 0.93 | 0.96 | 0.94 |
+| r1 features abstract | genus | 0.88 | 0.94 | 0.91 |
+| r1 features abstract | family | 0.76 | 0.96 | 0.85 |
 | r1 features abstract | broad_group | 0.97 | 0.89 | 0.93 |
 | r1 features abstract | group_mentioned | 1.00 | 0.79 | 0.88 |
 | r1 features abstract | count_present | 1.00 | 0.22 | 0.36 |
 | r1 features abstract | string_exact | 0.05 | 0.08 | 0.06 |
 | r1 features abstract | string_fuzzy | 0.40 | 0.61 | 0.48 |
-| r1 features pdf text | exact | 0.93 | 0.78 | 0.85 |
+| r1 features pdf text | exact | 0.82 | 0.78 | 0.80 |
 | r1 features pdf text | species | 0.94 | 1.00 | 0.97 |
-| r1 features pdf text | genus | 0.94 | 1.00 | 0.97 |
-| r1 features pdf text | family | 0.93 | 1.00 | 0.97 |
+| r1 features pdf text | genus | 0.85 | 1.00 | 0.92 |
+| r1 features pdf text | family | 0.82 | 1.00 | 0.90 |
 | r1 features pdf text | broad_group | 0.95 | 0.95 | 0.95 |
 | r1 features pdf text | group_mentioned | 1.00 | 0.86 | 0.92 |
 | r1 features pdf text | count_present | 1.00 | 1.00 | 1.00 |
 | r1 features pdf text | string_exact | 0.14 | 0.18 | 0.16 |
 | r1 features pdf text | string_fuzzy | 0.53 | 0.70 | 0.60 |
-| r1 features pdf native | exact | 0.56 | 0.78 | 0.65 |
+| r1 features pdf native | exact | 0.48 | 0.78 | 0.60 |
 | r1 features pdf native | species | 0.61 | 1.00 | 0.76 |
-| r1 features pdf native | genus | 0.77 | 1.00 | 0.87 |
-| r1 features pdf native | family | 0.74 | 1.00 | 0.85 |
+| r1 features pdf native | genus | 0.65 | 1.00 | 0.79 |
+| r1 features pdf native | family | 0.61 | 1.00 | 0.76 |
 | r1 features pdf native | broad_group | 0.87 | 0.95 | 0.91 |
 | r1 features pdf native | group_mentioned | 1.00 | 0.86 | 0.92 |
 | r1 features pdf native | count_present | 1.00 | 0.33 | 0.50 |
 | r1 features pdf native | string_exact | 0.13 | 0.30 | 0.18 |
 | r1 features pdf native | string_fuzzy | 0.29 | 0.67 | 0.41 |
-| r2 combined abstract | exact | 0.72 | 0.81 | 0.76 |
+| r2 combined abstract | exact | 0.63 | 0.81 | 0.71 |
 | r2 combined abstract | species | 0.76 | 0.89 | 0.82 |
-| r2 combined abstract | genus | 0.80 | 0.90 | 0.85 |
-| r2 combined abstract | family | 0.78 | 0.96 | 0.86 |
+| r2 combined abstract | genus | 0.76 | 0.90 | 0.82 |
+| r2 combined abstract | family | 0.66 | 0.96 | 0.78 |
 | r2 combined abstract | broad_group | 0.86 | 0.91 | 0.89 |
 | r2 combined abstract | group_mentioned | 1.00 | 0.86 | 0.92 |
 | r2 combined abstract | count_present | 1.00 | 0.11 | 0.20 |
 | r2 combined abstract | string_exact | 0.18 | 0.33 | 0.23 |
 | r2 combined abstract | string_fuzzy | 0.31 | 0.56 | 0.40 |
-| r2 combined pdf text | exact | 0.78 | 0.78 | 0.78 |
+| r2 combined pdf text | exact | 0.70 | 0.78 | 0.74 |
 | r2 combined pdf text | species | 0.81 | 1.00 | 0.90 |
-| r2 combined pdf text | genus | 0.81 | 1.00 | 0.90 |
-| r2 combined pdf text | family | 0.78 | 1.00 | 0.88 |
+| r2 combined pdf text | genus | 0.74 | 1.00 | 0.85 |
+| r2 combined pdf text | family | 0.70 | 1.00 | 0.82 |
 | r2 combined pdf text | broad_group | 0.90 | 0.95 | 0.92 |
 | r2 combined pdf text | group_mentioned | 1.00 | 0.86 | 0.92 |
 | r2 combined pdf text | count_present | 1.00 | 1.00 | 1.00 |
