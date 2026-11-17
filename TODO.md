@@ -11,25 +11,25 @@ Track A — article 1 (fill `docs/article_outline.md`)
 - [x] WU-C2 — Evaluate section parsing without Docker (recommendation, not a decision) `sonnet` *(16 dev PDFs, all that exist; PDF text main, sections as the cheap option)*
 - [x] WU-E1 — Relevance rules as a tested module; human vs rule label agreement `sonnet`
 - [x] WU-E2 — Class-level and evidence-aware metrics, confidence intervals `sonnet` *(plus paired comparison and flag scoring)*
-- [x] WU-E3 — Taxonomic resolution and multi-rank evaluation `opus` *(review fixes in progress)*
+- [x] WU-E3 — Taxonomic resolution and multi-rank evaluation `opus` *(review fixes merged: capped set-asides, homonym and vernacular guards)*
 - [x] WU-E4 — Register of doubtful annotations + discussion points on the Fuster schema `sonnet`
 - [x] WU-P1 — Hypothesis-driven prompt rounds on the dev subset `opus` *(rounds 1–5, effort sweep, Sonnet on abstracts and PDF text)*
 - [x] WU-P2 — Relevance with Claude: direct scoring and the combined variant `sonnet`
 - [x] WU-P3 — Claim grounding, only if a diagnosis stays open `sonnet` *(not launched: no diagnosis stayed open; budget line left unspent)*
-- [ ] WU-F1 — Freeze, run once on the held-out set, fill the outline `opus`
+- [x] WU-F1 — Freeze, run once on the held-out set, fill the outline `opus` *(eight conditions, 0.58 USD)*
 
 Review checkpoints (fresh subagent, reports only, never edits)
 - [x] WU-V1 — Review of the evaluation code, before the prompt rounds `sonnet` *(two reviews: evaluation code, taxa evaluation)*
-- [ ] WU-V2 — Review before the held-out pass (no leak, frozen config, budget) `sonnet`
+- [x] WU-V2 — Review before the held-out pass (no leak, frozen config, budget) `sonnet` *(go)*
 - [ ] WU-V3 — Review of the filled outline (numbers traceable, claims within intervals) `opus`
-- [ ] WU-V4 — Optional: ecological review of the Atlas contribution scores `opus`
+- [ ] WU-V4 — Optional: ecological review of the Atlas contribution scores `opus` *(not done; listed as a step before a second article)*
 
 Track B — Atlas contribution potential (candidate second article)
 - [x] WU-G1 — Atlas reference tables (aggregates only in git) `sonnet`
 - [x] WU-G2 — Matching taxa, regions and period to the Atlas `opus`
-- [ ] WU-G3 — Extraction schema for contribution `opus`
+- [x] WU-G3 — Extraction schema for contribution `opus` *(native structured output; dev and held-out runs)*
 - [x] WU-G4 — Contribution scores `opus`
-- [ ] WU-G5 — Validation against the Fuster relevance + insects in northern Quebec case `opus` (annotation ceiling, Fuster comparison and insect case done on the 231 non-held-out records; extraction runs and held-out records still to do)
+- [x] WU-G5 — Validation against the Fuster relevance + insects in northern Quebec case `opus` *(annotation ceiling, extraction on dev and held-out, Fuster comparison, insect case)*
 
 ---
 
