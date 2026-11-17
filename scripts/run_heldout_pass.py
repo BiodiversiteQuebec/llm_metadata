@@ -36,8 +36,11 @@ def digests() -> dict[str, str]:
 
 
 def command(cond: dict, cfg: dict) -> list[str]:
+    # The cost guard cannot estimate section mode (it needs GROBID output first); the
+    # dev run gives its real cost per record instead.
+    guard = [] if cond["mode"] == "sections" else ["--max-cost", str(cond["max_cost"])]
     common = ["--model", cfg["model"], "--reasoning-effort", cfg["effort"], "--manifest", cond["manifest"],
-              "--name", f"heldout_{cond['name']}", "--max-cost", str(cond["max_cost"]),
+              "--name", f"heldout_{cond['name']}", *guard,
               "--parallelism", str(cfg.get("parallelism", 5)), "--skip-cache"]
     if cond["approach"] == "features":
         return [sys.executable, "-m", "llm_metadata.prompt_eval", "--mode", cond["mode"],

@@ -5,5 +5,6 @@
   "r2_combined_abstract": "artifacts/runs/20261115_224355_heldout_r2_combined_abstract.json",
   "r2_combined_pdf_text": "artifacts/runs/20261115_224538_heldout_r2_combined_pdf_text.json",
   "r3_scoring_abstract": "artifacts/runs/20261115_224630_heldout_r3_scoring_abstract.json",
-  "r3_scoring_pdf_text": "artifacts/runs/20261115_224712_heldout_r3_scoring_pdf_text.json"
+  "r3_scoring_pdf_text": "artifacts/runs/20261115_224712_heldout_r3_scoring_pdf_text.json",
+  "r1_features_sections": "artifacts/runs/20261116_231423_heldout_r1_features_sections.json"
 }

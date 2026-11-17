@@ -9,3 +9,4 @@ Cost of each condition (model claude-haiku-5-5), standard API prices, prompt cac
 | r2 combined pdf text | 31 | 0.0958 | 0.00309 | 31,947 | 1,079 | 30.92 |
 | r3 scoring abstract | 68 | 0.0170 | 0.00025 | 2,678 | 246 | 2.51 |
 | r3 scoring pdf text | 31 | 0.0813 | 0.00262 | 26,529 | 246 | 26.21 |
+| r1 features sections | 31 | 0.0267 | 0.00086 | 10,988 | 732 | 8.60 |

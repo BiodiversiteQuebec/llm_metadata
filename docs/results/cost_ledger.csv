@@ -31,3 +31,4 @@ date,run,model,effort,mode,records,budget_line,estimated_usd,actual_usd,cumulati
 2026-11-15,20261115_225438_atlas_abstract_dev,claude-haiku-5-5,low,abstract,30,atlas_track,0.0201,0.0127,2.2970,Atlas contribution extraction dev (native structured output)
 2026-11-15,20261115_225748_heldout_atlas_abstract,claude-haiku-5-5,low,abstract,68,atlas_track,0.0460,0.0273,2.3243,Atlas contribution extraction held-out
 2026-11-16,20261116_231240_haiku_sections_dev16,claude-haiku-5-5,low,sections,16,prompt_rounds,,0.0150,2.3393,Section input (GROBID) on 16 dev PDFs
+2026-11-16,20261116_231423_heldout_r1_features_sections,claude-haiku-5-5,low,sections,31,heldout_final,,0.0267,2.3660,Held-out pass: section input (added after dev evaluation)

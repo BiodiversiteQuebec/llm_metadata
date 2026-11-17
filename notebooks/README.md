@@ -2661,3 +2661,15 @@ An independent review of the evaluation code (fresh agent, read-only) found two 
 **Result:** gaps filled (count of scores above the gap cut) correlates with the annotation-based count at 0.49 on both dev and held-out; spatial 0.52 / 0.48, taxonomic 0.63 / 0.51, group gap 0.98 / 1.00. The extraction defines more scores than the annotations (place names). Only 7 of the 68 held-out datasets are judged to deposit loadable occurrence records.
 
 **Decision:** the hypothesis about holds (0.49, at the threshold); the structured-output route works for this schema. Results added to `docs/atlas_contribution/results.md`. Remaining steps for a second article: a check of the extracted places by a person, the sensitive-species list, and an ecological review of the scores.
+
+### 2026-11-16: Section input (GROBID without Docker): evaluation on all available dev PDFs, then held-out
+
+**Hypothesis:** with subsections typed in reading order, section input (abstract + Methods block) matches PDF text at a fraction of the cost, but loses the context written in the introduction (northern setting, study area framing).
+
+**Work:** the section-parsing agent was stopped by an interruption; the evaluation was done in the main session. GROBID 0.7.3 (Java 11) on the 16 dev PDFs (30 not reachable: only 16 dev PDFs exist from open sources). Two fixes with tests: letter-spaced Wiley headings, and subsections typed by the block they sit in (`classify_in_reading_order`). Methods found 16/16, Results 15/16; untyped sections 70 % → 16 %.
+
+**Runs:** dev `20261116_231240_haiku_sections_dev16.json` (0.015 USD); held-out `20261116_231423_heldout_r1_features_sections.json` (0.027 USD, added to the frozen config as an eighth condition: section prompt digest unchanged; selection code added after the first seven ran).
+
+**Result (sections vs PDF text, paired):** dev micro F1 −0.03, held-out +0.04 (both within noise); species held-out +0.15 [+0.03, +0.25] (gain); north–south flag −0.23 (dev, loss) and −0.28 (held-out); relevance binary F1 unchanged; cost 0.0009 vs 0.003 USD per record.
+
+**Decision:** hypothesis holds. PDF text stays the main long-text input (no service to run); sections are the cheap option at harvest scale if GROBID is maintained, with the Introduction to be added to the selection (untested). Report updated: `docs/results/section_parsing_evaluation.md`.

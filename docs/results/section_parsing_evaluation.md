@@ -1,8 +1,40 @@
-# Section parsing without Docker (WU-C2)
+# Section parsing without Docker
 
-Date: 2026-11-15. Branch: `feat/anthropic-extraction`.
+Date: 2026-11-15, completed 2026-11-16. Branch: `feat/anthropic-extraction`.
 
-## Short answer
+## Final recommendation (2026-11-16, all 16 dev PDFs, then the held-out PDFs)
+
+**Use PDF text (PyMuPDF) as the main long-text input; keep sections (GROBID 0.7.3 with Java 11) as the cheaper option for harvest scale, if someone on the team will look after a Java service.**
+
+All 30 dev records could not be tested: only 16 dev PDFs are reachable from open sources (`docs/results/corpus_report.md`).
+
+**Coverage (16 dev PDFs):**
+- Methods were found in 16 of 16 and Results in 15 of 16. Record 91 has no Results heading of its own.
+- Two fixes in `section_normalize.py`, with tests in `tests/test_section_order.py`. Letter-spaced Wiley headings ("ME THODS", "INTRODUC TI ON") are now recognised. Subsections, which GROBID returns flat, take the type of the block they sit in: everything between Methods and Results counts as Methods, and a "Model" subsection under Results stays Results.
+- Untyped sections dropped from 70 % to 16 %. The "Untitled" first section of the Nature paper (record 104) stays untyped, which is correct.
+- The selected text (abstract plus the Methods block) is 42 % of the full text.
+
+**Text quality:** spot checks on records 12 (Wiley) and 104 (Nature) show clean, complete Methods text. Record 12 keeps "The study area (7,250 km²)", which is the annotated value. Figure references appear only as in-text mentions. One page footer is left in one section.
+
+**Extraction (Haiku 5.5, low effort, round 5 prompt), sections against PDF text on the same records:**
+
+| | Dev (16) | Held-out (31; 19 with a relevance label) |
+|---|---|---|
+| Micro F1 | −0.03 [−0.07, +0.03] | +0.04 [−0.01, +0.09] |
+| Species F1 | +0.01 | +0.15 [+0.03, +0.25], gain |
+| North–south flag | −0.23 [−0.50, −0.05], loss | −0.28 [−0.58, 0.00] |
+| Relevance, binary F1 (rule label) | +0.07 [0.00, +0.20] | 0.00 [−0.13, +0.12] |
+| Cost per record | 0.0009 USD vs 0.0033 | 0.0009 USD vs 0.0029 |
+
+**Reading:**
+- Sections keep the study's own methods and drop the introduction and discussion. Species improves, because there are fewer incidental taxa.
+- The north–south flag gets worse, because the northern context is usually written in the introduction.
+- Relevance is unchanged, at about one third of the cost.
+- A next step, not tested: add the Introduction to the selected sections, to recover the geographic context.
+
+**Maintainability:** GROBID 0.7.3 needs Java 11, a 1.3 GB build and a running service (restart steps below). That is acceptable on a university VM, but it is one more service for a team that is weaker in DevOps. PDF text needs nothing beyond PyMuPDF.
+
+## Short answer (first pass, 7 PDFs, 2026-11-15)
 
 Run GROBID 0.7.3 directly with Java 11. It builds and runs on this server without Docker. The existing `call_grobid` works unchanged. It found Methods and Results in 7 of 7 test PDFs, at about 3 seconds per PDF.
 

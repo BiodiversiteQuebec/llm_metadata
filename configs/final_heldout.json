@@ -56,6 +56,14 @@
       "manifest": "data/manifests/heldout_with_pdf.csv",
       "max_cost": 0.2,
       "structured_output": true
+    },
+    {
+      "name": "r1_features_sections",
+      "approach": "features",
+      "mode": "sections",
+      "manifest": "data/manifests/heldout_with_pdf.csv",
+      "max_cost": 0.05,
+      "note": "Added 2026-11-16 after the section-parsing evaluation on dev (prompt digest unchanged since the freeze; the section selection rule in code was added after the other seven conditions ran). No pre-flight estimate in this mode; dev cost 0.0009 USD per record."
     }
   ],
   "prompt_sha256": {

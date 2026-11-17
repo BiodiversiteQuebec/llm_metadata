@@ -7,7 +7,8 @@
     "r2_combined_abstract": "artifacts/runs/20261115_224355_heldout_r2_combined_abstract.json",
     "r2_combined_pdf_text": "artifacts/runs/20261115_224538_heldout_r2_combined_pdf_text.json",
     "r3_scoring_abstract": "artifacts/runs/20261115_224630_heldout_r3_scoring_abstract.json",
-    "r3_scoring_pdf_text": "artifacts/runs/20261115_224712_heldout_r3_scoring_pdf_text.json"
+    "r3_scoring_pdf_text": "artifacts/runs/20261115_224712_heldout_r3_scoring_pdf_text.json",
+    "r1_features_sections": "artifacts/runs/20261116_231423_heldout_r1_features_sections.json"
   },
   "table1": {
     "r1_features_abstract": {
@@ -942,6 +943,140 @@
             "M": 0,
             "L": 0,
             "X": 2
+          }
+        }
+      }
+    },
+    "r1_features_sections": {
+      "run": "artifacts/runs/20261116_231423_heldout_r1_features_sections.json",
+      "n_records": 31,
+      "failed": 0,
+      "missing_from_run": [],
+      "rule": {
+        "n": 19,
+        "acc4": [
+          0.21052631578947367,
+          0.05263157894736842,
+          0.42105263157894735
+        ],
+        "kappa4": [
+          -0.1585365853658536,
+          -0.42723004694835676,
+          0.11284046692607004
+        ],
+        "acc2": [
+          0.7894736842105263,
+          0.5789473684210527,
+          0.9473684210526315
+        ],
+        "precision": [
+          0.8,
+          0.5714285714285714,
+          1.0
+        ],
+        "recall": [
+          0.9230769230769231,
+          0.7333333333333333,
+          1.0
+        ],
+        "f1": [
+          0.8571428571428571,
+          0.6666666666666666,
+          0.967741935483871
+        ],
+        "direction": {
+          "exact": 4,
+          "over": 10,
+          "under": 5
+        },
+        "confusion": {
+          "H": {
+            "H": 3,
+            "M": 5,
+            "L": 0,
+            "X": 0
+          },
+          "M": {
+            "H": 4,
+            "M": 0,
+            "L": 3,
+            "X": 0
+          },
+          "L": {
+            "H": 1,
+            "M": 0,
+            "L": 1,
+            "X": 2
+          },
+          "X": {
+            "H": 0,
+            "M": 0,
+            "L": 0,
+            "X": 0
+          }
+        }
+      },
+      "human": {
+        "n": 19,
+        "acc4": [
+          0.15789473684210525,
+          0.0,
+          0.3157894736842105
+        ],
+        "kappa4": [
+          -0.13011152416356872,
+          -0.31543795620437953,
+          0.08180874246891408
+        ],
+        "acc2": [
+          0.47368421052631576,
+          0.2631578947368421,
+          0.6842105263157895
+        ],
+        "precision": [
+          0.4,
+          0.15384615384615385,
+          0.6428571428571429
+        ],
+        "recall": [
+          0.8571428571428571,
+          0.5,
+          1.0
+        ],
+        "f1": [
+          0.5454545454545454,
+          0.25,
+          0.7619047619047619
+        ],
+        "direction": {
+          "exact": 3,
+          "over": 13,
+          "under": 3
+        },
+        "confusion": {
+          "H": {
+            "H": 1,
+            "M": 2,
+            "L": 5,
+            "X": 0
+          },
+          "M": {
+            "H": 2,
+            "M": 1,
+            "L": 4,
+            "X": 0
+          },
+          "L": {
+            "H": 0,
+            "M": 1,
+            "L": 1,
+            "X": 2
+          },
+          "X": {
+            "H": 0,
+            "M": 0,
+            "L": 0,
+            "X": 0
           }
         }
       }
@@ -2807,6 +2942,378 @@
           "records": 30
         }
       ]
+    },
+    "r1_features_sections": {
+      "run": "artifacts/runs/20261116_231423_heldout_r1_features_sections.json",
+      "n": 31,
+      "failed": 0,
+      "fields": {
+        "bias_north_south": {
+          "precision": [
+            0.16666666666666666,
+            0.0,
+            0.4
+          ],
+          "recall": [
+            0.5,
+            0.0,
+            1.0
+          ],
+          "f1": [
+            0.25,
+            0.0,
+            0.5
+          ]
+        },
+        "data_type": {
+          "precision": [
+            0.20930232558139536,
+            0.10256410256410256,
+            0.31927832087406544
+          ],
+          "recall": [
+            0.36,
+            0.21428571428571427,
+            0.5
+          ],
+          "f1": [
+            0.2647058823529412,
+            0.1402903811252269,
+            0.3783783783783784
+          ]
+        },
+        "geospatial_info_dataset": {
+          "precision": [
+            0.0625,
+            0.0,
+            0.13465909090909087
+          ],
+          "recall": [
+            0.3333333333333333,
+            0.0,
+            0.6666666666666666
+          ],
+          "f1": [
+            0.10526315789473684,
+            0.0,
+            0.2181960227272727
+          ]
+        },
+        "multispecies": {
+          "precision": [
+            0.23809523809523808,
+            0.05555555555555555,
+            0.44458333333333316
+          ],
+          "recall": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "f1": [
+            0.38461538461538464,
+            0.10526315789473684,
+            0.6155172413793103
+          ]
+        },
+        "new_species_region": {
+          "precision": [
+            null,
+            null,
+            null
+          ],
+          "recall": [
+            null,
+            null,
+            null
+          ],
+          "f1": [
+            null,
+            null,
+            null
+          ]
+        },
+        "new_species_science": {
+          "precision": [
+            null,
+            null,
+            null
+          ],
+          "recall": [
+            null,
+            null,
+            null
+          ],
+          "f1": [
+            null,
+            null,
+            null
+          ]
+        },
+        "spatial_range_class": {
+          "precision": [
+            0.4074074074074074,
+            0.2222222222222222,
+            0.6071428571428571
+          ],
+          "recall": [
+            0.7857142857142857,
+            0.5625,
+            1.0
+          ],
+          "f1": [
+            0.5365853658536586,
+            0.3331081081081083,
+            0.72
+          ]
+        },
+        "spatial_range_km2": {
+          "precision": [
+            0.18518518518518517,
+            0.052506265664160515,
+            0.346195652173913
+          ],
+          "recall": [
+            0.35714285714285715,
+            0.125,
+            0.625
+          ],
+          "f1": [
+            0.24390243902439024,
+            0.07120535714285735,
+            0.43902439024390244
+          ]
+        },
+        "species": {
+          "precision": [
+            0.3763440860215054,
+            0.21816205533596839,
+            0.589117700072098
+          ],
+          "recall": [
+            0.7608695652173914,
+            0.6,
+            0.9000490196078431
+          ],
+          "f1": [
+            0.5035971223021583,
+            0.32612082066869313,
+            0.6939034936008301
+          ]
+        },
+        "temp_range_f": {
+          "precision": [
+            0.42857142857142855,
+            0.24117816091954042,
+            0.6071428571428571
+          ],
+          "recall": [
+            0.8,
+            0.5625,
+            1.0
+          ],
+          "f1": [
+            0.5581395348837209,
+            0.34994565217391305,
+            0.72
+          ]
+        },
+        "temp_range_i": {
+          "precision": [
+            0.5,
+            0.3103448275862069,
+            0.6785714285714286
+          ],
+          "recall": [
+            0.9333333333333333,
+            0.8,
+            1.0
+          ],
+          "f1": [
+            0.6511627906976745,
+            0.46153846153846156,
+            0.8
+          ]
+        },
+        "temporal_range_class": {
+          "precision": [
+            0.5,
+            0.3103448275862069,
+            0.6785714285714286
+          ],
+          "recall": [
+            0.9333333333333333,
+            0.8,
+            1.0
+          ],
+          "f1": [
+            0.6511627906976745,
+            0.46153846153846156,
+            0.8
+          ]
+        },
+        "threatened_species": {
+          "precision": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "recall": [
+            null,
+            null,
+            null
+          ],
+          "f1": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "time_series": {
+          "precision": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "recall": [
+            null,
+            null,
+            null
+          ],
+          "f1": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "__micro__": {
+          "precision": [
+            0.2733118971061093,
+            0.1933259493670886,
+            0.35617030857467885
+          ],
+          "recall": [
+            0.6390977443609023,
+            0.5525869759143622,
+            0.7246515101228012
+          ],
+          "f1": [
+            0.38288288288288286,
+            0.29062827024681587,
+            0.46474246797762947
+          ]
+        }
+      },
+      "taxa": [
+        {
+          "rank": "exact",
+          "precision": 0.508,
+          "recall": 0.943,
+          "f1": 0.66,
+          "annotated": 35,
+          "annotated_matched": 33,
+          "extracted": 65,
+          "extracted_matched": 33,
+          "extracted_not_scored": 19,
+          "records": 28
+        },
+        {
+          "rank": "species",
+          "precision": 0.569,
+          "recall": 0.943,
+          "f1": 0.71,
+          "annotated": 35,
+          "annotated_matched": 33,
+          "extracted": 58,
+          "extracted_matched": 33,
+          "extracted_not_scored": 10,
+          "records": 26
+        },
+        {
+          "rank": "genus",
+          "precision": 0.537,
+          "recall": 0.935,
+          "f1": 0.682,
+          "annotated": 31,
+          "annotated_matched": 29,
+          "extracted": 54,
+          "extracted_matched": 29,
+          "extracted_not_scored": 16,
+          "records": 28
+        },
+        {
+          "rank": "family",
+          "precision": 0.605,
+          "recall": 0.929,
+          "f1": 0.732,
+          "annotated": 28,
+          "annotated_matched": 26,
+          "extracted": 43,
+          "extracted_matched": 26,
+          "extracted_not_scored": 10,
+          "records": 28
+        },
+        {
+          "rank": "broad_group",
+          "precision": 0.818,
+          "recall": 0.871,
+          "f1": 0.844,
+          "annotated": 31,
+          "annotated_matched": 27,
+          "extracted": 33,
+          "extracted_matched": 27,
+          "extracted_not_scored": 0,
+          "records": 30
+        },
+        {
+          "rank": "group_mentioned",
+          "precision": 0.6,
+          "recall": 0.8,
+          "f1": 0.686,
+          "annotated": 10,
+          "annotated_matched": 8,
+          "extracted": 5,
+          "extracted_matched": 3,
+          "extracted_not_scored": 0,
+          "records": 9
+        },
+        {
+          "rank": "count_present",
+          "precision": 0.6,
+          "recall": 0.429,
+          "f1": 0.5,
+          "annotated": 7,
+          "annotated_matched": 3,
+          "extracted": 5,
+          "extracted_matched": 3,
+          "extracted_not_scored": 0,
+          "records": 9
+        },
+        {
+          "rank": "string_exact",
+          "precision": 0.191,
+          "recall": 0.391,
+          "f1": 0.257,
+          "annotated": 46,
+          "annotated_matched": 18,
+          "extracted": 94,
+          "extracted_matched": 18,
+          "extracted_not_scored": 0,
+          "records": 30
+        },
+        {
+          "rank": "string_fuzzy",
+          "precision": 0.376,
+          "recall": 0.761,
+          "f1": 0.504,
+          "annotated": 46,
+          "annotated_matched": 35,
+          "extracted": 93,
+          "extracted_matched": 35,
+          "extracted_not_scored": 0,
+          "records": 30
+        }
+      ]
     }
   },
   "s2": {
@@ -2858,6 +3365,13 @@
       "usd_per_record": 0.002621032258064516,
       "input_tokens": 26528.935483870966,
       "output_tokens": 245.67741935483872
+    },
+    "r1_features_sections": {
+      "records": 31,
+      "total_usd": 0.026671,
+      "usd_per_record": 0.0008603548387096775,
+      "input_tokens": 10988.258064516129,
+      "output_tokens": 732.3870967741935
     }
   }
 }
