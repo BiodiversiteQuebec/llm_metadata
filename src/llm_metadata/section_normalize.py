@@ -200,7 +200,75 @@ def extract_from_section(heading: str) -> SectionType:
             if re.match(pattern, normalized, flags=re.IGNORECASE):
                 return section_type
 
+    # Letter-spaced headings from some publisher layouts (Wiley: "ME THODS",
+    # "INTRODUC TI ON", "K E Y W O R D S"): retry with the spaces removed, for short
+    # all-caps headings only, so ordinary multi-word titles are not glued together.
+    letters = re.sub(r"[^A-Za-z ]", "", heading).strip()
+    if letters and letters.upper() == letters and len(letters) <= 40 and " " in letters:
+        glued = letters.replace(" ", "").lower()
+        for section_type, patterns in SECTION_PATTERNS.items():
+            for pattern in patterns:
+                if re.match(pattern, glued, flags=re.IGNORECASE):
+                    return section_type
+        # "MATERIALSANDMETHODS" and similar
+        for word, section_type in (("methods", SectionType.METHODS), ("results", SectionType.RESULTS),
+                                   ("discussion", SectionType.DISCUSSION), ("introduction", SectionType.INTRO)):
+            if word in glued:
+                return section_type
+
     return SectionType.OTHER
+
+
+#: Major headings that open a block; untyped sections after them belong to that block.
+_BLOCK_TYPES = {"ABSTRACT", "INTRO", "METHODS", "RESULTS", "DISCUSSION", "CONCLUSION", "REFERENCES"}
+
+
+def classify_in_reading_order(headings: list[str]) -> list[SectionType]:
+    """Classify headings in document order, giving untyped subsections the type of the
+    major block they sit in.
+
+    GROBID 0.7.3 returns subsections ("Study area", "Sampling", "Model") as top-level
+    sections, so on their own they classify as OTHER. Reading in order, everything after
+    a Methods heading and before the next major heading (Results, Discussion...) counts as
+    Methods; a "Model" subsection after the Results heading stays Results. Sections before
+    the first major heading, or an "Untitled" first section, keep their own type.
+    """
+    out: list[SectionType] = []
+    current: SectionType | None = None
+    for h in headings:
+        t = extract_from_section(h)
+        if _is_major_heading(h):
+            current = t
+            out.append(t)
+        elif current is not None and current.value in {"METHODS", "RESULTS"}:
+            # A subsection: keyword typing ("Model", "Sampling" read as Methods) yields to
+            # the block it sits in.
+            out.append(current)
+        else:
+            out.append(t)
+    return out
+
+
+_MAJOR_HEADING = re.compile(
+    r"^(?:[ivx\d]+[.)]?\s*)?(?:"
+    r"abstract|summary|introduction|background|"
+    r"(?:materials?\s+and\s+)?methods?(?:\s+and\s+materials?)?|methodology|"
+    r"results?(?:\s+and\s+discussion)?|discussion|conclusions?|"
+    r"references|literature\s+cited|acknowledge?ments?"
+    r")\s*$",
+    re.IGNORECASE,
+)
+
+
+def _is_major_heading(heading: str) -> bool:
+    """A top-level article heading (Methods, Results...), letter-spaced forms included."""
+    text = re.sub(r"[^A-Za-z0-9 ]", " ", heading or "").strip()
+    if _MAJOR_HEADING.match(re.sub(r"\s+", " ", text)):
+        return True
+    glued = text.replace(" ", "")
+    return text.upper() == text and bool(glued) and bool(_MAJOR_HEADING.match(
+        re.sub(r"(materials?)(and)(methods?)", r"\1 \2 \3", glued, flags=re.I)
+        .replace("resultsanddiscussion", "results and discussion")))
 
 
 def get_section_path(

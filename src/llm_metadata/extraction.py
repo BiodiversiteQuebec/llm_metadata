@@ -30,7 +30,7 @@ from llm_metadata.schemas.data_paper import (
     RunArtifact,
     RunRecord,
 )
-from llm_metadata.section_normalize import extract_from_section
+from llm_metadata.section_normalize import classify_in_reading_order, extract_from_section
 
 
 DEFAULT_PROMPT_MODULES = {
@@ -158,8 +158,14 @@ def collect_relevant_sections(
     parent_relevant: bool = False,
 ) -> list[Section]:
     relevant: list[Section] = []
-    for section in sections:
-        is_relevant = is_relevant_section(section, config) or parent_relevant
+    # Subsections returned flat (GROBID 0.7.3) take the type of the block they sit in.
+    in_order = classify_in_reading_order([s.title for s in sections])
+    for section, block_type in zip(sections, in_order):
+        is_relevant = (
+            is_relevant_section(section, config)
+            or parent_relevant
+            or (not config.include_all and block_type in config.section_types)
+        )
         if is_relevant and section.text and section.text.strip():
             relevant.append(section)
         relevant.extend(collect_relevant_sections(section.subsections, config, is_relevant))
