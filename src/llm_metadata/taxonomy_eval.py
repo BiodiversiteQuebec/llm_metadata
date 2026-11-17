@@ -300,11 +300,25 @@ def evaluate_taxonomy_fields(
 #     uv run python -m llm_metadata.taxonomy_eval artifacts/runs/<run>.json
 
 import json as _json
+import re
 from dataclasses import dataclass as _dataclass, field as _field
 from typing import Any, Iterable, Sequence
 
-from llm_metadata.gbif import GBIFCache, TaxonRecord, resolve_taxon
-from llm_metadata.species_parsing import TaxonMention, normalize_vernacular, split_taxon_items
+from llm_metadata.gbif import (
+    GBIFCache,
+    TaxonRecord,
+    get_default_cache,
+    resolve_taxon,
+    stamp_backbone_version,
+)
+import math
+
+from llm_metadata.species_parsing import (
+    TaxonMention,
+    normalize_vernacular,
+    split_conjunction,
+    split_taxon_items,
+)
 
 #: Ranks scored, finest first. "exact" compares accepted backbone keys of the
 #: named taxa (family rank or finer); "broad_group" compares `gbif.BROAD_GROUPS`.
@@ -316,6 +330,10 @@ _RANK_LABELS = {
     "family": "same family",
     "broad_group": "same broad group",
 }
+
+
+class GBIFUnavailable(RuntimeError):
+    """A GBIF request failed after retries; results would be silently incomplete."""
 
 
 @_dataclass
@@ -398,7 +416,12 @@ def resolve_species_items(
     side: str = "",
     cache: Optional[GBIFCache] = None,
 ) -> list[TaxonItem]:
-    """Split, classify and resolve every mention in a raw `species` list."""
+    """Split, classify and resolve every mention in a raw `species` list.
+
+    A mention joined by "and", "et" or "&" is split into one item per name when
+    every part resolves ("lemming and rock vole" is two taxa; "coprophilous and
+    necrophagous beetles" stays one label).
+    """
     items: list[TaxonItem] = []
     for raw in species or []:
         if not isinstance(raw, str) or not raw.strip():
@@ -420,15 +443,37 @@ def resolve_species_items(
                         item.record = rec
                         break
             else:
-                rec = resolve_taxon(part, cache=cache)
-                if rec.resolved:
-                    item.kind = rec.kind
-                    item.record = rec
-                elif mention.generic_label:
-                    item.other_reason = "label without a taxon (trait or functional group)"
-                else:
-                    item.kind = "unresolved"
-                    item.record = rec
+                # "lemming and rock vole" is two taxa, but "coprophilous and necrophagous
+                # beetles" is one label: split only when every part resolves on its own.
+                pieces = split_conjunction(part)
+                resolved_pieces: list[tuple[str, TaxonRecord]] = []
+                if len(pieces) > 1:
+                    recs = [resolve_taxon(p, cache=cache) for p in pieces]
+                    if all(r.resolved for r in recs):
+                        resolved_pieces = list(zip(pieces, recs))
+                    elif any(r.resolved for r in recs):
+                        # "lemming and rock vole" would otherwise resolve to the last name only,
+                        # through the qualifier-dropping fallback; keep the unresolved part visible.
+                        if resolve_taxon(part, cache=cache).method == "vernacular, qualifier dropped":
+                            resolved_pieces = list(zip(pieces, recs))
+                if not resolved_pieces:
+                    resolved_pieces = [(part, resolve_taxon(part, cache=cache))]
+                for text, rec in resolved_pieces:
+                    piece = item if len(resolved_pieces) == 1 else TaxonItem(
+                        record_id=record_id, side=side, raw=raw, mention=text, kind="other"
+                    )
+                    if rec.resolved:
+                        piece.kind = rec.kind
+                        piece.record = rec
+                    elif mention.generic_label:
+                        piece.other_reason = "label without a taxon (trait or functional group)"
+                    else:
+                        piece.kind = "unresolved"
+                        piece.record = rec
+                    if piece is not item:
+                        items.append(piece)
+                if len(resolved_pieces) > 1:
+                    continue
             items.append(item)
     return items
 
@@ -446,8 +491,10 @@ def _strictly_inside(inner: TaxonItem, outer: TaxonItem) -> bool:
         return False
     if inner.kind not in ("taxon", "group") or outer.kind not in ("taxon", "group", "count"):
         return False
+    if ro.status == "species_not_in_backbone":
+        return False  # nothing is finer than a species
     if ro.key is not None:
-        if ri.key == ro.key:
+        if ri.exact_id == ro.exact_id:
             return False
         return ro.key in ri.lineage_keys
     # Group without a backbone taxon (fish, invertebrates, algae): use broad groups
@@ -524,7 +571,109 @@ class RankCounts:
         }
 
 
-def _score_rank(rank: str, true_items: list[TaxonItem], pred_items: list[TaxonItem]) -> RankCounts:
+#: How extracted taxa inside a coarser annotation are treated.
+#: "capped"   (default) inside a genus or species annotation: left out of precision;
+#:            inside a count annotation: at most the stated number (+10% when
+#:            approximate) of species are left out, the rest are false positives,
+#:            and so are extractions coarser than species.
+#: "uncapped" every extracted taxon strictly inside any coarser annotation is left out.
+#: "none"     every unmatched extraction is a false positive (the floor).
+SET_ASIDE_MODES: tuple[str, ...] = ("capped", "uncapped", "none")
+
+_COARSE_COUNT_UNIT_RE = re.compile(r"\b(?:taxa|taxon|otus?|genera|genus|famil\w*|orders?|phyl\w*|classes)\b", re.IGNORECASE)
+
+
+def _count_cap(count_item: TaxonItem) -> int:
+    n = count_item.count or 0
+    return math.floor(n * 1.1 + 1e-9) if count_item.approximate else n
+
+
+def _counts_species(count_item: TaxonItem) -> bool:
+    """A count of species (not of taxa, OTUs, genera or families, which may be coarser)."""
+    return not _COARSE_COUNT_UNIT_RE.search(count_item.mention)
+
+
+def _is_species_or_finer(item: TaxonItem) -> bool:
+    r = item.record
+    return item.kind == "taxon" and r is not None and (r.rank_level or 0) >= _RANK_LEVEL_SPECIES
+
+
+_RANK_LEVEL_SPECIES = 7
+
+
+@_dataclass
+class SetAside:
+    """Decision for one extracted item that sits strictly inside an annotation."""
+
+    aside: bool
+    container: Optional[TaxonItem] = None
+    reason: str = ""
+
+
+def _decide_set_aside(
+    true_items: list[TaxonItem], pred_items: list[TaxonItem], mode: str
+) -> dict[int, SetAside]:
+    """For each extracted item inside a coarser annotation, set it aside or count it as a false positive.
+
+    Keyed by ``id(item)``; items not inside any annotation are absent. Items
+    that match an annotated taxon exactly are never inside anything.
+    """
+    if mode not in SET_ASIDE_MODES:
+        raise ValueError(f"set_aside must be one of {SET_ASIDE_MODES}, got {mode!r}")
+    decisions: dict[int, SetAside] = {}
+    if mode == "none":
+        return decisions
+    used: dict[int, set[Any]] = {}
+    for item in pred_items:
+        if item.kind not in ("taxon", "group") or item.record is None:
+            continue
+        if any(
+            item.entry_at("exact") is not None and _entries_match(item.entry_at("exact"), t.entry_at("exact"))
+            for t in true_items
+            if t.entry_at("exact") is not None
+        ):
+            continue
+        containers = [t for t in true_items if _strictly_inside(item, t)]
+        if not containers:
+            continue
+        if mode == "uncapped":
+            decisions[id(item)] = SetAside(True, containers[0])
+            continue
+        plain = [t for t in containers if t.kind != "count"]
+        if plain:
+            decisions[id(item)] = SetAside(True, plain[0])
+            continue
+        # Only count annotations contain it
+        counts = [t for t in containers if t.kind == "count"]
+        species_counts = [t for t in counts if _counts_species(t)]
+        if species_counts and not _is_species_or_finer(item):
+            decisions[id(item)] = SetAside(
+                False, counts[0], "coarser than the species the annotation counts"
+            )
+            continue
+        identity = item.record.exact_id if item.record.exact_id is not None else item.name_key
+        placed = False
+        for t in counts:
+            taken = used.setdefault(id(t), set())
+            if identity in taken or len(taken) < _count_cap(t):
+                taken.add(identity)
+                decisions[id(item)] = SetAside(True, t)
+                placed = True
+                break
+        if not placed:
+            decisions[id(item)] = SetAside(
+                False, counts[0], f"beyond the {_count_cap(counts[0])} taxa the annotation allows"
+            )
+    return decisions
+
+
+def _score_rank(
+    rank: str,
+    true_items: list[TaxonItem],
+    pred_items: list[TaxonItem],
+    decisions: Optional[dict[int, SetAside]] = None,
+) -> RankCounts:
+    decisions = decisions or {}
     true_entries: dict[Any, list[TaxonItem]] = {}
     pred_entries: dict[Any, list[TaxonItem]] = {}
     for item in true_items:
@@ -547,8 +696,8 @@ def _score_rank(rank: str, true_items: list[TaxonItem], pred_items: list[TaxonIt
             counts.n_pred_matched += 1
             continue
         # A finer extracted taxon inside a coarser annotation ("Vaccinium spp",
-        # "c.30 beetle species") cannot be judged at this rank.
-        if any(_strictly_inside(pi, ti) for pi in items for ti in true_items):
+        # "c.30 beetle species") cannot be judged at this rank, within the cap.
+        if any((d := decisions.get(id(pi))) is not None and d.aside for pi in items):
             counts.n_pred_not_scored += 1
             continue
         counts.n_pred += 1
@@ -565,8 +714,13 @@ def _best_rank(item: TaxonItem, others: list[TaxonItem]) -> Optional[str]:
     return None
 
 
-def _annotate_items(true_items: list[TaxonItem], pred_items: list[TaxonItem]) -> None:
+def _annotate_items(
+    true_items: list[TaxonItem],
+    pred_items: list[TaxonItem],
+    decisions: Optional[dict[int, SetAside]] = None,
+) -> None:
     """Fill best_rank / status / reason on every item of one record."""
+    decisions = decisions or {}
     for side_items, others, side in ((true_items, pred_items, "annotation"), (pred_items, true_items, "extraction")):
         for item in side_items:
             item.best_rank = _best_rank(item, others)
@@ -589,16 +743,17 @@ def _annotate_items(true_items: list[TaxonItem], pred_items: list[TaxonItem]) ->
                 item.status = "match"
                 item.reason = "same taxon" + (" (different wording)" if item.raw.strip().casefold() not in {o.raw.strip().casefold() for o in others} else "")
                 continue
-            container = None
-            if side == "extraction":
-                container = next((o for o in others if _strictly_inside(item, o)), None)
-            if container is not None:
+            decision = decisions.get(id(item)) if side == "extraction" else None
+            if decision is not None and decision.aside:
                 # The annotation is coarser ("Vaccinium spp", "c.30 beetle species"):
                 # the extracted taxon cannot be judged at the finer ranks.
                 item.status = "within annotation"
-                item.reason = f"inside the annotated '{container.mention}'"
+                item.reason = f"inside the annotated '{decision.container.mention}'"
                 if item.best_rank is not None:
                     item.reason += f"; {_RANK_LABELS[item.best_rank]}"
+            elif decision is not None:
+                item.status = "extra"
+                item.reason = f"over the annotated '{decision.container.mention}': {decision.reason}"
             elif item.best_rank is not None:
                 item.status = f"partial ({item.best_rank})"
                 item.reason = f"{_RANK_LABELS[item.best_rank]} only"
@@ -671,7 +826,7 @@ class RecordTaxaResult:
     pred_species: list[str]
     true_items: list[TaxonItem]
     pred_items: list[TaxonItem]
-    ranks: dict[str, RankCounts]
+    ranks_by_mode: dict[str, dict[str, RankCounts]]
     groups: RankCounts
     counts: dict[str, Any]
     baselines: dict[str, RankCounts]
@@ -683,6 +838,8 @@ class TaxaEvaluation:
 
     run_name: str
     records: list[RecordTaxaResult] = _field(default_factory=list)
+    #: Variant used by default in the frames, per-mention statuses and the CLI.
+    set_aside: str = "capped"
 
     def _total(self, getter) -> RankCounts:
         total: Optional[RankCounts] = None
@@ -693,8 +850,9 @@ class TaxaEvaluation:
             total.add(part)
         return total or RankCounts(rank="")
 
-    def rank_metrics(self, rank: str) -> RankCounts:
-        return self._total(lambda r: r.ranks[rank])
+    def rank_metrics(self, rank: str, set_aside: Optional[str] = None) -> RankCounts:
+        mode = set_aside or self.set_aside
+        return self._total(lambda r: r.ranks_by_mode[mode][rank])
 
     def group_metrics(self) -> RankCounts:
         return self._total(lambda r: r.groups)
@@ -718,11 +876,26 @@ class TaxaEvaluation:
         both = [r for r in self.records if r.counts["count_value_match"] is not None]
         return sum(1 for r in both if r.counts["count_value_match"]), len(both)
 
-    def metrics_frame(self):
-        """Per-rank precision/recall/F1 (micro over records), plus signals and string baselines."""
+    def variants_frame(self):
+        """Precision/recall/F1 per rank under each set-aside variant (long format)."""
         import pandas as pd
 
-        rows = [self.rank_metrics(rank).to_row() for rank in RANKS]
+        rows = []
+        for mode in SET_ASIDE_MODES:
+            for rank in RANKS:
+                rows.append({"set_aside": mode, **self.rank_metrics(rank, mode).to_row()})
+        return pd.DataFrame(rows)
+
+    def metrics_frame(self, set_aside: Optional[str] = None):
+        """Per-rank precision/recall/F1 (micro over records), plus signals and string baselines.
+
+        `set_aside` picks how extractions inside a coarser annotation are
+        treated ("capped" by default, "uncapped", "none"); see `SET_ASIDE_MODES`
+        and `variants_frame` for all three side by side.
+        """
+        import pandas as pd
+
+        rows = [self.rank_metrics(rank, set_aside).to_row() for rank in RANKS]
         rows.append(self.group_metrics().to_row())
         rows.append(self.count_metrics().to_row())
         rows.append(self._total(lambda r: r.baselines["string_exact"]).to_row())
@@ -744,7 +917,7 @@ class TaxaEvaluation:
         for rec in self.records:
             row: dict[str, Any] = {"record_id": rec.record_id}
             for rank in RANKS:
-                c = rec.ranks[rank]
+                c = rec.ranks_by_mode[self.set_aside][rank]
                 row[f"{rank}_recall"] = f"{c.n_true_matched}/{c.n_true}"
                 row[f"{rank}_precision"] = f"{c.n_pred_matched}/{c.n_pred}"
             row["groups"] = f"{rec.groups.n_true_matched}/{rec.groups.n_true}"
@@ -765,7 +938,9 @@ class TaxaEvaluation:
     def to_dict(self) -> dict[str, Any]:
         return {
             "run_name": self.run_name,
+            "set_aside": self.set_aside,
             "metrics": self.metrics_frame().to_dict(orient="records"),
+            "set_aside_variants": self.variants_frame().to_dict(orient="records"),
             "count_value_agreement": list(self.count_value_agreement()),
             "resolution_rate": {
                 side: list(self.resolution_rate(side)) for side in ("annotation", "extraction")
@@ -780,19 +955,34 @@ def evaluate_taxa_lists(
     *,
     run_name: str = "",
     cache: Optional[GBIFCache] = None,
+    set_aside: str = "capped",
+    strict: bool = True,
 ) -> TaxaEvaluation:
     """Multi-rank evaluation of raw `species` lists keyed by record id.
 
     Records are those present in `true_by_id`; a missing prediction counts as
     an empty list.
+
+    Args:
+        set_aside: Default variant for frames and per-mention statuses: "capped"
+            (extractions inside a coarser annotation are left out of precision,
+            up to the stated count), "uncapped", or "none". All three are always
+            computed (`TaxaEvaluation.variants_frame`).
+        strict: Raise `GBIFUnavailable` if any GBIF request failed during the
+            evaluation (the unresolved names would otherwise look like misses).
     """
-    evaluation = TaxaEvaluation(run_name=run_name)
+    if set_aside not in SET_ASIDE_MODES:
+        raise ValueError(f"set_aside must be one of {SET_ASIDE_MODES}, got {set_aside!r}")
+    gbif_cache = cache if cache is not None else get_default_cache()
+    failures_before = len(gbif_cache.failures)
+    evaluation = TaxaEvaluation(run_name=run_name, set_aside=set_aside)
     for record_id in sorted(true_by_id, key=lambda x: (len(str(x)), str(x))):
         true_species = [s for s in (true_by_id.get(record_id) or []) if isinstance(s, str)]
         pred_species = [s for s in (pred_by_id.get(record_id) or []) if isinstance(s, str)]
         true_items = resolve_species_items(true_species, record_id=str(record_id), side="annotation", cache=cache)
         pred_items = resolve_species_items(pred_species, record_id=str(record_id), side="extraction", cache=cache)
-        _annotate_items(true_items, pred_items)
+        decisions = {mode: _decide_set_aside(true_items, pred_items, mode) for mode in SET_ASIDE_MODES}
+        _annotate_items(true_items, pred_items, decisions[set_aside])
         exact_b, fuzzy_b = _string_baselines(true_species, pred_species)
         evaluation.records.append(
             RecordTaxaResult(
@@ -801,11 +991,20 @@ def evaluate_taxa_lists(
                 pred_species=pred_species,
                 true_items=true_items,
                 pred_items=pred_items,
-                ranks={rank: _score_rank(rank, true_items, pred_items) for rank in RANKS},
+                ranks_by_mode={
+                    mode: {rank: _score_rank(rank, true_items, pred_items, decisions[mode]) for rank in RANKS}
+                    for mode in SET_ASIDE_MODES
+                },
                 groups=_group_signal(true_items, pred_items),
                 counts=_count_signal(true_items, pred_items),
                 baselines={"string_exact": exact_b, "string_fuzzy": fuzzy_b},
             )
+        )
+    new_failures = gbif_cache.failures[failures_before:]
+    if new_failures and strict:
+        raise GBIFUnavailable(
+            f"{len(new_failures)} GBIF request(s) failed, so some names are unresolved for a technical reason "
+            f"(first: {new_failures[0]}). Re-run when GBIF is reachable, or pass strict=False."
         )
     return evaluation
 
@@ -822,6 +1021,8 @@ def evaluate_run_taxa(
     gt_path: str | Path = "data/gt/fuster_gt.json",
     record_ids: Optional[Iterable[int | str]] = None,
     cache: Optional[GBIFCache] = None,
+    set_aside: str = "capped",
+    strict: bool = True,
 ) -> TaxaEvaluation:
     """Multi-rank taxa evaluation of a prompt_eval run artifact, in one call.
 
@@ -831,6 +1032,9 @@ def evaluate_run_taxa(
         record_ids: Optional subset of gt_record_ids to score (default: every
             record in the run).
         cache: Optional `GBIFCache` (default: the shared JSON cache).
+        set_aside: "capped" (default), "uncapped" or "none": how extracted taxa
+            inside a coarser annotation are treated (see `SET_ASIDE_MODES`).
+        strict: Raise `GBIFUnavailable` when a GBIF request failed.
 
     Returns:
         A `TaxaEvaluation`; use ``.metrics_frame()``, ``.items_frame()``,
@@ -852,7 +1056,9 @@ def evaluate_run_taxa(
         true_by_id[rid] = gt.get(rid)
         output = rec.output or {}
         pred_by_id[rid] = output.get("species") if rec.status == "success" else None
-    return evaluate_taxa_lists(true_by_id, pred_by_id, run_name=artifact.name, cache=cache)
+    return evaluate_taxa_lists(
+        true_by_id, pred_by_id, run_name=artifact.name, cache=cache, set_aside=set_aside, strict=strict
+    )
 
 
 def _format_metrics(ev: TaxaEvaluation) -> str:
@@ -860,9 +1066,17 @@ def _format_metrics(ev: TaxaEvaluation) -> str:
     agree, both = ev.count_value_agreement()
     res_t = ev.resolution_rate("annotation")
     res_p = ev.resolution_rate("extraction")
+    variants = ev.variants_frame()
+    variants = variants[variants["rank"].isin(["exact", "species", "genus", "family"])]
+    table = variants.pivot(index="rank", columns="set_aside", values=["precision", "recall", "f1"])
     lines = [
-        f"Run: {ev.run_name} ({len(ev.records)} records)",
+        f"Run: {ev.run_name} ({len(ev.records)} records); set-aside variant: {ev.set_aside}",
         frame.to_string(index=False),
+        "",
+        "Set-aside variants (extractions inside a coarser annotation):",
+        "  capped = left out of precision up to the stated count; uncapped = always left out; none = all false positives",
+        table.reindex(["exact", "species", "genus", "family"]).round(3).to_string(),
+        "",
         f"Count values agree in {agree}/{both} records where both sides give a count.",
         f"Resolved names: annotation {res_t[0]}/{res_t[1]}, extraction {res_p[0]}/{res_p[1]}.",
     ]
@@ -880,6 +1094,9 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
     parser.add_argument("--manifest", help="Restrict to gt_record_id values in this manifest CSV")
     parser.add_argument("--items-csv", help="Write the per-mention table to this CSV")
     parser.add_argument("--json", dest="json_path", help="Write metrics and items to this JSON")
+    parser.add_argument("--set-aside", dest="set_aside", choices=list(SET_ASIDE_MODES), default="capped",
+                        help="How extractions inside a coarser annotation are treated (default: capped); "
+                             "all three variants are printed anyway")
     parser.add_argument("--show", choices=["mismatches", "all", "none"], default="mismatches",
                         help="Per-mention rows to print")
     args = parser.parse_args(argv)
@@ -887,7 +1104,10 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
     record_ids = None
     if args.manifest:
         record_ids = pd.read_csv(args.manifest)["gt_record_id"].astype(int).tolist()
-    ev = evaluate_run_taxa(args.run, gt_path=args.gt, record_ids=record_ids)
+    stamp_cache = get_default_cache()
+    ev = evaluate_run_taxa(args.run, gt_path=args.gt, record_ids=record_ids, set_aside=args.set_aside)
+    if stamp_cache.path.exists() and "backbone_title" not in stamp_cache.meta:
+        stamp_backbone_version(stamp_cache)
     print(_format_metrics(ev))
 
     items = ev.items_frame()

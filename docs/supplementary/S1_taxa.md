@@ -55,7 +55,9 @@ Synonyms resolve to their accepted taxon ("Sambucus pubens" → Sambucus racemos
 
 Each resolved record holds the backbone key, the rank, the classification from kingdom to species (names and keys) and a broad group. The same function will be reused to match taxa against the Biodiversité Québec Atlas.
 
-GBIF answers are cached in `data/gbif/name_resolution_cache.json` (committed, about 330 KB for the dev subset), so re-running the evaluation makes no network call and gives identical results.
+GBIF answers are cached in `data/gbif/name_resolution_cache.json` (committed, about 360 KB, 338 requests). Re-running the evaluation is offline and identical only when every request is already in the cache; a new name triggers a GBIF call, and the backbone itself changes over time. A failed request is retried and never stored as "unresolved".
+
+**Guards added after the review:** a capitalised genus name shared by several accepted taxa ("Morus": gannets and mulberries) stays unresolved (`ambiguous_homonym`) instead of falling to a vernacular search; a binomial GBIF does not know keeps its own exact-rank label (`species_not_in_backbone`), classified by its genus at the genus rank and above, so two unknown species of one genus do not merge; common Quebec vernacular names with a known wrong GBIF pick (brook trout, fox, wolf, deer, robin, caribou, moose / orignal, lamprey, mésange) use a curated override; "lemming and rock vole" is split into two mentions when each part resolves.
 
 ### 3. Broad groups
 
@@ -94,7 +96,7 @@ For each record and each rank, both sides become a set of entries, so two string
 
 Precision is the share of extracted entries that match an annotated entry; recall is the share of annotated entries matched by an extracted entry. Both are summed over records before dividing (micro average). A name GBIF cannot resolve stays in the scoring as its own label at every rank: it can only match the identical string on the other side, so resolution failures stay visible.
 
-**Extracted taxa inside a coarser annotation are not false positives.** When the annotation gives a genus ("Vaccinium spp"), a species ("caribou", resolved to Rangifer tarandus) or a group or count ("c.30 bird species"), extracted taxa inside it cannot be judged at the finer ranks: the annotation is not detailed enough. They are counted as "within annotation", reported separately, and left out of precision at that rank. The annotated entry itself is still a miss at the ranks it does not match (nobody named the genus Vaccinium itself). The rule is one-sided on purpose: an extraction coarser than the annotation ("beetles" when the annotation names species) is a miss.
+**Extracted taxa inside a coarser annotation are not false positives.** When the annotation gives a genus ("Vaccinium spp"), a species ("caribou", resolved to Rangifer tarandus) or a group or count ("c.30 bird species"), extracted taxa inside it cannot be judged at the finer ranks: the annotation is not detailed enough. They are counted as "within annotation", reported separately, and left out of precision at that rank, **with a cap** (the default since the review): inside a count annotation ("c.30 bird species"), at most the stated number of taxa (+10 % for "c." or "about") is set aside, and the rest are false positives; a family, class or broad label listed under a species count is a false positive. Two other variants are reported to bound the result: *uncapped* (every taxon inside a coarser annotation is set aside, the first version) and *none* (every unmatched extraction is a false positive, the floor). The annotated entry itself is still a miss at the ranks it does not match (nobody named the genus Vaccinium itself). The rule is one-sided on purpose: an extraction coarser than the annotation ("beetles" when the annotation names species) is a miss.
 
 **Two separate signals:**
 
@@ -114,21 +116,23 @@ Two runs, the same 30 records:
 
 | Scoring | Haiku 5.5, abstract: P / R / F1 | GPT-5.4, PDF: P / R / F1 |
 |---|---|---|
-| Exact string | 0.16 / 0.29 / 0.20 | 0.06 / 0.21 / 0.09 |
-| Fuzzy string (current) | 0.32 / 0.60 / 0.42 | 0.17 / 0.62 / 0.27 |
-| Exact taxon | 0.78 / 0.81 / 0.80 | 0.57 / 0.86 / 0.69 |
-| Species | 0.82 / 0.91 / 0.86 | 0.61 / 0.97 / 0.75 |
-| Genus | 0.88 / 0.94 / 0.91 | 0.63 / 0.97 / 0.76 |
-| Family | 0.86 / 0.96 / 0.91 | 0.68 / 0.96 / 0.79 |
-| Broad group | 0.94 / 0.94 / 0.94 | 0.93 / 0.94 / 0.93 |
+| Exact string | 0.15 / 0.29 / 0.20 | 0.06 / 0.21 / 0.09 |
+| Fuzzy string (current) | 0.32 / 0.60 / 0.42 | 0.17 / 0.61 / 0.27 |
+| Exact taxon (capped, headline) | 0.66 / 0.81 / 0.72 | 0.41 / 0.86 / 0.56 |
+| Exact taxon, uncapped | 0.76 / 0.81 / 0.78 | 0.56 / 0.86 / 0.68 |
+| Exact taxon, no set-aside (floor) | 0.41 / 0.81 / 0.54 | 0.15 / 0.86 / 0.25 |
+| Species (capped) | 0.80 / 0.91 / 0.85 | 0.57 / 0.97 / 0.72 |
+| Genus (capped) | 0.81 / 0.94 / 0.87 | 0.56 / 0.97 / 0.71 |
+| Family (capped) | 0.69 / 0.96 / 0.81 | 0.53 / 0.96 / 0.69 |
+| Broad group | 0.92 / 0.94 / 0.93 | 0.93 / 0.94 / 0.93 |
 | Group mentioned | 1.00 / 0.93 / 0.96 | 1.00 / 0.93 / 0.96 |
 | Count present | 1.00 / 0.22 / 0.36 | 1.00 / 0.56 / 0.71 |
 
-Counts behind the table, exact-taxon rank: 36 annotated taxa in both runs; Haiku gives 37 scorable extracted taxa (29 matched) plus 33 inside a coarser annotation; GPT-5.4 on PDFs gives 54 scorable (31 matched) plus 156 inside a coarser annotation. Count values agree in 2 of 2 records where both sides give a count for Haiku, 3 of 5 for GPT-5.4.
+Counts behind the table, exact-taxon rank, capped: 36 annotated taxa in both runs; Haiku gives 44 scorable extracted taxa (29 matched) plus 27 set aside inside a coarser annotation; GPT-5.4 on PDFs gives 75 scorable (31 matched) plus 136 set aside. Count values agree in 2 of 2 records where both sides give a count for Haiku, 3 of 5 for GPT-5.4.
 
 Per-mention tables with the status and reason of every match and miss: `docs/supplementary/data/S1_taxa_items_haiku55_abstract_low.csv` and `docs/supplementary/data/S1_taxa_items_pe_model_medium_pdf_native.csv`.
 
-**Reading.** Most of what looked like species errors is wording: exact-taxon F1 is four times the exact-string F1 for Haiku and seven times for GPT-5.4. Recall is high at every rank once names are resolved (0.81 to 0.97). What remains is a precision question, and it depends on input length: with the full PDF, GPT-5.4 lists many more taxa than the annotator (210 extracted taxa against 36 annotated), Most of them sit inside an annotated group or count (156); 23 do not match any annotated taxon at the exact rank, and most of these are incidental taxa (see below). At the broad-group rank both runs agree with the annotation in about 94% of cases, which is the level that matters for a gap analysis by taxonomic group. Count statements are the weak spot: Haiku drops most of them (2 of 9 records), the PDF run keeps more (5 of 9).
+**Reading.** Most of what looked like species errors is wording: exact-taxon F1 is four times the exact-string F1 for Haiku and seven times for GPT-5.4. Recall is high at every rank once names are resolved (0.81 to 0.97). What remains is a precision question, and it depends on input length: with the full PDF, GPT-5.4 lists many more taxa than the annotator (210 extracted taxa against 36 annotated), Most of them sit inside an annotated group or count (136 within the stated counts, the rest beyond them and counted as false positives); 23 do not match any annotated taxon at the exact rank, and most of these are incidental taxa (see below). At the broad-group rank both runs agree with the annotation in about 94% of cases, which is the level that matters for a gap analysis by taxonomic group. Count statements are the weak spot: Haiku drops most of them (2 of 9 records), the PDF run keeps more (5 of 9).
 
 **Name resolution.** 36 of the 37 annotated names resolve (97%): 21 through scientific names, 14 through vernacular names (5 of them French), and 1 group label; the 13 annotated count statements all yield a counted group. On the extraction side, 89 of 90 names resolve for Haiku and 223 of 224 for GPT-5.4.
 
