@@ -2673,3 +2673,16 @@ An independent review of the evaluation code (fresh agent, read-only) found two 
 **Result (sections vs PDF text, paired):** dev micro F1 −0.03, held-out +0.04 (both within noise); species held-out +0.15 [+0.03, +0.25] (gain); north–south flag −0.23 (dev, loss) and −0.28 (held-out); relevance binary F1 unchanged; cost 0.0009 vs 0.003 USD per record.
 
 **Decision:** hypothesis holds. PDF text stays the main long-text input (no service to run); sections are the cheap option at harvest scale if GROBID is maintained, with the Introduction to be added to the selection (untested). Report updated: `docs/results/section_parsing_evaluation.md`.
+
+### 2026-11-16: Outline filled, then reviewed
+
+**Done:** sections 5 to 9 of `docs/article_outline.md` filled from the held-out tables (Table 4 from dev, flagged). Taxa rows use the capped scoring merged the same day (review fixes of the taxa evaluation, finished in the main session after the agent was stopped).
+
+**Independent review (fresh agent, read-only):** about 130 numbers checked; all cells of Tables 1 and 2, S2, Table 4, S3 and the case study trace to their source files, and 11 paired comparisons were recomputed. The case-study records are not held-out. Problems were in claims, not values. Fixed:
+- the long-text gain (+0.09) holds for rules on features and scoring only, not for the combined variant (−0.05);
+- the high-effort "loss" in Table 4 had been retracted against the replicate; now "within run-to-run noise";
+- LLM binary F1 against the human label was set next to an agreement percentage; now compared like with like (agreement 0.47–0.68 against 74 %);
+- a surviving result added: combined beats rules on features on PDF text against the human label (+0.15 [+0.03, +0.34]);
+- four-class κ shown (−0.16 to 0.49), multiple-testing caveat stated, error directions corrected (all approaches lean high against the human label), flags with no annotated case no longer read as misses, cost range 2.5–53 USD, dev-only claims flagged, provenance of the 7 dev PDFs already on disk stated.
+
+**Spending:** 2.37 USD of the 4.50 cap (ledger committed). Optional ecological review of the contribution scores not done (listed as a step before a second article).

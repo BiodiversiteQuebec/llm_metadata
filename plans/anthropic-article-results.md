@@ -316,8 +316,8 @@ Round 5: WU-V2, then WU-F1, then WU-V3 and the held-out part of WU-G5
 - [x] Each prompt round committed separately with its hypothesis, result and decision in `notebooks/README.md`
 - [x] Held-out results in the outline for Tables 1 to 3 and the cost supplement; Table 4 filled from the dev subset and flagged
 - [x] Section parsing without Docker evaluated on all dev PDFs available (16 of 30: the other 14 have no open PDF reachable by script), with a recommendation, plus a held-out run
-- [ ] Three review checkpoints done (evaluation code, before the held-out pass, filled outline), findings logged
+- [x] Three review checkpoints done (evaluation code, before the held-out pass, filled outline), findings logged *(plus a review of the taxa evaluation)*
 - [x] Register of doubtful annotations and discussion points on the Fuster schema committed
 - [x] Track B: reference aggregates, matching, scores, ceiling results and the insect case committed; recommendation on article 1 vs second article *(plus extraction on dev and held-out; optional ecological review not done)*
 - [x] Total API spending at or under 4.50 USD, ledger committed *(2.37 USD)*
-- [ ] `TODO.md` updated, all work committed locally (not pushed)
+- [x] `TODO.md` updated, all work committed locally (not pushed)

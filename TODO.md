@@ -21,7 +21,7 @@ Track A — article 1 (fill `docs/article_outline.md`)
 Review checkpoints (fresh subagent, reports only, never edits)
 - [x] WU-V1 — Review of the evaluation code, before the prompt rounds `sonnet` *(two reviews: evaluation code, taxa evaluation)*
 - [x] WU-V2 — Review before the held-out pass (no leak, frozen config, budget) `sonnet` *(go)*
-- [ ] WU-V3 — Review of the filled outline (numbers traceable, claims within intervals) `opus`
+- [x] WU-V3 — Review of the filled outline (numbers traceable, claims within intervals) `opus` *(claims corrected, values all traced)*
 - [ ] WU-V4 — Optional: ecological review of the Atlas contribution scores `opus` *(not done; listed as a step before a second article)*
 
 Track B — Atlas contribution potential (candidate second article)
